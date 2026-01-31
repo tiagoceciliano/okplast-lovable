@@ -4,6 +4,7 @@ import { WhatsAppModal } from "@/components/layout/WhatsAppModal";
 interface WhatsAppModalContextType {
   openWhatsAppModal: (defaultProduto?: string) => void;
   closeWhatsAppModal: () => void;
+  isOpen: boolean;
 }
 
 const WhatsAppModalContext = createContext<WhatsAppModalContextType | undefined>(undefined);
@@ -22,7 +23,7 @@ export function WhatsAppModalProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <WhatsAppModalContext.Provider value={{ openWhatsAppModal, closeWhatsAppModal }}>
+    <WhatsAppModalContext.Provider value={{ openWhatsAppModal, closeWhatsAppModal, isOpen }}>
       {children}
       <WhatsAppModal 
         open={isOpen} 
