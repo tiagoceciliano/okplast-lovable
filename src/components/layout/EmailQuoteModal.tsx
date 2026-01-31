@@ -137,15 +137,15 @@ export function EmailQuoteModal({ open, onOpenChange, defaultProduto }: EmailQuo
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="p-0 gap-0 overflow-hidden max-w-[420px] max-h-[90vh] rounded-2xl border-0 flex flex-col">
+      <DialogContent className="p-0 gap-0 overflow-hidden max-w-[420px] max-h-[85vh] rounded-2xl border-0 flex flex-col">
         {/* Header */}
-        <div className="bg-primary flex items-center justify-between px-5 py-4">
+        <div className="bg-primary flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary-foreground/20 flex items-center justify-center">
-              <Mail className="h-5 w-5 text-primary-foreground" />
+            <div className="w-9 h-9 rounded-full bg-primary-foreground/20 flex items-center justify-center">
+              <Mail className="h-4 w-4 text-primary-foreground" />
             </div>
             <div>
-              <h3 className="text-primary-foreground font-semibold text-base leading-tight">Orçamento por E-mail</h3>
+              <h3 className="text-primary-foreground font-semibold text-sm leading-tight">Orçamento por E-mail</h3>
               <span className="text-primary-foreground/70 text-xs">Resposta em até 24h</span>
             </div>
           </div>
@@ -159,11 +159,11 @@ export function EmailQuoteModal({ open, onOpenChange, defaultProduto }: EmailQuo
         </div>
 
         {isSuccess ? (
-          <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mb-4">
-              <CheckCircle className="h-8 w-8 text-green-600" />
+          <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+            <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center mb-3">
+              <CheckCircle className="h-7 w-7 text-green-600" />
             </div>
-            <h3 className="text-xl font-semibold text-foreground mb-2">Orçamento Enviado!</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-2">Orçamento Enviado!</h3>
             <p className="text-muted-foreground text-sm">
               Recebemos sua solicitação e entraremos em contato em breve pelo e-mail informado.
             </p>
@@ -172,8 +172,8 @@ export function EmailQuoteModal({ open, onOpenChange, defaultProduto }: EmailQuo
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-1 min-h-0">
               <ScrollArea className="flex-1 min-h-0">
-                <div className="p-5 space-y-4">
-                  <p className="text-sm text-muted-foreground">
+                <div className="p-4 space-y-3">
+                  <p className="text-xs text-muted-foreground">
                     Preencha os dados abaixo e receba seu orçamento personalizado diretamente no seu e-mail.
                   </p>
 
@@ -269,7 +269,7 @@ export function EmailQuoteModal({ open, onOpenChange, defaultProduto }: EmailQuo
                         <FormControl>
                           <Textarea 
                             placeholder="Descreva seu projeto, medidas, quantidades..."
-                            className="min-h-[100px] resize-none"
+                            className="min-h-[80px] resize-none"
                             {...field} 
                           />
                         </FormControl>
@@ -281,7 +281,7 @@ export function EmailQuoteModal({ open, onOpenChange, defaultProduto }: EmailQuo
               </ScrollArea>
 
               {/* Fixed Send Button */}
-              <div className="p-4 bg-secondary border-t">
+              <div className="p-3 bg-secondary border-t">
                 <Button 
                   type="submit" 
                   className="w-full"
