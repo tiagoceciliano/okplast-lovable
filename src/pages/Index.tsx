@@ -12,16 +12,18 @@ import { MotivosCarousel } from "@/components/home/MotivosCarousel";
 import { ProductCategoryGrid } from "@/components/home/ProductCategoryGrid";
 import { PRODUTOS_IMAGES, CHAPAS_IMAGES, DEPOIMENTOS_IMAGES, EMPRESA_IMAGES } from "@/lib/images";
 
-// Produtos Sob Medida
+// Produtos Sob Medida - Ordem conforme layout Acrilzano (2 linhas de 4)
 const produtosSobMedida = [
-  { nome: "Caixas Sob Medida", href: "/acrilico-sob-medida/caixas-sob-medida", imageUrl: PRODUTOS_IMAGES.caixasSobMedida },
-  { nome: "Cúpulas e Redomas", href: "/acrilico-sob-medida/cupulas-e-redomas", imageUrl: PRODUTOS_IMAGES.cupulasRedomas },
+  // Linha 1
   { nome: "Potes para Doces", href: "/acrilico-sob-medida/potes-para-doces-e-guloseimas", imageUrl: PRODUTOS_IMAGES.potesDoces },
+  { nome: "Cúpulas e Redomas", href: "/acrilico-sob-medida/cupulas-e-redomas", imageUrl: PRODUTOS_IMAGES.cupulasRedomas },
+  { nome: "Display de Acrílico", href: "/acrilico-sob-medida/display-de-acrilico", imageUrl: PRODUTOS_IMAGES.display },
+  { nome: "Porta Folder", href: "/acrilico-sob-medida/porta-folder", imageUrl: PRODUTOS_IMAGES.portaFolder },
+  // Linha 2
   { nome: "Potes para Grãos", href: "/acrilico-sob-medida/potes-para-graos-e-cereais", imageUrl: PRODUTOS_IMAGES.potesGraos },
   { nome: "Urna de Acrílico", href: "/acrilico-sob-medida/urna-de-acrilico", imageUrl: PRODUTOS_IMAGES.urna },
-  { nome: "Display de Acrílico", href: "/acrilico-sob-medida/display-de-acrilico", imageUrl: PRODUTOS_IMAGES.display },
+  { nome: "Caixas Sob Medida", href: "/acrilico-sob-medida/caixas-sob-medida", imageUrl: PRODUTOS_IMAGES.caixasSobMedida },
   { nome: "Troféus", href: "/acrilico-sob-medida/trofeus-personalizados", imageUrl: PRODUTOS_IMAGES.trofeus },
-  { nome: "Medalhas", href: "/acrilico-sob-medida/medalhas-personalizadas", imageUrl: PRODUTOS_IMAGES.medalhas },
 ];
 
 // Tipos de Chapas

@@ -25,12 +25,15 @@ export const EMPRESA_IMAGES = {
 // PRODUTOS SOB MEDIDA (Home)
 // ========================================
 export const PRODUTOS_IMAGES = {
-  caixasSobMedida: img("produtos/caixas-sob-medida.jpg"),
-  cupulasRedomas: img("produtos/cupulas-redomas.jpg"),
-  potesDoces: img("produtos/potes-doces.jpg"),
-  potesGraos: img("produtos/potes-graos.jpg"),
-  urna: img("produtos/urna.jpg"),
-  display: img("produtos/display.jpg"),
+  // Linha 1 (conforme layout Acrilzano)
+  potesDoces: img("produtos/expositor-doces-escada.jpg"),
+  cupulasRedomas: img("produtos/cupula-preta.jpg"),
+  display: img("produtos/quadro-avisos.jpg"),
+  portaFolder: img("produtos/porta-folder-dourado.png"),
+  // Linha 2
+  potesGraos: img("produtos/potes-graos-varios.jpg"),
+  urna: img("produtos/cupula-transparente.jpg"),
+  caixasSobMedida: img("produtos/pulpito.jpg"),
   trofeus: img("produtos/trofeus.jpg"),
   medalhas: img("produtos/medalhas.jpg"),
 } as const;
