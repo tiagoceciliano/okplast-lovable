@@ -7,7 +7,7 @@ import { BlueBanner } from "@/components/ui/BlueBanner";
 import { TestimonialCard } from "@/components/ui/TestimonialCard";
 import { ClientLogos } from "@/components/ui/ClientLogos";
 import { GoogleMapEmbed } from "@/components/ui/GoogleMapEmbed";
-import { HeroSlider } from "@/components/home/HeroSlider";
+
 import { MotivosCarousel } from "@/components/home/MotivosCarousel";
 import { ProductCategoryGrid } from "@/components/home/ProductCategoryGrid";
 import { PRODUTOS_IMAGES, CHAPAS_IMAGES, DEPOIMENTOS_IMAGES, EMPRESA_IMAGES } from "@/lib/images";
@@ -86,8 +86,6 @@ export default function Index() {
               </div>
             </div>
 
-            {/* Right Column - Slider */}
-            <HeroSlider />
           </div>
         </div>
       </section>
