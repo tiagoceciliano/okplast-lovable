@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -20,6 +20,12 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { COMPANY, PRODUTOS_WHATSAPP } from "@/lib/constants";
@@ -125,189 +131,158 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
     form.setValue("nome", capitalized);
   };
 
-  const widgetRef = useRef<HTMLDivElement>(null);
-
-  // Click outside to close
-  useEffect(() => {
-    if (!open) return;
-    
-    const handleClickOutside = (event: MouseEvent) => {
-      if (widgetRef.current && !widgetRef.current.contains(event.target as Node)) {
-        // Check if click is on the WhatsApp button
-        const isWhatsAppButton = (event.target as Element)?.closest('[data-whatsapp-button]');
-        if (!isWhatsAppButton) {
-          onOpenChange(false);
-        }
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [open, onOpenChange]);
-
-  if (!open) return null;
-
   return (
-    <div 
-      ref={widgetRef}
-      className="whatsapp-chat-widget animate-slide-up"
-    >
-      {/* WhatsApp Header */}
-      <div className="whatsapp-header flex items-center gap-3 px-4 py-3 rounded-t-2xl">
-        <Avatar className="h-10 w-10 border-2 border-white/20">
-          <AvatarImage src={logoImage} alt="Lab Acrílicos" className="object-cover" />
-          <AvatarFallback className="bg-white/20 text-white text-sm font-semibold">LA</AvatarFallback>
-        </Avatar>
-        
-        <div className="flex-1">
-          <h3 className="text-white font-semibold text-base leading-tight">Lab Acrílicos</h3>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-            <span className="text-white/80 text-xs">Online</span>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent className="p-0 gap-0 max-w-md overflow-hidden border-0 rounded-2xl">
+        {/* WhatsApp Header */}
+        <DialogHeader className="whatsapp-header flex-row items-center gap-3 px-4 py-3 rounded-t-2xl space-y-0">
+          <Avatar className="h-10 w-10 border-2 border-white/20">
+            <AvatarImage src={logoImage} alt="Lab Acrílicos" className="object-cover" />
+            <AvatarFallback className="bg-white/20 text-white text-sm font-semibold">LA</AvatarFallback>
+          </Avatar>
+          
+          <div className="flex-1">
+            <DialogTitle className="text-white font-semibold text-base leading-tight">Lab Acrílicos</DialogTitle>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+              <span className="text-white/80 text-xs">Online</span>
+            </div>
           </div>
-        </div>
+        </DialogHeader>
 
-        <button 
-          onClick={() => onOpenChange(false)}
-          className="text-white/90 hover:text-white transition-colors p-1"
-          aria-label="Fechar"
-        >
-          <X className="h-5 w-5" />
-        </button>
-      </div>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-1 min-h-0">
+            {/* Chat Area */}
+            <ScrollArea className="whatsapp-chat-area flex-1 min-h-0 max-h-[350px]">
+              <div className="p-4 space-y-3">
+                {/* Welcome Message Bubble */}
+                <div className="whatsapp-bubble-received animate-fade-in">
+                  <p className="text-sm leading-relaxed">
+                    Olá! 👋 Preencha os dados abaixo para iniciar sua conversa.
+                  </p>
+                  <span className="whatsapp-time">agora</span>
+                </div>
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-1 min-h-0">
-          {/* Chat Area */}
-          <ScrollArea className="whatsapp-chat-area flex-1 min-h-0 max-h-[300px]">
-            <div className="p-4 space-y-3">
-              {/* Welcome Message Bubble */}
-              <div className="whatsapp-bubble-received animate-fade-in">
-                <p className="text-sm leading-relaxed">
-                  Olá! 👋 Preencha os dados abaixo para iniciar sua conversa.
-                </p>
-                <span className="whatsapp-time">agora</span>
-              </div>
-
-              {/* Form Fields Bubble */}
-              <div className="whatsapp-bubble-sent animate-fade-in" style={{ animationDelay: "0.1s" }}>
-                <div className="space-y-2.5">
-                  <FormField
-                    control={form.control}
-                    name="nome"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Input 
-                            placeholder="Seu nome" 
-                            className="whatsapp-input h-8 text-sm"
-                            {...field} 
-                            onBlur={(e) => {
-                              field.onBlur();
-                              handleNameBlur(e);
-                            }}
-                          />
-                        </FormControl>
-                        <FormMessage className="text-xs text-red-600" />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Input 
-                            type="email" 
-                            placeholder="seu@email.com" 
-                            className="whatsapp-input h-8 text-sm"
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormMessage className="text-xs text-red-600" />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="telefone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Input 
-                            placeholder="(21) 99999-9999" 
-                            className="whatsapp-input h-8 text-sm"
-                            {...field}
-                            onChange={(e) => handlePhoneChange(e, field.onChange)}
-                            maxLength={15}
-                          />
-                        </FormControl>
-                        <FormMessage className="text-xs text-red-600" />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="produto"
-                    render={({ field }) => (
-                      <FormItem>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                {/* Form Fields Bubble */}
+                <div className="whatsapp-bubble-sent animate-fade-in" style={{ animationDelay: "0.1s" }}>
+                  <div className="space-y-2.5">
+                    <FormField
+                      control={form.control}
+                      name="nome"
+                      render={({ field }) => (
+                        <FormItem>
                           <FormControl>
-                            <SelectTrigger className="whatsapp-input h-8 text-sm">
-                              <SelectValue placeholder="Selecione o produto" />
-                            </SelectTrigger>
+                            <Input 
+                              placeholder="Seu nome" 
+                              className="whatsapp-input h-9 text-sm"
+                              {...field} 
+                              onBlur={(e) => {
+                                field.onBlur();
+                                handleNameBlur(e);
+                              }}
+                            />
                           </FormControl>
-                          <SelectContent>
-                            {PRODUTOS_WHATSAPP.map((produto) => (
-                              <SelectItem key={produto} value={produto}>
-                                {produto}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage className="text-xs text-red-600" />
-                      </FormItem>
-                    )}
-                  />
+                          <FormMessage className="text-xs text-red-600" />
+                        </FormItem>
+                      )}
+                    />
 
-                  <FormField
-                    control={form.control}
-                    name="mensagem"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Textarea 
-                            placeholder="Descreva seu projeto..."
-                            className="whatsapp-input min-h-[50px] text-sm resize-none"
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormMessage className="text-xs text-red-600" />
-                      </FormItem>
-                    )}
-                  />
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input 
+                              type="email" 
+                              placeholder="seu@email.com" 
+                              className="whatsapp-input h-9 text-sm"
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage className="text-xs text-red-600" />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="telefone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input 
+                              placeholder="(21) 99999-9999" 
+                              className="whatsapp-input h-9 text-sm"
+                              {...field}
+                              onChange={(e) => handlePhoneChange(e, field.onChange)}
+                              maxLength={15}
+                            />
+                          </FormControl>
+                          <FormMessage className="text-xs text-red-600" />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="produto"
+                      render={({ field }) => (
+                        <FormItem>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="whatsapp-input h-9 text-sm">
+                                <SelectValue placeholder="Selecione o produto" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {PRODUTOS_WHATSAPP.map((produto) => (
+                                <SelectItem key={produto} value={produto}>
+                                  {produto}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage className="text-xs text-red-600" />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="mensagem"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Textarea 
+                              placeholder="Descreva seu projeto..."
+                              className="whatsapp-input min-h-[60px] text-sm resize-none"
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage className="text-xs text-red-600" />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          </ScrollArea>
+            </ScrollArea>
 
-          {/* Fixed Send Button */}
-          <div className="p-3 bg-[#F0F0F0] border-t border-gray-200 rounded-b-2xl">
-            <Button 
-              type="submit" 
-              className="whatsapp-send-button w-full"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Enviando..." : "Iniciar Conversa"}
-              <Send className="h-4 w-4 ml-2" />
-            </Button>
-          </div>
-        </form>
-      </Form>
-    </div>
+            {/* Fixed Send Button */}
+            <div className="p-3 bg-[#F0F0F0] border-t border-gray-200 rounded-b-2xl">
+              <Button 
+                type="submit" 
+                className="whatsapp-send-button w-full"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Enviando..." : "Iniciar Conversa"}
+                <Send className="h-4 w-4 ml-2" />
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   );
 }
