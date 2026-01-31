@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Layout } from "@/components/layout";
 import { WhatsAppModalProvider } from "@/contexts/WhatsAppModalContext";
+import { EmailQuoteModalProvider } from "@/contexts/EmailQuoteModalContext";
 
 // Pages
 import Index from "./pages/Index";
@@ -45,7 +46,8 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <WhatsAppModalProvider>
-          <Layout>
+          <EmailQuoteModalProvider>
+            <Layout>
             <Routes>
               {/* Home */}
               <Route path="/" element={<Index />} />
@@ -81,7 +83,8 @@ const App = () => (
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </Layout>
+            </Layout>
+          </EmailQuoteModalProvider>
         </WhatsAppModalProvider>
       </BrowserRouter>
     </TooltipProvider>
