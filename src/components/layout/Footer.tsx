@@ -42,21 +42,6 @@ export function Footer() {
                 </a>
               </li>
             </ul>
-            {/* Quick Links */}
-            <div className="pt-4 space-y-2">
-              <Link to="/home/sobre-nos" className="block text-sm text-primary-foreground/80 hover:text-primary-foreground transition-colors">
-                Sobre Nós
-              </Link>
-              <Link to="/home/orcamento" className="block text-sm text-primary-foreground/80 hover:text-primary-foreground transition-colors">
-                Solicitar Orçamento
-              </Link>
-              <Link to="/acrilico-sob-medida" className="block text-sm text-primary-foreground/80 hover:text-primary-foreground transition-colors">
-                9h às 17h
-              </Link>
-              <Link to="/chapas-de-acrilico" className="block text-sm text-primary-foreground/80 hover:text-primary-foreground transition-colors">
-                Chapas de Acrílico
-              </Link>
-            </div>
           </div>
 
           {/* Horários */}
