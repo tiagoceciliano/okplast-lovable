@@ -1,136 +1,169 @@
 
-# Plano: Redesenhar Modal WhatsApp com Visual de Conversa de Chat
+# Plano: Modal de Orçamento por Email + Envio para comercial@labacrilicos.com.br
 
-## Objetivo
-Transformar o modal atual em algo que pareça uma janela do WhatsApp aberta no celular - com header verde do WhatsApp, avatar do atendente, área de chat, e input estilizado como campo de mensagem do WhatsApp.
+## Visão Geral
+
+Criar um modal de orçamento por email (similar ao modal do WhatsApp) que ao ser enviado:
+1. Salva o lead no banco de dados
+2. Envia para o webhook Kinbox
+3. **Envia um email** para comercial@labacrilicos.com.br
 
 ---
 
-## Design Visual Proposto
+## Pré-requisito: Configurar Resend
 
-### Estrutura do Modal
+Para enviar emails, você precisa:
+
+1. **Criar conta no Resend**: Acesse [resend.com](https://resend.com) e crie uma conta gratuita
+2. **Verificar domínio**: Adicione e verifique o domínio `labacrilicos.com.br` em [resend.com/domains](https://resend.com/domains)
+   - Você precisará adicionar alguns registros DNS (o Resend mostra exatamente quais)
+3. **Criar API Key**: Gere uma chave em [resend.com/api-keys](https://resend.com/api-keys)
+4. **Adicionar Secret**: Eu vou pedir para você adicionar a chave `RESEND_API_KEY` nos secrets do projeto
+
+---
+
+## Estrutura da Solução
 
 ```text
-+------------------------------------------+
-|  [Verde WhatsApp] Header com avatar      |
-|  [Foto] Lab Acrílicos - Online           |
-+------------------------------------------+
-|                                          |
-|  [Balão cinza esquerda]                  |
-|  "Olá! Preencha os dados abaixo          |
-|   para iniciarmos sua conversa"          |
-|                                          |
-|  +------------------------------------+  |
-|  | [Formulário estilizado como chat] |  |
-|  | Nome, Email, Telefone, Produto    |  |
-|  +------------------------------------+  |
-|                                          |
-|  +------------------------------------+  |
-|  | Sua mensagem...           [Enviar]|  |
-|  +------------------------------------+  |
-+------------------------------------------+
+┌─────────────────────────────────────────────────────────────┐
+│                     MODAL EMAIL                              │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │  Formulário: Nome, Email, Telefone, Produto, Mensagem   │ │
+│  └─────────────────────────────────────────────────────────┘ │
+│                         │                                    │
+│                    [Enviar]                                  │
+└─────────────────────────────────────────────────────────────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────────────────┐
+│              Edge Function: send-quote-email                 │
+│                                                              │
+│  1. Valida dados                                             │
+│  2. Salva lead no banco (tabela leads)                       │
+│  3. Envia para webhook Kinbox                                │
+│  4. Envia email via Resend para comercial@labacrilicos.com.br│
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Elementos Visuais WhatsApp
+## Arquivos a Criar/Modificar
 
-### 1. Header do Modal
-- Background verde WhatsApp (#128C7E ou #075E54)
-- Ícone de seta para voltar (fecha modal)
-- Avatar circular (logo da empresa ou ícone genérico)
-- Nome "Lab Acrílicos"
-- Status "Online" com bolinha verde
+### 1. Novo Componente: `src/components/layout/EmailQuoteModal.tsx`
 
-### 2. Área de Conversa
-- Background com padrão do WhatsApp (bege claro #ECE5DD)
-- Balão de mensagem do "atendente" (cinza claro, lado esquerdo)
-- Mensagem de boas-vindas estilizada
+Modal com visual profissional de formulário de email:
+- Header com ícone de email
+- Campos: Nome, Email, Telefone, Produto, Mensagem
+- Botão "Enviar Orçamento"
+- Feedback de sucesso/erro
 
-### 3. Campos do Formulário
-- Estilizados como inputs modernos com bordas suaves
-- Labels discretos dentro ou acima dos campos
-- Cores neutras que combinem com o tema WhatsApp
+### 2. Novo Context: `src/contexts/EmailQuoteModalContext.tsx`
 
-### 4. Botão de Enviar
-- Circular verde no estilo do WhatsApp
-- Ou barra inferior verde com texto "Iniciar Conversa"
+Similar ao WhatsAppModalContext para gerenciar estado do modal globalmente
+
+### 3. Nova Edge Function: `supabase/functions/send-quote-email/index.ts`
+
+```text
+Responsabilidades:
+- Validar payload
+- Capturar IP e geolocalização
+- Salvar lead no banco
+- Enviar para webhook Kinbox
+- Enviar email via Resend
+
+Email enviado:
+- DE: noreply@labacrilicos.com.br (ou orçamentos@labacrilicos.com.br)
+- PARA: comercial@labacrilicos.com.br
+- REPLY-TO: email do cliente (para você responder direto)
+- ASSUNTO: "Novo Orçamento - [Produto] - [Nome do Cliente]"
+```
+
+### 4. Modificar: `src/pages/Index.tsx`
+
+Trocar o link `/home/orcamento` por um botão que abre o modal de email
+
+### 5. Modificar: `src/App.tsx`
+
+Adicionar o EmailQuoteModalProvider
+
+### 6. Atualizar: `supabase/config.toml`
+
+Adicionar configuração da nova edge function
+
+---
+
+## Formato do Email
+
+```text
+═══════════════════════════════════════════════════
+  NOVO ORÇAMENTO - LAB ACRÍLICOS
+═══════════════════════════════════════════════════
+
+DADOS DO CLIENTE:
+─────────────────
+Nome: João Silva
+Email: joao@exemplo.com
+Telefone: (21) 99999-9999
+
+PRODUTO DE INTERESSE:
+─────────────────────
+Display de Acrílico
+
+MENSAGEM:
+─────────
+Preciso de um display personalizado para minha loja...
+
+───────────────────────────────────────────────────
+Origem: Rio de Janeiro, RJ
+Data: 31/01/2026 às 14:30
+Lead ID: #12345
+───────────────────────────────────────────────────
+```
+
+---
+
+## Fluxo do Usuário
+
+1. Usuário clica em "Prefere orçamento via e-mail?"
+2. Modal abre com formulário
+3. Usuário preenche dados
+4. Clica em "Enviar Orçamento"
+5. Sistema:
+   - Mostra loading
+   - Salva no banco
+   - Envia para Kinbox
+   - Envia email para comercial@
+6. Modal mostra mensagem de sucesso
+7. Modal fecha automaticamente
 
 ---
 
 ## Detalhes Técnicos
 
-### Cores WhatsApp Oficiais
-- Header: #075E54 (verde escuro)
-- Botão enviar: #25D366 (verde claro)
-- Background chat: #ECE5DD (bege)
-- Balão recebido: #FFFFFF
-- Balão enviado: #DCF8C6
-- Texto: #303030
+### Secret Necessário
 
-### Estrutura do Componente
-```text
-<Dialog>
-  <DialogContent> (sem padding, bordas arredondadas)
-    <Header WhatsApp>
-      <Avatar + Nome + Status>
-    </Header>
-    
-    <ChatArea> (background padrão WhatsApp)
-      <BubbleMessage>
-        "Olá! Preencha seus dados..."
-      </BubbleMessage>
-      
-      <FormFields>
-        (campos estilizados)
-      </FormFields>
-    </ChatArea>
-    
-    <InputArea>
-      <Textarea mensagem>
-      <BotaoEnviar circular verde>
-    </InputArea>
-  </DialogContent>
-</Dialog>
+```
+RESEND_API_KEY = "re_xxxxxxxxxx"
 ```
 
-### CSS Customizado
-- Adicionar classes específicas para o tema WhatsApp
-- Pattern de background do chat (opcional - pode ser cor sólida)
-- Animações sutis nos balões de mensagem
-- Border-radius específicos para balões (lado esquerdo/direito)
+### Configuração TOML
+
+```toml
+[functions.send-quote-email]
+verify_jwt = false
+```
+
+### Tratamento de Erros
+
+- Se Resend falhar: Lead já está salvo no banco e no Kinbox
+- Se Kinbox falhar: Email ainda é enviado
+- Todos os erros são logados para debug
 
 ---
 
-## Arquivo a Modificar
+## Próximos Passos
 
-### `src/components/layout/WhatsAppModal.tsx`
-
-**Mudanças:**
-1. Remover DialogHeader padrão
-2. Criar header customizado verde com avatar
-3. Criar área de chat com background WhatsApp
-4. Adicionar balão de mensagem de boas-vindas
-5. Reorganizar campos do formulário
-6. Estilizar botão de envio como o WhatsApp
-7. Adicionar animação de entrada do balão
-
-### `src/index.css`
-
-**Adicionar:**
-- Classes para cores do WhatsApp
-- Estilos para balões de mensagem
-- Background pattern do chat (opcional)
-- Animações
-
----
-
-## Experiência do Usuário
-
-1. Usuário clica no botão WhatsApp
-2. Modal abre com animação suave
-3. Header verde mostra "Lab Acrílicos - Online"
-4. Balão de mensagem aparece: "Olá! Para agilizar seu atendimento, preencha os dados abaixo"
-5. Usuário preenche os campos
-6. Clica no botão verde de enviar
-7. Abre WhatsApp com mensagem formatada
+1. **Você configura o Resend** (criar conta, verificar domínio, gerar API Key)
+2. **Você me passa a API Key** e eu adiciono nos secrets
+3. **Eu implemento** o modal, context e edge function
+4. **Testamos** o fluxo completo
