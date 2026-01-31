@@ -106,23 +106,22 @@ export default function Index() {
           {/* Grid 4x2 */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {produtosSobMedida.map((produto, index) => (
-              <Link
+              <div
                 key={index}
-                to="/acrilico-sob-medida"
-                className="group bg-background rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                className="bg-background rounded-lg overflow-hidden shadow-sm"
               >
                 <div className="aspect-square bg-muted overflow-hidden">
                   <img 
                     src={produto.imageUrl} 
                     alt={produto.nome}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-cover"
                     loading="lazy"
                   />
                 </div>
                 <div className="p-3 text-center">
                   <span className="text-sm font-medium text-foreground">{produto.nome}</span>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
           
@@ -154,30 +153,29 @@ export default function Index() {
           {/* Grid 4x2 */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {tiposChapas.map((chapa, index) => (
-              <Link
+              <div
                 key={index}
-                to="/chapas-de-acrilico"
-                className="group bg-background rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow border"
+                className="bg-background rounded-lg overflow-hidden shadow-sm border"
               >
                 <div className="aspect-square bg-muted overflow-hidden">
                   <img 
                     src={chapa.imageUrl} 
                     alt={chapa.nome}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-cover"
                     loading="lazy"
                   />
                 </div>
                 <div className="p-3 text-center">
                   <span className="text-sm font-medium text-foreground">{chapa.nome}</span>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
           
           <div className="text-center mt-8">
             <Button size="lg" variant="outline" asChild className="gap-2">
               <Link to="/chapas-de-acrilico">
-                Ver mais chapas
+                Ver mais chapas e materiais
                 <ArrowRight className="h-5 w-5" />
               </Link>
             </Button>
