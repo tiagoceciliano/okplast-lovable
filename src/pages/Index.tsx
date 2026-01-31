@@ -18,7 +18,7 @@ const produtosSobMedida = [
   { nome: "Cúpulas e Redomas", href: "/acrilico-sob-medida/cupulas-e-redomas", imageUrl: PRODUTOS_IMAGES.cupulasRedomas },
   { nome: "Potes para Doces", href: "/acrilico-sob-medida/potes-para-doces-e-guloseimas", imageUrl: PRODUTOS_IMAGES.potesDoces },
   { nome: "Potes para Grãos", href: "/acrilico-sob-medida/potes-para-graos-e-cereais", imageUrl: PRODUTOS_IMAGES.potesGraos },
-  { nome: "Urna de Acrílico", href: "/acrilico-sob-medida/urna-de-acrilico", imageUrl: PRODUTOS_IMAGES.display },
+  { nome: "Urna de Acrílico", href: "/acrilico-sob-medida/urna-de-acrilico", imageUrl: PRODUTOS_IMAGES.urna },
   { nome: "Display de Acrílico", href: "/acrilico-sob-medida/display-de-acrilico", imageUrl: PRODUTOS_IMAGES.display },
   { nome: "Troféus", href: "/acrilico-sob-medida/trofeus-personalizados", imageUrl: PRODUTOS_IMAGES.trofeus },
   { nome: "Medalhas", href: "/acrilico-sob-medida/medalhas-personalizadas", imageUrl: PRODUTOS_IMAGES.medalhas },
