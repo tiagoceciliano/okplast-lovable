@@ -129,7 +129,13 @@
   }
 
   .btn-whatsapp {
-    @apply bg-[hsl(var(--whatsapp))] text-[hsl(var(--whatsapp-foreground))] hover:bg-[hsl(142,70%,40%)] transition-all duration-200;
+    background-color: hsl(142 70% 45%) !important;
+    color: hsl(0 0% 100%) !important;
+    transition: all 0.2s;
+  }
+  
+  .btn-whatsapp:hover {
+    background-color: hsl(142 70% 38%) !important;
   }
 
   .btn-cta-email {
