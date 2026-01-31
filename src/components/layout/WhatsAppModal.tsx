@@ -128,7 +128,7 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="p-0 gap-0 overflow-hidden max-w-[400px] rounded-2xl border-0 whatsapp-modal">
+      <DialogContent className="p-0 gap-0 overflow-hidden max-w-[400px] max-h-[90vh] rounded-2xl border-0 whatsapp-modal flex flex-col">
         {/* WhatsApp Header */}
         <div className="whatsapp-header flex items-center gap-3 px-4 py-3">
           <button 
@@ -153,26 +153,22 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
           </div>
         </div>
 
-        {/* Chat Area */}
-        <ScrollArea className="whatsapp-chat-area h-[450px]">
-          <div className="p-4 space-y-4">
-            {/* Welcome Message Bubble */}
-            <div className="whatsapp-bubble-received animate-fade-in">
-              <p className="text-sm leading-relaxed">
-                Olá! 👋 Bem-vindo à <strong>Lab Acrílicos</strong>!
-              </p>
-              <p className="text-sm leading-relaxed mt-2">
-                Para agilizar seu atendimento, preencha os dados abaixo e clique em enviar.
-              </p>
-              <span className="whatsapp-time">agora</span>
-            </div>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-1 min-h-0">
+            {/* Chat Area */}
+            <ScrollArea className="whatsapp-chat-area flex-1 min-h-0">
+              <div className="p-4 space-y-3">
+                {/* Welcome Message Bubble */}
+                <div className="whatsapp-bubble-received animate-fade-in">
+                  <p className="text-sm leading-relaxed">
+                    Olá! 👋 Preencha os dados abaixo para iniciar sua conversa.
+                  </p>
+                  <span className="whatsapp-time">agora</span>
+                </div>
 
-            {/* Form as Chat */}
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
                 {/* Form Fields Bubble */}
                 <div className="whatsapp-bubble-sent animate-fade-in" style={{ animationDelay: "0.1s" }}>
-                  <div className="space-y-3">
+                  <div className="space-y-2.5">
                     <FormField
                       control={form.control}
                       name="nome"
@@ -180,8 +176,8 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
                         <FormItem>
                           <FormControl>
                             <Input 
-                              placeholder="Seu nome completo" 
-                              className="whatsapp-input"
+                              placeholder="Seu nome" 
+                              className="whatsapp-input h-8 text-sm"
                               {...field} 
                               onBlur={(e) => {
                                 field.onBlur();
@@ -203,7 +199,7 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
                             <Input 
                               type="email" 
                               placeholder="seu@email.com" 
-                              className="whatsapp-input"
+                              className="whatsapp-input h-8 text-sm"
                               {...field} 
                             />
                           </FormControl>
@@ -220,7 +216,7 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
                           <FormControl>
                             <Input 
                               placeholder="(21) 99999-9999" 
-                              className="whatsapp-input"
+                              className="whatsapp-input h-8 text-sm"
                               {...field}
                               onChange={(e) => handlePhoneChange(e, field.onChange)}
                               maxLength={15}
@@ -238,7 +234,7 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
                         <FormItem>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
-                              <SelectTrigger className="whatsapp-input">
+                              <SelectTrigger className="whatsapp-input h-8 text-sm">
                                 <SelectValue placeholder="Selecione o produto" />
                               </SelectTrigger>
                             </FormControl>
@@ -262,8 +258,8 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
                         <FormItem>
                           <FormControl>
                             <Textarea 
-                              placeholder="Descreva seu projeto ou dúvida..."
-                              className="whatsapp-input min-h-[70px] resize-none"
+                              placeholder="Descreva seu projeto..."
+                              className="whatsapp-input min-h-[50px] text-sm resize-none"
                               {...field} 
                             />
                           </FormControl>
@@ -273,23 +269,22 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
                     />
                   </div>
                 </div>
+              </div>
+            </ScrollArea>
 
-                {/* Send Button */}
-                <div className="flex justify-end pt-2">
-                  <Button 
-                    type="submit" 
-                    className="whatsapp-send-button"
-                    disabled={isSubmitting}
-                    size="lg"
-                  >
-                    {isSubmitting ? "Enviando..." : "Iniciar Conversa"}
-                    <Send className="h-4 w-4 ml-2" />
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </div>
-        </ScrollArea>
+            {/* Fixed Send Button */}
+            <div className="p-3 bg-[#F0F0F0] border-t border-gray-200">
+              <Button 
+                type="submit" 
+                className="whatsapp-send-button w-full"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Enviando..." : "Iniciar Conversa"}
+                <Send className="h-4 w-4 ml-2" />
+              </Button>
+            </div>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
