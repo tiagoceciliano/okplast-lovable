@@ -1,10 +1,12 @@
 import { ProductPage } from "@/components/products/ProductPage";
+import { SOBMEDIDA_IMAGES } from "@/lib/images";
 
 export default function TrofeusPersonalizados() {
   return (
     <ProductPage
       title="Troféus Personalizados"
       description="Troféus de acrílico personalizados para premiações, reconhecimentos corporativos, eventos esportivos e celebrações. Criamos peças exclusivas que transmitem elegância e valorizam o homenageado. Possibilidade de combinar acrílico com outros materiais como madeira e metal."
+      imageUrl={SOBMEDIDA_IMAGES.trofeus}
       benefits={[
         "Design exclusivo para sua premiação",
         "Combinação de materiais (acrílico + madeira/metal)",

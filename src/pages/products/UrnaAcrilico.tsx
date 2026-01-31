@@ -1,10 +1,12 @@
 import { ProductPage } from "@/components/products/ProductPage";
+import { SOBMEDIDA_IMAGES } from "@/lib/images";
 
 export default function UrnaAcrilico() {
   return (
     <ProductPage
       title="Urna de Acrílico"
       description="Urnas de acrílico para sorteios, votações, promoções e coleta de cupons. Fabricadas com acrílico de alta qualidade, nossas urnas são transparentes para demonstrar a lisura do processo, ou podem ser opacas para garantir sigilo. Personalizamos conforme a necessidade do seu evento ou estabelecimento."
+      imageUrl={SOBMEDIDA_IMAGES.urna}
       benefits={[
         "Transparência para processos públicos",
         "Opção com acrílico opaco para sigilo",

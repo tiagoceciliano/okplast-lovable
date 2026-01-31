@@ -1,10 +1,12 @@
 import { ProductPage } from "@/components/products/ProductPage";
+import { SOBMEDIDA_IMAGES } from "@/lib/images";
 
 export default function PotesGraos() {
   return (
     <ProductPage
       title="Potes para Grãos e Cereais a Granel"
       description="Solução ideal para lojas de produtos naturais, mercados e empórios que trabalham com produtos a granel. Nossos potes de acrílico para grãos e cereais são desenvolvidos para facilitar o armazenamento, a visualização e a dispensação de produtos, mantendo a qualidade e higiene."
+      imageUrl={SOBMEDIDA_IMAGES.potesGraos}
       benefits={[
         "Sistema de dispensação prático",
         "Tampa com vedação para proteção do produto",
