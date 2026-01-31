@@ -9,37 +9,37 @@ const motivos = [
   { 
     icon: FileText, 
     titulo: "Emissão de NF-e", 
-    desc: "Nota fiscal eletrônica em todas as compras para sua segurança e garantia",
-    bgImage: MOTIVOS_IMAGES.credito // usando credito pois nfe deu 404
+    desc: "Todas nossas vendas são acompanhadas de nota fiscal",
+    bgImage: MOTIVOS_IMAGES.nfe
   },
   { 
     icon: CreditCard, 
-    titulo: "Faturamento e Linha de Crédito", 
-    desc: "Condições especiais de pagamento para clientes corporativos",
+    titulo: "Faturamos com Linha de Crédito", 
+    desc: "Vendemos no boleto com prazo para pagamento",
     bgImage: MOTIVOS_IMAGES.credito
   },
   { 
     icon: Building, 
     titulo: "Empresa Sólida e Confiável", 
-    desc: "Mais de 30 anos de tradição no mercado de acrílico",
+    desc: "Há mais de 30 anos no mercado de acrílico",
     bgImage: MOTIVOS_IMAGES.empresaSolida
   },
   { 
     icon: Package, 
-    titulo: "Pronta Entrega", 
-    desc: "Estoque completo para atendimento imediato dos seus pedidos",
+    titulo: "Produtos a Pronta Entrega", 
+    desc: "Disponibilizamos produtos em estoque para envio",
     bgImage: MOTIVOS_IMAGES.prontaEntrega
   },
   { 
     icon: Truck, 
-    titulo: "Entrega em Todo Brasil", 
-    desc: "Logística eficiente com entrega segura para todo território nacional",
+    titulo: "Entregamos em todo o Brasil", 
+    desc: "Entregamos acrílico e produtos para todo país",
     bgImage: MOTIVOS_IMAGES.entregaBrasil
   },
   { 
     icon: Headphones, 
-    titulo: "Atendimento Rápido", 
-    desc: "Equipe especializada pronta para atender suas necessidades",
+    titulo: "Atendimento Rápido e Objetivo", 
+    desc: "Tire suas dúvidas e faça seu orçamento agora",
     bgImage: MOTIVOS_IMAGES.atendimento
   },
 ];
