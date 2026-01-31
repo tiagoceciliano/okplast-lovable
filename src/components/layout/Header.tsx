@@ -1,10 +1,12 @@
 import { Link } from "react-router-dom";
-import { MessageCircle, Calendar } from "lucide-react";
+import { MessageCircle, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { COMPANY } from "@/lib/constants";
+import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
 import logoImg from "@/assets/logos/logo-horizontal.png";
 
 export function Header() {
+  const { openWhatsAppModal } = useWhatsAppModal();
+
   return (
     <header className="sticky top-0 z-50 w-full bg-primary">
       <div className="container-custom">
@@ -20,29 +22,24 @@ export function Header() {
 
           {/* CTA Buttons */}
           <div className="flex items-center gap-3 md:gap-4">
-            {/* WhatsApp Button - Green */}
+            {/* WhatsApp Button - Green (Primary) */}
             <Button
-              asChild
+              onClick={() => openWhatsAppModal()}
               className="btn-whatsapp rounded-full px-4 md:px-6 py-2 md:py-3 text-sm md:text-base font-semibold shadow-lg hover:shadow-xl transition-all"
             >
-              <a
-                href={`https://wa.me/${COMPANY.whatsapp}?text=${encodeURIComponent(`Olá! Gostaria de solicitar um orçamento.`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <MessageCircle className="h-4 w-4 md:h-5 md:w-5 mr-2" />
-                <span className="hidden sm:inline">Orçamento via </span>WhatsApp
-              </a>
+              <MessageCircle className="h-4 w-4 md:h-5 md:w-5 mr-2" />
+              <span className="hidden sm:inline">Orçamento via </span>WhatsApp
             </Button>
 
-            {/* Email Button - Light Blue */}
+            {/* Email Button - Discrete (Secondary) */}
             <Button
               asChild
-              className="btn-cta-email rounded-full px-4 md:px-6 py-2 md:py-3 text-sm md:text-base font-semibold shadow-lg hover:shadow-xl transition-all hidden sm:flex"
+              variant="ghost"
+              className="text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10 rounded-full px-3 md:px-4 py-2 text-xs md:text-sm hidden sm:flex"
             >
               <Link to="/home/orcamento">
-                <Calendar className="h-4 w-4 md:h-5 md:w-5 mr-2" />
-                Orçamento via e-mail
+                <Mail className="h-4 w-4 mr-1" />
+                E-mail
               </Link>
             </Button>
           </div>

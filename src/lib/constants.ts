@@ -17,6 +17,12 @@ export const WEBHOOKS = {
   geral: "WEBHOOK_GERAL", // Placeholder - configurar em secrets
 } as const;
 
+// Produtos simplificados para modal WhatsApp
+export const PRODUTOS_WHATSAPP = [
+  "Chapa Inteira ou Cortada",
+  "Produto Personalizado",
+] as const;
+
 // Produtos para formulário de orçamento
 export const PRODUTOS_INTERESSE = [
   "Caixas Sob Medida",
