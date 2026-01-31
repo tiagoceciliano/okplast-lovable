@@ -14,7 +14,7 @@ export function Header() {
             <img
               src={logoImg}
               alt="Lab Acrílicos"
-              className="h-14 md:h-16 lg:h-[70px] w-auto brightness-0 invert"
+              className="h-16 md:h-20 lg:h-24 w-auto brightness-0 invert object-contain"
             />
           </Link>
 
