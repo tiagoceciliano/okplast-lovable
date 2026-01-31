@@ -79,7 +79,7 @@ export function Footer() {
 
         {/* Copyright com Logo */}
         <div className="mt-12 pt-8 border-t border-primary-foreground/20 flex flex-col items-center gap-4">
-          <img src={logoImg} alt="Lab Acrílicos" className="h-20 w-auto brightness-0 invert opacity-90" />
+          <img src={logoImg} alt="Lab Acrílicos" className="h-40 w-auto brightness-0 invert opacity-90" />
           <p className="text-sm text-primary-foreground/60">
             © {currentYear} {COMPANY.name}. Todos os direitos reservados.
           </p>
