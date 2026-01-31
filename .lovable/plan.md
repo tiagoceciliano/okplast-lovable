@@ -1,123 +1,177 @@
 
 
-# Plano: Corrigir Mapeamento Completo de Imagens - Seção PRODUTOS SOB MEDIDA
+# Plano: Cards de Chapas com Fotos + Logos de Clientes + Nova Logo
 
-## Problema Identificado
+## Resumo das Alteracoes
 
-Comparando a imagem de referência do Acrilzano com o código atual, as imagens estão mapeadas para produtos errados. A disposição na imagem mostra 8 produtos específicos em 2 linhas de 4 produtos cada.
-
----
-
-## Mapeamento Correto (Baseado na Imagem de Referência)
-
-### LINHA 1 - Da esquerda para direita:
-
-| Posição | Produto no Acrilzano | URL Original | Mapeamento Atual | Produto Lab Acrílicos |
-|---------|---------------------|--------------|------------------|----------------------|
-| 1 | Expositor Doces (escada) | `3333333333333333333333333-min.jpg` | `chapas-pagina/acm.jpg` (ERRADO) | Potes para Doces |
-| 2 | Cúpula Preta | `builderall/.../9852756.jpg` | Não migrada | Cúpulas e Redomas |
-| 3 | Quadro de Avisos | `builderall/.../9852775.jpg` | Não migrada | Display de Acrílico |
-| 4 | Porta Folder Dourado | `builderall/.../9860922.png` | Não migrada | Porta Folder |
-
-### LINHA 2 - Da esquerda para direita:
-
-| Posição | Produto no Acrilzano | URL Original | Mapeamento Atual | Produto Lab Acrílicos |
-|---------|---------------------|--------------|------------------|----------------------|
-| 5 | Potes Grãos (vários) | `111111111111111111111111-min.jpg` | `chapas/pvc-expandido.jpg` (ERRADO) | Potes para Grãos |
-| 6 | Cúpula Transparente | `9852742-min.jpeg` | Não migrada | Urna de Acrílico |
-| 7 | Púlpito Acrílico | `pulpito-oratoria-...min.jpg` | Não migrada | Caixas Sob Medida |
-| 8 | Troféu Team Awards | `trofeu-acrilico-fenda-300x300-min.jpg` | `sobmedida/trofeus.jpg` (OK) | Troféus |
+| Alteracao | Descricao |
+|-----------|-----------|
+| Cards de Chapas | Adicionar fotos de fundo em cada card da secao "Chapas e Pedacos de Placas" |
+| Logos de Clientes | Salvar imagem com logos dos clientes e usar no componente ClientLogos |
+| Logo do Site | Trocar a logo atual para a versao horizontal PNG maior |
 
 ---
 
-## Correções Necessárias
+## 1. SECAO CHAPAS COM FOTOS
 
-### 1. Migrar Novas Imagens do Builderall
+### Problema Atual
+Os cards de chapas na home sao apenas blocos azuis com texto, sem imagens.
 
-Estas imagens não foram baixadas ainda:
+### Solucao
+Transformar cada card em um bloco com imagem de fundo e texto sobreposto, identico ao layout do Acrilzano mostrado na referencia.
 
-| Key | URL Original |
-|-----|-------------|
-| `produtos/cupula-preta.jpg` | `https://storage.builderall.com//franquias/2/7085438/editor-html/9852756.jpg` |
-| `produtos/quadro-avisos.jpg` | `https://storage.builderall.com//franquias/2/7085438/editor-html/9852775.jpg` |
-| `produtos/porta-folder-dourado.png` | `https://storage.builderall.com//franquias/2/7085438/editor-html/9860922.png` |
-| `produtos/cupula-transparente.jpg` | `https://acrilzano.com.br/wp-content/uploads/2022/12/9852742-min.jpeg` |
-| `produtos/pulpito.jpg` | `https://acrilzano.com.br/wp-content/uploads/2022/08/pulpito-oratoria-acrilizo-acrilzano-luxo-300x240-300x240-min-e1728777263731.jpg` |
+### Mapeamento de Imagens (Conforme Print Enviado)
 
-### 2. Atualizar `src/lib/images.ts`
+| Card | Produto | Imagem Necessaria |
+|------|---------|-------------------|
+| 1 | Acrilico Transparente | Chapas transparentes empilhadas (fundo preto) |
+| 2 | Acrilico Colorido | Amostras coloridas variadas |
+| 3 | Pet G | Cantos de chapas cinzas |
+| 4 | Ps Poliestireno | Chapas coloridas arredondadas |
+| 5 | Policarbonato Alveolar | Chapas alveolares marrom/verde/azul |
+| 6 | Policarbonato Compact | Chapas em leque azul/branco |
+| 7 | PVC Expandido | Chapas em tons de azul |
+| 8 | ACM | Chapas coloridas quadriculadas |
 
-Adicionar novas constantes e corrigir mapeamento:
+### Arquivos a Modificar
 
-```typescript
-export const PRODUTOS_IMAGES = {
-  // Linha 1
-  potesDoces: img("produtos/expositor-doces-escada.jpg"),      // Era ACM
-  cupulasRedomas: img("produtos/cupula-preta.jpg"),            // Nova
-  display: img("produtos/quadro-avisos.jpg"),                   // Nova
-  portaFolder: img("produtos/porta-folder-dourado.png"),        // Nova
-  
-  // Linha 2
-  potesGraos: img("produtos/potes-graos-varios.jpg"),          // Era PVC
-  urna: img("produtos/cupula-transparente.jpg"),                // Nova
-  caixasSobMedida: img("produtos/pulpito.jpg"),                 // Nova
-  trofeus: img("produtos/trofeus.jpg"),                         // OK
-  medalhas: img("produtos/medalhas.jpg"),                       // Mantém
-} as const;
-```
-
-### 3. Atualizar `src/pages/Index.tsx`
-
-Reordenar o array `produtosSobMedida` para corresponder à ordem visual do Acrilzano:
-
-```typescript
-const produtosSobMedida = [
-  // Linha 1
-  { nome: "Potes para Doces", href: "...", imageUrl: PRODUTOS_IMAGES.potesDoces },
-  { nome: "Cúpulas e Redomas", href: "...", imageUrl: PRODUTOS_IMAGES.cupulasRedomas },
-  { nome: "Display de Acrílico", href: "...", imageUrl: PRODUTOS_IMAGES.display },
-  { nome: "Porta Folder", href: "...", imageUrl: PRODUTOS_IMAGES.portaFolder },
-  // Linha 2  
-  { nome: "Potes para Grãos", href: "...", imageUrl: PRODUTOS_IMAGES.potesGraos },
-  { nome: "Urna de Acrílico", href: "...", imageUrl: PRODUTOS_IMAGES.urna },
-  { nome: "Caixas Sob Medida", href: "...", imageUrl: PRODUTOS_IMAGES.caixasSobMedida },
-  { nome: "Troféus", href: "...", imageUrl: PRODUTOS_IMAGES.trofeus },
-];
-```
-
----
-
-## Arquivos a Modificar
-
-| Arquivo | Alteração |
+| Arquivo | Alteracao |
 |---------|-----------|
-| `src/lib/images.ts` | Adicionar URLs das novas imagens + corrigir mapeamento |
-| `src/pages/Index.tsx` | Reordenar produtos + associar imagens corretas |
-| `supabase/functions/migrate-images/index.ts` | Executar para baixar as 5 imagens novas |
+| `src/pages/Index.tsx` | Alterar renderizacao dos cards de chapas para exibir imagem de fundo |
+| `src/lib/images.ts` | Adicionar constantes para as novas imagens de chapas (se necessario migrar) |
+
+### Novo Layout dos Cards
+
+```text
++------------------+
+|    [IMAGEM]      |
+|   de fundo com   |
+|   overlay escuro |
+|                  |
+| "Acrilico Cristal"
++------------------+
+```
 
 ---
 
-## Resumo da Execução
+## 2. LOGOS DE CLIENTES
 
-1. Chamar edge function `migrate-images` para baixar as 5 imagens faltantes
-2. Atualizar `images.ts` com novas constantes
-3. Atualizar `Index.tsx` com ordem correta + imagens corretas
-4. Testar visualização
+### Problema Atual
+O componente `ClientLogos` mostra apenas placeholders cinzas com "Logo".
+
+### Solucao
+Salvar a imagem com todos os logos de clientes enviada e exibi-la como uma unica imagem responsiva.
+
+### Clientes Identificados na Imagem
+- Rede D'Or
+- BRT
+- Marinha do Brasil
+- Werner Coiffeur
+- The British School
+- Essilor
+- Michelin
+- Museu do Amanha
+- Museu Nacional
+- ALERJ
+- Banco do Brasil
+- Colegio Santo Inacio
+- Fetranspor
+- UFRJ
+- PGE-RJ
+- Prefeitura do Rio
+- Record TV
+- BNDES
+- Sicoob
+- Jockey Club Brasileiro
+- AgeRio
+- HS Sports Travel
+
+### Arquivos a Modificar
+
+| Arquivo | Alteracao |
+|---------|-----------|
+| `src/assets/logos/clientes.png` | Copiar imagem enviada pelo usuario |
+| `src/components/ui/ClientLogos.tsx` | Exibir imagem unica em vez de grid de placeholders |
 
 ---
 
-## Seção Técnica
+## 3. NOVA LOGO DO SITE
 
-### Novas URLs a migrar:
+### Problema Atual
+A logo atual (`logo-lab-acrilicos.png`) e pequena e pode nao ter qualidade ideal.
+
+### Solucao
+Usar a logo horizontal que esta em `src/assets/logos/logo-horizontal.png` (ja salva anteriormente).
+
+### Arquivos a Modificar
+
+| Arquivo | Alteracao |
+|---------|-----------|
+| `src/components/layout/Header.tsx` | Trocar import para `logo-horizontal.png` |
+| `src/components/layout/Footer.tsx` | Trocar import para `logo-horizontal.png` |
+
+---
+
+## Ordem de Implementacao
+
+1. Copiar imagem de logos de clientes para `src/assets/logos/clientes.png`
+2. Atualizar `ClientLogos.tsx` para exibir imagem unica
+3. Atualizar Header.tsx e Footer.tsx com nova logo
+4. Migrar imagens de chapas (se necessario) via Edge Function
+5. Atualizar cards de chapas no Index.tsx para exibir fotos
+
+---
+
+## Secao Tecnica
+
+### Novo Codigo para Cards de Chapas
 
 ```typescript
-[
-  { key: "produtos/cupula-preta.jpg", url: "https://storage.builderall.com//franquias/2/7085438/editor-html/9852756.jpg" },
-  { key: "produtos/quadro-avisos.jpg", url: "https://storage.builderall.com//franquias/2/7085438/editor-html/9852775.jpg" },
-  { key: "produtos/porta-folder-dourado.png", url: "https://storage.builderall.com//franquias/2/7085438/editor-html/9860922.png" },
-  { key: "produtos/cupula-transparente.jpg", url: "https://acrilzano.com.br/wp-content/uploads/2022/12/9852742-min.jpeg" },
-  { key: "produtos/pulpito.jpg", url: "https://acrilzano.com.br/wp-content/uploads/2022/08/pulpito-oratoria-acrilizo-acrilzano-luxo-300x240-300x240-min-e1728777263731.jpg" },
-  { key: "produtos/expositor-doces-escada.jpg", url: "https://acrilzano.com.br/wp-content/uploads/2022/08/3333333333333333333333333-min.jpg" },
-  { key: "produtos/potes-graos-varios.jpg", url: "https://acrilzano.com.br/wp-content/uploads/2022/08/111111111111111111111111-min.jpg" }
-]
+// Index.tsx - Secao Chapas
+<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+  {tiposChapas.map((chapa, index) => (
+    <Link
+      key={index}
+      to={chapa.href}
+      className="group relative aspect-[4/3] rounded-lg overflow-hidden"
+    >
+      <img 
+        src={chapa.imageUrl} 
+        alt={chapa.nome}
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+      <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors" />
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="font-semibold text-white text-center px-2">
+          {chapa.nome}
+        </span>
+      </div>
+    </Link>
+  ))}
+</div>
+```
+
+### Novo ClientLogos
+
+```typescript
+import clientesImg from "@/assets/logos/clientes.png";
+
+export function ClientLogos({ className }: ClientLogosProps) {
+  return (
+    <div className={cn("w-full", className)}>
+      <img 
+        src={clientesImg} 
+        alt="Nossos Clientes" 
+        className="w-full h-auto"
+      />
+    </div>
+  );
+}
+```
+
+### Nova Logo no Header/Footer
+
+```typescript
+import logoImg from "@/assets/logos/logo-horizontal.png";
 ```
 
