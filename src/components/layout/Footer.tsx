@@ -74,13 +74,6 @@ export function Footer() {
                   <p className="font-semibold text-primary-foreground">8h às 18h</p>
                 </div>
               </li>
-              <li className="flex items-start gap-2">
-                <Clock className="h-4 w-4 mt-0.5 shrink-0" />
-                <div>
-                  <p>Sábado</p>
-                  <p className="font-semibold text-primary-foreground">8h às 12h</p>
-                </div>
-              </li>
             </ul>
             {/* Policies */}
             <div className="pt-4 space-y-2">
