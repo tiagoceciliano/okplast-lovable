@@ -91,27 +91,15 @@ export default function AcrilicoSobMedida() {
         <div className="container-custom">
           <DecorativeDivider />
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            {/* Foto da Equipe */}
-            <div className="aspect-video bg-muted rounded-lg overflow-hidden">
-              <img 
-                src={EMPRESA_IMAGES.equipe} 
-                alt="Equipe Lab Acrílicos" 
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
-            </div>
-
-            <div>
-              <h2 className="font-bold text-2xl md:text-3xl text-foreground mb-6">
-                Conheça um pouco da nossa empresa
-              </h2>
-              <p className="text-muted-foreground mb-6">
-                A {COMPANY.name} é uma empresa familiar que nasceu da paixão pelo trabalho com acrílico. 
-                Ao longo de mais de três décadas, construímos uma reputação sólida baseada na qualidade, 
-                no atendimento personalizado e na capacidade de transformar ideias em realidade.
-              </p>
-            </div>
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="font-bold text-2xl md:text-3xl text-foreground mb-6">
+              Conheça um pouco da nossa empresa
+            </h2>
+            <p className="text-muted-foreground">
+              A {COMPANY.name} é uma empresa familiar que nasceu da paixão pelo trabalho com acrílico. 
+              Ao longo de mais de três décadas, construímos uma reputação sólida baseada na qualidade, 
+              no atendimento personalizado e na capacidade de transformar ideias em realidade.
+            </p>
           </div>
         </div>
       </section>
