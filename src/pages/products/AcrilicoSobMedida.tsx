@@ -41,7 +41,7 @@ const categorias = [
     produtos: [
       { nome: "Display de Acrílico", href: "/acrilico-sob-medida/display-de-acrilico", imageUrl: SOBMEDIDA_IMAGES.display },
       { nome: "Urna de Acrílico", href: "/acrilico-sob-medida/urna-de-acrilico", imageUrl: SOBMEDIDA_IMAGES.urna },
-      { nome: "Caixa de Sugestão", href: "/acrilico-sob-medida/caixa-de-sugestao", imageUrl: SOBMEDIDA_IMAGES.urna },
+      { nome: "Caixa de Sugestão", href: "/acrilico-sob-medida/caixa-de-sugestao", imageUrl: SOBMEDIDA_IMAGES.caixaSugestao },
     ],
   },
   {
