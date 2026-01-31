@@ -4,7 +4,7 @@ import { ArrowRight, Plus, Minus } from "lucide-react";
 import { COMPANY } from "@/lib/constants";
 import { DecorativeDivider } from "@/components/ui/DecorativeDivider";
 import { BlueBanner } from "@/components/ui/BlueBanner";
-import { HeroSlider } from "@/components/home/HeroSlider";
+
 import { CHAPAS_PAGINA_IMAGES } from "@/lib/images";
 import {
   Accordion,
@@ -206,9 +206,6 @@ export default function ChapasDeAcrilico() {
                 </Link>
               </Button>
             </div>
-
-            {/* Right - Slider */}
-            <HeroSlider />
           </div>
         </div>
       </section>
