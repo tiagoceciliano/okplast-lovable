@@ -12,18 +12,18 @@ import { MotivosCarousel } from "@/components/home/MotivosCarousel";
 import { ProductCategoryGrid } from "@/components/home/ProductCategoryGrid";
 import { PRODUTOS_IMAGES, CHAPAS_IMAGES, DEPOIMENTOS_IMAGES, EMPRESA_IMAGES } from "@/lib/images";
 
-// Produtos Sob Medida - Ordem conforme layout Acrilzano (2 linhas de 4)
+// Produtos Sob Medida - Grid de 8 produtos (sem links individuais)
 const produtosSobMedida = [
   // Linha 1
-  { nome: "Potes para Doces", href: "/acrilico-sob-medida/potes-para-doces-e-guloseimas", imageUrl: PRODUTOS_IMAGES.potesDoces },
-  { nome: "Cúpulas e Redomas", href: "/acrilico-sob-medida/cupulas-e-redomas", imageUrl: PRODUTOS_IMAGES.cupulasRedomas },
-  { nome: "Display de Acrílico", href: "/acrilico-sob-medida/display-de-acrilico", imageUrl: PRODUTOS_IMAGES.display },
-  { nome: "Porta Folder", href: "/acrilico-sob-medida/porta-folder", imageUrl: PRODUTOS_IMAGES.portaFolder },
+  { nome: "Potes para Doces", href: "/acrilico-sob-medida", imageUrl: PRODUTOS_IMAGES.potesDoces },
+  { nome: "Cúpulas e Redomas", href: "/acrilico-sob-medida", imageUrl: PRODUTOS_IMAGES.cupulasRedomas },
+  { nome: "Display de Acrílico", href: "/acrilico-sob-medida", imageUrl: PRODUTOS_IMAGES.display },
+  { nome: "Porta Folder", href: "/acrilico-sob-medida", imageUrl: PRODUTOS_IMAGES.portaFolder },
   // Linha 2
-  { nome: "Potes para Grãos", href: "/acrilico-sob-medida/potes-para-graos-e-cereais", imageUrl: PRODUTOS_IMAGES.potesGraos },
-  { nome: "Urna de Acrílico", href: "/acrilico-sob-medida/urna-de-acrilico", imageUrl: PRODUTOS_IMAGES.urna },
-  { nome: "Caixas Sob Medida", href: "/acrilico-sob-medida/caixas-sob-medida", imageUrl: PRODUTOS_IMAGES.caixasSobMedida },
-  { nome: "Troféus", href: "/acrilico-sob-medida/trofeus-personalizados", imageUrl: PRODUTOS_IMAGES.trofeus },
+  { nome: "Potes para Grãos", href: "/acrilico-sob-medida", imageUrl: PRODUTOS_IMAGES.potesGraos },
+  { nome: "Urna de Acrílico", href: "/acrilico-sob-medida", imageUrl: PRODUTOS_IMAGES.urna },
+  { nome: "Caixas Sob Medida", href: "/acrilico-sob-medida", imageUrl: PRODUTOS_IMAGES.caixasSobMedida },
+  { nome: "Troféus", href: "/acrilico-sob-medida", imageUrl: PRODUTOS_IMAGES.trofeus },
 ];
 
 // Tipos de Chapas
@@ -86,6 +86,15 @@ export default function Index() {
               </div>
             </div>
 
+            {/* Right Column - Image */}
+            <div className="aspect-video bg-muted rounded-lg overflow-hidden">
+              <img 
+                src={EMPRESA_IMAGES.equipe} 
+                alt="Equipe Lab Acrílicos" 
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -93,28 +102,20 @@ export default function Index() {
       {/* Conheça Nossa Empresa */}
       <section className="section-padding bg-secondary">
         <div className="container-custom">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            <div>
-              <h2 className="font-bold text-2xl md:text-3xl text-foreground mb-6">
-                Conheça um pouco da nossa empresa
-              </h2>
-              <p className="text-muted-foreground mb-6">
-                A {COMPANY.name} é uma empresa familiar que nasceu da paixão pelo trabalho com acrílico. 
-                Ao longo de mais de três décadas, construímos uma reputação sólida baseada na qualidade, 
-                no atendimento personalizado e na capacidade de transformar ideias em realidade.
-              </p>
-              <p className="text-muted-foreground mb-8">
-                Nossa equipe de profissionais altamente qualificados está pronta para atender desde 
-                pequenos projetos até grandes demandas corporativas, sempre com o mesmo compromisso: 
-                excelência em cada detalhe.
-              </p>
-              <Button variant="outline" asChild>
-                <Link to="/home/sobre-nos">
-                  Conheça a Nossa História
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="font-bold text-2xl md:text-3xl text-foreground mb-6">
+              Conheça um pouco da nossa empresa
+            </h2>
+            <p className="text-muted-foreground mb-6">
+              A {COMPANY.name} é uma empresa familiar que nasceu da paixão pelo trabalho com acrílico. 
+              Ao longo de mais de três décadas, construímos uma reputação sólida baseada na qualidade, 
+              no atendimento personalizado e na capacidade de transformar ideias em realidade.
+            </p>
+            <p className="text-muted-foreground">
+              Nossa equipe de profissionais altamente qualificados está pronta para atender desde 
+              pequenos projetos até grandes demandas corporativas, sempre com o mesmo compromisso: 
+              excelência em cada detalhe.
+            </p>
           </div>
         </div>
       </section>
