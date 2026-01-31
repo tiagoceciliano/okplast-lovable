@@ -1,154 +1,136 @@
 
-# Plano: Modal de WhatsApp como Canal Principal + Reestruturação de CTAs
+# Plano: Redesenhar Modal WhatsApp com Visual de Conversa de Chat
 
 ## Objetivo
-Transformar o WhatsApp no canal principal de contato, com botões verdes e chamativos que abrem um modal de formulário (similar ao print da Acrilzano). O formulário coleta dados do visitante e redireciona para o WhatsApp com mensagem formatada. Orçamento via email fica discreto e secundário.
+Transformar o modal atual em algo que pareça uma janela do WhatsApp aberta no celular - com header verde do WhatsApp, avatar do atendente, área de chat, e input estilizado como campo de mensagem do WhatsApp.
 
 ---
 
-## 1. Criar Componente WhatsAppModal
+## Design Visual Proposto
 
-**Arquivo:** `src/components/layout/WhatsAppModal.tsx`
-
-**Funcionalidades:**
-- Modal usando Dialog do Radix UI (já instalado)
-- Campos: Nome, E-mail, Telefone (com máscara), Produto de Interesse (select), Mensagem
-- Validação com Zod (reutilizar lógica existente)
-- Opções de produto simplificadas:
-  - "Chapa Inteira ou Cortada"
-  - "Produto Personalizado"
-- Botão verde "Clique aqui para falar pelo WhatsApp"
-- Ao submeter: abre WhatsApp com dados formatados + dispara webhook via edge function
-
----
-
-## 2. Atualizar Constantes
-
-**Arquivo:** `src/lib/constants.ts`
-
-**Mudanças:**
-- Adicionar lista simplificada de produtos para o modal:
-```
-PRODUTOS_WHATSAPP = [
-  "Chapa Inteira ou Cortada",
-  "Produto Personalizado"
-]
-```
-
----
-
-## 3. Reestruturar Header
-
-**Arquivo:** `src/components/layout/Header.tsx`
-
-**Mudanças:**
-- Botão WhatsApp: verde, destacado, abre o WhatsAppModal
-- Botão Email: discreto (outline ou texto), menor, vai para /home/orcamento
-- Inverter ordem visual: WhatsApp primeiro e maior, Email secundário
-
----
-
-## 4. Atualizar Página Inicial (Home)
-
-**Arquivo:** `src/pages/Index.tsx`
-
-**Mudanças:**
-- Hero: substituir botões atuais por:
-  - Botão WhatsApp verde (principal) - abre modal
-  - Link discreto "Orçamento via e-mail" abaixo
-- Seção CTA Final: mesmo padrão - WhatsApp verde + email discreto
-- Todos os botões de WhatsApp abrem o modal ao invés de link direto
-
----
-
-## 5. Atualizar Botão Flutuante
-
-**Arquivo:** `src/components/layout/WhatsAppButton.tsx`
-
-**Mudanças:**
-- Ao clicar, abre o WhatsAppModal ao invés de link direto
-- Manter animação pulse-glow verde
-
----
-
-## 6. Atualizar Layout Principal
-
-**Arquivo:** `src/components/layout/Layout.tsx`
-
-**Mudanças:**
-- Adicionar estado global para controlar abertura do modal
-- Passar contexto para componentes filhos
-
----
-
-## 7. Aplicar nas Páginas de Produto
-
-**Arquivos:** 
-- `src/pages/products/AcrilicoSobMedida.tsx`
-- `src/pages/products/ChapasDeAcrilico.tsx`
-
-**Mudanças:**
-- CTAs de WhatsApp abrem o modal
-- Pré-selecionar produto de interesse baseado na página
-
----
-
-## Fluxo do Usuário
+### Estrutura do Modal
 
 ```text
-+-------------------+     +------------------+     +-------------------+
-| Clica em botão    | --> | Modal abre com   | --> | Valida campos e   |
-| WhatsApp verde    |     | formulário       |     | abre WhatsApp     |
-+-------------------+     +------------------+     +-------------------+
-                                                          |
-                                                          v
-                                              +------------------------+
-                                              | Dispara webhook para   |
-                                              | salvar lead (async)    |
-                                              +------------------------+
++------------------------------------------+
+|  [Verde WhatsApp] Header com avatar      |
+|  [Foto] Lab Acrílicos - Online           |
++------------------------------------------+
+|                                          |
+|  [Balão cinza esquerda]                  |
+|  "Olá! Preencha os dados abaixo          |
+|   para iniciarmos sua conversa"          |
+|                                          |
+|  +------------------------------------+  |
+|  | [Formulário estilizado como chat] |  |
+|  | Nome, Email, Telefone, Produto    |  |
+|  +------------------------------------+  |
+|                                          |
+|  +------------------------------------+  |
+|  | Sua mensagem...           [Enviar]|  |
+|  +------------------------------------+  |
++------------------------------------------+
 ```
+
+---
+
+## Elementos Visuais WhatsApp
+
+### 1. Header do Modal
+- Background verde WhatsApp (#128C7E ou #075E54)
+- Ícone de seta para voltar (fecha modal)
+- Avatar circular (logo da empresa ou ícone genérico)
+- Nome "Lab Acrílicos"
+- Status "Online" com bolinha verde
+
+### 2. Área de Conversa
+- Background com padrão do WhatsApp (bege claro #ECE5DD)
+- Balão de mensagem do "atendente" (cinza claro, lado esquerdo)
+- Mensagem de boas-vindas estilizada
+
+### 3. Campos do Formulário
+- Estilizados como inputs modernos com bordas suaves
+- Labels discretos dentro ou acima dos campos
+- Cores neutras que combinem com o tema WhatsApp
+
+### 4. Botão de Enviar
+- Circular verde no estilo do WhatsApp
+- Ou barra inferior verde com texto "Iniciar Conversa"
 
 ---
 
 ## Detalhes Técnicos
 
-### Estrutura do Modal
-- Usa `Dialog` do shadcn/ui (já disponível)
-- Estado controlado via useState ou Context
-- Validação com react-hook-form + zod
-- Reutiliza funções existentes: `formatPhone`, `capitalizeName`, `generateWhatsAppMessage`
+### Cores WhatsApp Oficiais
+- Header: #075E54 (verde escuro)
+- Botão enviar: #25D366 (verde claro)
+- Background chat: #ECE5DD (bege)
+- Balão recebido: #FFFFFF
+- Balão enviado: #DCF8C6
+- Texto: #303030
 
-### Formato da Mensagem WhatsApp
+### Estrutura do Componente
+```text
+<Dialog>
+  <DialogContent> (sem padding, bordas arredondadas)
+    <Header WhatsApp>
+      <Avatar + Nome + Status>
+    </Header>
+    
+    <ChatArea> (background padrão WhatsApp)
+      <BubbleMessage>
+        "Olá! Preencha seus dados..."
+      </BubbleMessage>
+      
+      <FormFields>
+        (campos estilizados)
+      </FormFields>
+    </ChatArea>
+    
+    <InputArea>
+      <Textarea mensagem>
+      <BotaoEnviar circular verde>
+    </InputArea>
+  </DialogContent>
+</Dialog>
 ```
-Olá, gostaria de atendimento para um orçamento para os dados abaixo:
 
-Nome: [Nome Capitalizado]
-E-mail: [email]
-Telefone: [(XX) XXXXX-XXXX]
-Produto: [Selecionado]
-Mensagem: [Texto]
-```
-
-### Webhook
-- Reutiliza edge function `process-lead` existente
-- Disparo assíncrono (não bloqueia redirecionamento ao WhatsApp)
-
-### Estilos CSS
-- Botões WhatsApp usam classe `.btn-whatsapp` já definida
-- Verde oficial WhatsApp: `hsl(142 70% 45%)`
-- Botão de email usa `variant="ghost"` ou `variant="link"` para ser discreto
+### CSS Customizado
+- Adicionar classes específicas para o tema WhatsApp
+- Pattern de background do chat (opcional - pode ser cor sólida)
+- Animações sutis nos balões de mensagem
+- Border-radius específicos para balões (lado esquerdo/direito)
 
 ---
 
-## Arquivos a Criar
-1. `src/components/layout/WhatsAppModal.tsx`
+## Arquivo a Modificar
 
-## Arquivos a Modificar
-1. `src/lib/constants.ts` - adicionar produtos simplificados
-2. `src/components/layout/Header.tsx` - integrar modal
-3. `src/components/layout/Layout.tsx` - contexto do modal
-4. `src/components/layout/WhatsAppButton.tsx` - abrir modal
-5. `src/components/layout/index.ts` - exportar modal
-6. `src/pages/Index.tsx` - CTAs com modal
-7. `src/pages/products/AcrilicoSobMedida.tsx` - CTAs com modal
-8. `src/pages/products/ChapasDeAcrilico.tsx` - CTAs com modal
+### `src/components/layout/WhatsAppModal.tsx`
+
+**Mudanças:**
+1. Remover DialogHeader padrão
+2. Criar header customizado verde com avatar
+3. Criar área de chat com background WhatsApp
+4. Adicionar balão de mensagem de boas-vindas
+5. Reorganizar campos do formulário
+6. Estilizar botão de envio como o WhatsApp
+7. Adicionar animação de entrada do balão
+
+### `src/index.css`
+
+**Adicionar:**
+- Classes para cores do WhatsApp
+- Estilos para balões de mensagem
+- Background pattern do chat (opcional)
+- Animações
+
+---
+
+## Experiência do Usuário
+
+1. Usuário clica no botão WhatsApp
+2. Modal abre com animação suave
+3. Header verde mostra "Lab Acrílicos - Online"
+4. Balão de mensagem aparece: "Olá! Para agilizar seu atendimento, preencha os dados abaixo"
+5. Usuário preenche os campos
+6. Clica no botão verde de enviar
+7. Abre WhatsApp com mensagem formatada
