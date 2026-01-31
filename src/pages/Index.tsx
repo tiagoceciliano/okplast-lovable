@@ -93,8 +93,6 @@ export default function Index() {
       {/* Conheça Nossa Empresa */}
       <section className="section-padding bg-secondary">
         <div className="container-custom">
-          <DecorativeDivider />
-          
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             <div>
               <h2 className="font-bold text-2xl md:text-3xl text-foreground mb-6">
