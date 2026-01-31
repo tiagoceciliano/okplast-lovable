@@ -2,10 +2,12 @@ import { Link } from "react-router-dom";
 import { MessageCircle, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
+import { useEmailQuoteModal } from "@/contexts/EmailQuoteModalContext";
 import logoImg from "@/assets/logos/logo-horizontal.png";
 
 export function Header() {
   const { openWhatsAppModal } = useWhatsAppModal();
+  const { openEmailModal } = useEmailQuoteModal();
 
   return (
     <header className="sticky top-0 z-50 w-full bg-primary">
@@ -33,14 +35,12 @@ export function Header() {
 
             {/* Email Button - Discrete (Secondary) */}
             <Button
-              asChild
+              onClick={() => openEmailModal()}
               variant="ghost"
               className="text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10 rounded-full px-3 md:px-4 py-2 text-xs md:text-sm hidden sm:flex"
             >
-              <Link to="/home/orcamento">
-                <Mail className="h-4 w-4 mr-1" />
-                E-mail
-              </Link>
+              <Mail className="h-4 w-4 mr-1" />
+              E-mail
             </Button>
           </div>
         </div>
