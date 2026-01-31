@@ -23,10 +23,6 @@ export function Footer() {
                 </a>
               </li>
             </ul>
-            {/* Logo */}
-            <div className="pt-4">
-              <img src={logoImg} alt="Lab Acrílicos" className="h-10 w-auto brightness-0 invert opacity-80" />
-            </div>
           </div>
 
           {/* Atendimento */}
@@ -96,9 +92,10 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Copyright */}
-        <div className="mt-12 pt-8 border-t border-primary-foreground/20 text-center text-sm text-primary-foreground/60">
-          <p>
+        {/* Copyright com Logo */}
+        <div className="mt-12 pt-8 border-t border-primary-foreground/20 flex flex-col items-center gap-4">
+          <img src={logoImg} alt="Lab Acrílicos" className="h-20 w-auto brightness-0 invert opacity-90" />
+          <p className="text-sm text-primary-foreground/60">
             © {currentYear} {COMPANY.name}. Todos os direitos reservados.
           </p>
         </div>
