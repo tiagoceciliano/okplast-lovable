@@ -137,16 +137,16 @@ export function EmailQuoteModal({ open, onOpenChange, defaultProduto }: EmailQuo
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="p-0 gap-0 overflow-hidden max-w-[420px] max-h-[85vh] rounded-2xl border-0 flex flex-col">
-        {/* Header */}
-        <div className="bg-primary flex items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-primary-foreground/20 flex items-center justify-center">
+      <DialogContent className="p-0 gap-0 overflow-hidden max-w-[400px] max-h-[80vh] rounded-2xl border-0 flex flex-col">
+        {/* Header Compacto */}
+        <div className="bg-primary flex items-center justify-between px-3 py-2">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-primary-foreground/20 flex items-center justify-center">
               <Mail className="h-4 w-4 text-primary-foreground" />
             </div>
             <div>
               <h3 className="text-primary-foreground font-semibold text-sm leading-tight">Orçamento por E-mail</h3>
-              <span className="text-primary-foreground/70 text-xs">Resposta em até 24h</span>
+              <span className="text-primary-foreground/70 text-[11px]">Resposta em até 24h</span>
             </div>
           </div>
           <button 
@@ -159,33 +159,34 @@ export function EmailQuoteModal({ open, onOpenChange, defaultProduto }: EmailQuo
         </div>
 
         {isSuccess ? (
-          <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-            <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center mb-3">
-              <CheckCircle className="h-7 w-7 text-green-600" />
+          <div className="flex-1 flex flex-col items-center justify-center p-5 text-center">
+            <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mb-2">
+              <CheckCircle className="h-6 w-6 text-green-600" />
             </div>
-            <h3 className="text-lg font-semibold text-foreground mb-2">Orçamento Enviado!</h3>
-            <p className="text-muted-foreground text-sm">
-              Recebemos sua solicitação e entraremos em contato em breve pelo e-mail informado.
+            <h3 className="text-base font-semibold text-foreground mb-1">Orçamento Enviado!</h3>
+            <p className="text-muted-foreground text-xs">
+              Entraremos em contato em breve pelo e-mail informado.
             </p>
           </div>
         ) : (
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-1 min-h-0">
               <ScrollArea className="flex-1 min-h-0">
-                <div className="p-4 space-y-3">
-                  <p className="text-xs text-muted-foreground">
-                    Preencha os dados abaixo e receba seu orçamento personalizado diretamente no seu e-mail.
+                <div className="px-3 py-2 space-y-2">
+                  <p className="text-[11px] text-muted-foreground leading-tight">
+                    Preencha os dados e receba seu orçamento no e-mail.
                   </p>
 
                   <FormField
                     control={form.control}
                     name="nome"
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Nome completo</FormLabel>
+                      <FormItem className="space-y-1">
+                        <FormLabel className="text-xs">Nome completo</FormLabel>
                         <FormControl>
                           <Input 
                             placeholder="Seu nome" 
+                            className="h-9 text-sm"
                             {...field} 
                             onBlur={(e) => {
                               field.onBlur();
@@ -193,7 +194,7 @@ export function EmailQuoteModal({ open, onOpenChange, defaultProduto }: EmailQuo
                             }}
                           />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-[10px]" />
                       </FormItem>
                     )}
                   />
@@ -202,16 +203,17 @@ export function EmailQuoteModal({ open, onOpenChange, defaultProduto }: EmailQuo
                     control={form.control}
                     name="email"
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>E-mail</FormLabel>
+                      <FormItem className="space-y-1">
+                        <FormLabel className="text-xs">E-mail</FormLabel>
                         <FormControl>
                           <Input 
                             type="email" 
                             placeholder="seu@email.com" 
+                            className="h-9 text-sm"
                             {...field} 
                           />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-[10px]" />
                       </FormItem>
                     )}
                   />
@@ -220,17 +222,18 @@ export function EmailQuoteModal({ open, onOpenChange, defaultProduto }: EmailQuo
                     control={form.control}
                     name="telefone"
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Telefone</FormLabel>
+                      <FormItem className="space-y-1">
+                        <FormLabel className="text-xs">Telefone</FormLabel>
                         <FormControl>
                           <Input 
                             placeholder="(21) 99999-9999" 
+                            className="h-9 text-sm"
                             {...field}
                             onChange={(e) => handlePhoneChange(e, field.onChange)}
                             maxLength={15}
                           />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-[10px]" />
                       </FormItem>
                     )}
                   />
@@ -239,11 +242,11 @@ export function EmailQuoteModal({ open, onOpenChange, defaultProduto }: EmailQuo
                     control={form.control}
                     name="produto"
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Produto de interesse</FormLabel>
+                      <FormItem className="space-y-1">
+                        <FormLabel className="text-xs">Produto de interesse</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger className="h-9 text-sm">
                               <SelectValue placeholder="Selecione o produto" />
                             </SelectTrigger>
                           </FormControl>
@@ -255,7 +258,7 @@ export function EmailQuoteModal({ open, onOpenChange, defaultProduto }: EmailQuo
                             ))}
                           </SelectContent>
                         </Select>
-                        <FormMessage />
+                        <FormMessage className="text-[10px]" />
                       </FormItem>
                     )}
                   />
@@ -264,16 +267,16 @@ export function EmailQuoteModal({ open, onOpenChange, defaultProduto }: EmailQuo
                     control={form.control}
                     name="mensagem"
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Mensagem</FormLabel>
+                      <FormItem className="space-y-1">
+                        <FormLabel className="text-xs">Mensagem</FormLabel>
                         <FormControl>
                           <Textarea 
                             placeholder="Descreva seu projeto, medidas, quantidades..."
-                            className="min-h-[80px] resize-none"
+                            className="min-h-[60px] text-sm resize-none"
                             {...field} 
                           />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-[10px]" />
                       </FormItem>
                     )}
                   />
@@ -281,11 +284,10 @@ export function EmailQuoteModal({ open, onOpenChange, defaultProduto }: EmailQuo
               </ScrollArea>
 
               {/* Fixed Send Button */}
-              <div className="p-3 bg-secondary border-t">
+              <div className="p-2 bg-secondary border-t">
                 <Button 
                   type="submit" 
-                  className="w-full"
-                  size="lg"
+                  className="w-full h-10"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? "Enviando..." : "Enviar Orçamento"}
