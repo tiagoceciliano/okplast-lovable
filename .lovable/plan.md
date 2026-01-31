@@ -1,400 +1,275 @@
 
 
-# Plano de Redesign: Lab Acrilicos - Estrutura Identica ao Acrilzano
+# Plano de Implementacao: Adicionar Imagens Reais do WordPress
 
 ## Visao Geral
 
-Redesign completo replicando **exatamente** a estrutura e layout do site Acrilzano, porem mantendo a paleta de cores azul modernizada para a Lab Acrilicos.
+Vou substituir TODAS as imagens placeholder do Unsplash pelas imagens reais extraidas dos arquivos XML do WordPress que voce enviou. Analisei cada arquivo em detalhes e mapeei exatamente quais imagens vao em cada secao do site.
 
 ---
 
-## 1. NOVA PALETA DE CORES (AZUL MODERNO)
+## 1. MAPEAMENTO COMPLETO DE IMAGENS POR SECAO
 
-### Cores Atuais vs Novas
-
-```text
-+------------------------------------------+------------------------------------------+
-|           CORES ATUAIS                   |           CORES NOVAS (MODERNAS)         |
-+------------------------------------------+------------------------------------------+
-| Primary: #1A3A5C (azul escuro apagado)   | Primary: #0F4C81 (azul petróleo vibrante)|
-| Accent:  #00AFEF (azul claro ciano)      | Accent:  #00B4D8 (turquesa moderno)      |
-+------------------------------------------+------------------------------------------+
+### Base URL para todas as imagens:
 ```
-
-### Nova Paleta Completa
-
-| Variavel | Cor HSL | Hex | Uso |
-|----------|---------|-----|-----|
-| Primary | 207 80% 28% | `#0F4C81` | Header, banners, botoes |
-| Accent | 190 100% 42% | `#00B4D8` | Destaques, hovers, icones |
-| Secondary | 190 70% 92% | `#E0F7FA` | Fundo secundario |
-| WhatsApp | 142 70% 45% | `#25D366` | Botao WhatsApp (verde padrao) |
-| CTA Email | 207 60% 45% | `#4A7CB8` | Botao email/orcamento |
-| Text Dark | 207 40% 15% | `#1C2D3E` | Textos principais |
-
----
-
-## 2. NOVO HEADER (Identico ao Acrilzano)
-
-### Layout Desktop
-
-```text
-+-------------------------------------------------------------------------------------+
-|  [LOGO GRANDE branca]               [Orcamento via WhatsApp] [Orcamento Via e-mail] |
-|  (altura ~60-70px)                        VERDE #25D366         AZUL #4A7CB8        |
-+-------------------------------------------------------------------------------------+
-               Fundo: Azul #0F4C81 (solido, sem gradiente)
-```
-
-### Especificacoes
-
-- **Fundo**: Azul solido `#0F4C81`
-- **Logo**: Aumentar de 40px para **60-70px** de altura
-- **Botao WhatsApp**: Verde `#25D366`, border-radius 30px, icone WhatsApp, texto branco
-- **Botao E-mail**: Azul claro `#4A7CB8`, border-radius 30px, icone calendario/email
-- **Posicao**: Sticky top
-- **Remover**: Menu dropdown atual (simplificar navegacao)
-
-### Arquivos a Modificar
-
-- `src/components/layout/Header.tsx` - Layout completamente novo
-
----
-
-## 3. HOME PAGE (Estrutura Identica ao Acrilzano)
-
-### 3.1 Hero Section (2 Colunas)
-
-```text
-+----------------------------------------+----------------------------------------+
-|  FABRICA e LOJA DE CHAPAS DE           |     [Imagem Cubo de Acrilico 3D]       |
-|  ACRILICO e PERSONALIZADOS.            |                                        |
-|                                        |                                        |
-|  Acrilico Transparente e Colorido,     |         • • • • (dots navegacao)       |
-|  PS, Policarbonato, Petg, PVC          |                                        |
-+----------------------------------------+----------------------------------------+
-      Fundo: Branco | Titulo: Azul escuro
-```
-
-- Titulo grande (47px desktop, 30px mobile)
-- Subtitulo em cor accent (turquesa)
-- Imagem do cubo a direita com slider dots
-
-### 3.2 Secao "Conheca um pouco da nossa empresa"
-
-- Linha decorativa horizontal com estrela/icone central (cor turquesa)
-- Foto da equipe Lab Acrilicos (placeholder por enquanto)
-- Texto institucional do dossie
-- Botao "Conheca a Nossa Historia" com borda azul
-
-### 3.3 Banner Azul
-
-```text
-+-------------------------------------------------------------------------------------+
-|  Lab Acrilicos e sua casa do acrilico com o melhor preco da regiao                  |
-|  entre todas as lojas de acrilicos.                                                 |
-+-------------------------------------------------------------------------------------+
-       Fundo: Azul #0F4C81 | Texto: Branco
-```
-
-### 3.4 "6 Motivos para Escolher a Lab Acrilicos"
-
-- Titulo centralizado (azul escuro)
-- **Carrossel com setas laterais** (nao grid estatico)
-- 3 cards visiveis desktop, 1 mobile
-- Cards com imagem de fundo + texto sobreposto
-- Conteudo do dossie:
-  1. Emissao de NF-e
-  2. Faturamento e Linha de Credito
-  3. Empresa Solida e Confiavel
-  4. Pronta Entrega
-  5. Entrega em Todo Brasil
-  6. Atendimento Rapido
-
-### 3.5 "Satisfacao Garantida"
-
-- Titulo + subtitulo "Veja as opinioes de nossos clientes"
-- Linha decorativa com estrela turquesa
-- Grid 4 colunas com cards de depoimentos
-- 5 estrelas douradas em cada card
-- Texto italico entre aspas
-- Nome do cliente em destaque azul
-
-### 3.6 "PRODUTOS SOB MEDIDA"
-
-- Titulo caps centralizado (azul)
-- Grid 4x2 de produtos com **imagens reais**
-- Link para cada produto
-- Botao "Ver mais produtos" com borda azul
-
-### 3.7 "CHAPAS E PEDACOS DE PLACAS"
-
-- Titulo caps centralizado
-- Grid de tipos de chapas (8 itens) com imagens de cores
-- Link "VER MAIS CHAPAS"
-
-### 3.8 "Grande Empresa, Grandes Clientes"
-
-- Fundo branco
-- Titulo centralizado
-- Grid de logos de clientes (placeholders cinza por enquanto)
-
-### 3.9 Secao Final: Orcamento + Mapa
-
-- Layout 2 colunas:
-  - Esquerda: 3 cards de beneficios (Contato Rapido, Alta Qualidade, Melhor Preco)
-  - Direita: Google Maps embed
-- Dados de contato Lab Acrilicos abaixo
-
----
-
-## 4. PAGINA CHAPAS DE ACRILICO (Identica ao Acrilzano)
-
-### 4.1 Hero
-
-```text
-+----------------------------------------+----------------------------------------+
-|  CHAPAS DE ACRILICO                    |   [Slider imagens chapas coloridas     |
-|                                        |    empilhadas]                         |
-|  A melhor fabrica de acrilico          |                                        |
-|  com o melhor preco do Rio de Janeiro  |                                        |
-+----------------------------------------+----------------------------------------+
-      Fundo: Cinza claro #F5F5F5
-```
-
-### 4.2 Introducao
-
-- Titulo: "Chapas de acrilico cristal e diversas cores..."
-- Linha decorativa com estrela turquesa
-- Grid de amostras de cores (quadradinhos coloridos)
-- Imagem de chapas empilhadas
-
-### 4.3 Banner Azul
-
-"Chapas de Acrilico cristal e diversas cores, Poliestireno (PS e PSAI), PETG, Policarbonato, ACM e PVC."
-
-### 4.4 Lista de Tipos de Chapas (Layout Alternado)
-
-Cada tipo com layout alternado (esquerda-direita):
-
-```text
-+---------------------------+---------------------------+
-|  [IMAGEM]                 |  TITULO                   |
-|                           |  Descricao...             |
-|                           |  + Principais aplicacoes  |
-|                           |  + Caracteristicas        |
-+---------------------------+---------------------------+
-
-+---------------------------+---------------------------+
-|  TITULO                   |  [IMAGEM]                 |
-|  Descricao...             |                           |
-|  + Principais aplicacoes  |                           |
-|  + Caracteristicas        |                           |
-+---------------------------+---------------------------+
-```
-
-**Tipos a incluir:**
-1. CHAPAS Acrilico CAST (100% Virgem)
-2. CHAPAS Poliestireno (PS e PSAI)
-3. CHAPAS PETG
-4. CHAPAS Policarbonato Alveolar
-5. CHAPAS Policarbonato Compacto
-6. CHAPAS de PVC Expandido
-7. CHAPAS ACM
-
-### 4.5 Accordions Expansiveis
-
-- Titulo clicavel com "+"
-- Conteudo expandivel com aplicacoes e caracteristicas
-- Animacao suave slide-down
-
----
-
-## 5. PAGINA ACRILICO SOB MEDIDA (Identica ao Acrilzano)
-
-### 5.1 Hero Azul
-
-```text
-+-------------------------------------------------------------------------------------+
-|  A MELHOR FABRICA DE ACRILICO PERSONALIZADO E SOB MEDIDA                            |
-|  do RIO DE JANEIRO (RJ).                                                            |
-|                                                                                     |
-|  Produtos, Caixas e Placas de acrilico Transparente, Cristal e           [Cubo 3D]  |
-|  Coloridos.                                                                         |
-+-------------------------------------------------------------------------------------+
-       Fundo: Azul #0F4C81 | Texto: Branco
-```
-
-### 5.2 Secao Empresa
-
-- Linha decorativa estrela turquesa
-- Foto equipe
-- Texto institucional
-
-### 5.3 Categorias de Produtos (Grid por Categoria)
-
-Cada categoria com titulo e grid horizontal:
-
-**1. CAIXAS, POTES, CUPULAS, REDOMAS**
-- Caixas Sob Medida
-- Cupulas e Redomas
-- Potes para Doces
-- Potes para Graos
-
-**2. MEDALHAS E TROFEUS PERSONALIZADOS**
-- Medalhas Personalizadas
-- Trofeus Personalizados
-
-**3. PLACAS SOB MEDIDA, PERSONALIZADAS E GRAVADAS**
-- Placa Customizada
-- Placa Sinalizacao
-
-**4. DISPLAY, URNAS E QUADROS**
-- Display de Acrilico
-- Urna de Acrilico
-- Caixa de Sugestao
-
-**5. EXPOSITORES**
-- Expositores para Bijuterias
-- Expositores para Calcados
-- Expositores para Oculos
-- Porta Folder
-
-### 5.4 "Grande Empresa, Grandes Clientes"
-
-Grid de logos
-
-### 5.5 "Satisfacao Garantida"
-
-Depoimentos (reutilizar componente)
-
-### 5.6 Formulario "Solicite seu Orcamento"
-
-```text
-+-------------------------------------------------------------------------------------+
-|  SOLICITE SEU ORCAMENTO                                                             |
-|                                                                                     |
-|  [Nome]              [E-mail]            [Telefone]                                 |
-|  [WhatsApp]          [Produto interesse v]                                          |
-|  [Mensagem .............................................................]         |
-|  [ ] Li e concordo com a politica de privacidade                                    |
-|                           [ENVIAR MENSAGEM] (botao amarelo/dourado)                 |
-+-------------------------------------------------------------------------------------+
-       Fundo: Azul escuro #0A3D66
-```
-
-### 5.7 "Nossa Localizacao"
-
-- Google Maps embed (iframe)
-- Dados de contato ao lado
-
----
-
-## 6. NOVO FOOTER (Identico ao Acrilzano)
-
-### Layout 4 Colunas
-
-```text
-+--------------------+--------------------+--------------------+--------------------+
-|  CONTATO           |  ATENDIMENTO       |  HORARIOS          |  [GOOGLE MAP]      |
-+--------------------+--------------------+--------------------+--------------------+
-|  Endereco          |  Telefone          |  Seg-Sex 8h-18h    |  [iframe embed]    |
-|  Email             |  WhatsApp          |  Sabado 8h-12h     |                    |
-|  [Icons redes]     |                    |                    |                    |
-+--------------------+--------------------+--------------------+--------------------+
-       Fundo: Azul #0F4C81 | Texto: Branco
+https://acrilzano.com.br/wp-content/uploads/
 ```
 
 ---
 
-## 7. NOVOS COMPONENTES A CRIAR
+### 1.1 Hero Slider (HeroSlider.tsx)
 
-| Componente | Descricao |
-|------------|-----------|
-| `DecorativeDivider.tsx` | Linha horizontal + estrela/icone central turquesa |
-| `ProductCarousel.tsx` | Carrossel com setas laterais (usando embla-carousel) |
-| `TestimonialCard.tsx` | Card depoimento com 5 estrelas douradas |
-| `PurpleBanner.tsx` > `BlueBanner.tsx` | Faixa azul com texto centralizado |
-| `AccordionSection.tsx` | Accordions expansiveis para chapas |
-| `ProductCategoryGrid.tsx` | Grid de produtos por categoria |
-| `EmbeddedQuoteForm.tsx` | Formulario de orcamento embutido |
-| `GoogleMapEmbed.tsx` | Iframe do Google Maps |
-| `ClientLogos.tsx` | Grid de logos de clientes |
-| `HeroSlider.tsx` | Slider do hero com dots |
+Substituir as 3 imagens genericas do Unsplash:
+
+| Slot | Imagem Atual | Nova Imagem (URL Acrilzano) | Descricao |
+|------|--------------|----------------------------|-----------|
+| 1 | Unsplash generic | `https://storage.builderall.com/franquias/2/6891583/editor-html/9121285.png` | Cubo de acrilico 3D transparente |
+| 2 | Unsplash generic | `2022/08/chapa-1-min.jpg` | Chapas de acrilico empilhadas |
+| 3 | Unsplash generic | `2022/08/chapa-min.jpg` | Chapas coloridas variadas |
 
 ---
 
-## 8. ARQUIVOS A MODIFICAR
+### 1.2 Secao "Conheca nossa empresa" (Index.tsx)
 
-### Design System
+Substituir placeholder por imagem real da equipe:
+
+| Elemento | Imagem |
+|----------|--------|
+| Foto da Equipe | `2022/08/Equipe-Acrilzano-acrilico-1-min.jpg` |
+
+(Nota: Esta imagem e da equipe Acrilzano. Voce pode substituir por foto propria da Lab Acrilicos depois)
+
+---
+
+### 1.3 Produtos Sob Medida (Index.tsx - produtosSobMedida)
+
+Adicionar campo `imageUrl` a cada produto:
+
+| Produto | URL da Imagem |
+|---------|---------------|
+| Caixas Sob Medida | `2022/08/caixa-acrilico-doces-3-300x225-300x225-min.jpg` |
+| Cupulas e Redomas | `2022/08/expositor-de-acrilico-cone-300x300-min.jpg` |
+| Potes para Doces | `2022/08/suporte-para-bolo-de-andar-300x300-min.jpg` |
+| Potes para Graos | `2022/08/caixa-acrilico-granel-300x225-300x225-min.jpg` |
+| Urna de Acrilico | `2022/08/urna-de-acrilico-300x300-min.jpg` (se disponivel) ou placeholder |
+| Display de Acrilico | `2022/08/expositor-de-acrilico-doces-300x300-min.jpg` |
+| Trofeus | `2022/08/trofeu-acrilico-acrilzano-300x298-min.jpg` |
+| Medalhas | `2022/08/medalhas-acrilicas-300x300-min.jpg` |
+
+---
+
+### 1.4 Tipos de Chapas (Index.tsx - tiposChapas)
+
+Adicionar imagens para cada tipo de chapa:
+
+| Tipo | URL da Imagem |
+|------|---------------|
+| Acrilico Cristal | `2022/08/CHAPA-PRINCIPAL-300x300-min.jpg` |
+| Acrilico Colorido | `2022/08/chapa-acrilico-colorido-300x223-300x223-1.jpg` |
+| Acrilico Leitoso | `2022/08/chapa-2-min.jpg` |
+| Acrilico Espelhado | `2022/08/chapa-acrilico-espelhada-300x225-min.jpg` |
+| Policarbonato | `2022/08/chapa-3-min.jpg` |
+| PETG | `2022/08/4444444444444444444444444-min.jpg` |
+| PVC Expandido | `2022/08/111111111111111111111111-min.jpg` |
+| Pedacos e Retalhos | `2022/08/22222222222222222222222222-min.jpg` |
+
+---
+
+### 1.5 Carrossel "6 Motivos" (MotivosCarousel.tsx)
+
+Adicionar imagens de fundo aos cards:
+
+| Motivo | URL da Imagem |
+|--------|---------------|
+| Emissao de NF-e | `2022/08/1.2-min.jpg` |
+| Faturamento e Linha de Credito | `2022/08/2.2-min.jpg` |
+| Empresa Solida e Confiavel | `2022/08/3.2-min.jpg` |
+| Pronta Entrega | `2022/08/4.2-min.jpg` |
+| Entrega em Todo Brasil | `2022/08/5.2-min.jpg` |
+| Atendimento Rapido | `2022/08/6.2-min.jpg` |
+
+---
+
+### 1.6 Depoimentos / Satisfacao Garantida (Index.tsx)
+
+Usar avatares de depoimentos:
+
+| Cliente | URL do Avatar |
+|---------|---------------|
+| Cliente 1 | `2022/06/1-min.png` |
+| Cliente 2 | `2022/06/2-min.png` |
+| Cliente 3 | `2022/06/3-min.png` |
+| Cliente 4 | `2022/06/4-min.png` |
+
+---
+
+### 1.7 Pagina Chapas de Acrilico (ChapasDeAcrilico.tsx)
+
+Imagens para cada tipo de chapa na lista:
+
+| Tipo de Chapa | URL da Imagem |
+|---------------|---------------|
+| Acrilico CAST 100% Virgem | `2022/08/chapa-1-min.jpg` |
+| Poliestireno (PS e PSAI) | `2022/08/chapa-2-min.jpg` |
+| PETG | `2022/08/chapa-3-min.jpg` |
+| Policarbonato Alveolar | `2022/08/chapa-min.jpg` |
+| Policarbonato Compacto | `2022/08/111111111111111111111111-min.jpg` |
+| PVC Expandido | `2022/08/22222222222222222222222222-min.jpg` |
+| ACM | `2022/08/3333333333333333333333333-min.jpg` |
+
+---
+
+### 1.8 Pagina Acrilico Sob Medida (AcrilicoSobMedida.tsx)
+
+Imagens para categorias de produtos:
+
+**CAIXAS, POTES, CUPULAS, REDOMAS:**
+| Produto | URL da Imagem |
+|---------|---------------|
+| Caixas Sob Medida | `2022/08/Caixas-acrilico-300x251-300x251-min.jpg` |
+| Cupulas e Redomas | `2022/08/cupula-acrilico-400x300-300x225-min.jpg` |
+| Potes para Doces | `2022/08/caixa-acrilico-doces-2-300x200-300x200-min.jpg` |
+| Potes para Graos | `2022/08/pote-acrilico-granel-225x300-225x300-min.jpg` |
+
+**MEDALHAS E TROFEUS:**
+| Produto | URL da Imagem |
+|---------|---------------|
+| Medalhas Personalizadas | `2022/08/medalhas-acrilica-300x300-min.jpg` |
+| Trofeus Personalizados | `2022/08/trofeu-acrilico-fenda-300x300-min.jpg` |
+
+**PLACAS:**
+| Produto | URL da Imagem |
+|---------|---------------|
+| Placa Customizada | placeholder (usar gradiente) |
+| Placa Sinalizacao | placeholder (usar gradiente) |
+
+**DISPLAY, URNAS:**
+| Produto | URL da Imagem |
+|---------|---------------|
+| Display de Acrilico | `2022/08/expositor-de-acrilicos-300x180-300x180-min.jpg` |
+| Urna de Acrilico | `2022/08/sugestoes-400x267-300x225-min.jpg` |
+| Caixa de Sugestao | `2022/08/caixa-sugestao-300x300-min.jpg` |
+
+**EXPOSITORES:**
+| Produto | URL da Imagem |
+|---------|---------------|
+| Expositores para Bijuterias | `2022/08/expositor-acrilico-brinco-1-300x297-min.jpg` |
+| Expositores para Calcados | `2022/08/expositor-de-acrilico-doces-300x300-min.jpg` |
+| Expositores para Oculos | placeholder |
+| Porta Folder | `2022/08/porta-folder-acrilicdo-parede-400x240-300x225-min.jpg` |
+
+---
+
+## 2. ARQUIVOS A MODIFICAR
+
+### Design System / Componentes
 
 | Arquivo | Alteracao |
 |---------|-----------|
-| `src/index.css` | Nova paleta de cores azul moderno |
-| `tailwind.config.ts` | Atualizar cores, adicionar font Open Sans |
-
-### Layout
-
-| Arquivo | Alteracao |
-|---------|-----------|
-| `src/components/layout/Header.tsx` | Redesign completo (logo grande + 2 CTAs) |
-| `src/components/layout/Footer.tsx` | Novo layout 4 colunas com mapa |
+| `src/components/home/HeroSlider.tsx` | Substituir 3 URLs do Unsplash por imagens reais do Acrilzano |
+| `src/components/home/MotivosCarousel.tsx` | Adicionar imagens de fundo aos 6 cards |
+| `src/components/home/ProductCategoryGrid.tsx` | Garantir que renderiza imageUrl corretamente |
 
 ### Paginas
 
 | Arquivo | Alteracao |
 |---------|-----------|
-| `src/pages/Index.tsx` | Estrutura identica ao Acrilzano |
-| `src/pages/products/ChapasDeAcrilico.tsx` | Layout alternado + accordions |
-| `src/pages/products/AcrilicoSobMedida.tsx` | Categorias + formulario embutido |
+| `src/pages/Index.tsx` | Adicionar imageUrl aos arrays produtosSobMedida e tiposChapas, atualizar secao empresa com foto real, adicionar avatarUrl aos depoimentos |
+| `src/pages/products/ChapasDeAcrilico.tsx` | Adicionar imagens a cada tipo de chapa |
+| `src/pages/products/AcrilicoSobMedida.tsx` | Adicionar imageUrl a cada produto nas categorias |
 
 ---
 
-## 9. IMAGENS (Estrategia)
+## 3. EXEMPLO DE CODIGO
 
-### Abordagem para Site Limpo e Rapido
+### HeroSlider.tsx (antes e depois)
 
-1. **Imagens temporarias**: URLs do site Acrilzano (ate voce fornecer fotos proprias)
-2. **Lazy loading**: Todas as imagens com `loading="lazy"`
-3. **Otimizacao**: srcset para diferentes tamanhos
-4. **Placeholders**: Cinza com icone para logos de clientes
+**Antes:**
+```typescript
+const heroImages = [
+  {
+    id: 1,
+    src: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=500&fit=crop",
+    alt: "Cubo de acrilico transparente",
+  },
+  // ...
+];
+```
 
-### Imagens Necessarias
+**Depois:**
+```typescript
+const heroImages = [
+  {
+    id: 1,
+    src: "https://storage.builderall.com/franquias/2/6891583/editor-html/9121285.png",
+    alt: "Cubo de acrilico transparente 3D",
+  },
+  {
+    id: 2,
+    src: "https://acrilzano.com.br/wp-content/uploads/2022/08/chapa-1-min.jpg",
+    alt: "Chapas de acrilico empilhadas",
+  },
+  {
+    id: 3,
+    src: "https://acrilzano.com.br/wp-content/uploads/2022/08/chapa-min.jpg",
+    alt: "Chapas de acrilico coloridas",
+  },
+];
+```
 
-| Imagem | Uso |
-|--------|-----|
-| Cubo acrilico 3D | Hero sections |
-| Foto equipe | Secao empresa |
-| Chapas coloridas empilhadas | Hero chapas |
-| Produtos individuais | Grids de produtos |
-| Depoimentos (avatares) | Cards depoimentos |
-| Logos clientes | Grid "Grandes Clientes" |
+### Index.tsx - Produtos com Imagem
+
+**Antes:**
+```typescript
+const produtosSobMedida = [
+  { nome: "Caixas Sob Medida", href: "/acrilico-sob-medida/caixas-sob-medida" },
+  // ...
+];
+```
+
+**Depois:**
+```typescript
+const produtosSobMedida = [
+  { 
+    nome: "Caixas Sob Medida", 
+    href: "/acrilico-sob-medida/caixas-sob-medida",
+    imageUrl: "https://acrilzano.com.br/wp-content/uploads/2022/08/caixa-acrilico-doces-3-300x225-300x225-min.jpg"
+  },
+  // ...
+];
+```
 
 ---
 
-## 10. PERFORMANCE
+## 4. PERFORMANCE
 
-Para manter o site **limpo e rapido**:
+Para manter o site rapido e limpo:
 
-- Fontes: Google Fonts com `display=swap`
-- Imagens: Lazy loading nativo
-- CSS: Minificado pelo Vite
-- JS: Code splitting por rota (ja configurado)
-- Animacoes: Apenas CSS transitions (sem bibliotecas pesadas)
-- Carrossel: embla-carousel (ja instalado, leve)
+- Todas as imagens terao `loading="lazy"`
+- Preferir versoes 300x300 ou 300x225 (mais leves)
+- Manter srcset para responsividade quando possivel
+- Usar fallback para imagens que falharem
 
 ---
 
-## Resumo de Entregaveis
+## 5. RESUMO DE ENTREGAVEIS
 
-| Item | Status |
-|------|--------|
-| Nova paleta azul moderno | A fazer |
-| Header com logo grande + 2 CTAs | A fazer |
-| Home Page identica ao Acrilzano | A fazer |
-| Pagina Chapas com accordions | A fazer |
-| Pagina Sob Medida com categorias | A fazer |
-| Footer com mapa embutido | A fazer |
-| 10 componentes reutilizaveis | A fazer |
-| Backend (leads, webhooks) | Ja pronto, manter |
+| Secao | Quantidade de Imagens |
+|-------|----------------------|
+| Hero Slider | 3 imagens |
+| Secao Empresa | 1 imagem (equipe) |
+| Produtos Sob Medida | 8 imagens |
+| Tipos de Chapas | 8 imagens |
+| 6 Motivos (Carrossel) | 6 imagens de fundo |
+| Depoimentos | 4 avatares |
+| Pagina Chapas | 7 imagens |
+| Pagina Sob Medida | 15+ imagens |
+
+**Total: ~52 imagens reais** substituindo os placeholders atuais.
+
+---
+
+## 6. OBSERVACAO IMPORTANTE
+
+As imagens estao hospedadas no servidor `acrilzano.com.br`. Quando voce tiver fotos proprias da Lab Acrilicos, basta substituir as URLs por imagens hospedadas em seu proprio servidor ou fazer upload delas diretamente no Lovable.
 
