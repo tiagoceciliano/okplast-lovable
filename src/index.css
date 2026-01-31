@@ -172,4 +172,58 @@
   .decorative-divider > * {
     @apply mx-4 text-accent;
   }
+
+  /* WhatsApp Modal Styles */
+  .whatsapp-modal {
+    @apply shadow-2xl;
+  }
+
+  .whatsapp-header {
+    background: linear-gradient(135deg, #075E54 0%, #128C7E 100%);
+  }
+
+  .whatsapp-chat-area {
+    background-color: #ECE5DD;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4cfc4' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  .whatsapp-bubble-received {
+    @apply bg-white rounded-lg rounded-tl-none p-3 max-w-[85%] shadow-sm relative;
+  }
+
+  .whatsapp-bubble-received::before {
+    content: '';
+    @apply absolute -left-2 top-0 w-0 h-0;
+    border-top: 8px solid white;
+    border-left: 8px solid transparent;
+  }
+
+  .whatsapp-bubble-sent {
+    @apply bg-[#DCF8C6] rounded-lg rounded-tr-none p-3 ml-auto max-w-[95%] shadow-sm relative;
+  }
+
+  .whatsapp-bubble-sent::before {
+    content: '';
+    @apply absolute -right-2 top-0 w-0 h-0;
+    border-top: 8px solid #DCF8C6;
+    border-right: 8px solid transparent;
+  }
+
+  .whatsapp-time {
+    @apply text-[10px] text-gray-500 float-right mt-1 ml-2;
+  }
+
+  .whatsapp-input {
+    @apply bg-white/90 border-0 rounded-lg text-sm h-9 focus-visible:ring-1 focus-visible:ring-[#25D366] placeholder:text-gray-400;
+  }
+
+  .whatsapp-send-button {
+    background: linear-gradient(135deg, #25D366 0%, #128C7E 100%) !important;
+    @apply text-white font-semibold rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-200;
+  }
+
+  .whatsapp-send-button:hover {
+    background: linear-gradient(135deg, #1da851 0%, #0d7a6b 100%) !important;
+    transform: translateY(-1px);
+  }
 }
