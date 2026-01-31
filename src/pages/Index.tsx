@@ -96,16 +96,6 @@ export default function Index() {
           <DecorativeDivider />
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            {/* Foto da Equipe */}
-            <div className="aspect-video bg-muted rounded-lg overflow-hidden">
-              <img 
-                src={EMPRESA_IMAGES.equipe} 
-                alt="Equipe Lab Acrílicos" 
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
-            </div>
-
             <div>
               <h2 className="font-bold text-2xl md:text-3xl text-foreground mb-6">
                 Conheça um pouco da nossa empresa
