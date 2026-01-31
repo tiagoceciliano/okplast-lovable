@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { X, Send } from "lucide-react";
+import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -36,8 +36,7 @@ import logoImage from "@/assets/logo-lab-acrilicos.png";
 // Schema de validação
 const whatsappFormSchema = z.object({
   nome: z.string().trim().min(2, "Nome deve ter pelo menos 2 caracteres").max(100),
-  email: z.string().trim().email("E-mail inválido").max(255),
-  telefone: z.string().min(14, "Telefone inválido").max(15),
+  telefone: z.string().min(14, "WhatsApp inválido").max(15),
   produto: z.string().min(1, "Selecione um produto"),
   mensagem: z.string().trim().min(5, "Mensagem deve ter pelo menos 5 caracteres").max(1000),
 });
@@ -57,7 +56,6 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
     resolver: zodResolver(whatsappFormSchema),
     defaultValues: {
       nome: "",
-      email: "",
       telefone: "",
       produto: defaultProduto || "",
       mensagem: "",
@@ -83,8 +81,7 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
         `Olá, gostaria de atendimento para um orçamento para os dados abaixo:`,
         ``,
         `Nome: ${nomeFormatado}`,
-        `E-mail: ${data.email}`,
-        `Telefone: ${telefoneFormatado}`,
+        `WhatsApp: ${telefoneFormatado}`,
         `Produto: ${data.produto}`,
         `Mensagem: ${data.mensagem}`,
       ].join("\n");
@@ -104,7 +101,7 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
       supabase.functions.invoke("process-lead", {
         body: {
           nome: nomeFormatado,
-          email: data.email,
+          email: "",
           telefone: telefoneFormatado,
           produto_interesse: data.produto,
           mensagem: data.mensagem,
@@ -189,30 +186,12 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
 
                     <FormField
                       control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <Input 
-                              type="email" 
-                              placeholder="seu@email.com" 
-                              className="whatsapp-input h-9 text-sm"
-                              {...field} 
-                            />
-                          </FormControl>
-                          <FormMessage className="text-xs text-red-600" />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
                       name="telefone"
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
                             <Input 
-                              placeholder="(21) 99999-9999" 
+                              placeholder="Seu WhatsApp: (21) 99999-9999" 
                               className="whatsapp-input h-9 text-sm"
                               {...field}
                               onChange={(e) => handlePhoneChange(e, field.onChange)}
