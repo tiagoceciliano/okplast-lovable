@@ -1,10 +1,12 @@
 import { ProductPage } from "@/components/products/ProductPage";
+import { SOBMEDIDA_IMAGES } from "@/lib/images";
 
 export default function PortaFolder() {
   return (
     <ProductPage
       title="Porta Folder"
       description="Porta folders de acrílico para organização e distribuição de materiais promocionais, folhetos, revistas e catálogos. Disponíveis em versões de mesa e parede, nossos porta folders são ideais para recepções, consultórios, lojas e espaços corporativos, mantendo os materiais organizados e acessíveis."
+      imageUrl={SOBMEDIDA_IMAGES.portaFolder}
       benefits={[
         "Organização de materiais impressos",
         "Versões de mesa e parede",

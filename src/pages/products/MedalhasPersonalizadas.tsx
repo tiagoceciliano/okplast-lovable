@@ -1,10 +1,12 @@
 import { ProductPage } from "@/components/products/ProductPage";
+import { SOBMEDIDA_IMAGES } from "@/lib/images";
 
 export default function MedalhasPersonalizadas() {
   return (
     <ProductPage
       title="Medalhas Personalizadas"
       description="Medalhas de acrílico personalizadas para eventos esportivos, corporativos, escolares e premiações diversas. Nossas medalhas são fabricadas com acrílico de alta qualidade, podendo receber gravação a laser, impressão UV ou aplicação de adesivos com design exclusivo."
+      imageUrl={SOBMEDIDA_IMAGES.medalhas}
       benefits={[
         "Personalização completa do design",
         "Gravação a laser de alta precisão",

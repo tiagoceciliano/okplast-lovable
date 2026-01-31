@@ -1,10 +1,12 @@
 import { ProductPage } from "@/components/products/ProductPage";
+import { SOBMEDIDA_IMAGES } from "@/lib/images";
 
 export default function PotesDoces() {
   return (
     <ProductPage
       title="Potes para Doces e Guloseimas"
       description="Potes de acrílico especialmente desenvolvidos para confeitarias, buffets, festas e estabelecimentos comerciais. Nossos potes valorizam a apresentação dos doces, mantendo-os frescos e protegidos. Disponíveis em diversos tamanhos e formatos para atender diferentes tipos de produtos."
+      imageUrl={SOBMEDIDA_IMAGES.potesDoces}
       benefits={[
         "Acrílico atóxico e seguro para alimentos",
         "Tampa hermética para manter a frescura",

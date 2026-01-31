@@ -1,10 +1,12 @@
 import { ProductPage } from "@/components/products/ProductPage";
+import { SOBMEDIDA_IMAGES } from "@/lib/images";
 
 export default function CaixasSobMedida() {
   return (
     <ProductPage
       title="Caixas Sob Medida"
       description="Fabricamos caixas de acrílico em qualquer tamanho e formato para atender às suas necessidades específicas. Nossas caixas são produzidas com acrílico de alta qualidade, garantindo transparência, resistência e acabamento impecável. Ideais para exposição de produtos, organização, proteção de itens delicados e muito mais."
+      imageUrl={SOBMEDIDA_IMAGES.caixas}
       benefits={[
         "Fabricação personalizada nas medidas exatas do seu projeto",
         "Acrílico de alta transparência e resistência",

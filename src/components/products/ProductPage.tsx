@@ -10,10 +10,11 @@ interface ProductPageProps {
   description: string;
   benefits: string[];
   variations?: string[];
+  imageUrl?: string;
   children?: ReactNode;
 }
 
-export function ProductPage({ title, description, benefits, variations, children }: ProductPageProps) {
+export function ProductPage({ title, description, benefits, variations, imageUrl, children }: ProductPageProps) {
   return (
     <>
       {/* Hero */}
@@ -38,6 +39,18 @@ export function ProductPage({ title, description, benefits, variations, children
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Descrição */}
             <div className="lg:col-span-2 space-y-8">
+              {/* Imagem do Produto */}
+              {imageUrl && (
+                <div className="aspect-video rounded-lg overflow-hidden bg-muted">
+                  <img 
+                    src={imageUrl} 
+                    alt={title} 
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+              )}
+
               <div className="prose prose-lg max-w-none">
                 <p className="text-lg text-muted-foreground">{description}</p>
               </div>
