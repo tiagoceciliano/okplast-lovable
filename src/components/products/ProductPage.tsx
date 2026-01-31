@@ -2,8 +2,8 @@ import { Link } from "react-router-dom";
 import { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle } from "lucide-react";
-import { COMPANY } from "@/lib/constants";
+import { CheckCircle, MessageCircle } from "lucide-react";
+import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
 
 interface ProductPageProps {
   title: string;
@@ -15,6 +15,8 @@ interface ProductPageProps {
 }
 
 export function ProductPage({ title, description, benefits, variations, imageUrl, children }: ProductPageProps) {
+  const { openWhatsAppModal } = useWhatsAppModal();
+
   return (
     <>
       {/* Hero */}
@@ -101,14 +103,13 @@ export function ProductPage({ title, description, benefits, variations, imageUrl
                   <Button className="w-full" size="lg" asChild>
                     <Link to="/home/orcamento">Solicitar Orçamento</Link>
                   </Button>
-                  <Button variant="outline" className="w-full btn-whatsapp border-0" asChild>
-                    <a
-                      href={`https://wa.me/${COMPANY.whatsapp}?text=${encodeURIComponent(`Olá! Gostaria de um orçamento para ${title}.`)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Falar pelo WhatsApp
-                    </a>
+                  <Button 
+                    variant="outline" 
+                    className="w-full btn-whatsapp border-0" 
+                    onClick={() => openWhatsAppModal(title)}
+                  >
+                    <MessageCircle className="h-4 w-4 mr-2" />
+                    Falar pelo WhatsApp
                   </Button>
                 </CardContent>
               </Card>
