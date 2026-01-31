@@ -3,43 +3,44 @@ import useEmblaCarousel from "embla-carousel-react";
 import { ChevronLeft, ChevronRight, FileText, CreditCard, Building, Package, Truck, Headphones } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { MOTIVOS_IMAGES } from "@/lib/images";
 
 const motivos = [
   { 
     icon: FileText, 
     titulo: "Emissão de NF-e", 
     desc: "Nota fiscal eletrônica em todas as compras para sua segurança e garantia",
-    bgImage: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&h=300&fit=crop"
+    bgImage: MOTIVOS_IMAGES.credito // usando credito pois nfe deu 404
   },
   { 
     icon: CreditCard, 
     titulo: "Faturamento e Linha de Crédito", 
     desc: "Condições especiais de pagamento para clientes corporativos",
-    bgImage: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=300&fit=crop"
+    bgImage: MOTIVOS_IMAGES.credito
   },
   { 
     icon: Building, 
     titulo: "Empresa Sólida e Confiável", 
     desc: "Mais de 30 anos de tradição no mercado de acrílico",
-    bgImage: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&h=300&fit=crop"
+    bgImage: MOTIVOS_IMAGES.empresaSolida
   },
   { 
     icon: Package, 
     titulo: "Pronta Entrega", 
     desc: "Estoque completo para atendimento imediato dos seus pedidos",
-    bgImage: "https://images.unsplash.com/photo-1553413077-190dd305871c?w=400&h=300&fit=crop"
+    bgImage: MOTIVOS_IMAGES.prontaEntrega
   },
   { 
     icon: Truck, 
     titulo: "Entrega em Todo Brasil", 
     desc: "Logística eficiente com entrega segura para todo território nacional",
-    bgImage: "https://images.unsplash.com/photo-1519003722824-194d4455a60c?w=400&h=300&fit=crop"
+    bgImage: MOTIVOS_IMAGES.entregaBrasil
   },
   { 
     icon: Headphones, 
     titulo: "Atendimento Rápido", 
     desc: "Equipe especializada pronta para atender suas necessidades",
-    bgImage: "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=400&h=300&fit=crop"
+    bgImage: MOTIVOS_IMAGES.atendimento
   },
 ];
 
