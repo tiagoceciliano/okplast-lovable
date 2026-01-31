@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { MessageCircle, X } from "lucide-react";
-import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
+import { WhatsAppChatWidget } from "./WhatsAppChatWidget";
 
 export function WhatsAppFloatingButton() {
-  const { openWhatsAppModal, isOpen } = useWhatsAppModal();
   const [showProactiveMessage, setShowProactiveMessage] = useState(false);
+  const [isWidgetOpen, setIsWidgetOpen] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -21,16 +21,16 @@ export function WhatsAppFloatingButton() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Hide proactive message when modal opens
+  // Hide proactive message when widget opens
   useEffect(() => {
-    if (isOpen) {
+    if (isWidgetOpen) {
       setShowProactiveMessage(false);
     }
-  }, [isOpen]);
+  }, [isWidgetOpen]);
 
   const handleMessageClick = () => {
     setShowProactiveMessage(false);
-    openWhatsAppModal();
+    setIsWidgetOpen(true);
   };
 
   const handleCloseMessage = (e: React.MouseEvent) => {
@@ -38,36 +38,45 @@ export function WhatsAppFloatingButton() {
     setShowProactiveMessage(false);
   };
 
-  return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
-      {/* Proactive Message */}
-      {showProactiveMessage && !isOpen && (
-        <div 
-          onClick={handleMessageClick}
-          className="whatsapp-proactive-message cursor-pointer animate-slide-up"
-        >
-          <button 
-            onClick={handleCloseMessage}
-            className="absolute -top-2 -right-2 w-6 h-6 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center shadow-md transition-colors"
-            aria-label="Fechar mensagem"
-          >
-            <X className="h-3.5 w-3.5 text-gray-600" />
-          </button>
-          <p className="text-sm text-gray-700 leading-snug pr-2">
-            Precisa de ajuda com seu orçamento? 💬
-          </p>
-        </div>
-      )}
+  const handleButtonClick = () => {
+    setIsWidgetOpen(!isWidgetOpen);
+  };
 
-      {/* WhatsApp Button */}
-      <button
-        data-whatsapp-button
-        onClick={() => openWhatsAppModal()}
-        className="flex items-center justify-center w-14 h-14 rounded-full bg-[hsl(var(--whatsapp))] text-[hsl(var(--whatsapp-foreground))] shadow-lg hover:scale-110 transition-transform animate-pulse-glow"
-        aria-label="Fale conosco pelo WhatsApp"
-      >
-        <MessageCircle className="h-7 w-7" />
-      </button>
-    </div>
+  return (
+    <>
+      {/* Chat Widget */}
+      <WhatsAppChatWidget open={isWidgetOpen} onOpenChange={setIsWidgetOpen} />
+
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+        {/* Proactive Message */}
+        {showProactiveMessage && !isWidgetOpen && (
+          <div 
+            onClick={handleMessageClick}
+            className="whatsapp-proactive-message cursor-pointer animate-slide-up"
+          >
+            <button 
+              onClick={handleCloseMessage}
+              className="absolute -top-2 -right-2 w-6 h-6 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center shadow-md transition-colors"
+              aria-label="Fechar mensagem"
+            >
+              <X className="h-3.5 w-3.5 text-gray-600" />
+            </button>
+            <p className="text-sm text-gray-700 leading-snug pr-2">
+              Precisa de ajuda com seu orçamento? 💬
+            </p>
+          </div>
+        )}
+
+        {/* WhatsApp Button */}
+        <button
+          data-whatsapp-button
+          onClick={handleButtonClick}
+          className="flex items-center justify-center w-14 h-14 rounded-full bg-[hsl(var(--whatsapp))] text-[hsl(var(--whatsapp-foreground))] shadow-lg hover:scale-110 transition-transform animate-pulse-glow"
+          aria-label="Fale conosco pelo WhatsApp"
+        >
+          <MessageCircle className="h-7 w-7" />
+        </button>
+      </div>
+    </>
   );
 }
