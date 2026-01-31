@@ -6,7 +6,7 @@ export const COMPANY = {
   phone: "(21) 3372-3797",
   whatsapp: "5521923670633",
   whatsappFormatted: "(21) 92367-0633",
-  email: "vendas@labacrilicos.com.br",
+  email: "comercial@labacrilicos.com.br",
   domain: "https://labacrilicos.com.br",
   businessHours: "Segunda a Sexta: 8h às 18h | Sábado: 8h às 12h",
 } as const;

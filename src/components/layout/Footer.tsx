@@ -45,23 +45,11 @@ export function Footer() {
             <ul className="space-y-3 text-sm text-primary-foreground/80">
               <li className="flex items-center gap-2">
                 <Phone className="h-4 w-4 shrink-0" />
-                <a
-                  href={`tel:${COMPANY.phone.replace(/\D/g, "")}`}
-                  className="hover:text-primary-foreground transition-colors"
-                >
-                  {COMPANY.phone}
-                </a>
+                <span>{COMPANY.phone}</span>
               </li>
               <li className="flex items-center gap-2">
                 <MessageCircle className="h-4 w-4 shrink-0" />
-                <a
-                  href={`https://wa.me/${COMPANY.whatsapp}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-primary-foreground transition-colors"
-                >
-                  {COMPANY.whatsappFormatted}
-                </a>
+                <span>{COMPANY.whatsappFormatted}</span>
               </li>
             </ul>
             {/* Quick Links */}
