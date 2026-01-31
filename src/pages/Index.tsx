@@ -228,9 +228,20 @@ export default function Index() {
               <Link
                 key={index}
                 to={chapa.href}
-                className="group p-6 rounded-lg bg-primary-foreground/10 hover:bg-primary-foreground/20 transition-colors text-center"
+                className="group relative aspect-[4/3] rounded-lg overflow-hidden"
               >
-                <span className="font-semibold text-sm md:text-base">{chapa.nome}</span>
+                <img 
+                  src={chapa.imageUrl} 
+                  alt={chapa.nome}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="font-semibold text-white text-center px-2 text-sm md:text-base">
+                    {chapa.nome}
+                  </span>
+                </div>
               </Link>
             ))}
           </div>

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { MessageCircle, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { COMPANY } from "@/lib/constants";
-import logoImg from "@/assets/logo-lab-acrilicos.png";
+import logoImg from "@/assets/logos/logo-horizontal.png";
 
 export function Header() {
   return (

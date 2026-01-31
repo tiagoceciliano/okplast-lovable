@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { MapPin, Phone, Mail, Clock, MessageCircle } from "lucide-react";
 import { COMPANY } from "@/lib/constants";
-import logoImg from "@/assets/logo-lab-acrilicos.png";
+import logoImg from "@/assets/logos/logo-horizontal.png";
 import { GoogleMapEmbed } from "@/components/ui/GoogleMapEmbed";
 
 export function Footer() {
