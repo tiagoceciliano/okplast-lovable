@@ -9,23 +9,24 @@ import { ClientLogos } from "@/components/ui/ClientLogos";
 import { GoogleMapEmbed } from "@/components/ui/GoogleMapEmbed";
 import { ProductCategoryGrid } from "@/components/home/ProductCategoryGrid";
 import { EmbeddedQuoteForm } from "@/components/forms/EmbeddedQuoteForm";
+import { SOBMEDIDA_IMAGES, EMPRESA_IMAGES, DEPOIMENTOS_IMAGES } from "@/lib/images";
 
 // Categories with products
 const categorias = [
   {
     titulo: "CAIXAS, POTES, CÚPULAS, REDOMAS",
     produtos: [
-      { nome: "Caixas Sob Medida", href: "/acrilico-sob-medida/caixas-sob-medida" },
-      { nome: "Cúpulas e Redomas", href: "/acrilico-sob-medida/cupulas-e-redomas" },
-      { nome: "Potes para Doces", href: "/acrilico-sob-medida/potes-para-doces-e-guloseimas" },
-      { nome: "Potes para Grãos", href: "/acrilico-sob-medida/potes-para-graos-e-cereais-a-granel" },
+      { nome: "Caixas Sob Medida", href: "/acrilico-sob-medida/caixas-sob-medida", imageUrl: SOBMEDIDA_IMAGES.caixas },
+      { nome: "Cúpulas e Redomas", href: "/acrilico-sob-medida/cupulas-e-redomas", imageUrl: SOBMEDIDA_IMAGES.cupulas },
+      { nome: "Potes para Doces", href: "/acrilico-sob-medida/potes-para-doces-e-guloseimas", imageUrl: SOBMEDIDA_IMAGES.potesDoces },
+      { nome: "Potes para Grãos", href: "/acrilico-sob-medida/potes-para-graos-e-cereais-a-granel", imageUrl: SOBMEDIDA_IMAGES.potesGraos },
     ],
   },
   {
     titulo: "MEDALHAS E TROFÉUS PERSONALIZADOS",
     produtos: [
-      { nome: "Medalhas Personalizadas", href: "/acrilico-sob-medida/medalhas-personalizadas" },
-      { nome: "Troféus Personalizados", href: "/acrilico-sob-medida/trofeus-personalizados" },
+      { nome: "Medalhas Personalizadas", href: "/acrilico-sob-medida/medalhas-personalizadas", imageUrl: SOBMEDIDA_IMAGES.medalhas },
+      { nome: "Troféus Personalizados", href: "/acrilico-sob-medida/trofeus-personalizados", imageUrl: SOBMEDIDA_IMAGES.trofeus },
     ],
   },
   {
@@ -38,28 +39,28 @@ const categorias = [
   {
     titulo: "DISPLAY, URNAS E QUADROS",
     produtos: [
-      { nome: "Display de Acrílico", href: "/acrilico-sob-medida/display-de-acrilico" },
-      { nome: "Urna de Acrílico", href: "/acrilico-sob-medida/urna-de-acrilico" },
-      { nome: "Caixa de Sugestão", href: "/acrilico-sob-medida/caixa-de-sugestao" },
+      { nome: "Display de Acrílico", href: "/acrilico-sob-medida/display-de-acrilico", imageUrl: SOBMEDIDA_IMAGES.display },
+      { nome: "Urna de Acrílico", href: "/acrilico-sob-medida/urna-de-acrilico", imageUrl: SOBMEDIDA_IMAGES.urna },
+      { nome: "Caixa de Sugestão", href: "/acrilico-sob-medida/caixa-de-sugestao", imageUrl: SOBMEDIDA_IMAGES.urna },
     ],
   },
   {
     titulo: "EXPOSITORES",
     produtos: [
-      { nome: "Expositores para Bijuterias", href: "/acrilico-sob-medida/expositores-para-bijuterias" },
-      { nome: "Expositores para Calçados", href: "/acrilico-sob-medida/expositores-para-calcados" },
+      { nome: "Expositores para Bijuterias", href: "/acrilico-sob-medida/expositores-para-bijuterias", imageUrl: SOBMEDIDA_IMAGES.expositoresBijuterias },
+      { nome: "Expositores para Calçados", href: "/acrilico-sob-medida/expositores-para-calcados", imageUrl: SOBMEDIDA_IMAGES.expositoresCalcados },
       { nome: "Expositores para Óculos", href: "/acrilico-sob-medida/expositores-para-oculos" },
-      { nome: "Porta Folder", href: "/acrilico-sob-medida/porta-folder" },
+      { nome: "Porta Folder", href: "/acrilico-sob-medida/porta-folder", imageUrl: SOBMEDIDA_IMAGES.portaFolder },
     ],
   },
 ];
 
 // Depoimentos
 const depoimentos = [
-  { nome: "Carlos Silva", empresa: "Loja de Bijuterias", texto: "Excelente qualidade nos expositores. Minha loja ficou muito mais organizada e bonita!" },
-  { nome: "Ana Paula", empresa: "Confeitaria Doce Sabor", texto: "Os potes de acrílico são perfeitos para expor os doces. Clientes elogiam muito!" },
-  { nome: "Roberto Santos", empresa: "Arquiteto", texto: "Trabalho com a Lab Acrílicos há anos. Sempre entregam no prazo e com qualidade impecável." },
-  { nome: "Maria Fernanda", empresa: "Joalheria Elegance", texto: "Os displays valorizaram muito nossas peças. Atendimento excepcional desde o primeiro contato!" },
+  { nome: "Carlos Silva", empresa: "Loja de Bijuterias", texto: "Excelente qualidade nos expositores. Minha loja ficou muito mais organizada e bonita!", avatarUrl: DEPOIMENTOS_IMAGES.avatar1 },
+  { nome: "Ana Paula", empresa: "Confeitaria Doce Sabor", texto: "Os potes de acrílico são perfeitos para expor os doces. Clientes elogiam muito!", avatarUrl: DEPOIMENTOS_IMAGES.avatar2 },
+  { nome: "Roberto Santos", empresa: "Arquiteto", texto: "Trabalho com a Lab Acrílicos há anos. Sempre entregam no prazo e com qualidade impecável.", avatarUrl: DEPOIMENTOS_IMAGES.avatar3 },
+  { nome: "Maria Fernanda", empresa: "Joalheria Elegance", texto: "Os displays valorizaram muito nossas peças. Atendimento excepcional desde o primeiro contato!", avatarUrl: DEPOIMENTOS_IMAGES.avatar4 },
 ];
 
 export default function AcrilicoSobMedida() {
@@ -97,9 +98,14 @@ export default function AcrilicoSobMedida() {
           <DecorativeDivider />
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            {/* Image placeholder */}
-            <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
-              <span className="text-muted-foreground">Foto da Equipe Lab Acrílicos</span>
+            {/* Foto da Equipe */}
+            <div className="aspect-video bg-muted rounded-lg overflow-hidden">
+              <img 
+                src={EMPRESA_IMAGES.equipe} 
+                alt="Equipe Lab Acrílicos" 
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
             </div>
 
             <div>
@@ -173,6 +179,7 @@ export default function AcrilicoSobMedida() {
                 nome={dep.nome}
                 empresa={dep.empresa}
                 texto={dep.texto}
+                avatarUrl={dep.avatarUrl}
               />
             ))}
           </div>

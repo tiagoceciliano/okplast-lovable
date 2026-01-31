@@ -5,6 +5,7 @@ import { COMPANY } from "@/lib/constants";
 import { DecorativeDivider } from "@/components/ui/DecorativeDivider";
 import { BlueBanner } from "@/components/ui/BlueBanner";
 import { HeroSlider } from "@/components/home/HeroSlider";
+import { CHAPAS_PAGINA_IMAGES } from "@/lib/images";
 import {
   Accordion,
   AccordionContent,
@@ -18,6 +19,7 @@ const tiposChapas = [
     id: "cast",
     nome: "CHAPAS Acrílico CAST (100% Virgem)",
     desc: "O acrílico CAST é produzido pelo processo de vazamento (casting), resultando em chapas de alta qualidade com excelente transparência e resistência. Ideal para projetos que exigem perfeição óptica e durabilidade superior.",
+    imageUrl: CHAPAS_PAGINA_IMAGES.cast,
     aplicacoes: [
       "Vitrines e displays de alto padrão",
       "Projetos arquitetônicos",
@@ -38,6 +40,7 @@ const tiposChapas = [
     id: "ps",
     nome: "CHAPAS Poliestireno (PS e PSAI)",
     desc: "O Poliestireno é uma alternativa econômica ao acrílico, oferecendo boa transparência e facilidade de trabalho. Disponível nas versões PS (cristal) e PSAI (alto impacto).",
+    imageUrl: CHAPAS_PAGINA_IMAGES.poliestireno,
     aplicacoes: [
       "Molduras e porta-retratos",
       "Displays descartáveis",
@@ -58,6 +61,7 @@ const tiposChapas = [
     id: "petg",
     nome: "CHAPAS PETG",
     desc: "O PETG combina transparência semelhante ao acrílico com alta resistência ao impacto. É ideal para aplicações que exigem segurança e durabilidade.",
+    imageUrl: CHAPAS_PAGINA_IMAGES.petg,
     aplicacoes: [
       "Proteções de máquinas",
       "Viseiras e EPIs",
@@ -78,6 +82,7 @@ const tiposChapas = [
     id: "pc-alveolar",
     nome: "CHAPAS Policarbonato Alveolar",
     desc: "O Policarbonato Alveolar é uma chapa multicamadas com câmaras de ar, oferecendo excelente isolamento térmico e leveza. Ideal para coberturas e fechamentos.",
+    imageUrl: CHAPAS_PAGINA_IMAGES.policarbonatoAlveolar,
     aplicacoes: [
       "Coberturas e pergolados",
       "Telhados translúcidos",
@@ -98,6 +103,7 @@ const tiposChapas = [
     id: "pc-compacto",
     nome: "CHAPAS Policarbonato Compacto",
     desc: "O Policarbonato Compacto é uma das chapas mais resistentes do mercado, com resistência ao impacto 250 vezes maior que o vidro comum.",
+    imageUrl: CHAPAS_PAGINA_IMAGES.policarbonatoCompacto,
     aplicacoes: [
       "Blindagem arquitetônica",
       "Escudos de proteção",
@@ -118,6 +124,7 @@ const tiposChapas = [
     id: "pvc",
     nome: "CHAPAS de PVC Expandido",
     desc: "O PVC Expandido é uma chapa leve e versátil, ideal para comunicação visual e aplicações internas. Fácil de cortar, colar e pintar.",
+    imageUrl: CHAPAS_PAGINA_IMAGES.pvc,
     aplicacoes: [
       "Painéis de comunicação visual",
       "Displays e totens",
@@ -138,6 +145,7 @@ const tiposChapas = [
     id: "acm",
     nome: "CHAPAS ACM",
     desc: "O ACM (Alumínio Composto) é formado por duas lâminas de alumínio com núcleo de polietileno. Ideal para fachadas, letreiros e revestimentos externos.",
+    imageUrl: CHAPAS_PAGINA_IMAGES.acm,
     aplicacoes: [
       "Fachadas de lojas e edifícios",
       "Letreiros e totens",
@@ -256,8 +264,13 @@ export default function ChapasDeAcrilico() {
             >
               {/* Image */}
               <div className={`${chapa.imagePosition === "right" ? "lg:order-2" : "lg:order-1"}`}>
-                <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
-                  <span className="text-muted-foreground">Imagem {chapa.nome}</span>
+                <div className="aspect-video bg-muted rounded-lg overflow-hidden">
+                  <img 
+                    src={chapa.imageUrl} 
+                    alt={chapa.nome}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
                 </div>
               </div>
 
