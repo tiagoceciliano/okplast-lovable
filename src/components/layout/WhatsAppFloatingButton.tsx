@@ -9,6 +9,13 @@ export function WhatsAppFloatingButton() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowProactiveMessage(true);
+      
+      // Tocar som de notificação
+      const audio = new Audio('/sounds/notification.mp3');
+      audio.volume = 0.5;
+      audio.play().catch(() => {
+        // Ignora erro se autoplay bloqueado pelo navegador
+      });
     }, 5000);
     
     return () => clearTimeout(timer);
