@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, CheckCircle, Phone, Award, DollarSign } from "lucide-react";
+import { ArrowRight, CheckCircle, Phone, Award, DollarSign, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { COMPANY } from "@/lib/constants";
 import { DecorativeDivider } from "@/components/ui/DecorativeDivider";
@@ -9,33 +9,34 @@ import { ClientLogos } from "@/components/ui/ClientLogos";
 import { GoogleMapEmbed } from "@/components/ui/GoogleMapEmbed";
 
 import { MotivosCarousel } from "@/components/home/MotivosCarousel";
-import { ProductCategoryGrid } from "@/components/home/ProductCategoryGrid";
-import { PRODUTOS_IMAGES, CHAPAS_IMAGES, DEPOIMENTOS_IMAGES, EMPRESA_IMAGES } from "@/lib/images";
+import { PRODUTOS_IMAGES, CHAPAS_IMAGES, DEPOIMENTOS_IMAGES } from "@/lib/images";
 
-// Produtos Sob Medida - Grid de 8 produtos (sem links individuais)
+// Produtos Sob Medida - Grid de 8 produtos
 const produtosSobMedida = [
   // Linha 1
-  { nome: "Potes para Doces", href: "/acrilico-sob-medida", imageUrl: PRODUTOS_IMAGES.potesDoces },
-  { nome: "Cúpulas e Redomas", href: "/acrilico-sob-medida", imageUrl: PRODUTOS_IMAGES.cupulasRedomas },
-  { nome: "Display de Acrílico", href: "/acrilico-sob-medida", imageUrl: PRODUTOS_IMAGES.display },
-  { nome: "Porta Folder", href: "/acrilico-sob-medida", imageUrl: PRODUTOS_IMAGES.portaFolder },
+  { nome: "Potes para Doces", imageUrl: PRODUTOS_IMAGES.potesDoces },
+  { nome: "Cúpulas e Redomas", imageUrl: PRODUTOS_IMAGES.cupulasRedomas },
+  { nome: "Display de Acrílico", imageUrl: PRODUTOS_IMAGES.display },
+  { nome: "Porta Folder", imageUrl: PRODUTOS_IMAGES.portaFolder },
   // Linha 2
-  { nome: "Potes para Grãos", href: "/acrilico-sob-medida", imageUrl: PRODUTOS_IMAGES.potesGraos },
-  { nome: "Urna de Acrílico", href: "/acrilico-sob-medida", imageUrl: PRODUTOS_IMAGES.urna },
-  { nome: "Caixas Sob Medida", href: "/acrilico-sob-medida", imageUrl: PRODUTOS_IMAGES.caixasSobMedida },
-  { nome: "Troféus", href: "/acrilico-sob-medida", imageUrl: PRODUTOS_IMAGES.trofeus },
+  { nome: "Potes para Grãos", imageUrl: PRODUTOS_IMAGES.potesGraos },
+  { nome: "Urna de Acrílico", imageUrl: PRODUTOS_IMAGES.urna },
+  { nome: "Caixas Sob Medida", imageUrl: PRODUTOS_IMAGES.caixasSobMedida },
+  { nome: "Troféus", imageUrl: PRODUTOS_IMAGES.trofeus },
 ];
 
-// Tipos de Chapas
+// Tipos de Chapas - Grid de 8 chapas
 const tiposChapas = [
-  { nome: "Acrílico Cristal", href: "/chapas-de-acrilico", imageUrl: CHAPAS_IMAGES.acrilicoCristal },
-  { nome: "Acrílico Colorido", href: "/chapas-de-acrilico", imageUrl: CHAPAS_IMAGES.acrilicoColorido },
-  { nome: "Acrílico Leitoso", href: "/chapas-de-acrilico", imageUrl: CHAPAS_IMAGES.acrilicoLeitoso },
-  { nome: "Acrílico Espelhado", href: "/chapas-de-acrilico", imageUrl: CHAPAS_IMAGES.acrilicoEspelhado },
-  { nome: "Policarbonato", href: "/chapas-de-acrilico", imageUrl: CHAPAS_IMAGES.policarbonato },
-  { nome: "PETG", href: "/chapas-de-acrilico", imageUrl: CHAPAS_IMAGES.petg },
-  { nome: "PVC Expandido", href: "/chapas-de-acrilico", imageUrl: CHAPAS_IMAGES.pvcExpandido },
-  { nome: "Pedaços e Retalhos", href: "/chapas-de-acrilico", imageUrl: CHAPAS_IMAGES.pedacosRetalhos },
+  // Linha 1
+  { nome: "Acrílico Transparente", imageUrl: CHAPAS_IMAGES.acrilicoCristal },
+  { nome: "Acrílico Colorido", imageUrl: CHAPAS_IMAGES.acrilicoColorido },
+  { nome: "Pet G", imageUrl: CHAPAS_IMAGES.petg },
+  { nome: "PS Poliestireno", imageUrl: CHAPAS_IMAGES.acrilicoLeitoso },
+  // Linha 2
+  { nome: "Policarbonato Alveolar", imageUrl: CHAPAS_IMAGES.policarbonato },
+  { nome: "Policarbonato Compacto", imageUrl: CHAPAS_IMAGES.acrilicoEspelhado },
+  { nome: "PVC Expandido", imageUrl: CHAPAS_IMAGES.pvcExpandido },
+  { nome: "ACM", imageUrl: CHAPAS_IMAGES.pedacosRetalhos },
 ];
 
 // Depoimentos
@@ -56,66 +57,130 @@ const beneficios = [
 export default function Index() {
   return (
     <>
-      {/* Hero Section - 2 Columns */}
+      {/* Hero Section */}
       <section className="bg-background py-12 md:py-16 lg:py-20">
         <div className="container-custom">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            {/* Left Column - Text */}
-            <div>
-              <h1 className="font-bold text-3xl md:text-4xl lg:text-5xl text-foreground mb-6 leading-tight">
-                FÁBRICA e LOJA DE CHAPAS DE{" "}
-                <span className="text-accent">ACRÍLICO</span> e PERSONALIZADOS.
-              </h1>
-              <p className="text-lg md:text-xl text-accent font-medium mb-6">
-                Acrílico Transparente e Colorido, PS, Policarbonato, PETG, PVC e muito mais.
-              </p>
-              <p className="text-muted-foreground mb-8">
-                A <strong className="text-foreground">{COMPANY.name}</strong> é especializada na fabricação e venda de chapas de acrílico e produtos personalizados. 
-                Há mais de 30 anos oferecendo qualidade, inovação e as melhores soluções em acrílico para empresas e consumidores de todo o Brasil.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" asChild>
-                  <Link to="/home/orcamento">
-                    Solicitar Orçamento
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Link>
-                </Button>
-                <Button size="lg" variant="outline" asChild>
-                  <Link to="/acrilico-sob-medida">Ver Produtos</Link>
-                </Button>
-              </div>
-            </div>
-
-            {/* Right Column - Image */}
-            <div className="aspect-video bg-muted rounded-lg overflow-hidden">
-              <img 
-                src={EMPRESA_IMAGES.equipe} 
-                alt="Equipe Lab Acrílicos" 
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
+          <div className="max-w-4xl mx-auto text-center">
+            <h1 className="font-bold text-3xl md:text-4xl lg:text-5xl text-foreground mb-6 leading-tight">
+              FÁBRICA e LOJA DE CHAPAS DE{" "}
+              <span className="text-accent">ACRÍLICO</span> e PERSONALIZADOS.
+            </h1>
+            <p className="text-lg md:text-xl text-accent font-medium mb-6">
+              Acrílico Transparente e Colorido, PS, Policarbonato, PETG, PVC e muito mais.
+            </p>
+            <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
+              A <strong className="text-foreground">{COMPANY.name}</strong> é especializada na fabricação e venda de chapas de acrílico e produtos personalizados. 
+              Há mais de 30 anos oferecendo qualidade, inovação e as melhores soluções em acrílico.
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+              <Button size="lg" asChild>
+                <Link to="/home/orcamento">
+                  Solicitar Orçamento
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+              <Button size="lg" variant="outline" asChild>
+                <a href={`https://wa.me/${COMPANY.whatsapp}`} target="_blank" rel="noopener noreferrer">
+                  Falar pelo WhatsApp
+                </a>
+              </Button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Conheça Nossa Empresa */}
+      {/* ========================================
+          LINHA 1: PRODUTOS SOB MEDIDA
+          ======================================== */}
       <section className="section-padding bg-secondary">
         <div className="container-custom">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="font-bold text-2xl md:text-3xl text-foreground mb-6">
-              Conheça um pouco da nossa empresa
+          <div className="text-center mb-10">
+            <h2 className="font-bold text-2xl md:text-3xl lg:text-4xl text-accent uppercase tracking-wide">
+              Produtos Sob Medida
             </h2>
-            <p className="text-muted-foreground mb-6">
-              A {COMPANY.name} é uma empresa familiar que nasceu da paixão pelo trabalho com acrílico. 
-              Ao longo de mais de três décadas, construímos uma reputação sólida baseada na qualidade, 
-              no atendimento personalizado e na capacidade de transformar ideias em realidade.
+            <p className="text-muted-foreground mt-2">
+              Fabricamos produtos personalizados em acrílico de alta qualidade
             </p>
-            <p className="text-muted-foreground">
-              Nossa equipe de profissionais altamente qualificados está pronta para atender desde 
-              pequenos projetos até grandes demandas corporativas, sempre com o mesmo compromisso: 
-              excelência em cada detalhe.
+          </div>
+          
+          {/* Grid 4x2 */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            {produtosSobMedida.map((produto, index) => (
+              <Link
+                key={index}
+                to="/acrilico-sob-medida"
+                className="group bg-background rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+              >
+                <div className="aspect-square bg-muted overflow-hidden">
+                  <img 
+                    src={produto.imageUrl} 
+                    alt={produto.nome}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                  />
+                </div>
+                <div className="p-3 text-center">
+                  <span className="text-sm font-medium text-foreground">{produto.nome}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+          
+          <div className="text-center mt-8">
+            <Button size="lg" asChild className="gap-2">
+              <Link to="/acrilico-sob-medida">
+                Ver mais produtos
+                <ShoppingCart className="h-5 w-5" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* ========================================
+          LINHA 2: CHAPAS E PEDAÇOS DE PLACAS
+          ======================================== */}
+      <section className="section-padding">
+        <div className="container-custom">
+          <div className="text-center mb-10">
+            <h2 className="font-bold text-2xl md:text-3xl lg:text-4xl text-accent uppercase tracking-wide">
+              Chapas e Pedaços de Placas
+            </h2>
+            <p className="text-muted-foreground mt-2">
+              Trabalhamos com diversos tipos de chapas de acrílico e materiais plásticos
             </p>
+          </div>
+          
+          {/* Grid 4x2 */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            {tiposChapas.map((chapa, index) => (
+              <Link
+                key={index}
+                to="/chapas-de-acrilico"
+                className="group bg-background rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow border"
+              >
+                <div className="aspect-square bg-muted overflow-hidden">
+                  <img 
+                    src={chapa.imageUrl} 
+                    alt={chapa.nome}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                  />
+                </div>
+                <div className="p-3 text-center">
+                  <span className="text-sm font-medium text-foreground">{chapa.nome}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+          
+          <div className="text-center mt-8">
+            <Button size="lg" variant="outline" asChild className="gap-2">
+              <Link to="/chapas-de-acrilico">
+                Ver mais chapas
+                <ArrowRight className="h-5 w-5" />
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
@@ -165,81 +230,6 @@ export default function Index() {
                 avatarUrl={dep.avatarUrl}
               />
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Produtos Sob Medida */}
-      <section className="section-padding">
-        <div className="container-custom">
-          <div className="text-center mb-12">
-            <h2 className="font-bold text-2xl md:text-3xl text-foreground mb-4 uppercase">
-              Produtos Sob Medida
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Fabricamos produtos personalizados em acrílico de alta qualidade
-            </p>
-          </div>
-          
-          <ProductCategoryGrid
-            title=""
-            products={produtosSobMedida}
-            columns={4}
-          />
-          
-          <div className="text-center mt-8">
-            <Button size="lg" variant="outline" asChild>
-              <Link to="/acrilico-sob-medida">
-                Ver mais produtos
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Chapas e Pedaços */}
-      <section className="section-padding bg-primary text-primary-foreground">
-        <div className="container-custom">
-          <div className="text-center mb-12">
-            <h2 className="font-bold text-2xl md:text-3xl mb-4 uppercase">
-              Chapas e Pedaços de Placas
-            </h2>
-            <p className="text-primary-foreground/80 max-w-2xl mx-auto">
-              Trabalhamos com diversos tipos de chapas de acrílico para atender projetos de todos os portes
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {tiposChapas.map((chapa, index) => (
-              <Link
-                key={index}
-                to={chapa.href}
-                className="group relative aspect-[4/3] rounded-lg overflow-hidden"
-              >
-                <img 
-                  src={chapa.imageUrl} 
-                  alt={chapa.nome}
-                  className="absolute inset-0 w-full h-full object-cover"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="font-semibold text-white text-center px-2 text-sm md:text-base">
-                    {chapa.nome}
-                  </span>
-                </div>
-              </Link>
-            ))}
-          </div>
-          
-          <div className="text-center mt-8">
-            <Button size="lg" variant="secondary" asChild>
-              <Link to="/chapas-de-acrilico">
-                Ver Mais Chapas
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
           </div>
         </div>
       </section>
