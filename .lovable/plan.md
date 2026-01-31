@@ -1,100 +1,123 @@
 
-# Plano: Corrigir Mapeamento de Imagens nos Componentes
+
+# Plano: Corrigir Mapeamento Completo de Imagens - Seção PRODUTOS SOB MEDIDA
 
 ## Problema Identificado
 
-As imagens foram baixadas e hospedadas corretamente no storage, mas o **mapeamento nos componentes** está errado. Algumas imagens estao apontando para as constantes erradas.
+Comparando a imagem de referência do Acrilzano com o código atual, as imagens estão mapeadas para produtos errados. A disposição na imagem mostra 8 produtos específicos em 2 linhas de 4 produtos cada.
 
 ---
 
-## Erros Encontrados
+## Mapeamento Correto (Baseado na Imagem de Referência)
 
-### 1. Index.tsx - Linha 21
-**Produto:** "Urna de Acrilico"  
-**Atual:** `PRODUTOS_IMAGES.display` (ERRADO)  
-**Correto:** `PRODUTOS_IMAGES.urna`
+### LINHA 1 - Da esquerda para direita:
 
-### 2. AcrilicoSobMedida.tsx - Linha 44
-**Produto:** "Caixa de Sugestao"  
-**Atual:** `SOBMEDIDA_IMAGES.urna` (ERRADO)  
-**Correto:** `SOBMEDIDA_IMAGES.caixaSugestao`
+| Posição | Produto no Acrilzano | URL Original | Mapeamento Atual | Produto Lab Acrílicos |
+|---------|---------------------|--------------|------------------|----------------------|
+| 1 | Expositor Doces (escada) | `3333333333333333333333333-min.jpg` | `chapas-pagina/acm.jpg` (ERRADO) | Potes para Doces |
+| 2 | Cúpula Preta | `builderall/.../9852756.jpg` | Não migrada | Cúpulas e Redomas |
+| 3 | Quadro de Avisos | `builderall/.../9852775.jpg` | Não migrada | Display de Acrílico |
+| 4 | Porta Folder Dourado | `builderall/.../9860922.png` | Não migrada | Porta Folder |
 
-### 3. AcrilicoSobMedida.tsx - Linha 51
-**Produto:** "Expositores para Calcados"  
-**Atual:** `SOBMEDIDA_IMAGES.expositoresCalcados` que aponta para `expositor-de-acrilico-doces` (ERRADO)  
-**Correto:** Precisa de uma imagem especifica de expositores de calcados
+### LINHA 2 - Da esquerda para direita:
 
----
-
-## Problemas no Mapeamento Original (images.ts)
-
-Analisando o arquivo `src/lib/images.ts`, encontrei que algumas URLs originais do Acrilzano foram mapeadas incorretamente:
-
-| Produto | Imagem Atual | Problema |
-|---------|--------------|----------|
-| expositoresCalcados | expositor-de-acrilico-doces-300x300-min.jpg | Deveria ser imagem de calcados, nao de doces |
-| urna (sobmedida) | sugestoes-400x267-300x225-min.jpg | Esta e foto de caixa de sugestao, nao urna |
+| Posição | Produto no Acrilzano | URL Original | Mapeamento Atual | Produto Lab Acrílicos |
+|---------|---------------------|--------------|------------------|----------------------|
+| 5 | Potes Grãos (vários) | `111111111111111111111111-min.jpg` | `chapas/pvc-expandido.jpg` (ERRADO) | Potes para Grãos |
+| 6 | Cúpula Transparente | `9852742-min.jpeg` | Não migrada | Urna de Acrílico |
+| 7 | Púlpito Acrílico | `pulpito-oratoria-...min.jpg` | Não migrada | Caixas Sob Medida |
+| 8 | Troféu Team Awards | `trofeu-acrilico-fenda-300x300-min.jpg` | `sobmedida/trofeus.jpg` (OK) | Troféus |
 
 ---
 
-## Correcoes Necessarias
+## Correções Necessárias
 
-### Arquivo: `src/pages/Index.tsx`
+### 1. Migrar Novas Imagens do Builderall
 
-| Linha | Produto | Alterar de | Para |
-|-------|---------|-----------|------|
-| 21 | Urna de Acrilico | `PRODUTOS_IMAGES.display` | `PRODUTOS_IMAGES.urna` |
+Estas imagens não foram baixadas ainda:
 
-### Arquivo: `src/pages/products/AcrilicoSobMedida.tsx`
+| Key | URL Original |
+|-----|-------------|
+| `produtos/cupula-preta.jpg` | `https://storage.builderall.com//franquias/2/7085438/editor-html/9852756.jpg` |
+| `produtos/quadro-avisos.jpg` | `https://storage.builderall.com//franquias/2/7085438/editor-html/9852775.jpg` |
+| `produtos/porta-folder-dourado.png` | `https://storage.builderall.com//franquias/2/7085438/editor-html/9860922.png` |
+| `produtos/cupula-transparente.jpg` | `https://acrilzano.com.br/wp-content/uploads/2022/12/9852742-min.jpeg` |
+| `produtos/pulpito.jpg` | `https://acrilzano.com.br/wp-content/uploads/2022/08/pulpito-oratoria-acrilizo-acrilzano-luxo-300x240-300x240-min-e1728777263731.jpg` |
 
-| Linha | Produto | Alterar de | Para |
-|-------|---------|-----------|------|
-| 44 | Caixa de Sugestao | `SOBMEDIDA_IMAGES.urna` | `SOBMEDIDA_IMAGES.caixaSugestao` |
+### 2. Atualizar `src/lib/images.ts`
 
-### Arquivo: `src/lib/images.ts`
+Adicionar novas constantes e corrigir mapeamento:
 
-Re-mapear URLs originais para produtos corretos:
+```typescript
+export const PRODUTOS_IMAGES = {
+  // Linha 1
+  potesDoces: img("produtos/expositor-doces-escada.jpg"),      // Era ACM
+  cupulasRedomas: img("produtos/cupula-preta.jpg"),            // Nova
+  display: img("produtos/quadro-avisos.jpg"),                   // Nova
+  portaFolder: img("produtos/porta-folder-dourado.png"),        // Nova
+  
+  // Linha 2
+  potesGraos: img("produtos/potes-graos-varios.jpg"),          // Era PVC
+  urna: img("produtos/cupula-transparente.jpg"),                // Nova
+  caixasSobMedida: img("produtos/pulpito.jpg"),                 // Nova
+  trofeus: img("produtos/trofeus.jpg"),                         // OK
+  medalhas: img("produtos/medalhas.jpg"),                       // Mantém
+} as const;
+```
 
-| Constante | URL Original Correta |
-|-----------|---------------------|
-| `sobmedida/urna.jpg` | urna-de-acrilico-300x300-min.jpg |
-| `sobmedida/caixa-sugestao.jpg` | sugestoes-400x267-300x225-min.jpg ou caixa-sugestao-300x300-min.jpg |
-| `sobmedida/expositores-calcados.jpg` | Procurar imagem correta de expositores de calcados |
+### 3. Atualizar `src/pages/Index.tsx`
+
+Reordenar o array `produtosSobMedida` para corresponder à ordem visual do Acrilzano:
+
+```typescript
+const produtosSobMedida = [
+  // Linha 1
+  { nome: "Potes para Doces", href: "...", imageUrl: PRODUTOS_IMAGES.potesDoces },
+  { nome: "Cúpulas e Redomas", href: "...", imageUrl: PRODUTOS_IMAGES.cupulasRedomas },
+  { nome: "Display de Acrílico", href: "...", imageUrl: PRODUTOS_IMAGES.display },
+  { nome: "Porta Folder", href: "...", imageUrl: PRODUTOS_IMAGES.portaFolder },
+  // Linha 2  
+  { nome: "Potes para Grãos", href: "...", imageUrl: PRODUTOS_IMAGES.potesGraos },
+  { nome: "Urna de Acrílico", href: "...", imageUrl: PRODUTOS_IMAGES.urna },
+  { nome: "Caixas Sob Medida", href: "...", imageUrl: PRODUTOS_IMAGES.caixasSobMedida },
+  { nome: "Troféus", href: "...", imageUrl: PRODUTOS_IMAGES.trofeus },
+];
+```
 
 ---
 
 ## Arquivos a Modificar
 
-| Arquivo | Alteracao |
+| Arquivo | Alteração |
 |---------|-----------|
-| `src/pages/Index.tsx` | Corrigir referencia de urna (linha 21) |
-| `src/pages/products/AcrilicoSobMedida.tsx` | Corrigir referencia de Caixa de Sugestao (linha 44) |
-| `src/lib/images.ts` | Atualizar mapeamento de URLs se necessario |
+| `src/lib/images.ts` | Adicionar URLs das novas imagens + corrigir mapeamento |
+| `src/pages/Index.tsx` | Reordenar produtos + associar imagens corretas |
+| `supabase/functions/migrate-images/index.ts` | Executar para baixar as 5 imagens novas |
 
 ---
 
-## Resumo das Correcoes
+## Resumo da Execução
 
-1. **Urna** no Index.tsx: trocar `display` por `urna`
-2. **Caixa de Sugestao** no AcrilicoSobMedida.tsx: trocar `urna` por `caixaSugestao`
-3. Verificar se as imagens no storage estao corretas ou se precisam ser re-migradas com URLs corretas
+1. Chamar edge function `migrate-images` para baixar as 5 imagens faltantes
+2. Atualizar `images.ts` com novas constantes
+3. Atualizar `Index.tsx` com ordem correta + imagens corretas
+4. Testar visualização
 
 ---
 
-## Secao Tecnica
+## Seção Técnica
 
-As alteracoes sao simples substituicoes de constantes:
+### Novas URLs a migrar:
 
 ```typescript
-// Index.tsx - Linha 21
-// DE:
-{ nome: "Urna de Acrilico", href: "...", imageUrl: PRODUTOS_IMAGES.display }
-// PARA:
-{ nome: "Urna de Acrilico", href: "...", imageUrl: PRODUTOS_IMAGES.urna }
-
-// AcrilicoSobMedida.tsx - Linha 44
-// DE:
-{ nome: "Caixa de Sugestao", href: "...", imageUrl: SOBMEDIDA_IMAGES.urna }
-// PARA:
-{ nome: "Caixa de Sugestao", href: "...", imageUrl: SOBMEDIDA_IMAGES.caixaSugestao }
+[
+  { key: "produtos/cupula-preta.jpg", url: "https://storage.builderall.com//franquias/2/7085438/editor-html/9852756.jpg" },
+  { key: "produtos/quadro-avisos.jpg", url: "https://storage.builderall.com//franquias/2/7085438/editor-html/9852775.jpg" },
+  { key: "produtos/porta-folder-dourado.png", url: "https://storage.builderall.com//franquias/2/7085438/editor-html/9860922.png" },
+  { key: "produtos/cupula-transparente.jpg", url: "https://acrilzano.com.br/wp-content/uploads/2022/12/9852742-min.jpeg" },
+  { key: "produtos/pulpito.jpg", url: "https://acrilzano.com.br/wp-content/uploads/2022/08/pulpito-oratoria-acrilizo-acrilzano-luxo-300x240-300x240-min-e1728777263731.jpg" },
+  { key: "produtos/expositor-doces-escada.jpg", url: "https://acrilzano.com.br/wp-content/uploads/2022/08/3333333333333333333333333-min.jpg" },
+  { key: "produtos/potes-graos-varios.jpg", url: "https://acrilzano.com.br/wp-content/uploads/2022/08/111111111111111111111111-min.jpg" }
+]
 ```
+
