@@ -9,48 +9,40 @@ import { ClientLogos } from "@/components/ui/ClientLogos";
 import { GoogleMapEmbed } from "@/components/ui/GoogleMapEmbed";
 import { ProductCategoryGrid } from "@/components/home/ProductCategoryGrid";
 import { EmbeddedQuoteForm } from "@/components/forms/EmbeddedQuoteForm";
-import { SOBMEDIDA_IMAGES, EMPRESA_IMAGES, DEPOIMENTOS_IMAGES } from "@/lib/images";
+import { SOBMEDIDA_IMAGES, EMPRESA_IMAGES, DEPOIMENTOS_IMAGES, HERO_IMAGES } from "@/lib/images";
 
-// Categories with products
+// Categories with products (links apontam para a própria página)
 const categorias = [
   {
     titulo: "CAIXAS, POTES, CÚPULAS, REDOMAS",
     produtos: [
-      { nome: "Caixas Sob Medida", href: "/acrilico-sob-medida/caixas-sob-medida", imageUrl: SOBMEDIDA_IMAGES.caixas },
-      { nome: "Cúpulas e Redomas", href: "/acrilico-sob-medida/cupulas-e-redomas", imageUrl: SOBMEDIDA_IMAGES.cupulas },
-      { nome: "Potes para Doces", href: "/acrilico-sob-medida/potes-para-doces-e-guloseimas", imageUrl: SOBMEDIDA_IMAGES.potesDoces },
-      { nome: "Potes para Grãos", href: "/acrilico-sob-medida/potes-para-graos-e-cereais-a-granel", imageUrl: SOBMEDIDA_IMAGES.potesGraos },
+      { nome: "Caixas Sob Medida", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.caixas },
+      { nome: "Cúpulas e Redomas", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.cupulas },
+      { nome: "Potes para Doces", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.potesDoces },
+      { nome: "Potes para Grãos", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.potesGraos },
     ],
   },
   {
     titulo: "MEDALHAS E TROFÉUS PERSONALIZADOS",
     produtos: [
-      { nome: "Medalhas Personalizadas", href: "/acrilico-sob-medida/medalhas-personalizadas", imageUrl: SOBMEDIDA_IMAGES.medalhas },
-      { nome: "Troféus Personalizados", href: "/acrilico-sob-medida/trofeus-personalizados", imageUrl: SOBMEDIDA_IMAGES.trofeus },
-    ],
-  },
-  {
-    titulo: "PLACAS SOB MEDIDA, PERSONALIZADAS E GRAVADAS",
-    produtos: [
-      { nome: "Placa Customizada", href: "/acrilico-sob-medida/placa-de-acrilico-customizada" },
-      { nome: "Placa Sinalização", href: "/acrilico-sob-medida/placa-de-acrilico-sinalizacao" },
+      { nome: "Medalhas Personalizadas", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.medalhas },
+      { nome: "Troféus Personalizados", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.trofeus },
     ],
   },
   {
     titulo: "DISPLAY, URNAS E QUADROS",
     produtos: [
-      { nome: "Display de Acrílico", href: "/acrilico-sob-medida/display-de-acrilico", imageUrl: SOBMEDIDA_IMAGES.display },
-      { nome: "Urna de Acrílico", href: "/acrilico-sob-medida/urna-de-acrilico", imageUrl: SOBMEDIDA_IMAGES.urna },
-      { nome: "Caixa de Sugestão", href: "/acrilico-sob-medida/caixa-de-sugestao", imageUrl: SOBMEDIDA_IMAGES.caixaSugestao },
+      { nome: "Display de Acrílico", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.display },
+      { nome: "Urna de Acrílico", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.urna },
+      { nome: "Caixa de Sugestão", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.caixaSugestao },
     ],
   },
   {
     titulo: "EXPOSITORES",
     produtos: [
-      { nome: "Expositores para Bijuterias", href: "/acrilico-sob-medida/expositores-para-bijuterias", imageUrl: SOBMEDIDA_IMAGES.expositoresBijuterias },
-      { nome: "Expositores para Calçados", href: "/acrilico-sob-medida/expositores-para-calcados", imageUrl: SOBMEDIDA_IMAGES.expositoresCalcados },
-      { nome: "Expositores para Óculos", href: "/acrilico-sob-medida/expositores-para-oculos" },
-      { nome: "Porta Folder", href: "/acrilico-sob-medida/porta-folder", imageUrl: SOBMEDIDA_IMAGES.portaFolder },
+      { nome: "Expositores para Bijuterias", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.expositoresBijuterias },
+      { nome: "Expositores para Calçados", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.expositoresCalcados },
+      { nome: "Porta Folder", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.portaFolder },
     ],
   },
 ];
@@ -82,11 +74,13 @@ export default function AcrilicoSobMedida() {
               </p>
             </div>
             
-            {/* Cube image placeholder */}
+            {/* Hero Image */}
             <div className="flex justify-center">
-              <div className="w-64 h-64 bg-primary-foreground/10 rounded-lg flex items-center justify-center">
-                <span className="text-primary-foreground/50">Cubo 3D</span>
-              </div>
+              <img 
+                src={HERO_IMAGES.cubo3d} 
+                alt="Cubo 3D de Acrílico" 
+                className="w-64 h-64 object-contain"
+              />
             </div>
           </div>
         </div>
@@ -117,12 +111,6 @@ export default function AcrilicoSobMedida() {
                 Ao longo de mais de três décadas, construímos uma reputação sólida baseada na qualidade, 
                 no atendimento personalizado e na capacidade de transformar ideias em realidade.
               </p>
-              <Button variant="outline" asChild>
-                <Link to="/home/sobre-nos">
-                  Conheça a Nossa História
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
             </div>
           </div>
         </div>

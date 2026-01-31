@@ -5,7 +5,7 @@ import { COMPANY } from "@/lib/constants";
 import { DecorativeDivider } from "@/components/ui/DecorativeDivider";
 import { BlueBanner } from "@/components/ui/BlueBanner";
 
-import { CHAPAS_PAGINA_IMAGES } from "@/lib/images";
+import { CHAPAS_PAGINA_IMAGES, CHAPAS_IMAGES } from "@/lib/images";
 import {
   Accordion,
   AccordionContent,
@@ -205,6 +205,16 @@ export default function ChapasDeAcrilico() {
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
+            </div>
+
+            {/* Right - Image */}
+            <div className="aspect-video bg-muted rounded-lg overflow-hidden">
+              <img 
+                src={CHAPAS_IMAGES.acrilicoColorido} 
+                alt="Chapas de Acrílico Colorido"
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
             </div>
           </div>
         </div>
