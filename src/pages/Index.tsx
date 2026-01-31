@@ -284,18 +284,6 @@ export default function Index() {
               </div>
             </div>
 
-            {/* Right - Map */}
-            <div>
-              <h2 className="font-bold text-2xl md:text-3xl text-foreground mb-8">
-                Nossa Localização
-              </h2>
-              <GoogleMapEmbed height="300px" />
-              <div className="mt-4 text-muted-foreground text-sm">
-                <p className="font-semibold text-foreground">{COMPANY.address}</p>
-                <p>Telefone: {COMPANY.phone}</p>
-                <p>WhatsApp: {COMPANY.whatsappFormatted}</p>
-              </div>
-            </div>
           </div>
         </div>
       </section>
