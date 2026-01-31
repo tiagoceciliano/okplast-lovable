@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Plus, Minus } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import { COMPANY } from "@/lib/constants";
 import { DecorativeDivider } from "@/components/ui/DecorativeDivider";
 import { BlueBanner } from "@/components/ui/BlueBanner";
+import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
 
 import { CHAPAS_PAGINA_IMAGES, CHAPAS_IMAGES } from "@/lib/images";
 import {
@@ -181,6 +182,8 @@ const coresDisponiveis = [
 ];
 
 export default function ChapasDeAcrilico() {
+  const { openWhatsAppModal } = useWhatsAppModal();
+
   return (
     <>
       {/* Hero - 2 Colunas */}
@@ -199,12 +202,22 @@ export default function ChapasDeAcrilico() {
                 Trabalhamos com chapas de acrílico cristal, colorido, leitoso, espelhado, fumê e muito mais. 
                 Atendemos projetos de todos os portes com qualidade e preço justo.
               </p>
-              <Button size="lg" asChild>
-                <Link to="/home/orcamento">
-                  Solicitar Orçamento
-                  <ArrowRight className="ml-2 h-5 w-5" />
+              <div className="flex flex-col items-start gap-3">
+                <Button 
+                  size="lg" 
+                  className="btn-whatsapp text-lg px-8 py-6"
+                  onClick={() => openWhatsAppModal("Chapa Inteira ou Cortada")}
+                >
+                  <MessageCircle className="h-5 w-5 mr-2" />
+                  Orçamento via WhatsApp
+                </Button>
+                <Link 
+                  to="/home/orcamento" 
+                  className="text-muted-foreground hover:text-foreground text-sm underline underline-offset-4"
+                >
+                  Prefere orçamento via e-mail?
                 </Link>
-              </Button>
+              </div>
             </div>
 
             {/* Right - Image */}
@@ -262,7 +275,7 @@ export default function ChapasDeAcrilico() {
       {/* Lista de Tipos de Chapas - Layout Alternado */}
       <section className="section-padding">
         <div className="container-custom space-y-16">
-          {tiposChapas.map((chapa, index) => (
+          {tiposChapas.map((chapa) => (
             <div 
               key={chapa.id}
               className={`grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start ${
@@ -363,23 +376,21 @@ export default function ChapasDeAcrilico() {
           <p className="text-primary-foreground/80 mb-8 max-w-xl mx-auto">
             Informe o tipo de chapa, espessura e dimensões desejadas para receber um orçamento personalizado.
           </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Button size="lg" variant="secondary" asChild>
-              <Link to="/home/orcamento">Solicitar Orçamento</Link>
-            </Button>
+          <div className="flex flex-col items-center gap-4">
             <Button 
               size="lg" 
-              className="btn-whatsapp"
-              asChild
+              className="btn-whatsapp text-lg px-8 py-6"
+              onClick={() => openWhatsAppModal("Chapa Inteira ou Cortada")}
             >
-              <a 
-                href={`https://wa.me/${COMPANY.whatsapp}?text=${encodeURIComponent(`Olá! Gostaria de um orçamento para chapas de acrílico.`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Orçamento via WhatsApp
-              </a>
+              <MessageCircle className="h-5 w-5 mr-2" />
+              Orçamento via WhatsApp
             </Button>
+            <Link 
+              to="/home/orcamento" 
+              className="text-primary-foreground/70 hover:text-primary-foreground text-sm underline underline-offset-4"
+            >
+              Prefere orçamento via e-mail?
+            </Link>
           </div>
         </div>
       </section>

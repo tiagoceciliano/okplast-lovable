@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, CheckCircle, Phone, Award, DollarSign, ShoppingCart } from "lucide-react";
+import { ArrowRight, CheckCircle, Phone, Award, DollarSign, ShoppingCart, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { COMPANY } from "@/lib/constants";
 import { DecorativeDivider } from "@/components/ui/DecorativeDivider";
@@ -7,18 +7,17 @@ import { BlueBanner } from "@/components/ui/BlueBanner";
 import { TestimonialCard } from "@/components/ui/TestimonialCard";
 import { ClientLogos } from "@/components/ui/ClientLogos";
 import { GoogleMapEmbed } from "@/components/ui/GoogleMapEmbed";
+import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
 
 import { MotivosCarousel } from "@/components/home/MotivosCarousel";
 import { PRODUTOS_IMAGES, CHAPAS_IMAGES, DEPOIMENTOS_IMAGES } from "@/lib/images";
 
 // Produtos Sob Medida - Grid de 8 produtos
 const produtosSobMedida = [
-  // Linha 1
   { nome: "Potes para Doces", imageUrl: PRODUTOS_IMAGES.potesDoces },
   { nome: "Cúpulas e Redomas", imageUrl: PRODUTOS_IMAGES.cupulasRedomas },
   { nome: "Display de Acrílico", imageUrl: PRODUTOS_IMAGES.display },
   { nome: "Porta Folder", imageUrl: PRODUTOS_IMAGES.portaFolder },
-  // Linha 2
   { nome: "Potes para Grãos", imageUrl: PRODUTOS_IMAGES.potesGraos },
   { nome: "Urna de Acrílico", imageUrl: PRODUTOS_IMAGES.urna },
   { nome: "Caixas Sob Medida", imageUrl: PRODUTOS_IMAGES.caixasSobMedida },
@@ -27,12 +26,10 @@ const produtosSobMedida = [
 
 // Tipos de Chapas - Grid de 8 chapas
 const tiposChapas = [
-  // Linha 1
   { nome: "Acrílico Transparente", imageUrl: CHAPAS_IMAGES.acrilicoCristal },
   { nome: "Acrílico Colorido", imageUrl: CHAPAS_IMAGES.acrilicoColorido },
   { nome: "Pet G", imageUrl: CHAPAS_IMAGES.petg },
   { nome: "PS Poliestireno", imageUrl: CHAPAS_IMAGES.acrilicoLeitoso },
-  // Linha 2
   { nome: "Policarbonato Alveolar", imageUrl: CHAPAS_IMAGES.policarbonato },
   { nome: "Policarbonato Compacto", imageUrl: CHAPAS_IMAGES.acrilicoEspelhado },
   { nome: "PVC Expandido", imageUrl: CHAPAS_IMAGES.pvcExpandido },
@@ -55,6 +52,8 @@ const beneficios = [
 ];
 
 export default function Index() {
+  const { openWhatsAppModal } = useWhatsAppModal();
+
   return (
     <>
       {/* Hero Section */}
@@ -72,26 +71,27 @@ export default function Index() {
               A <strong className="text-foreground">{COMPANY.name}</strong> é especializada na fabricação e venda de chapas de acrílico e produtos personalizados. 
               Há mais de 30 anos oferecendo qualidade, inovação e as melhores soluções em acrílico.
             </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Button size="lg" asChild>
-                <Link to="/home/orcamento">
-                  Solicitar Orçamento
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
+            <div className="flex flex-col items-center gap-4">
+              <Button 
+                size="lg" 
+                className="btn-whatsapp text-lg px-8 py-6"
+                onClick={() => openWhatsAppModal()}
+              >
+                <MessageCircle className="h-5 w-5 mr-2" />
+                Orçamento via WhatsApp
               </Button>
-              <Button size="lg" variant="outline" asChild>
-                <a href={`https://wa.me/${COMPANY.whatsapp}`} target="_blank" rel="noopener noreferrer">
-                  Falar pelo WhatsApp
-                </a>
-              </Button>
+              <Link 
+                to="/home/orcamento" 
+                className="text-muted-foreground hover:text-foreground text-sm underline underline-offset-4"
+              >
+                Prefere orçamento via e-mail?
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ========================================
-          LINHA 1: PRODUTOS SOB MEDIDA
-          ======================================== */}
+      {/* LINHA 1: PRODUTOS SOB MEDIDA */}
       <section className="section-padding bg-secondary">
         <div className="container-custom">
           <div className="text-center mb-10">
@@ -103,7 +103,6 @@ export default function Index() {
             </p>
           </div>
           
-          {/* Grid 4x2 */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {produtosSobMedida.map((produto, index) => (
               <div
@@ -136,9 +135,7 @@ export default function Index() {
         </div>
       </section>
 
-      {/* ========================================
-          LINHA 2: CHAPAS E PEDAÇOS DE PLACAS
-          ======================================== */}
+      {/* LINHA 2: CHAPAS E PEDAÇOS DE PLACAS */}
       <section className="section-padding">
         <div className="container-custom">
           <div className="text-center mb-10">
@@ -150,7 +147,6 @@ export default function Index() {
             </p>
           </div>
           
-          {/* Grid 4x2 */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {tiposChapas.map((chapa, index) => (
               <div
@@ -314,23 +310,21 @@ export default function Index() {
             Entre em contato conosco e solicite um orçamento personalizado. 
             Nossa equipe está pronta para atender você!
           </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Button size="lg" variant="secondary" asChild>
-              <Link to="/home/orcamento">Solicitar Orçamento</Link>
-            </Button>
+          <div className="flex flex-col items-center gap-4">
             <Button 
               size="lg" 
-              className="btn-whatsapp"
-              asChild
+              className="btn-whatsapp text-lg px-8 py-6"
+              onClick={() => openWhatsAppModal()}
             >
-              <a 
-                href={`https://wa.me/${COMPANY.whatsapp}?text=${encodeURIComponent(`Olá! Gostaria de mais informações sobre os produtos da ${COMPANY.name}.`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Falar pelo WhatsApp
-              </a>
+              <MessageCircle className="h-5 w-5 mr-2" />
+              Orçamento via WhatsApp
             </Button>
+            <Link 
+              to="/home/orcamento" 
+              className="text-primary-foreground/70 hover:text-primary-foreground text-sm underline underline-offset-4"
+            >
+              Prefere orçamento via e-mail?
+            </Link>
           </div>
         </div>
       </section>

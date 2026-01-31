@@ -1,15 +1,15 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import { COMPANY } from "@/lib/constants";
 import { DecorativeDivider } from "@/components/ui/DecorativeDivider";
-import { BlueBanner } from "@/components/ui/BlueBanner";
 import { TestimonialCard } from "@/components/ui/TestimonialCard";
 import { ClientLogos } from "@/components/ui/ClientLogos";
 import { GoogleMapEmbed } from "@/components/ui/GoogleMapEmbed";
 import { ProductCategoryGrid } from "@/components/home/ProductCategoryGrid";
 import { EmbeddedQuoteForm } from "@/components/forms/EmbeddedQuoteForm";
-import { SOBMEDIDA_IMAGES, EMPRESA_IMAGES, DEPOIMENTOS_IMAGES, HERO_IMAGES } from "@/lib/images";
+import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
+import { SOBMEDIDA_IMAGES, DEPOIMENTOS_IMAGES, HERO_IMAGES } from "@/lib/images";
 
 // Categories with products (links apontam para a própria página)
 const categorias = [
@@ -56,6 +56,8 @@ const depoimentos = [
 ];
 
 export default function AcrilicoSobMedida() {
+  const { openWhatsAppModal } = useWhatsAppModal();
+
   return (
     <>
       {/* Hero Azul */}
@@ -69,9 +71,25 @@ export default function AcrilicoSobMedida() {
               <p className="text-lg text-primary-foreground/90 mb-4">
                 do Rio de Janeiro (RJ).
               </p>
-              <p className="text-primary-foreground/80">
+              <p className="text-primary-foreground/80 mb-8">
                 Produtos, Caixas e Placas de acrílico Transparente, Cristal e Coloridos.
               </p>
+              <div className="flex flex-col items-start gap-3">
+                <Button 
+                  size="lg" 
+                  className="btn-whatsapp text-lg px-8 py-6"
+                  onClick={() => openWhatsAppModal("Produto Personalizado")}
+                >
+                  <MessageCircle className="h-5 w-5 mr-2" />
+                  Orçamento via WhatsApp
+                </Button>
+                <Link 
+                  to="/home/orcamento" 
+                  className="text-primary-foreground/70 hover:text-primary-foreground text-sm underline underline-offset-4"
+                >
+                  Prefere orçamento via e-mail?
+                </Link>
+              </div>
             </div>
             
             {/* Hero Image */}
