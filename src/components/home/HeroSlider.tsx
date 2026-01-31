@@ -10,11 +10,6 @@ const heroImages = [
     src: HERO_IMAGES.chapasEmpilhadas,
     alt: "Chapas de acrílico empilhadas",
   },
-  {
-    id: 2,
-    src: HERO_IMAGES.chapasColoridas,
-    alt: "Chapas de acrílico coloridas",
-  },
 ];
 
 interface HeroSliderProps {
