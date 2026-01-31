@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, CheckCircle, Phone, Award, DollarSign, ShoppingCart, MessageCircle } from "lucide-react";
+import { ArrowRight, CheckCircle, Phone, Award, DollarSign, ShoppingCart, MessageCircle, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { COMPANY } from "@/lib/constants";
 import { DecorativeDivider } from "@/components/ui/DecorativeDivider";
@@ -8,6 +8,7 @@ import { TestimonialCard } from "@/components/ui/TestimonialCard";
 import { ClientLogos } from "@/components/ui/ClientLogos";
 import { GoogleMapEmbed } from "@/components/ui/GoogleMapEmbed";
 import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
+import { useEmailQuoteModal } from "@/contexts/EmailQuoteModalContext";
 
 import { MotivosCarousel } from "@/components/home/MotivosCarousel";
 import { PRODUTOS_IMAGES, CHAPAS_IMAGES, DEPOIMENTOS_IMAGES } from "@/lib/images";
@@ -53,6 +54,7 @@ const beneficios = [
 
 export default function Index() {
   const { openWhatsAppModal } = useWhatsAppModal();
+  const { openEmailModal } = useEmailQuoteModal();
 
   return (
     <>
@@ -80,12 +82,12 @@ export default function Index() {
                 <MessageCircle className="h-5 w-5 mr-2" />
                 Orçamento via WhatsApp
               </Button>
-              <Link 
-                to="/home/orcamento" 
+              <button 
+                onClick={() => openEmailModal()}
                 className="text-muted-foreground hover:text-foreground text-sm underline underline-offset-4"
               >
                 Prefere orçamento via e-mail?
-              </Link>
+              </button>
             </div>
           </div>
         </div>
@@ -307,12 +309,12 @@ export default function Index() {
               <MessageCircle className="h-5 w-5 mr-2" />
               Orçamento via WhatsApp
             </Button>
-            <Link 
-              to="/home/orcamento" 
+            <button 
+              onClick={() => openEmailModal()}
               className="text-primary-foreground/70 hover:text-primary-foreground text-sm underline underline-offset-4"
             >
               Prefere orçamento via e-mail?
-            </Link>
+            </button>
           </div>
         </div>
       </section>
