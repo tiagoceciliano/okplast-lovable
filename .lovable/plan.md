@@ -1,275 +1,252 @@
 
 
-# Plano de Implementacao: Adicionar Imagens Reais do WordPress
+# Plano: Migrar Imagens do Acrilzano para Lovable Cloud Storage
 
 ## Visao Geral
 
-Vou substituir TODAS as imagens placeholder do Unsplash pelas imagens reais extraidas dos arquivos XML do WordPress que voce enviou. Analisei cada arquivo em detalhes e mapeei exatamente quais imagens vao em cada secao do site.
+Vou baixar todas as ~52 imagens do site Acrilzano e hospeda-las diretamente no storage do Lovable Cloud, eliminando a dependencia do servidor externo e garantindo performance otima.
 
 ---
 
-## 1. MAPEAMENTO COMPLETO DE IMAGENS POR SECAO
+## 1. CRIAR BUCKET DE STORAGE
 
-### Base URL para todas as imagens:
+### 1.1 Migracao SQL
+
+Criar bucket publico para as imagens do site:
+
+```sql
+-- Criar bucket publico para imagens do site
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('site-images', 'site-images', true);
+
+-- Permitir leitura publica
+CREATE POLICY "Imagens publicas para leitura"
+ON storage.objects FOR SELECT
+USING (bucket_id = 'site-images');
+
+-- Permitir upload via service role (edge function)
+CREATE POLICY "Upload via service role"
+ON storage.objects FOR INSERT
+WITH CHECK (bucket_id = 'site-images');
 ```
-https://acrilzano.com.br/wp-content/uploads/
+
+---
+
+## 2. CRIAR EDGE FUNCTION PARA DOWNLOAD DE IMAGENS
+
+### 2.1 Nova Edge Function: `migrate-images`
+
+Esta funcao vai:
+1. Receber uma lista de URLs de imagens do Acrilzano
+2. Baixar cada imagem
+3. Fazer upload para o bucket `site-images`
+4. Retornar as novas URLs publicas
+
+### 2.2 Estrutura do arquivo
+
+Arquivo: `supabase/functions/migrate-images/index.ts`
+
+```typescript
+// Recebe: { images: [{ key: "hero-1", url: "https://..." }] }
+// Retorna: { results: [{ key: "hero-1", newUrl: "https://...supabase.co/..." }] }
+```
+
+### 2.3 Organizacao das imagens no bucket
+
+```
+site-images/
+├── hero/
+│   ├── cubo-3d.png
+│   ├── chapas-empilhadas.jpg
+│   └── chapas-coloridas.jpg
+├── empresa/
+│   └── equipe.jpg
+├── produtos/
+│   ├── caixas-sob-medida.jpg
+│   ├── cupulas-redomas.jpg
+│   ├── potes-doces.jpg
+│   └── ...
+├── chapas/
+│   ├── acrilico-cristal.jpg
+│   ├── acrilico-colorido.jpg
+│   └── ...
+├── motivos/
+│   ├── nfe.jpg
+│   ├── credito.jpg
+│   └── ...
+└── depoimentos/
+    ├── avatar-1.png
+    ├── avatar-2.png
+    └── ...
 ```
 
 ---
 
-### 1.1 Hero Slider (HeroSlider.tsx)
+## 3. LISTA COMPLETA DE IMAGENS A MIGRAR
 
-Substituir as 3 imagens genericas do Unsplash:
+### 3.1 Hero Slider (3 imagens)
 
-| Slot | Imagem Atual | Nova Imagem (URL Acrilzano) | Descricao |
-|------|--------------|----------------------------|-----------|
-| 1 | Unsplash generic | `https://storage.builderall.com/franquias/2/6891583/editor-html/9121285.png` | Cubo de acrilico 3D transparente |
-| 2 | Unsplash generic | `2022/08/chapa-1-min.jpg` | Chapas de acrilico empilhadas |
-| 3 | Unsplash generic | `2022/08/chapa-min.jpg` | Chapas coloridas variadas |
+| Key | URL Origem |
+|-----|------------|
+| hero/cubo-3d.png | https://storage.builderall.com/franquias/2/6891583/editor-html/9121285.png |
+| hero/chapas-empilhadas.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/chapa-1-min.jpg |
+| hero/chapas-coloridas.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/chapa-min.jpg |
 
----
+### 3.2 Empresa (1 imagem)
 
-### 1.2 Secao "Conheca nossa empresa" (Index.tsx)
+| Key | URL Origem |
+|-----|------------|
+| empresa/equipe.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/Equipe-Acrilzano-acrilico-1-min.jpg |
 
-Substituir placeholder por imagem real da equipe:
+### 3.3 Produtos Sob Medida (8 imagens)
 
-| Elemento | Imagem |
-|----------|--------|
-| Foto da Equipe | `2022/08/Equipe-Acrilzano-acrilico-1-min.jpg` |
+| Key | URL Origem |
+|-----|------------|
+| produtos/caixas-sob-medida.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/caixa-acrilico-doces-3-300x225-300x225-min.jpg |
+| produtos/cupulas-redomas.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/expositor-de-acrilico-cone-300x300-min.jpg |
+| produtos/potes-doces.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/suporte-para-bolo-de-andar-300x300-min.jpg |
+| produtos/potes-graos.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/caixa-acrilico-granel-300x225-300x225-min.jpg |
+| produtos/urna.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/urna-de-acrilico-300x300-min.jpg |
+| produtos/display.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/expositor-de-acrilico-doces-300x300-min.jpg |
+| produtos/trofeus.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/trofeu-acrilico-acrilzano-300x298-min.jpg |
+| produtos/medalhas.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/medalhas-acrilicas-300x300-min.jpg |
 
-(Nota: Esta imagem e da equipe Acrilzano. Voce pode substituir por foto propria da Lab Acrilicos depois)
+### 3.4 Tipos de Chapas (8 imagens)
 
----
+| Key | URL Origem |
+|-----|------------|
+| chapas/acrilico-cristal.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/CHAPA-PRINCIPAL-300x300-min.jpg |
+| chapas/acrilico-colorido.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/chapa-acrilico-colorido-300x223-300x223-1.jpg |
+| chapas/acrilico-leitoso.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/chapa-2-min.jpg |
+| chapas/acrilico-espelhado.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/chapa-acrilico-espelhada-300x225-min.jpg |
+| chapas/policarbonato.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/chapa-3-min.jpg |
+| chapas/petg.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/4444444444444444444444444-min.jpg |
+| chapas/pvc-expandido.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/111111111111111111111111-min.jpg |
+| chapas/pedacos-retalhos.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/22222222222222222222222222-min.jpg |
 
-### 1.3 Produtos Sob Medida (Index.tsx - produtosSobMedida)
+### 3.5 Motivos Carousel (6 imagens)
 
-Adicionar campo `imageUrl` a cada produto:
+| Key | URL Origem |
+|-----|------------|
+| motivos/nfe.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/1.2-min.jpg |
+| motivos/credito.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/2.2-min.jpg |
+| motivos/empresa-solida.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/3.2-min.jpg |
+| motivos/pronta-entrega.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/4.2-min.jpg |
+| motivos/entrega-brasil.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/5.2-min.jpg |
+| motivos/atendimento.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/6.2-min.jpg |
 
-| Produto | URL da Imagem |
-|---------|---------------|
-| Caixas Sob Medida | `2022/08/caixa-acrilico-doces-3-300x225-300x225-min.jpg` |
-| Cupulas e Redomas | `2022/08/expositor-de-acrilico-cone-300x300-min.jpg` |
-| Potes para Doces | `2022/08/suporte-para-bolo-de-andar-300x300-min.jpg` |
-| Potes para Graos | `2022/08/caixa-acrilico-granel-300x225-300x225-min.jpg` |
-| Urna de Acrilico | `2022/08/urna-de-acrilico-300x300-min.jpg` (se disponivel) ou placeholder |
-| Display de Acrilico | `2022/08/expositor-de-acrilico-doces-300x300-min.jpg` |
-| Trofeus | `2022/08/trofeu-acrilico-acrilzano-300x298-min.jpg` |
-| Medalhas | `2022/08/medalhas-acrilicas-300x300-min.jpg` |
+### 3.6 Depoimentos (4 imagens)
 
----
+| Key | URL Origem |
+|-----|------------|
+| depoimentos/avatar-1.png | https://acrilzano.com.br/wp-content/uploads/2022/06/1-min.png |
+| depoimentos/avatar-2.png | https://acrilzano.com.br/wp-content/uploads/2022/06/2-min.png |
+| depoimentos/avatar-3.png | https://acrilzano.com.br/wp-content/uploads/2022/06/3-min.png |
+| depoimentos/avatar-4.png | https://acrilzano.com.br/wp-content/uploads/2022/06/4-min.png |
 
-### 1.4 Tipos de Chapas (Index.tsx - tiposChapas)
+### 3.7 Pagina Chapas - Detalhes (7 imagens)
 
-Adicionar imagens para cada tipo de chapa:
+| Key | URL Origem |
+|-----|------------|
+| chapas-pagina/cast.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/chapa-1-min.jpg |
+| chapas-pagina/poliestireno.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/chapa-2-min.jpg |
+| chapas-pagina/petg.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/chapa-3-min.jpg |
+| chapas-pagina/policarbonato-alveolar.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/chapa-min.jpg |
+| chapas-pagina/policarbonato-compacto.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/111111111111111111111111-min.jpg |
+| chapas-pagina/pvc.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/22222222222222222222222222-min.jpg |
+| chapas-pagina/acm.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/3333333333333333333333333-min.jpg |
 
-| Tipo | URL da Imagem |
-|------|---------------|
-| Acrilico Cristal | `2022/08/CHAPA-PRINCIPAL-300x300-min.jpg` |
-| Acrilico Colorido | `2022/08/chapa-acrilico-colorido-300x223-300x223-1.jpg` |
-| Acrilico Leitoso | `2022/08/chapa-2-min.jpg` |
-| Acrilico Espelhado | `2022/08/chapa-acrilico-espelhada-300x225-min.jpg` |
-| Policarbonato | `2022/08/chapa-3-min.jpg` |
-| PETG | `2022/08/4444444444444444444444444-min.jpg` |
-| PVC Expandido | `2022/08/111111111111111111111111-min.jpg` |
-| Pedacos e Retalhos | `2022/08/22222222222222222222222222-min.jpg` |
+### 3.8 Pagina Sob Medida - Categorias (15 imagens)
 
----
+| Key | URL Origem |
+|-----|------------|
+| sobmedida/caixas.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/Caixas-acrilico-300x251-300x251-min.jpg |
+| sobmedida/cupulas.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/cupula-acrilico-400x300-300x225-min.jpg |
+| sobmedida/potes-doces.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/caixa-acrilico-doces-2-300x200-300x200-min.jpg |
+| sobmedida/potes-graos.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/pote-acrilico-granel-225x300-225x300-min.jpg |
+| sobmedida/medalhas.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/medalhas-acrilica-300x300-min.jpg |
+| sobmedida/trofeus.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/trofeu-acrilico-fenda-300x300-min.jpg |
+| sobmedida/display.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/expositor-de-acrilicos-300x180-300x180-min.jpg |
+| sobmedida/urna.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/sugestoes-400x267-300x225-min.jpg |
+| sobmedida/caixa-sugestao.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/caixa-sugestao-300x300-min.jpg |
+| sobmedida/expositores-bijuterias.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/expositor-acrilico-brinco-1-300x297-min.jpg |
+| sobmedida/expositores-calcados.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/expositor-de-acrilico-doces-300x300-min.jpg |
+| sobmedida/porta-folder.jpg | https://acrilzano.com.br/wp-content/uploads/2022/08/porta-folder-acrilicdo-parede-400x240-300x225-min.jpg |
 
-### 1.5 Carrossel "6 Motivos" (MotivosCarousel.tsx)
-
-Adicionar imagens de fundo aos cards:
-
-| Motivo | URL da Imagem |
-|--------|---------------|
-| Emissao de NF-e | `2022/08/1.2-min.jpg` |
-| Faturamento e Linha de Credito | `2022/08/2.2-min.jpg` |
-| Empresa Solida e Confiavel | `2022/08/3.2-min.jpg` |
-| Pronta Entrega | `2022/08/4.2-min.jpg` |
-| Entrega em Todo Brasil | `2022/08/5.2-min.jpg` |
-| Atendimento Rapido | `2022/08/6.2-min.jpg` |
-
----
-
-### 1.6 Depoimentos / Satisfacao Garantida (Index.tsx)
-
-Usar avatares de depoimentos:
-
-| Cliente | URL do Avatar |
-|---------|---------------|
-| Cliente 1 | `2022/06/1-min.png` |
-| Cliente 2 | `2022/06/2-min.png` |
-| Cliente 3 | `2022/06/3-min.png` |
-| Cliente 4 | `2022/06/4-min.png` |
-
----
-
-### 1.7 Pagina Chapas de Acrilico (ChapasDeAcrilico.tsx)
-
-Imagens para cada tipo de chapa na lista:
-
-| Tipo de Chapa | URL da Imagem |
-|---------------|---------------|
-| Acrilico CAST 100% Virgem | `2022/08/chapa-1-min.jpg` |
-| Poliestireno (PS e PSAI) | `2022/08/chapa-2-min.jpg` |
-| PETG | `2022/08/chapa-3-min.jpg` |
-| Policarbonato Alveolar | `2022/08/chapa-min.jpg` |
-| Policarbonato Compacto | `2022/08/111111111111111111111111-min.jpg` |
-| PVC Expandido | `2022/08/22222222222222222222222222-min.jpg` |
-| ACM | `2022/08/3333333333333333333333333-min.jpg` |
+**Total: ~52 imagens**
 
 ---
 
-### 1.8 Pagina Acrilico Sob Medida (AcrilicoSobMedida.tsx)
+## 4. ORDEM DE IMPLEMENTACAO
 
-Imagens para categorias de produtos:
+### Passo 1: Criar Bucket (Migracao SQL)
+- Executar SQL para criar bucket `site-images`
+- Configurar politicas de acesso publico
 
-**CAIXAS, POTES, CUPULAS, REDOMAS:**
-| Produto | URL da Imagem |
-|---------|---------------|
-| Caixas Sob Medida | `2022/08/Caixas-acrilico-300x251-300x251-min.jpg` |
-| Cupulas e Redomas | `2022/08/cupula-acrilico-400x300-300x225-min.jpg` |
-| Potes para Doces | `2022/08/caixa-acrilico-doces-2-300x200-300x200-min.jpg` |
-| Potes para Graos | `2022/08/pote-acrilico-granel-225x300-225x300-min.jpg` |
+### Passo 2: Criar Edge Function `migrate-images`
+- Funcao que baixa imagens de URLs externas
+- Faz upload para o bucket
+- Retorna URLs publicas do Lovable Cloud
 
-**MEDALHAS E TROFEUS:**
-| Produto | URL da Imagem |
-|---------|---------------|
-| Medalhas Personalizadas | `2022/08/medalhas-acrilica-300x300-min.jpg` |
-| Trofeus Personalizados | `2022/08/trofeu-acrilico-fenda-300x300-min.jpg` |
+### Passo 3: Executar Migracao
+- Chamar a edge function com a lista completa de imagens
+- Aguardar conclusao do download/upload
 
-**PLACAS:**
-| Produto | URL da Imagem |
-|---------|---------------|
-| Placa Customizada | placeholder (usar gradiente) |
-| Placa Sinalizacao | placeholder (usar gradiente) |
+### Passo 4: Criar Arquivo de Constantes de Imagens
+- `src/lib/images.ts` com todas as URLs mapeadas
+- Facilita manutencao futura
 
-**DISPLAY, URNAS:**
-| Produto | URL da Imagem |
-|---------|---------------|
-| Display de Acrilico | `2022/08/expositor-de-acrilicos-300x180-300x180-min.jpg` |
-| Urna de Acrilico | `2022/08/sugestoes-400x267-300x225-min.jpg` |
-| Caixa de Sugestao | `2022/08/caixa-sugestao-300x300-min.jpg` |
-
-**EXPOSITORES:**
-| Produto | URL da Imagem |
-|---------|---------------|
-| Expositores para Bijuterias | `2022/08/expositor-acrilico-brinco-1-300x297-min.jpg` |
-| Expositores para Calcados | `2022/08/expositor-de-acrilico-doces-300x300-min.jpg` |
-| Expositores para Oculos | placeholder |
-| Porta Folder | `2022/08/porta-folder-acrilicdo-parede-400x240-300x225-min.jpg` |
-
----
-
-## 2. ARQUIVOS A MODIFICAR
-
-### Design System / Componentes
+### Passo 5: Atualizar Componentes
+Substituir placeholders pelas novas URLs:
 
 | Arquivo | Alteracao |
 |---------|-----------|
-| `src/components/home/HeroSlider.tsx` | Substituir 3 URLs do Unsplash por imagens reais do Acrilzano |
-| `src/components/home/MotivosCarousel.tsx` | Adicionar imagens de fundo aos 6 cards |
-| `src/components/home/ProductCategoryGrid.tsx` | Garantir que renderiza imageUrl corretamente |
+| `src/components/home/HeroSlider.tsx` | 3 URLs do hero |
+| `src/components/home/MotivosCarousel.tsx` | 6 URLs de fundo |
+| `src/pages/Index.tsx` | 8 produtos + 8 chapas + 4 avatares + 1 equipe |
+| `src/pages/products/ChapasDeAcrilico.tsx` | 7 URLs das chapas |
+| `src/pages/products/AcrilicoSobMedida.tsx` | 15 URLs dos produtos |
 
-### Paginas
+---
 
+## 5. ARQUIVOS A CRIAR/MODIFICAR
+
+### Novos arquivos:
+| Arquivo | Descricao |
+|---------|-----------|
+| `supabase/functions/migrate-images/index.ts` | Edge function para migrar imagens |
+| `src/lib/images.ts` | Constantes com URLs das imagens |
+
+### Arquivos a modificar:
 | Arquivo | Alteracao |
 |---------|-----------|
-| `src/pages/Index.tsx` | Adicionar imageUrl aos arrays produtosSobMedida e tiposChapas, atualizar secao empresa com foto real, adicionar avatarUrl aos depoimentos |
-| `src/pages/products/ChapasDeAcrilico.tsx` | Adicionar imagens a cada tipo de chapa |
-| `src/pages/products/AcrilicoSobMedida.tsx` | Adicionar imageUrl a cada produto nas categorias |
+| `src/components/home/HeroSlider.tsx` | URLs do storage |
+| `src/components/home/MotivosCarousel.tsx` | URLs de fundo |
+| `src/pages/Index.tsx` | imageUrl em produtos/chapas/depoimentos |
+| `src/pages/products/ChapasDeAcrilico.tsx` | URLs das chapas |
+| `src/pages/products/AcrilicoSobMedida.tsx` | URLs das categorias |
 
 ---
 
-## 3. EXEMPLO DE CODIGO
+## 6. URL FINAL DAS IMAGENS
 
-### HeroSlider.tsx (antes e depois)
+Apos migracao, as URLs serao:
 
-**Antes:**
-```typescript
-const heroImages = [
-  {
-    id: 1,
-    src: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=500&fit=crop",
-    alt: "Cubo de acrilico transparente",
-  },
-  // ...
-];
 ```
-
-**Depois:**
-```typescript
-const heroImages = [
-  {
-    id: 1,
-    src: "https://storage.builderall.com/franquias/2/6891583/editor-html/9121285.png",
-    alt: "Cubo de acrilico transparente 3D",
-  },
-  {
-    id: 2,
-    src: "https://acrilzano.com.br/wp-content/uploads/2022/08/chapa-1-min.jpg",
-    alt: "Chapas de acrilico empilhadas",
-  },
-  {
-    id: 3,
-    src: "https://acrilzano.com.br/wp-content/uploads/2022/08/chapa-min.jpg",
-    alt: "Chapas de acrilico coloridas",
-  },
-];
-```
-
-### Index.tsx - Produtos com Imagem
-
-**Antes:**
-```typescript
-const produtosSobMedida = [
-  { nome: "Caixas Sob Medida", href: "/acrilico-sob-medida/caixas-sob-medida" },
-  // ...
-];
-```
-
-**Depois:**
-```typescript
-const produtosSobMedida = [
-  { 
-    nome: "Caixas Sob Medida", 
-    href: "/acrilico-sob-medida/caixas-sob-medida",
-    imageUrl: "https://acrilzano.com.br/wp-content/uploads/2022/08/caixa-acrilico-doces-3-300x225-300x225-min.jpg"
-  },
-  // ...
-];
+https://dikfllrqtcdexvnlczsz.supabase.co/storage/v1/object/public/site-images/hero/cubo-3d.png
+https://dikfllrqtcdexvnlczsz.supabase.co/storage/v1/object/public/site-images/produtos/caixas-sob-medida.jpg
+...
 ```
 
 ---
 
-## 4. PERFORMANCE
+## 7. BENEFICIOS DESTA ABORDAGEM
 
-Para manter o site rapido e limpo:
-
-- Todas as imagens terao `loading="lazy"`
-- Preferir versoes 300x300 ou 300x225 (mais leves)
-- Manter srcset para responsividade quando possivel
-- Usar fallback para imagens que falharem
-
----
-
-## 5. RESUMO DE ENTREGAVEIS
-
-| Secao | Quantidade de Imagens |
-|-------|----------------------|
-| Hero Slider | 3 imagens |
-| Secao Empresa | 1 imagem (equipe) |
-| Produtos Sob Medida | 8 imagens |
-| Tipos de Chapas | 8 imagens |
-| 6 Motivos (Carrossel) | 6 imagens de fundo |
-| Depoimentos | 4 avatares |
-| Pagina Chapas | 7 imagens |
-| Pagina Sob Medida | 15+ imagens |
-
-**Total: ~52 imagens reais** substituindo os placeholders atuais.
-
----
-
-## 6. OBSERVACAO IMPORTANTE
-
-As imagens estao hospedadas no servidor `acrilzano.com.br`. Quando voce tiver fotos proprias da Lab Acrilicos, basta substituir as URLs por imagens hospedadas em seu proprio servidor ou fazer upload delas diretamente no Lovable.
+| Beneficio | Descricao |
+|-----------|-----------|
+| Independencia | Nao depende mais do servidor Acrilzano |
+| Performance | CDN do Supabase com cache global |
+| Confiabilidade | Imagens sempre disponiveis |
+| Manutencao | Facil substituir imagens no futuro |
+| SEO | URLs limpas e permanentes |
 
