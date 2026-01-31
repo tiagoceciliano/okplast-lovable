@@ -23,7 +23,7 @@ const produtosSobMedida = [{
   nome: "Display de Acrílico",
   imageUrl: PRODUTOS_IMAGES.display
 }, {
-  nome: "Porta Folder",
+  nome: "Defletores",
   imageUrl: PRODUTOS_IMAGES.portaFolder
 }, {
   nome: "Potes para Grãos",
