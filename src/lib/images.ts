@@ -111,7 +111,7 @@ export const SOBMEDIDA_IMAGES = {
   urna: "/src/assets/produtos/urna-acrilico.webp",
   caixaSugestao: "/src/assets/produtos/caixa-sugestao.webp",
   expositoresBijuterias: img("sobmedida/expositores-bijuterias.jpg"),
-  expositoresCalcados: img("sobmedida/expositores-calcados.jpg"),
+  expositoresCalcados: "/src/assets/produtos/expositor-calcados.webp",
   portaFolder: img("sobmedida/porta-folder.jpg"),
   // Novas imagens locais
   trofeuSobMedida: "/src/assets/produtos/trofeu-sob-medida.webp",
