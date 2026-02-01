@@ -15,6 +15,7 @@ import Orcamento from "./pages/Orcamento";
 import PoliticaRevenda from "./pages/PoliticaRevenda";
 import PoliticaVenda from "./pages/PoliticaVenda";
 import TermoUso from "./pages/TermoUso";
+import PoliticaPrivacidade from "./pages/PoliticaPrivacidade";
 
 // Product Hub Pages
 import AcrilicoSobMedida from "./pages/products/AcrilicoSobMedida";
@@ -58,6 +59,7 @@ const App = () => (
               <Route path="/home/politica-de-revenda" element={<PoliticaRevenda />} />
               <Route path="/home/politica-de-venda" element={<PoliticaVenda />} />
               <Route path="/home/termo-de-uso" element={<TermoUso />} />
+              <Route path="/home/politica-de-privacidade" element={<PoliticaPrivacidade />} />
 
               {/* Product Hub Pages */}
               <Route path="/acrilico-sob-medida" element={<AcrilicoSobMedida />} />

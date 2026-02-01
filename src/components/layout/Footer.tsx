@@ -81,6 +81,9 @@ export function Footer() {
               <Link to="/home/termo-de-uso" className="block text-sm text-primary-foreground/80 hover:text-primary-foreground transition-colors">
                 Termo de Uso
               </Link>
+              <Link to="/home/politica-de-privacidade" className="block text-sm text-primary-foreground/80 hover:text-primary-foreground transition-colors">
+                Política de Privacidade
+              </Link>
             </div>
           </div>
 
