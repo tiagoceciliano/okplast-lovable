@@ -1,44 +1,72 @@
 
-# Plano: Reorganizar Grid de Produtos Sob Medida
+# Plano: Criar Página de Política de Privacidade (LGPD)
 
 ## Resumo
-Reorganizar a seção "Produtos Sob Medida" na página inicial, removendo 4 itens e reordenando os 12 restantes em 3 linhas de 4 produtos cada.
+Criar uma nova página de Política de Privacidade com texto completo sobre proteção de dados conforme a Lei Geral de Proteção de Dados (LGPD) e adicionar o link no rodapé de todas as páginas.
 
 ---
 
-## O que será alterado
+## O que será feito
 
-### Arquivo: `src/pages/Index.tsx`
+### 1. Nova Página de Política de Privacidade
+Criar a página `src/pages/PoliticaPrivacidade.tsx` seguindo o mesmo padrão visual das outras páginas de política (Revenda, Venda, Termo de Uso).
 
-Substituir o array `produtosSobMedida` atual (16 itens) por um novo array com 12 itens na ordem especificada:
+**Conteúdo da página incluirá:**
+- Hero com título e descrição
+- Seções sobre:
+  - Dados coletados (nome, e-mail, telefone, WhatsApp)
+  - Finalidade do tratamento de dados
+  - Base legal para tratamento (LGPD Art. 7º)
+  - Compartilhamento de dados
+  - Armazenamento e segurança
+  - Direitos do titular (acesso, correção, exclusão, portabilidade)
+  - Cookies e tecnologias de rastreamento
+  - Alterações na política
+  - Contato do encarregado de dados (DPO)
+  - Caixa de contato com informações da empresa
 
-**Linha 1:**
-1. Cúpulas e Redomas → `cupulasRedomas`
-2. Troféus → `trofeus`
-3. Medalhas e Premiações → `medalhasPremiacoes`
-4. Expositores Sob medida → `potesDoces`
+### 2. Atualização do Roteamento
+Adicionar a rota `/home/politica-de-privacidade` no arquivo `App.tsx`.
 
-**Linha 2:**
-5. Display A4 Parede → `displayA4Parede`
-6. Display A6 Mesa → `displayA6Mesa`
-7. Urna Piramidal → `urnaPiramidal`
-8. Púlpitos → `caixasSobMedida`
-
-**Linha 3:**
-9. Caixa para Doces → `caixaDoces`
-10. Pote a Granel → `poteAGranel`
-11. Defletores → `portaFolder`
-12. Placas Personalizadas → `placasPersonalizadas`
-
----
-
-## Itens removidos
-- Display A6 Mesa (duplicado antigo)
-- Display A4 (duplicado antigo)
-- Expositores de Bijuterias
-- Bolo Fake
+### 3. Atualização do Rodapé
+Adicionar o link "Política de Privacidade" na seção de políticas do Footer, junto com os outros links existentes (Política de Revenda, Política de Venda, Termo de Uso).
 
 ---
 
-## Resultado visual esperado
-Grid 4x3 (4 colunas no desktop, 2 no mobile) com os 12 produtos organizados exatamente na ordem solicitada.
+## Arquivos a serem modificados/criados
+
+| Arquivo | Ação |
+|---------|------|
+| `src/pages/PoliticaPrivacidade.tsx` | Criar novo |
+| `src/App.tsx` | Adicionar import e rota |
+| `src/components/layout/Footer.tsx` | Adicionar link |
+
+---
+
+## Detalhes Técnicos
+
+### Estrutura da nova página
+```text
+PoliticaPrivacidade.tsx
+├── Hero Section (gradient-primary)
+│   ├── Título: "Política de Privacidade"
+│   └── Subtítulo: "Como protegemos seus dados pessoais"
+└── Conteúdo (prose prose-lg)
+    ├── Introdução
+    ├── Dados Coletados
+    ├── Finalidade do Tratamento
+    ├── Base Legal (LGPD)
+    ├── Compartilhamento
+    ├── Armazenamento e Segurança
+    ├── Direitos do Titular
+    ├── Cookies
+    ├── Alterações
+    └── Contato (card com info da empresa)
+```
+
+### Nova rota
+- **Caminho:** `/home/politica-de-privacidade`
+- **Componente:** `PoliticaPrivacidade`
+
+### Link no rodapé
+Será adicionado abaixo do "Termo de Uso" na seção de Horários/Políticas.
