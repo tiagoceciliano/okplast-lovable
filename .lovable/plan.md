@@ -1,72 +1,73 @@
 
-# Plano: Criar Página de Política de Privacidade (LGPD)
+# Plano: Melhorar Página de Termo de Uso
 
 ## Resumo
-Criar uma nova página de Política de Privacidade com texto completo sobre proteção de dados conforme a Lei Geral de Proteção de Dados (LGPD) e adicionar o link no rodapé de todas as páginas.
+Atualizar a página de Termo de Uso para seguir o mesmo padrão visual e de qualidade de conteúdo da Política de Privacidade, incluindo listas organizadas, seções mais detalhadas e melhor formatação.
 
 ---
 
-## O que será feito
+## Melhorias a serem feitas
 
-### 1. Nova Página de Política de Privacidade
-Criar a página `src/pages/PoliticaPrivacidade.tsx` seguindo o mesmo padrão visual das outras páginas de política (Revenda, Venda, Termo de Uso).
+### 1. Subtítulo do Hero
+**De:** "Termos e condições de uso do site"
+**Para:** "Regras e condições para utilização dos nossos serviços"
 
-**Conteúdo da página incluirá:**
-- Hero com título e descrição
-- Seções sobre:
-  - Dados coletados (nome, e-mail, telefone, WhatsApp)
-  - Finalidade do tratamento de dados
-  - Base legal para tratamento (LGPD Art. 7º)
-  - Compartilhamento de dados
-  - Armazenamento e segurança
-  - Direitos do titular (acesso, correção, exclusão, portabilidade)
-  - Cookies e tecnologias de rastreamento
-  - Alterações na política
-  - Contato do encarregado de dados (DPO)
-  - Caixa de contato com informações da empresa
+### 2. Seções com Listas Organizadas
+Converter parágrafos em listas com bullets onde apropriado, especialmente nas seções:
+- **Uso do Site** - listar proibições específicas
+- **Propriedade Intelectual** - listar tipos de conteúdo protegido
+- **Limitação de Responsabilidade** - listar isenções específicas
 
-### 2. Atualização do Roteamento
-Adicionar a rota `/home/politica-de-privacidade` no arquivo `App.tsx`.
+### 3. Adicionar Novas Seções
+Incluir seções adicionais para completude jurídica:
+- **Cadastro e Conta do Usuário** (se aplicável)
+- **Condições de Compra** (referência à política de venda)
+- **Rescisão** (condições de encerramento)
 
-### 3. Atualização do Rodapé
-Adicionar o link "Política de Privacidade" na seção de políticas do Footer, junto com os outros links existentes (Política de Revenda, Política de Venda, Termo de Uso).
+### 4. Melhorar Caixa de Contato
+- Adicionar título "Dúvidas sobre os Termos"
+- Incluir WhatsApp junto com e-mail e telefone
+- Atualizar data: "Última atualização: Fevereiro de 2026"
 
 ---
 
-## Arquivos a serem modificados/criados
+## Comparativo Visual
+
+```text
+ANTES                              DEPOIS
+├── Hero simples                   ├── Hero descritivo
+├── Parágrafos de texto            ├── Listas organizadas (ul/li)
+├── 8 seções básicas               ├── 10+ seções detalhadas
+└── Caixa contato simples          └── Caixa contato completa
+```
+
+---
+
+## Arquivo a ser modificado
 
 | Arquivo | Ação |
 |---------|------|
-| `src/pages/PoliticaPrivacidade.tsx` | Criar novo |
-| `src/App.tsx` | Adicionar import e rota |
-| `src/components/layout/Footer.tsx` | Adicionar link |
+| `src/pages/TermoUso.tsx` | Atualizar estrutura e conteúdo |
 
 ---
 
-## Detalhes Técnicos
+## Estrutura Final da Página
 
-### Estrutura da nova página
 ```text
-PoliticaPrivacidade.tsx
-├── Hero Section (gradient-primary)
-│   ├── Título: "Política de Privacidade"
-│   └── Subtítulo: "Como protegemos seus dados pessoais"
+TermoUso.tsx (atualizado)
+├── Hero Section
+│   ├── Título: "Termo de Uso"
+│   └── Subtítulo: "Regras e condições para utilização..."
 └── Conteúdo (prose prose-lg)
-    ├── Introdução
-    ├── Dados Coletados
-    ├── Finalidade do Tratamento
-    ├── Base Legal (LGPD)
-    ├── Compartilhamento
-    ├── Armazenamento e Segurança
-    ├── Direitos do Titular
-    ├── Cookies
-    ├── Alterações
-    └── Contato (card com info da empresa)
+    ├── 1. Aceitação dos Termos (com lista)
+    ├── 2. Uso do Site (com lista de proibições)
+    ├── 3. Propriedade Intelectual (com lista)
+    ├── 4. Informações do Usuário
+    ├── 5. Condições de Compra
+    ├── 6. Limitação de Responsabilidade (com lista)
+    ├── 7. Links Externos
+    ├── 8. Rescisão
+    ├── 9. Modificações
+    ├── 10. Lei Aplicável
+    └── Caixa de Contato (completa com WhatsApp)
 ```
-
-### Nova rota
-- **Caminho:** `/home/politica-de-privacidade`
-- **Componente:** `PoliticaPrivacidade`
-
-### Link no rodapé
-Será adicionado abaixo do "Termo de Uso" na seção de Horários/Políticas.
