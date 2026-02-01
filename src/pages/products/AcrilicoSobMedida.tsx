@@ -57,7 +57,7 @@ const categorias = [
     ],
   },
   {
-    titulo: "EXPOSITORES",
+    titulo: "EXPOSITORES E CONFEITARIA",
     produtos: [
       { nome: "Expositores para Bijuterias", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.expositoresBijuterias },
       { nome: "Expositores para Calçados", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.expositoresCalcados },
