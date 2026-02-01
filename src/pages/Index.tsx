@@ -190,7 +190,7 @@ export default function Index() {
         <div className="container-custom">
           <div className="text-center mb-10">
             <h2 className="font-bold text-2xl md:text-3xl lg:text-4xl text-accent uppercase tracking-wide">
-              Chapas Inteiras 
+              Chapas Inteiras e Cortadas   
             </h2>
             <p className="text-muted-foreground mt-2">
               Acrílico Transparente e Colorido, PS, Policarbonato, PETG, PVC e muito mais.
