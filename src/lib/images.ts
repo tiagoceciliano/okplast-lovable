@@ -112,7 +112,7 @@ export const SOBMEDIDA_IMAGES = {
   caixaSugestao: "/src/assets/produtos/caixa-sugestao.webp",
   expositoresBijuterias: img("sobmedida/expositores-bijuterias.jpg"),
   expositoresCalcados: "/src/assets/produtos/expositor-calcados.webp",
-  portaFolder: img("sobmedida/porta-folder.jpg"),
+  portaFolder: "/src/assets/produtos/porta-folder.webp",
   // Novas imagens locais
   trofeuSobMedida: "/src/assets/produtos/trofeu-sob-medida.webp",
   medalhaPersonalizada: "/src/assets/produtos/medalha-personalizada.webp",
