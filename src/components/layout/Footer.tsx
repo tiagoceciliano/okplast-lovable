@@ -72,8 +72,8 @@ export function Footer() {
             </ul>
             {/* Policies */}
             <div className="pt-4 space-y-2">
-              <Link to="/home/politica-de-revenda" className="block text-sm text-primary-foreground/80 hover:text-primary-foreground transition-colors">
-                Política de Revenda
+              <Link to="/home/politica-de-venda" className="block text-sm text-primary-foreground/80 hover:text-primary-foreground transition-colors">
+                Política de Venda
               </Link>
               <Link to="/home/politica-de-venda" className="block text-sm text-primary-foreground/80 hover:text-primary-foreground transition-colors">
                 Política de Venda
