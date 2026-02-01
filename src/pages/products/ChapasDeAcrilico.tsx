@@ -5,6 +5,13 @@ import { COMPANY } from "@/lib/constants";
 import { DecorativeDivider } from "@/components/ui/DecorativeDivider";
 import { BlueBanner } from "@/components/ui/BlueBanner";
 import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
+import { useRef } from "react";
 
 import { CHAPAS_PAGINA_IMAGES, CHAPAS_IMAGES } from "@/lib/images";
 import {
@@ -13,6 +20,27 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+
+// Imagens do carrossel hero
+import heroAcm from "@/assets/chapas-hero/acm.jpg";
+import heroAcrilicoColorido from "@/assets/chapas-hero/acrilico-colorido.jpg";
+import heroAcrilicoTransparente from "@/assets/chapas-hero/acrilico-transparente.jpg";
+import heroPetg from "@/assets/chapas-hero/petg.jpg";
+import heroPolicarbonatoAlveolar from "@/assets/chapas-hero/policarbonato-alveolar.jpg";
+import heroPolicarbonatoCompacto from "@/assets/chapas-hero/policarbonato-compacto.jpg";
+import heroPoliestireno from "@/assets/chapas-hero/poliestireno.jpg";
+import heroPvcExpandido from "@/assets/chapas-hero/pvc-expandido.jpg";
+
+const heroCarouselImages = [
+  { src: heroAcrilicoTransparente, alt: "Chapas de Acrílico Transparente" },
+  { src: heroAcrilicoColorido, alt: "Chapas de Acrílico Colorido" },
+  { src: heroPetg, alt: "Chapas PETG" },
+  { src: heroPolicarbonatoAlveolar, alt: "Chapas Policarbonato Alveolar" },
+  { src: heroPolicarbonatoCompacto, alt: "Chapas Policarbonato Compacto" },
+  { src: heroPoliestireno, alt: "Chapas Poliestireno" },
+  { src: heroPvcExpandido, alt: "Chapas PVC Expandido" },
+  { src: heroAcm, alt: "Chapas ACM" },
+];
 
 // Tipos de chapas com detalhes
 const tiposChapas = [
@@ -183,6 +211,9 @@ const coresDisponiveis = [
 
 export default function ChapasDeAcrilico() {
   const { openWhatsAppModal } = useWhatsAppModal();
+  const autoplayPlugin = useRef(
+    Autoplay({ delay: 3000, stopOnInteraction: false })
+  );
 
   return (
     <>
@@ -220,14 +251,26 @@ export default function ChapasDeAcrilico() {
               </div>
             </div>
 
-            {/* Right - Image */}
+            {/* Right - Carousel */}
             <div className="aspect-video bg-muted rounded-lg overflow-hidden">
-              <img 
-                src={CHAPAS_IMAGES.acrilicoColorido} 
-                alt="Chapas de Acrílico Colorido"
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
+              <Carousel
+                plugins={[autoplayPlugin.current]}
+                opts={{ loop: true }}
+                className="w-full h-full"
+              >
+                <CarouselContent className="h-full -ml-0">
+                  {heroCarouselImages.map((image, index) => (
+                    <CarouselItem key={index} className="h-full pl-0">
+                      <img 
+                        src={image.src} 
+                        alt={image.alt}
+                        className="w-full h-full object-cover"
+                        loading={index === 0 ? "eager" : "lazy"}
+                      />
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+              </Carousel>
             </div>
           </div>
         </div>
