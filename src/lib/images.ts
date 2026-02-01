@@ -51,7 +51,7 @@ export const CHAPAS_IMAGES = {
   acrilicoColorido: img("chapas/acrilico-colorido.jpg"),
   acrilicoLeitoso: "/src/assets/chapas/ps-poliestireno.jpg",
   acrilicoEspelhado: img("chapas/acrilico-espelhado.jpg"),
-  policarbonato: img("chapas/policarbonato.jpg"),
+  policarbonato: "/src/assets/chapas/policarbonato-alveolar.jpg",
   petg: "/src/assets/chapas/pet-g.jpg",
   pvcExpandido: img("chapas/pvc-expandido.jpg"),
   pedacosRetalhos: img("chapas/pedacos-retalhos.jpg"),
