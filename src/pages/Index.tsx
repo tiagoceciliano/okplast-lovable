@@ -29,7 +29,7 @@ const produtosSobMedida = [{
   nome: "Expositores de Bijuterias",
   imageUrl: PRODUTOS_IMAGES.potesGraos
 }, {
-  nome: "Urna de Acrílico",
+  nome: "Bolo Fake",
   imageUrl: PRODUTOS_IMAGES.urna
 }, {
   nome: "Caixas Sob Medida",
