@@ -32,7 +32,7 @@ const produtosSobMedida = [{
   nome: "Bolo Fake",
   imageUrl: PRODUTOS_IMAGES.urna
 }, {
-  nome: "Caixas Sob Medida",
+  nome: "Púlpitos",
   imageUrl: PRODUTOS_IMAGES.caixasSobMedida
 }, {
   nome: "Troféus",
