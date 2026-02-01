@@ -180,15 +180,6 @@ export default function AcrilicoSobMedida() {
         </div>
       </section>
 
-      {/* Formulário de Orçamento */}
-      <section className="section-padding bg-primary/95">
-        <div className="container-custom">
-          <div className="max-w-2xl mx-auto">
-            <EmbeddedQuoteForm variant="dark" />
-          </div>
-        </div>
-      </section>
-
       {/* Nossa Localização */}
       <section className="section-padding">
         <div className="container-custom">
