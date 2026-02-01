@@ -78,7 +78,7 @@ export default function PoliticaVenda() {
             <ul className="text-muted-foreground space-y-2">
               <li><strong className="text-foreground">PIX:</strong> Desconto especial à vista com confirmação imediata</li>
               <li><strong className="text-foreground">Transferência Bancária:</strong> Desconto à vista</li>
-              <li><strong className="text-foreground">Boleto Bancário:</strong> À vista ou parcelado (sujeito a análise de crédito)</li>
+              <li><strong className="text-foreground">Boleto Bancário:</strong> À vista</li>
               <li><strong className="text-foreground">Cartão de Crédito:</strong> Até 3x sem juros</li>
             </ul>
 
