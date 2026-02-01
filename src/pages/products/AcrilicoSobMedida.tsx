@@ -51,7 +51,7 @@ const categorias = [
     titulo: "DISPLAY, URNAS E QUADROS",
     produtos: [
       { nome: "Display de Parede e Mesa", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.display },
-      { nome: "Urna de Acrílico", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.urna },
+      { nome: "Urnas Transparente ou Coloridas", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.urna },
       { nome: "Caixa de Sugestão", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.caixaSugestao },
       { nome: "Quadro de Avisos", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.quadroAvisos },
     ],
