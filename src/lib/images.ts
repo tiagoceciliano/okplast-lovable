@@ -94,7 +94,7 @@ export const CHAPAS_PAGINA_IMAGES = {
   policarbonatoAlveolar: "/src/assets/chapas/policarbonato-alveolar-2.jpg",
   policarbonatoCompacto: "/src/assets/chapas/policarbonato-compacto-2.jpg",
   pvc: "/src/assets/chapas/pvc-expandido-2.jpg",
-  acm: img("chapas-pagina/acm.jpg"),
+  acm: "/src/assets/chapas/acm-2.jpg",
 } as const;
 
 // ========================================
