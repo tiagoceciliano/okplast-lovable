@@ -12,55 +12,16 @@ import { useEmailQuoteModal } from "@/contexts/EmailQuoteModalContext";
 import { MotivosCarousel } from "@/components/home/MotivosCarousel";
 import { PRODUTOS_IMAGES, CHAPAS_IMAGES, DEPOIMENTOS_IMAGES } from "@/lib/images";
 
-// Produtos Sob Medida - Grid de 8 produtos
+// Produtos Sob Medida - Grid reorganizado
 const produtosSobMedida = [{
-  nome: "Expositores Sob medida",
-  imageUrl: PRODUTOS_IMAGES.potesDoces
-}, {
-  nome: "Cúpulas e Redomas",
-  imageUrl: PRODUTOS_IMAGES.cupulasRedomas
-}, {
-  nome: "Display A6 Mesa",
-  imageUrl: PRODUTOS_IMAGES.displayA4
-}, {
-  nome: "Defletores",
-  imageUrl: PRODUTOS_IMAGES.portaFolder
-}, {
   nome: "Expositores de Bijuterias",
   imageUrl: PRODUTOS_IMAGES.potesGraos
 }, {
   nome: "Bolo Fake",
   imageUrl: PRODUTOS_IMAGES.urna
 }, {
-  nome: "Púlpitos",
-  imageUrl: PRODUTOS_IMAGES.caixasSobMedida
-}, {
-  nome: "Troféus",
-  imageUrl: PRODUTOS_IMAGES.trofeus
-}, {
   nome: "Display A4",
   imageUrl: PRODUTOS_IMAGES.displayA4
-}, {
-  nome: "Medalhas e Premiações",
-  imageUrl: PRODUTOS_IMAGES.medalhasPremiacoes
-}, {
-  nome: "Placas Personalizadas",
-  imageUrl: PRODUTOS_IMAGES.placasPersonalizadas
-}, {
-  nome: "Urna Piramidal",
-  imageUrl: PRODUTOS_IMAGES.urnaPiramidal
-}, {
-  nome: "Caixa para Doces",
-  imageUrl: PRODUTOS_IMAGES.caixaDoces
-}, {
-  nome: "Display A4 Parede",
-  imageUrl: PRODUTOS_IMAGES.displayA4Parede
-}, {
-  nome: "Display A6 Mesa",
-  imageUrl: PRODUTOS_IMAGES.displayA6Mesa
-}, {
-  nome: "Pote a Granel",
-  imageUrl: PRODUTOS_IMAGES.poteAGranel
 }];
 
 // Tipos de Chapas - Grid de 8 chapas
