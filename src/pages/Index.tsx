@@ -154,12 +154,16 @@ export default function Index() {
               </div>)}
           </div>
           
-          <div className="text-center mt-8">
+          <div className="flex flex-col items-center gap-3 mt-8">
             <Button size="lg" asChild className="gap-2">
               <Link to="/acrilico-sob-medida" onClick={() => window.scrollTo(0, 0)}>
                 Ver mais produtos
                 <ShoppingCart className="h-5 w-5" />
               </Link>
+            </Button>
+            <Button size="lg" className="btn-whatsapp gap-2" onClick={() => openWhatsAppModal("Produto Personalizado")}>
+              <MessageCircle className="h-5 w-5" />
+              Orçamento via WhatsApp
             </Button>
           </div>
         </div>
@@ -188,12 +192,16 @@ export default function Index() {
               </div>)}
           </div>
           
-          <div className="text-center mt-8">
+          <div className="flex flex-col items-center gap-3 mt-8">
             <Button size="lg" variant="outline" asChild className="gap-2">
               <Link to="/chapas-de-acrilico" onClick={() => window.scrollTo(0, 0)}>
                 Ver mais chapas e materiais
                 <ArrowRight className="h-5 w-5" />
               </Link>
+            </Button>
+            <Button size="lg" className="btn-whatsapp gap-2" onClick={() => openWhatsAppModal("Chapas de Acrílico")}>
+              <MessageCircle className="h-5 w-5" />
+              Orçamento via WhatsApp
             </Button>
           </div>
         </div>
