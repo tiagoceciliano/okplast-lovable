@@ -190,7 +190,7 @@ export default function Index() {
         <div className="container-custom">
           <div className="text-center mb-10">
             <h2 className="font-bold text-2xl md:text-3xl lg:text-4xl text-accent uppercase tracking-wide">
-              Chapas e Pedaços de Placas
+              Chapas Inteiras 
             </h2>
             <p className="text-muted-foreground mt-2">
               Trabalhamos com diversos tipos de chapas de acrílico e materiais plásticos
