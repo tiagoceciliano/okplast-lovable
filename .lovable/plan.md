@@ -1,54 +1,44 @@
 
+# Plano: Reorganizar Grid de Produtos Sob Medida
 
-# Plano: Adicionar Som de Notificação na Mensagem Proativa
+## Resumo
+Reorganizar a seção "Produtos Sob Medida" na página inicial, removendo 4 itens e reordenando os 12 restantes em 3 linhas de 4 produtos cada.
 
-## Objetivo
-Tocar um som de notificação quando a mensagem proativa do WhatsApp aparecer (após 5 segundos), para chamar a atenção do visitante da página.
+---
 
-## Alterações Necessárias
+## O que será alterado
 
-### 1. Adicionar arquivo de áudio na pasta public
+### Arquivo: `src/pages/Index.tsx`
 
-Adicionar um arquivo de som de notificação curto e agradável:
-- `public/sounds/notification.mp3` - Som estilo "pop" ou notificação de mensagem
+Substituir o array `produtosSobMedida` atual (16 itens) por um novo array com 12 itens na ordem especificada:
 
-O som deve ser:
-- Curto (menos de 1 segundo)
-- Agradável e não intrusivo
-- Similar a notificações de chat/mensagem
+**Linha 1:**
+1. Cúpulas e Redomas → `cupulasRedomas`
+2. Troféus → `trofeus`
+3. Medalhas e Premiações → `medalhasPremiacoes`
+4. Expositores Sob medida → `potesDoces`
 
-### 2. Atualizar WhatsAppFloatingButton.tsx
+**Linha 2:**
+5. Display A4 Parede → `displayA4Parede`
+6. Display A6 Mesa → `displayA6Mesa`
+7. Urna Piramidal → `urnaPiramidal`
+8. Púlpitos → `caixasSobMedida`
 
-Modificar o `useEffect` que mostra a mensagem proativa para também tocar o som:
+**Linha 3:**
+9. Caixa para Doces → `caixaDoces`
+10. Pote a Granel → `poteAGranel`
+11. Defletores → `portaFolder`
+12. Placas Personalizadas → `placasPersonalizadas`
 
-```tsx
-useEffect(() => {
-  const timer = setTimeout(() => {
-    setShowProactiveMessage(true);
-    
-    // Tocar som de notificação
-    const audio = new Audio('/sounds/notification.mp3');
-    audio.volume = 0.5; // Volume moderado
-    audio.play().catch(() => {
-      // Ignora erro se autoplay bloqueado pelo navegador
-    });
-  }, 5000);
-  
-  return () => clearTimeout(timer);
-}, []);
-```
+---
 
-## Observações Técnicas
+## Itens removidos
+- Display A6 Mesa (duplicado antigo)
+- Display A4 (duplicado antigo)
+- Expositores de Bijuterias
+- Bolo Fake
 
-- Navegadores modernos podem bloquear autoplay de áudio se o usuário não interagiu com a página
-- O `.catch()` trata silenciosamente esse caso para não gerar erros no console
-- Volume configurado em 50% para não ser muito alto
-- O som só toca uma vez, quando a mensagem aparece
+---
 
-## Arquivos a Modificar/Criar
-
-| Arquivo | Ação |
-|---------|------|
-| `public/sounds/notification.mp3` | Criar (adicionar arquivo de áudio) |
-| `src/components/layout/WhatsAppFloatingButton.tsx` | Modificar (adicionar reprodução do som) |
-
+## Resultado visual esperado
+Grid 4x3 (4 colunas no desktop, 2 no mobile) com os 12 produtos organizados exatamente na ordem solicitada.
