@@ -156,7 +156,7 @@ export default function Index() {
           
           <div className="text-center mt-8">
             <Button size="lg" asChild className="gap-2">
-              <Link to="/acrilico-sob-medida">
+              <Link to="/acrilico-sob-medida" onClick={() => window.scrollTo(0, 0)}>
                 Ver mais produtos
                 <ShoppingCart className="h-5 w-5" />
               </Link>
