@@ -108,7 +108,7 @@ export const SOBMEDIDA_IMAGES = {
   medalhas: img("sobmedida/medalhas.jpg"),
   trofeus: img("sobmedida/trofeus.jpg"),
   display: img("sobmedida/display.jpg"),
-  urna: img("sobmedida/urna.jpg"),
+  urna: "/src/assets/produtos/urna-acrilico.webp",
   caixaSugestao: img("sobmedida/caixa-sugestao.jpg"),
   expositoresBijuterias: img("sobmedida/expositores-bijuterias.jpg"),
   expositoresCalcados: img("sobmedida/expositores-calcados.jpg"),
