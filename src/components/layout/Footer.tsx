@@ -75,9 +75,6 @@ export function Footer() {
               <Link to="/home/politica-de-venda" className="block text-sm text-primary-foreground/80 hover:text-primary-foreground transition-colors">
                 Política de Venda
               </Link>
-              <Link to="/home/politica-de-venda" className="block text-sm text-primary-foreground/80 hover:text-primary-foreground transition-colors">
-                Política de Venda
-              </Link>
               <Link to="/home/termo-de-uso" className="block text-sm text-primary-foreground/80 hover:text-primary-foreground transition-colors">
                 Termo de Uso
               </Link>
