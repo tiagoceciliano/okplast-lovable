@@ -118,7 +118,7 @@ export default function AcrilicoSobMedida() {
             </div>
 
             {/* Right - Carousel */}
-            <div className="aspect-video bg-muted rounded-lg overflow-hidden">
+            <div className="aspect-[4/3] lg:aspect-square bg-muted rounded-lg overflow-hidden">
               <Carousel
                 plugins={[autoplayPlugin.current]}
                 opts={{ loop: true }}
