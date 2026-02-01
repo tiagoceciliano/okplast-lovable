@@ -20,7 +20,7 @@ const produtosSobMedida = [{
   nome: "Cúpulas e Redomas",
   imageUrl: PRODUTOS_IMAGES.cupulasRedomas
 }, {
-  nome: "Display de Acrílico",
+  nome: "Display A6 Mesa",
   imageUrl: PRODUTOS_IMAGES.display
 }, {
   nome: "Defletores",
