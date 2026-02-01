@@ -26,7 +26,7 @@ const produtosSobMedida = [{
   nome: "Defletores",
   imageUrl: PRODUTOS_IMAGES.portaFolder
 }, {
-  nome: "Potes para Grãos",
+  nome: "Expositores de Bijuterias",
   imageUrl: PRODUTOS_IMAGES.potesGraos
 }, {
   nome: "Urna de Acrílico",
