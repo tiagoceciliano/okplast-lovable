@@ -256,7 +256,29 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Orçamento + Mapa */}
+      {/* CTA Final */}
+      <section className="section-padding bg-primary text-primary-foreground">
+        <div className="container-custom text-center">
+          <h2 className="font-bold text-2xl md:text-3xl mb-4">
+            Pronto para Começar seu Projeto?
+          </h2>
+          <p className="text-primary-foreground/90 mb-8 max-w-2xl mx-auto">
+            Entre em contato conosco e solicite um orçamento personalizado. 
+            Nossa equipe está pronta para atender você!
+          </p>
+          <div className="flex flex-col items-center gap-4">
+            <Button size="lg" className="btn-whatsapp text-lg px-8 py-6" onClick={() => openWhatsAppModal()}>
+              <MessageCircle className="h-5 w-5 mr-2" />
+              Orçamento via WhatsApp
+            </Button>
+            <button onClick={() => openEmailModal()} className="text-primary-foreground/70 hover:text-primary-foreground text-sm underline underline-offset-4">
+              Prefere orçamento via e-mail?
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Por que escolher */}
       <section className="section-padding bg-secondary">
         <div className="container-custom">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
@@ -294,28 +316,6 @@ export default function Index() {
               </div>
             </div>
 
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Final */}
-      <section className="section-padding bg-primary text-primary-foreground">
-        <div className="container-custom text-center">
-          <h2 className="font-bold text-2xl md:text-3xl mb-4">
-            Pronto para Começar seu Projeto?
-          </h2>
-          <p className="text-primary-foreground/90 mb-8 max-w-2xl mx-auto">
-            Entre em contato conosco e solicite um orçamento personalizado. 
-            Nossa equipe está pronta para atender você!
-          </p>
-          <div className="flex flex-col items-center gap-4">
-            <Button size="lg" className="btn-whatsapp text-lg px-8 py-6" onClick={() => openWhatsAppModal()}>
-              <MessageCircle className="h-5 w-5 mr-2" />
-              Orçamento via WhatsApp
-            </Button>
-            <button onClick={() => openEmailModal()} className="text-primary-foreground/70 hover:text-primary-foreground text-sm underline underline-offset-4">
-              Prefere orçamento via e-mail?
-            </button>
           </div>
         </div>
       </section>
