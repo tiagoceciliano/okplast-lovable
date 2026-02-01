@@ -212,7 +212,7 @@ const coresDisponiveis = [
 export default function ChapasDeAcrilico() {
   const { openWhatsAppModal } = useWhatsAppModal();
   const autoplayPlugin = useRef(
-    Autoplay({ delay: 3000, stopOnInteraction: false })
+    Autoplay({ delay: 1000, stopOnInteraction: false })
   );
 
   return (
