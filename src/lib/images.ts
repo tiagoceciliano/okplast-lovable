@@ -113,6 +113,9 @@ export const SOBMEDIDA_IMAGES = {
   expositoresBijuterias: img("sobmedida/expositores-bijuterias.jpg"),
   expositoresCalcados: img("sobmedida/expositores-calcados.jpg"),
   portaFolder: img("sobmedida/porta-folder.jpg"),
+  // Novas imagens locais
+  trofeuSobMedida: "/src/assets/produtos/trofeu-sob-medida.webp",
+  medalhaPersonalizada: "/src/assets/produtos/medalha-personalizada.webp",
 } as const;
 
 // ========================================
