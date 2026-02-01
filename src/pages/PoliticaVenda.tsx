@@ -80,7 +80,6 @@ export default function PoliticaVenda() {
               <li><strong className="text-foreground">Transferência Bancária:</strong> Desconto à vista</li>
               <li><strong className="text-foreground">Boleto Bancário:</strong> À vista ou parcelado (sujeito a análise de crédito)</li>
               <li><strong className="text-foreground">Cartão de Crédito:</strong> Consulte condições de parcelamento</li>
-              <li><strong className="text-foreground">CNPJ:</strong> Condições especiais para empresas mediante cadastro</li>
             </ul>
 
             <h3 className="font-display text-xl font-bold text-foreground mt-8">
