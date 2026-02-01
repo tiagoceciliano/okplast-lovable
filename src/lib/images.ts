@@ -93,7 +93,7 @@ export const CHAPAS_PAGINA_IMAGES = {
   petg: "/src/assets/chapas/pet-g-2.jpg",
   policarbonatoAlveolar: "/src/assets/chapas/policarbonato-alveolar-2.jpg",
   policarbonatoCompacto: "/src/assets/chapas/policarbonato-compacto-2.jpg",
-  pvc: img("chapas-pagina/pvc.jpg"),
+  pvc: "/src/assets/chapas/pvc-expandido-2.jpg",
   acm: img("chapas-pagina/acm.jpg"),
 } as const;
 
