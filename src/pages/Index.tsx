@@ -193,7 +193,7 @@ export default function Index() {
               Chapas Inteiras 
             </h2>
             <p className="text-muted-foreground mt-2">
-              Trabalhamos com diversos tipos de chapas de acrílico e materiais plásticos
+              Acrílico Transparente e Colorido, PS, Policarbonato, PETG, PVC e muito mais.
             </p>
           </div>
           
