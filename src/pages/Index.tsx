@@ -21,7 +21,7 @@ const produtosSobMedida = [{
   imageUrl: PRODUTOS_IMAGES.cupulasRedomas
 }, {
   nome: "Display A6 Mesa",
-  imageUrl: PRODUTOS_IMAGES.display
+  imageUrl: PRODUTOS_IMAGES.displayA4
 }, {
   nome: "Defletores",
   imageUrl: PRODUTOS_IMAGES.portaFolder
