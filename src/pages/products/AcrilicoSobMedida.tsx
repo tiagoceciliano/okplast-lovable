@@ -52,7 +52,7 @@ const categorias = [
     produtos: [
       { nome: "Display de Parede e Mesa", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.display },
       { nome: "Urnas Transparente ou Coloridas", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.urna },
-      { nome: "Caixas Sob Medida", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.caixaSugestao },
+      { nome: "Caixas de Sugestões", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.caixaSugestao },
       { nome: "Quadro de Avisos", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.quadroAvisos },
     ],
   },
