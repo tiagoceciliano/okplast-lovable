@@ -108,8 +108,8 @@ export default function Index() {
         <div className="container-custom">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="font-bold text-3xl md:text-4xl lg:text-5xl text-foreground mb-6 leading-tight">
-              FÁBRICA e LOJA DE CHAPAS DE{" "}
-              <span className="text-accent">ACRÍLICO</span> e PERSONALIZADOS.
+              FÁBRICA PRODUTOS PERSONALIZADOS e DISTRIBUIDORA DE CHAPAS DE{" "}
+              <span className="text-accent">ACRÍLICO</span> E SIMILARES.
             </h1>
             <p className="text-lg md:text-xl text-accent font-medium mb-6">
               Acrílico Transparente e Colorido, PS, Policarbonato, PETG, PVC e muito mais.
