@@ -344,12 +344,12 @@ export default function ChapasDeAcrilico() {
       </section>
 
       {/* CTA Final */}
-      <section className="section-padding bg-primary text-primary-foreground">
+      <section className="section-padding bg-muted">
         <div className="container-custom text-center">
-          <h2 className="font-bold text-2xl md:text-3xl mb-4">
+          <h2 className="font-bold text-2xl md:text-3xl text-foreground mb-4">
             Solicite seu Orçamento
           </h2>
-          <p className="text-primary-foreground/80 mb-8 max-w-xl mx-auto">
+          <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
             Informe o tipo de chapa, espessura e dimensões desejadas para receber um orçamento personalizado.
           </p>
           <div className="flex flex-col items-center gap-4">
@@ -363,7 +363,7 @@ export default function ChapasDeAcrilico() {
             </Button>
             <Link 
               to="/home/orcamento" 
-              className="text-primary-foreground/70 hover:text-primary-foreground text-sm underline underline-offset-4"
+              className="text-muted-foreground hover:text-foreground text-sm underline underline-offset-4"
             >
               Prefere orçamento via e-mail?
             </Link>
