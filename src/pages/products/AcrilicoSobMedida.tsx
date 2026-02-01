@@ -3,15 +3,31 @@ import { Button } from "@/components/ui/button";
 import { MessageCircle } from "lucide-react";
 import { COMPANY } from "@/lib/constants";
 import { DecorativeDivider } from "@/components/ui/DecorativeDivider";
+import { BlueBanner } from "@/components/ui/BlueBanner";
 import { TestimonialCard } from "@/components/ui/TestimonialCard";
 import { ClientLogos } from "@/components/ui/ClientLogos";
-import { GoogleMapEmbed } from "@/components/ui/GoogleMapEmbed";
 import { ProductCategoryGrid } from "@/components/home/ProductCategoryGrid";
-import { EmbeddedQuoteForm } from "@/components/forms/EmbeddedQuoteForm";
 import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
-import { SOBMEDIDA_IMAGES, DEPOIMENTOS_IMAGES, HERO_IMAGES } from "@/lib/images";
+import { SOBMEDIDA_IMAGES, DEPOIMENTOS_IMAGES } from "@/lib/images";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
+import { useRef } from "react";
 
-// Categories with products (links apontam para a própria página)
+// Imagens do carrossel hero - reutilizando algumas imagens dos produtos
+const heroCarouselImages = [
+  { src: SOBMEDIDA_IMAGES.cupulas, alt: "Cúpulas e Redomas de Acrílico" },
+  { src: SOBMEDIDA_IMAGES.trofeus, alt: "Troféus Personalizados" },
+  { src: SOBMEDIDA_IMAGES.medalhas, alt: "Medalhas Personalizadas" },
+  { src: SOBMEDIDA_IMAGES.display, alt: "Displays de Acrílico" },
+  { src: SOBMEDIDA_IMAGES.caixas, alt: "Caixas Sob Medida" },
+  { src: SOBMEDIDA_IMAGES.urna, alt: "Urnas de Acrílico" },
+];
+
+// Categories with products
 const categorias = [
   {
     titulo: "CAIXAS, POTES, CÚPULAS, REDOMAS",
@@ -57,22 +73,27 @@ const depoimentos = [
 
 export default function AcrilicoSobMedida() {
   const { openWhatsAppModal } = useWhatsAppModal();
+  const autoplayPlugin = useRef(
+    Autoplay({ delay: 1000, stopOnInteraction: false })
+  );
 
   return (
     <>
-      {/* Hero Azul */}
-      <section className="bg-primary text-primary-foreground py-16 md:py-24">
+      {/* Hero - 2 Colunas (igual à página de Chapas) */}
+      <section className="bg-muted py-16 md:py-20">
         <div className="container-custom">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            {/* Left - Text */}
             <div>
-              <h1 className="font-bold text-3xl md:text-4xl lg:text-5xl mb-6">
-                A MELHOR FÁBRICA DE ACRÍLICO PERSONALIZADO E SOB MEDIDA
+              <h1 className="font-bold text-3xl md:text-4xl lg:text-5xl text-foreground mb-6">
+                ACRÍLICO PERSONALIZADO E SOB MEDIDA
               </h1>
-              <p className="text-lg text-primary-foreground/90 mb-4">
-                do Rio de Janeiro (RJ).
+              <p className="text-lg text-accent font-medium mb-4">
+                A melhor fábrica de acrílico do Rio de Janeiro (RJ)
               </p>
-              <p className="text-primary-foreground/80 mb-8">
-                Produtos, Caixas e Placas de acrílico Transparente, Cristal e Coloridos.
+              <p className="text-muted-foreground mb-8">
+                Produtos, Caixas e Placas de acrílico Transparente, Cristal e Coloridos. 
+                Fabricamos sob medida para seu projeto.
               </p>
               <div className="flex flex-col items-start gap-3">
                 <Button 
@@ -85,35 +106,48 @@ export default function AcrilicoSobMedida() {
                 </Button>
                 <Link 
                   to="/home/orcamento" 
-                  className="text-primary-foreground/70 hover:text-primary-foreground text-sm underline underline-offset-4"
+                  className="text-muted-foreground hover:text-foreground text-sm underline underline-offset-4"
                 >
                   Prefere orçamento via e-mail?
                 </Link>
               </div>
             </div>
-            
-            {/* Hero Image */}
-            <div className="flex justify-center">
-              <img 
-                src={HERO_IMAGES.cubo3d} 
-                alt="Cubo 3D de Acrílico" 
-                className="w-64 h-64 object-contain"
-              />
+
+            {/* Right - Carousel */}
+            <div className="aspect-video bg-muted rounded-lg overflow-hidden">
+              <Carousel
+                plugins={[autoplayPlugin.current]}
+                opts={{ loop: true }}
+                className="w-full h-full"
+              >
+                <CarouselContent className="h-full -ml-0">
+                  {heroCarouselImages.map((image, index) => (
+                    <CarouselItem key={index} className="h-full pl-0">
+                      <img 
+                        src={image.src} 
+                        alt={image.alt}
+                        className="w-full h-full object-cover"
+                        loading={index === 0 ? "eager" : "lazy"}
+                      />
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+              </Carousel>
             </div>
           </div>
         </div>
       </section>
 
       {/* Seção Empresa */}
-      <section className="section-padding bg-secondary">
+      <section className="section-padding">
         <div className="container-custom">
           <DecorativeDivider />
           
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="font-bold text-2xl md:text-3xl text-foreground mb-6">
+          <div className="text-center mb-12">
+            <h2 className="font-bold text-2xl md:text-3xl text-foreground mb-4">
               Conheça um pouco da nossa empresa
             </h2>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground max-w-3xl mx-auto">
               A {COMPANY.name} é uma empresa familiar que nasceu da paixão pelo trabalho com acrílico. 
               Ao longo de mais de três décadas, construímos uma reputação sólida baseada na qualidade, 
               no atendimento personalizado e na capacidade de transformar ideias em realidade.
@@ -121,6 +155,11 @@ export default function AcrilicoSobMedida() {
           </div>
         </div>
       </section>
+
+      {/* Banner Azul */}
+      <BlueBanner>
+        Produtos personalizados em acrílico: Caixas, Displays, Urnas, Troféus, Medalhas e muito mais.
+      </BlueBanner>
 
       {/* Categorias de Produtos */}
       <section className="section-padding">
@@ -176,6 +215,34 @@ export default function AcrilicoSobMedida() {
                 avatarUrl={dep.avatarUrl}
               />
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Final (igual à página de Chapas) */}
+      <section className="section-padding bg-muted">
+        <div className="container-custom text-center">
+          <h2 className="font-bold text-2xl md:text-3xl text-foreground mb-4">
+            Solicite seu Orçamento
+          </h2>
+          <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
+            Informe o produto desejado e suas medidas para receber um orçamento personalizado.
+          </p>
+          <div className="flex flex-col items-center gap-4">
+            <Button 
+              size="lg" 
+              className="btn-whatsapp text-lg px-8 py-6"
+              onClick={() => openWhatsAppModal("Produto Personalizado")}
+            >
+              <MessageCircle className="h-5 w-5 mr-2" />
+              Orçamento via WhatsApp
+            </Button>
+            <Link 
+              to="/home/orcamento" 
+              className="text-muted-foreground hover:text-foreground text-sm underline underline-offset-4"
+            >
+              Prefere orçamento via e-mail?
+            </Link>
           </div>
         </div>
       </section>
