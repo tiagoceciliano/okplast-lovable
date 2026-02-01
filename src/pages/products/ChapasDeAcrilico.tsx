@@ -343,30 +343,6 @@ export default function ChapasDeAcrilico() {
         </div>
       </section>
 
-      {/* Espessuras Disponíveis */}
-      <section className="section-padding bg-secondary">
-        <div className="container-custom">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="font-bold text-2xl md:text-3xl text-foreground mb-8 text-center">
-              Espessuras Disponíveis
-            </h2>
-            <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
-              {["2mm", "3mm", "4mm", "5mm", "6mm", "8mm", "10mm", "15mm", "20mm", "25mm", "30mm", "Sob consulta"].map((esp) => (
-                <div 
-                  key={esp} 
-                  className="bg-card p-4 rounded-lg text-center font-semibold text-foreground shadow-sm"
-                >
-                  {esp}
-                </div>
-              ))}
-            </div>
-            <p className="text-muted-foreground text-center">
-              Trabalhamos com chapas de diversas espessuras. Consulte disponibilidade e tamanhos.
-            </p>
-          </div>
-        </div>
-      </section>
-
       {/* CTA Final */}
       <section className="section-padding bg-primary text-primary-foreground">
         <div className="container-custom text-center">
