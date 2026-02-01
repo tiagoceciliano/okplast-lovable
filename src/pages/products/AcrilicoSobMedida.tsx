@@ -179,48 +179,6 @@ export default function AcrilicoSobMedida() {
           </div>
         </div>
       </section>
-
-      {/* Nossa Localização */}
-      <section className="section-padding">
-        <div className="container-custom">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-            <div>
-              <h2 className="font-bold text-2xl md:text-3xl text-foreground mb-8">
-                Nossa Localização
-              </h2>
-              <GoogleMapEmbed height="350px" />
-            </div>
-            
-            <div className="flex flex-col justify-center">
-              <h3 className="font-bold text-xl text-foreground mb-6">
-                Dados de Contato
-              </h3>
-              <div className="space-y-4 text-muted-foreground">
-                <p>
-                  <span className="font-semibold text-foreground">Endereço:</span><br />
-                  {COMPANY.address}
-                </p>
-                <p>
-                  <span className="font-semibold text-foreground">Telefone:</span><br />
-                  {COMPANY.phone}
-                </p>
-                <p>
-                  <span className="font-semibold text-foreground">WhatsApp:</span><br />
-                  {COMPANY.whatsappFormatted}
-                </p>
-                <p>
-                  <span className="font-semibold text-foreground">E-mail:</span><br />
-                  {COMPANY.email}
-                </p>
-                <p>
-                  <span className="font-semibold text-foreground">Horário:</span><br />
-                  {COMPANY.businessHours}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
     </>
   );
 }
