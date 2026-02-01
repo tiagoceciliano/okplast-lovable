@@ -49,7 +49,7 @@ export const PRODUTOS_IMAGES = {
 export const CHAPAS_IMAGES = {
   acrilicoCristal: img("chapas/acrilico-cristal.jpg"),
   acrilicoColorido: img("chapas/acrilico-colorido.jpg"),
-  acrilicoLeitoso: img("chapas/acrilico-leitoso.jpg"),
+  acrilicoLeitoso: "/src/assets/chapas/ps-poliestireno.jpg",
   acrilicoEspelhado: img("chapas/acrilico-espelhado.jpg"),
   policarbonato: img("chapas/policarbonato.jpg"),
   petg: "/src/assets/chapas/pet-g.jpg",
