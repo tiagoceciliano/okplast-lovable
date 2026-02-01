@@ -3,7 +3,10 @@ import { MapPin, Phone, Mail, Clock, MessageCircle } from "lucide-react";
 import { COMPANY } from "@/lib/constants";
 import logoImg from "@/assets/logo-lab-acrilicos.png";
 import { GoogleMapEmbed } from "@/components/ui/GoogleMapEmbed";
+import { useEmailQuoteModal } from "@/contexts/EmailQuoteModalContext";
+
 export function Footer() {
+  const { openEmailModal } = useEmailQuoteModal();
   const currentYear = new Date().getFullYear();
   return <footer className="bg-primary text-primary-foreground">
       <div className="container-custom section-padding">
@@ -18,7 +21,12 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="h-4 w-4 shrink-0" />
-                <span>{COMPANY.email}</span>
+                <button 
+                  onClick={() => openEmailModal()} 
+                  className="hover:text-primary-foreground transition-colors text-left"
+                >
+                  {COMPANY.email}
+                </button>
               </li>
             </ul>
           </div>
