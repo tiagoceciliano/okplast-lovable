@@ -179,22 +179,6 @@ export default function AcrilicoSobMedida() {
         </div>
       </section>
 
-      {/* Grande Empresa, Grandes Clientes */}
-      <section className="section-padding bg-secondary">
-        <div className="container-custom">
-          <div className="text-center mb-12">
-            <h2 className="font-bold text-2xl md:text-3xl text-foreground mb-4">
-              Grande Empresa, Grandes Clientes
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              A {COMPANY.name} atende desde pequenos empreendedores até grandes corporações
-            </p>
-          </div>
-          
-          <ClientLogos />
-        </div>
-      </section>
-
       {/* Satisfação Garantida */}
       <section className="section-padding">
         <div className="container-custom">
@@ -220,6 +204,22 @@ export default function AcrilicoSobMedida() {
               />
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Grande Empresa, Grandes Clientes */}
+      <section className="section-padding bg-secondary">
+        <div className="container-custom">
+          <div className="text-center mb-12">
+            <h2 className="font-bold text-2xl md:text-3xl text-foreground mb-4">
+              Grande Empresa, Grandes Clientes
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              A {COMPANY.name} atende desde pequenos empreendedores até grandes corporações
+            </p>
+          </div>
+          
+          <ClientLogos />
         </div>
       </section>
 
