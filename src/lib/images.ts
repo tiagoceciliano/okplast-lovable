@@ -117,6 +117,7 @@ export const SOBMEDIDA_IMAGES = {
   trofeuSobMedida: "/src/assets/produtos/trofeu-sob-medida.webp",
   medalhaPersonalizada: "/src/assets/produtos/medalha-personalizada.webp",
   quadroAvisos: "/src/assets/produtos/quadro-avisos.jpg",
+  boloFake: "/src/assets/produtos/bolo-fake.jpeg",
 } as const;
 
 // ========================================
