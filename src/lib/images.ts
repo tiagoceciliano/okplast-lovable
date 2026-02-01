@@ -89,7 +89,7 @@ export const DEPOIMENTOS_IMAGES = {
 // ========================================
 export const CHAPAS_PAGINA_IMAGES = {
   cast: img("chapas-pagina/cast.jpg"),
-  poliestireno: img("chapas-pagina/poliestireno.jpg"),
+  poliestireno: "/src/assets/chapas/ps-poliestireno-2.jpg",
   petg: img("chapas-pagina/petg.jpg"),
   policarbonatoAlveolar: img("chapas-pagina/policarbonato-alveolar.jpg"),
   policarbonatoCompacto: img("chapas-pagina/policarbonato-compacto.jpg"),
