@@ -61,7 +61,7 @@ const categorias = [
     produtos: [
       { nome: "Expositores para Bijuterias", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.expositoresBijuterias },
       { nome: "Expositores para Calçados", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.expositoresCalcados },
-      { nome: "Porta Folder", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.portaFolder },
+      { nome: "Expositor de Óculos Ótica", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.portaFolder },
       { nome: "Bolo Fake", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.boloFake },
     ],
   },
