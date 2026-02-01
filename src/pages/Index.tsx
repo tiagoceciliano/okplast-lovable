@@ -14,7 +14,7 @@ import { PRODUTOS_IMAGES, CHAPAS_IMAGES, DEPOIMENTOS_IMAGES } from "@/lib/images
 
 // Produtos Sob Medida - Grid de 8 produtos
 const produtosSobMedida = [{
-  nome: "Potes para Doces",
+  nome: "Expositores Sob medida",
   imageUrl: PRODUTOS_IMAGES.potesDoces
 }, {
   nome: "Cúpulas e Redomas",
