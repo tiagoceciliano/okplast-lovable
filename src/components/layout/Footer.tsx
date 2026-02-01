@@ -4,9 +4,11 @@ import { COMPANY } from "@/lib/constants";
 import logoImg from "@/assets/logo-lab-acrilicos.png";
 import { GoogleMapEmbed } from "@/components/ui/GoogleMapEmbed";
 import { useEmailQuoteModal } from "@/contexts/EmailQuoteModalContext";
+import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
 
 export function Footer() {
   const { openEmailModal } = useEmailQuoteModal();
+  const { openWhatsAppModal } = useWhatsAppModal();
   const currentYear = new Date().getFullYear();
   return <footer className="bg-primary text-primary-foreground">
       <div className="container-custom section-padding">
@@ -37,15 +39,21 @@ export function Footer() {
             <ul className="space-y-3 text-sm text-primary-foreground/80">
               <li className="flex items-center gap-2">
                 <Phone className="h-4 w-4 shrink-0" />
-                <a href={`tel:${COMPANY.phone.replace(/\D/g, "")}`} className="hover:text-primary-foreground transition-colors">
+                <button 
+                  onClick={() => openWhatsAppModal()} 
+                  className="hover:text-primary-foreground transition-colors text-left"
+                >
                   {COMPANY.phone}
-                </a>
+                </button>
               </li>
               <li className="flex items-center gap-2">
                 <MessageCircle className="h-4 w-4 shrink-0" />
-                <a href={`https://wa.me/${COMPANY.whatsapp}`} target="_blank" rel="noopener noreferrer" className="hover:text-primary-foreground transition-colors">
+                <button 
+                  onClick={() => openWhatsAppModal()} 
+                  className="hover:text-primary-foreground transition-colors text-left"
+                >
                   {COMPANY.whatsappFormatted}
-                </a>
+                </button>
               </li>
             </ul>
           </div>
