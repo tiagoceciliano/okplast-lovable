@@ -40,7 +40,7 @@ export function Header() {
               className="text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10 rounded-full px-3 md:px-4 py-2 text-xs md:text-sm hidden sm:flex"
             >
               <Mail className="h-4 w-4 mr-1" />
-              E-mail
+              Orçamento via e-mail
             </Button>
           </div>
         </div>
