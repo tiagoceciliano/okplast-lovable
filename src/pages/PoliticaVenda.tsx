@@ -45,18 +45,26 @@ export default function PoliticaVenda() {
             </ul>
 
             <h3 className="font-display text-xl font-bold text-foreground mt-8">
-              2. Pedidos Mínimos
+              2. Foco Comercial e Pedidos Mínimos
             </h3>
             
             <p className="text-muted-foreground">
-              Para viabilizar a produção e oferecer o melhor custo-benefício:
+              A <strong className="text-foreground">{COMPANY.name}</strong> tem como foco principal 
+              o atendimento a <strong className="text-foreground">empresas (Pessoa Jurídica)</strong>, 
+              oferecendo soluções personalizadas para o mercado corporativo, lojistas, eventos e premiações.
             </p>
             
-            <ul className="text-muted-foreground space-y-2">
+            <p className="text-muted-foreground mt-4">
+              Para <strong className="text-foreground">pessoas físicas</strong>, atendemos pedidos com 
+              valor mínimo de <strong className="text-foreground">R$ 1.000,00</strong>. Esta política 
+              nos permite manter a qualidade e os prazos que nossos clientes merecem.
+            </p>
+            
+            <ul className="text-muted-foreground space-y-2 mt-4">
               <li>Alguns produtos possuem quantidade mínima de pedido</li>
-              <li>Produtos sob medida podem ter valores mínimos de pedido</li>
-              <li>A quantidade mínima será informada no orçamento</li>
-              <li>Para quantidades menores, consulte disponibilidade</li>
+              <li>Produtos sob medida podem ter valores mínimos específicos</li>
+              <li>A quantidade mínima será sempre informada no orçamento</li>
+              <li>Para dúvidas sobre valores e quantidades, entre em contato conosco</li>
             </ul>
 
             <h3 className="font-display text-xl font-bold text-foreground mt-8">
