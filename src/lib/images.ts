@@ -41,6 +41,11 @@ export const PRODUTOS_IMAGES = {
   medalhasPremiacoes: "/src/assets/produtos/medalhas-premiacoes.webp",
   placasPersonalizadas: "/src/assets/produtos/placas-personalizadas.jpg",
   urnaPiramidal: "/src/assets/produtos/urna-piramidal.webp",
+  // Linha 4 (novas imagens)
+  caixaDoces: "/src/assets/produtos/caixa-doces.webp",
+  displayA4Parede: "/src/assets/produtos/display-a4-parede.webp",
+  displayA6Mesa: "/src/assets/produtos/display-a6-mesa.webp",
+  poteAGranel: "/src/assets/produtos/pote-a-granel.webp",
 } as const;
 
 // ========================================

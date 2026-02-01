@@ -49,6 +49,18 @@ const produtosSobMedida = [{
 }, {
   nome: "Urna Piramidal",
   imageUrl: PRODUTOS_IMAGES.urnaPiramidal
+}, {
+  nome: "Caixa para Doces",
+  imageUrl: PRODUTOS_IMAGES.caixaDoces
+}, {
+  nome: "Display A4 Parede",
+  imageUrl: PRODUTOS_IMAGES.displayA4Parede
+}, {
+  nome: "Display A6 Mesa",
+  imageUrl: PRODUTOS_IMAGES.displayA6Mesa
+}, {
+  nome: "Pote a Granel",
+  imageUrl: PRODUTOS_IMAGES.poteAGranel
 }];
 
 // Tipos de Chapas - Grid de 8 chapas
