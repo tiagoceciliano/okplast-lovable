@@ -91,7 +91,7 @@ export const CHAPAS_PAGINA_IMAGES = {
   cast: img("chapas-pagina/cast.jpg"),
   poliestireno: "/src/assets/chapas/ps-poliestireno-2.jpg",
   petg: "/src/assets/chapas/pet-g-2.jpg",
-  policarbonatoAlveolar: img("chapas-pagina/policarbonato-alveolar.jpg"),
+  policarbonatoAlveolar: "/src/assets/chapas/policarbonato-alveolar-2.jpg",
   policarbonatoCompacto: img("chapas-pagina/policarbonato-compacto.jpg"),
   pvc: img("chapas-pagina/pvc.jpg"),
   acm: img("chapas-pagina/acm.jpg"),
