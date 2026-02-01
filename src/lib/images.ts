@@ -116,6 +116,7 @@ export const SOBMEDIDA_IMAGES = {
   // Novas imagens locais
   trofeuSobMedida: "/src/assets/produtos/trofeu-sob-medida.webp",
   medalhaPersonalizada: "/src/assets/produtos/medalha-personalizada.webp",
+  quadroAvisos: "/src/assets/produtos/quadro-avisos.jpg",
 } as const;
 
 // ========================================
