@@ -10,7 +10,7 @@ export default function PoliticaVenda() {
             Política de Venda
           </h1>
           <p className="text-lg text-primary-foreground/90 max-w-2xl">
-            Condições gerais de venda e informações importantes
+            Condições comerciais e informações para sua compra
           </p>
         </div>
       </section>
@@ -19,79 +19,191 @@ export default function PoliticaVenda() {
       <section className="section-padding">
         <div className="container-custom">
           <div className="max-w-3xl mx-auto prose prose-lg">
-            <h2 className="font-display text-2xl font-bold text-foreground">Condições Gerais de Venda</h2>
+            <h2 className="font-display text-2xl font-bold text-foreground">
+              Condições Gerais de Venda
+            </h2>
             
             <p className="text-muted-foreground">
               Ao realizar um pedido na <strong className="text-foreground">{COMPANY.name}</strong>, você 
               concorda com as seguintes condições de venda. Leia atentamente antes de finalizar sua compra.
             </p>
 
-            <h3 className="font-display text-xl font-bold text-foreground mt-8">Orçamentos</h3>
+            <h3 className="font-display text-xl font-bold text-foreground mt-8">
+              1. Orçamentos
+            </h3>
             
             <p className="text-muted-foreground">
-              Todos os orçamentos têm validade de 7 (sete) dias corridos a partir da data de emissão. 
-              Após esse período, os valores podem sofrer alterações sem aviso prévio. 
-              Os orçamentos são personalizados e não constituem contrato de venda até a confirmação do pedido.
+              Nossos orçamentos seguem as seguintes condições:
             </p>
-
-            <h3 className="font-display text-xl font-bold text-foreground mt-8">Formas de Pagamento</h3>
             
             <ul className="text-muted-foreground space-y-2">
-              <li><strong className="text-foreground">PIX:</strong> Desconto especial à vista</li>
-              <li><strong className="text-foreground">Transferência Bancária:</strong> Desconto à vista</li>
-              <li><strong className="text-foreground">Boleto:</strong> À vista ou parcelado (sujeito a análise)</li>
-              <li><strong className="text-foreground">Cartão de Crédito:</strong> Consulte condições</li>
+              <li>Validade de 7 (sete) dias corridos a partir da data de emissão</li>
+              <li>Após esse período, os valores podem sofrer alterações sem aviso prévio</li>
+              <li>São personalizados e não constituem contrato de venda até a confirmação</li>
+              <li>Incluem especificações técnicas, quantidades e valores detalhados</li>
+              <li>O prazo de produção é informado junto com o orçamento</li>
             </ul>
 
-            <h3 className="font-display text-xl font-bold text-foreground mt-8">Prazo de Produção</h3>
+            <h3 className="font-display text-xl font-bold text-foreground mt-8">
+              2. Pedidos Mínimos
+            </h3>
             
             <p className="text-muted-foreground">
-              O prazo de produção varia de acordo com o tipo de produto, quantidade e complexidade. 
-              Produtos sob medida geralmente têm prazo de 5 a 15 dias úteis após a confirmação do 
-              pagamento. O prazo exato será informado no orçamento.
+              Para viabilizar a produção e oferecer o melhor custo-benefício:
+            </p>
+            
+            <ul className="text-muted-foreground space-y-2">
+              <li>Alguns produtos possuem quantidade mínima de pedido</li>
+              <li>Produtos sob medida podem ter valores mínimos de pedido</li>
+              <li>A quantidade mínima será informada no orçamento</li>
+              <li>Para quantidades menores, consulte disponibilidade</li>
+            </ul>
+
+            <h3 className="font-display text-xl font-bold text-foreground mt-8">
+              3. Formas de Pagamento
+            </h3>
+            
+            <p className="text-muted-foreground">
+              Oferecemos diversas opções para sua conveniência:
+            </p>
+            
+            <ul className="text-muted-foreground space-y-2">
+              <li><strong className="text-foreground">PIX:</strong> Desconto especial à vista com confirmação imediata</li>
+              <li><strong className="text-foreground">Transferência Bancária:</strong> Desconto à vista</li>
+              <li><strong className="text-foreground">Boleto Bancário:</strong> À vista ou parcelado (sujeito a análise de crédito)</li>
+              <li><strong className="text-foreground">Cartão de Crédito:</strong> Consulte condições de parcelamento</li>
+              <li><strong className="text-foreground">CNPJ:</strong> Condições especiais para empresas mediante cadastro</li>
+            </ul>
+
+            <h3 className="font-display text-xl font-bold text-foreground mt-8">
+              4. Aprovação de Arte
+            </h3>
+            
+            <p className="text-muted-foreground">
+              Para produtos personalizados, seguimos o seguinte processo:
+            </p>
+            
+            <ul className="text-muted-foreground space-y-2">
+              <li>O cliente envia a arte ou especificações desejadas</li>
+              <li>Nossa equipe prepara uma prova digital para aprovação</li>
+              <li>A produção só inicia após aprovação formal por escrito</li>
+              <li>Alterações após aprovação podem gerar custos adicionais</li>
+              <li>O cliente é responsável por revisar textos e cores antes da aprovação</li>
+            </ul>
+
+            <h3 className="font-display text-xl font-bold text-foreground mt-8">
+              5. Prazo de Produção
+            </h3>
+            
+            <p className="text-muted-foreground">
+              Os prazos de produção variam de acordo com:
+            </p>
+            
+            <ul className="text-muted-foreground space-y-2">
+              <li><strong className="text-foreground">Tipo de produto:</strong> Itens simples têm prazo menor que peças complexas</li>
+              <li><strong className="text-foreground">Quantidade:</strong> Pedidos maiores podem requerer prazo estendido</li>
+              <li><strong className="text-foreground">Personalização:</strong> Gravação e corte especial adicionam tempo</li>
+              <li><strong className="text-foreground">Prazo padrão:</strong> 5 a 15 dias úteis após confirmação do pagamento</li>
+              <li><strong className="text-foreground">Início da contagem:</strong> Após aprovação da arte e confirmação de pagamento</li>
+            </ul>
+            
+            <p className="text-muted-foreground">
+              O prazo exato será informado no orçamento. Em casos urgentes, consulte disponibilidade.
             </p>
 
-            <h3 className="font-display text-xl font-bold text-foreground mt-8">Entrega</h3>
+            <h3 className="font-display text-xl font-bold text-foreground mt-8">
+              6. Entrega
+            </h3>
             
             <p className="text-muted-foreground">
-              Realizamos entregas para todo o Brasil através de transportadoras parceiras ou Correios. 
-              O frete é calculado de acordo com o peso, dimensões e CEP de destino. Retirada no local 
-              também está disponível em nosso endereço em {COMPANY.address}.
+              Disponibilizamos as seguintes opções de entrega:
+            </p>
+            
+            <ul className="text-muted-foreground space-y-2">
+              <li><strong className="text-foreground">Retirada no local:</strong> Sem custo, em nosso endereço no Rio de Janeiro</li>
+              <li><strong className="text-foreground">Correios:</strong> PAC ou SEDEX para todo o Brasil</li>
+              <li><strong className="text-foreground">Transportadora:</strong> Para pedidos maiores ou volumes pesados</li>
+              <li><strong className="text-foreground">Entrega local:</strong> Consulte disponibilidade para região metropolitana</li>
+            </ul>
+            
+            <p className="text-muted-foreground">
+              O frete é calculado com base no peso, dimensões e CEP de destino. O valor será 
+              informado no orçamento.
             </p>
 
-            <h3 className="font-display text-xl font-bold text-foreground mt-8">Garantia</h3>
+            <h3 className="font-display text-xl font-bold text-foreground mt-8">
+              7. Garantia
+            </h3>
             
             <p className="text-muted-foreground">
-              Nossos produtos possuem garantia contra defeitos de fabricação. A garantia não cobre 
-              danos causados por mau uso, quedas, exposição excessiva ao sol ou produtos químicos 
-              não recomendados para limpeza de acrílico.
+              Nossos produtos possuem garantia contra defeitos de fabricação. A garantia cobre:
             </p>
+            
+            <ul className="text-muted-foreground space-y-2">
+              <li>Defeitos de fabricação comprovados</li>
+              <li>Problemas estruturais decorrentes do processo produtivo</li>
+              <li>Falhas em colagens e acabamentos</li>
+            </ul>
+            
+            <p className="text-muted-foreground mt-4">
+              A garantia <strong className="text-foreground">não cobre</strong>:
+            </p>
+            
+            <ul className="text-muted-foreground space-y-2">
+              <li>Danos causados por mau uso, quedas ou impactos</li>
+              <li>Exposição excessiva ao sol ou intempéries</li>
+              <li>Uso de produtos químicos não recomendados para limpeza</li>
+              <li>Desgaste natural pelo uso prolongado</li>
+              <li>Alterações ou modificações feitas pelo cliente</li>
+            </ul>
 
-            <h3 className="font-display text-xl font-bold text-foreground mt-8">Trocas e Devoluções</h3>
+            <h3 className="font-display text-xl font-bold text-foreground mt-8">
+              8. Trocas e Devoluções
+            </h3>
             
             <p className="text-muted-foreground">
-              Produtos sob medida e personalizados não são passíveis de troca ou devolução, exceto 
-              em caso de defeito de fabricação. Para produtos de pronta entrega, aceitamos troca em 
-              até 7 dias após o recebimento, desde que o produto esteja em perfeitas condições e 
-              na embalagem original.
+              Nossa política de trocas segue as seguintes condições:
             </p>
+            
+            <ul className="text-muted-foreground space-y-2">
+              <li><strong className="text-foreground">Produtos sob medida:</strong> Não são passíveis de troca ou devolução, exceto defeito de fabricação</li>
+              <li><strong className="text-foreground">Produtos personalizados:</strong> Por serem exclusivos, não aceitamos devolução</li>
+              <li><strong className="text-foreground">Pronta entrega:</strong> Troca em até 7 dias após recebimento</li>
+              <li><strong className="text-foreground">Condição:</strong> Produto deve estar em perfeitas condições e embalagem original</li>
+              <li><strong className="text-foreground">Frete de devolução:</strong> Por conta do cliente, exceto em caso de defeito</li>
+            </ul>
 
-            <h3 className="font-display text-xl font-bold text-foreground mt-8">Cancelamento</h3>
+            <h3 className="font-display text-xl font-bold text-foreground mt-8">
+              9. Cancelamento
+            </h3>
             
             <p className="text-muted-foreground">
-              Pedidos podem ser cancelados antes do início da produção, mediante reembolso integral 
-              do valor pago. Após o início da produção, o cancelamento está sujeito a cobrança de 
-              custos já incorridos.
+              As condições para cancelamento de pedidos são:
             </p>
+            
+            <ul className="text-muted-foreground space-y-2">
+              <li><strong className="text-foreground">Antes da produção:</strong> Reembolso integral do valor pago</li>
+              <li><strong className="text-foreground">Durante a produção:</strong> Cobrança de custos já incorridos</li>
+              <li><strong className="text-foreground">Após conclusão:</strong> Não é possível cancelar</li>
+              <li><strong className="text-foreground">Prazo para reembolso:</strong> Até 10 dias úteis após aprovação</li>
+            </ul>
 
             <div className="mt-8 p-6 bg-secondary rounded-lg">
-              <h3 className="font-display text-xl font-bold text-foreground mb-4">Dúvidas?</h3>
-              <p className="text-muted-foreground">
-                Entre em contato conosco para esclarecer qualquer dúvida sobre nossas políticas de venda.
+              <h3 className="font-display text-xl font-bold text-foreground mb-4">
+                Dúvidas sobre sua Compra?
+              </h3>
+              <p className="text-muted-foreground mb-4">
+                Para esclarecer dúvidas sobre nossas políticas de venda ou obter mais 
+                informações sobre seu pedido, entre em contato:
               </p>
-              <p className="text-muted-foreground mt-2">
+              <p className="text-muted-foreground">
                 <strong className="text-foreground">E-mail:</strong> {COMPANY.email}<br />
-                <strong className="text-foreground">WhatsApp:</strong> {COMPANY.whatsappFormatted}
+                <strong className="text-foreground">Telefone:</strong> {COMPANY.phone}<br />
+                <strong className="text-foreground">WhatsApp:</strong> {COMPANY.whatsappFormatted}<br />
+                <strong className="text-foreground">Endereço:</strong> {COMPANY.address}
+              </p>
+              <p className="text-muted-foreground mt-4 text-sm">
+                Última atualização: Fevereiro de 2026
               </p>
             </div>
           </div>
