@@ -36,6 +36,11 @@ export const PRODUTOS_IMAGES = {
   caixasSobMedida: img("produtos/pulpito.jpg"),
   trofeus: img("produtos/trofeus.jpg"),
   medalhas: img("produtos/medalhas.jpg"),
+  // Linha 3 (novas imagens locais)
+  displayA4: "/src/assets/produtos/display-a4.webp",
+  medalhasPremiacoes: "/src/assets/produtos/medalhas-premiacoes.webp",
+  placasPersonalizadas: "/src/assets/produtos/placas-personalizadas.jpg",
+  urnaPiramidal: "/src/assets/produtos/urna-piramidal.webp",
 } as const;
 
 // ========================================

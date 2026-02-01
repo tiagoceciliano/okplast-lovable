@@ -37,6 +37,18 @@ const produtosSobMedida = [{
 }, {
   nome: "Troféus",
   imageUrl: PRODUTOS_IMAGES.trofeus
+}, {
+  nome: "Display A4",
+  imageUrl: PRODUTOS_IMAGES.displayA4
+}, {
+  nome: "Medalhas e Premiações",
+  imageUrl: PRODUTOS_IMAGES.medalhasPremiacoes
+}, {
+  nome: "Placas Personalizadas",
+  imageUrl: PRODUTOS_IMAGES.placasPersonalizadas
+}, {
+  nome: "Urna Piramidal",
+  imageUrl: PRODUTOS_IMAGES.urnaPiramidal
 }];
 
 // Tipos de Chapas - Grid de 8 chapas
