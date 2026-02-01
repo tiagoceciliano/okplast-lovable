@@ -43,7 +43,7 @@ const categorias = [
     produtos: [
       { nome: "Medalhas Sob Medida", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.medalhas },
       { nome: "Troféus Personalizados", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.trofeus },
-      { nome: "Medalha Personalizada", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.medalhaPersonalizada },
+      { nome: "Medalhas Personalizadas", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.medalhaPersonalizada },
       { nome: "Troféus Sob Medida", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.trofeuSobMedida },
     ],
   },
