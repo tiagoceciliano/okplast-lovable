@@ -28,11 +28,11 @@ interface GeoData {
 }
 
 // Determina qual webhook usar baseado no produto
-function getWebhookType(produto: string): "chapas" | "geral" {
+function getWebhookType(produto: string): "chapas" | "peca" {
   if (produto === "Chapa Inteira ou Cortada") {
     return "chapas";
   }
-  return "geral";
+  return "peca";
 }
 
 // Obtém timestamp no fuso de São Paulo
@@ -76,11 +76,11 @@ serve(async (req) => {
       console.error("Erro ao consultar geolocalização:", geoError);
     }
 
-    // Determina tipo de webhook
+    // Determina tipo de webhook (WhatsApp)
     const webhookType = getWebhookType(payload.produto_interesse);
     const webhookUrl = webhookType === "chapas" 
-      ? Deno.env.get("WEBHOOK_CHAPAS") 
-      : Deno.env.get("WEBHOOK_GERAL");
+      ? Deno.env.get("WEBHOOK_WHATSAPP_CHAPA") 
+      : Deno.env.get("WEBHOOK_WHATSAPP_PECA");
 
     // Cria cliente Supabase com service role
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
