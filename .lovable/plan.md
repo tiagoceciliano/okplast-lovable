@@ -1,116 +1,137 @@
 
-# Plano: Configurar 4 Webhooks Separados por Canal e Produto
+# Plano: Corrigir Imagens que Não Carregam em Produção
 
-## Resumo
+## O Problema
 
-Vou atualizar a configuração para usar 4 webhooks diferentes, separados por canal (Email/WhatsApp) e tipo de produto (Chapa/Peça).
+Várias imagens no site estão usando caminhos locais como:
+```typescript
+displayA4: "/src/assets/produtos/display-a4.webp"
+```
+
+Isso funciona **apenas em desenvolvimento**. Em **produção** (site publicado), o Vite não processa esses caminhos e as imagens não carregam.
 
 ---
 
-## Novos Secrets Necessários
+## Imagens Afetadas
 
-| Secret | URL | Descrição |
-|--------|-----|-----------|
-| `WEBHOOK_EMAIL_CHAPA` | `https://webhook.kinbox.com.br/v3/inbound/D-M9K8zxx` | Email + Chapa |
-| `WEBHOOK_EMAIL_PECA` | `https://webhook.kinbox.com.br/v3/inbound/H6rfH5o-0` | Email + Peça |
-| `WEBHOOK_WHATSAPP_CHAPA` | `https://webhook.kinbox.com.br/v3/inbound/JqLvB0d7t` | WhatsApp + Chapa |
-| `WEBHOOK_WHATSAPP_PECA` | `https://webhook.kinbox.com.br/v3/inbound/nsCtk2Lqo` | WhatsApp + Peça |
+### PRODUTOS_IMAGES (src/lib/images.ts linhas 40-48)
+| Propriedade | Caminho Local |
+|-------------|---------------|
+| displayA4 | /src/assets/produtos/display-a4.webp |
+| medalhasPremiacoes | /src/assets/produtos/medalhas-premiacoes.webp |
+| placasPersonalizadas | /src/assets/produtos/placas-personalizadas.jpg |
+| urnaPiramidal | /src/assets/produtos/urna-piramidal.webp |
+| caixaDoces | /src/assets/produtos/caixa-doces.webp |
+| displayA4Parede | /src/assets/produtos/display-a4-parede.webp |
+| displayA6Mesa | /src/assets/produtos/display-a6-mesa.webp |
+| poteAGranel | /src/assets/produtos/pote-a-granel.webp |
+
+### CHAPAS_IMAGES (linhas 57-62)
+| Propriedade | Caminho Local |
+|-------------|---------------|
+| acrilicoLeitoso | /src/assets/chapas/ps-poliestireno.jpg |
+| acrilicoEspelhado | /src/assets/chapas/policarbonato-compacto.jpg |
+| policarbonato | /src/assets/chapas/policarbonato-alveolar.jpg |
+| petg | /src/assets/chapas/pet-g.jpg |
+| pvcExpandido | /src/assets/chapas/pvc-expandido.jpg |
+| pedacosRetalhos | /src/assets/chapas/acm.jpg |
+
+### CHAPAS_PAGINA_IMAGES (linhas 92-97)
+| Propriedade | Caminho Local |
+|-------------|---------------|
+| poliestireno | /src/assets/chapas/ps-poliestireno-2.jpg |
+| petg | /src/assets/chapas/pet-g-2.jpg |
+| policarbonatoAlveolar | /src/assets/chapas/policarbonato-alveolar-2.jpg |
+| policarbonatoCompacto | /src/assets/chapas/policarbonato-compacto-2.jpg |
+| pvc | /src/assets/chapas/pvc-expandido-2.jpg |
+| acm | /src/assets/chapas/acm-2.jpg |
+
+### SOBMEDIDA_IMAGES (linhas 110-120)
+| Propriedade | Caminho Local |
+|-------------|---------------|
+| display | /src/assets/produtos/display-acrilico.webp |
+| urna | /src/assets/produtos/urna-acrilico.webp |
+| caixaSugestao | /src/assets/produtos/caixa-sugestao.webp |
+| expositoresCalcados | /src/assets/produtos/expositor-calcados.webp |
+| portaFolder | /src/assets/produtos/porta-folder.webp |
+| trofeuSobMedida | /src/assets/produtos/trofeu-sob-medida.webp |
+| medalhaPersonalizada | /src/assets/produtos/medalha-personalizada.webp |
+| quadroAvisos | /src/assets/produtos/quadro-avisos.jpg |
+| boloFake | /src/assets/produtos/bolo-fake.jpeg |
 
 ---
 
-## Alterações por Arquivo
+## Solução
 
-### 1. send-quote-email/index.ts (Formulário de E-mail)
+Migrar todas as imagens locais para o bucket `site-images` do Supabase Storage e atualizar as referências.
 
-**Atualizar lógica de seleção de webhook:**
+### Passo 1: Upload das Imagens
+
+Farei upload de cada imagem local para o storage usando a edge function `migrate-images` ou upload manual.
+
+### Passo 2: Atualizar src/lib/images.ts
+
+Substituir todos os caminhos locais por URLs do storage:
+
 ```typescript
-// Seleciona webhook baseado no produto
-const webhookUrl = webhookType === "chapas" 
-  ? Deno.env.get("WEBHOOK_EMAIL_CHAPA") 
-  : Deno.env.get("WEBHOOK_EMAIL_PECA");
-```
+// ANTES
+displayA4: "/src/assets/produtos/display-a4.webp",
 
-**Simplificar getWebhookType:**
-```typescript
-function getWebhookType(produto: string): "chapas" | "peca" {
-  if (produto === "Chapa Inteira ou Cortada") {
-    return "chapas";
-  }
-  return "peca";
-}
-```
-
-**Corrigir endereço de envio do Resend:**
-```typescript
-from: "Lab Acrílicos <noreply@email.labacrilicos.com.br>",
-```
-
-### 2. process-lead/index.ts (Modal WhatsApp)
-
-**Atualizar lógica de seleção de webhook:**
-```typescript
-// Seleciona webhook baseado no produto
-const webhookUrl = webhookType === "chapas" 
-  ? Deno.env.get("WEBHOOK_WHATSAPP_CHAPA") 
-  : Deno.env.get("WEBHOOK_WHATSAPP_PECA");
+// DEPOIS
+displayA4: img("produtos/display-a4.webp"),
 ```
 
 ---
 
-## Fluxo de Roteamento
+## Estrutura Final do Storage
 
 ```text
-┌─────────────────────────────────────────────────────────────────┐
-│                    FORMULÁRIO DE E-MAIL                         │
-│                  (send-quote-email)                              │
-├─────────────────────────────────────────────────────────────────┤
-│  Produto: "Chapa Inteira ou Cortada"                            │
-│     → WEBHOOK_EMAIL_CHAPA (D-M9K8zxx)                           │
-│                                                                  │
-│  Produto: Outros (Produto Personalizado, etc)                   │
-│     → WEBHOOK_EMAIL_PECA (H6rfH5o-0)                            │
-└─────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────┐
-│                     MODAL WHATSAPP                               │
-│                    (process-lead)                                │
-├─────────────────────────────────────────────────────────────────┤
-│  Produto: "Chapa Inteira ou Cortada"                            │
-│     → WEBHOOK_WHATSAPP_CHAPA (JqLvB0d7t)                        │
-│                                                                  │
-│  Produto: Outros (Produto Personalizado, etc)                   │
-│     → WEBHOOK_WHATSAPP_PECA (nsCtk2Lqo)                         │
-└─────────────────────────────────────────────────────────────────┘
+site-images/
+├── produtos/
+│   ├── display-a4.webp
+│   ├── display-a4-parede.webp
+│   ├── display-a6-mesa.webp
+│   ├── display-acrilico.webp
+│   ├── medalhas-premiacoes.webp
+│   ├── medalha-personalizada.webp
+│   ├── placas-personalizadas.jpg
+│   ├── urna-piramidal.webp
+│   ├── urna-acrilico.webp
+│   ├── caixa-doces.webp
+│   ├── caixa-sugestao.webp
+│   ├── pote-a-granel.webp
+│   ├── expositor-calcados.webp
+│   ├── porta-folder.webp
+│   ├── trofeu-sob-medida.webp
+│   ├── quadro-avisos.jpg
+│   └── bolo-fake.jpeg
+├── chapas/
+│   ├── ps-poliestireno.jpg
+│   ├── ps-poliestireno-2.jpg
+│   ├── pet-g.jpg
+│   ├── pet-g-2.jpg
+│   ├── policarbonato-alveolar.jpg
+│   ├── policarbonato-alveolar-2.jpg
+│   ├── policarbonato-compacto.jpg
+│   ├── policarbonato-compacto-2.jpg
+│   ├── pvc-expandido.jpg
+│   ├── pvc-expandido-2.jpg
+│   ├── acm.jpg
+│   └── acm-2.jpg
 ```
 
 ---
 
 ## Arquivos a Modificar
 
-| Arquivo | Alterações |
-|---------|------------|
-| `supabase/functions/send-quote-email/index.ts` | Usar `WEBHOOK_EMAIL_CHAPA` e `WEBHOOK_EMAIL_PECA`, corrigir domínio Resend |
-| `supabase/functions/process-lead/index.ts` | Usar `WEBHOOK_WHATSAPP_CHAPA` e `WEBHOOK_WHATSAPP_PECA` |
-
----
-
-## Secrets a Adicionar
-
-Após aprovar o plano, você precisará adicionar os 4 novos secrets:
-
-1. **WEBHOOK_EMAIL_CHAPA**: `https://webhook.kinbox.com.br/v3/inbound/D-M9K8zxx`
-2. **WEBHOOK_EMAIL_PECA**: `https://webhook.kinbox.com.br/v3/inbound/H6rfH5o-0`
-3. **WEBHOOK_WHATSAPP_CHAPA**: `https://webhook.kinbox.com.br/v3/inbound/JqLvB0d7t`
-4. **WEBHOOK_WHATSAPP_PECA**: `https://webhook.kinbox.com.br/v3/inbound/nsCtk2Lqo`
-
-Os secrets antigos (`WEBHOOK_CHAPAS` e `WEBHOOK_GERAL`) podem ser removidos depois.
+| Arquivo | Alteração |
+|---------|-----------|
+| `src/lib/images.ts` | Substituir caminhos locais por URLs do storage |
 
 ---
 
 ## Resultado Esperado
 
-Após a implementação:
-1. Leads de E-mail vão para webhooks específicos de Email
-2. Leads de WhatsApp vão para webhooks específicos de WhatsApp
-3. Chapas e Peças são roteados corretamente em cada canal
-4. E-mails serão enviados corretamente via Resend (domínio corrigido)
+1. Todas as imagens carregarão corretamente em produção
+2. Seu amigo verá todas as imagens ao acessar o site
+3. Centralização de todas as imagens no storage para facilitar manutenção
