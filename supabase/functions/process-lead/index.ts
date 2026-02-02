@@ -29,27 +29,9 @@ interface GeoData {
 
 // Determina qual webhook usar baseado no produto
 function getWebhookType(produto: string): "chapas" | "geral" {
-  const produtosChapas = [
-    "chapas",
-    "pedaços",
-    "placas",
-    "chapa",
-    "pedaço",
-    "placa",
-  ];
-  
-  const produtoLower = produto.toLowerCase();
-  
-  for (const termo of produtosChapas) {
-    if (produtoLower.includes(termo)) {
-      return "chapas";
-    }
-  }
-  
-  if (produto === "Chapas e Pedaços de Placas") {
+  if (produto === "Chapa Inteira ou Cortada") {
     return "chapas";
   }
-  
   return "geral";
 }
 

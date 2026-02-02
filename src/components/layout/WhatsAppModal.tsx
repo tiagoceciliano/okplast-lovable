@@ -31,11 +31,13 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { COMPANY, PRODUTOS_WHATSAPP } from "@/lib/constants";
 import { formatPhone, capitalizeName } from "./WhatsAppButton";
 import { supabase } from "@/integrations/supabase/client";
+import { getStoredUTM } from "@/hooks/useUTM";
 import logoImage from "@/assets/logo-lab-acrilicos.png";
 
 // Schema de validação
 const whatsappFormSchema = z.object({
   nome: z.string().trim().min(2, "Nome deve ter pelo menos 2 caracteres").max(100),
+  email: z.string().trim().email("E-mail inválido").max(255),
   telefone: z.string().min(14, "WhatsApp inválido").max(15),
   produto: z.string().min(1, "Selecione um produto"),
   mensagem: z.string().trim().min(5, "Mensagem deve ter pelo menos 5 caracteres").max(1000),
@@ -56,6 +58,7 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
     resolver: zodResolver(whatsappFormSchema),
     defaultValues: {
       nome: "",
+      email: "",
       telefone: "",
       produto: defaultProduto || "",
       mensagem: "",
@@ -81,6 +84,7 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
         `Olá, gostaria de atendimento para um orçamento para os dados abaixo:`,
         ``,
         `Nome: ${nomeFormatado}`,
+        `E-mail: ${data.email}`,
         `WhatsApp: ${telefoneFormatado}`,
         `Produto: ${data.produto}`,
         `Mensagem: ${data.mensagem}`,
@@ -89,19 +93,13 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
       const whatsappUrl = `https://api.whatsapp.com/send?phone=${COMPANY.whatsapp}&text=${encodeURIComponent(mensagemWhatsApp)}`;
       window.open(whatsappUrl, "_blank");
 
-      // Dispara webhook de forma assíncrona
-      const utmData = {
-        utm_source: localStorage.getItem("utm_source") || null,
-        utm_medium: localStorage.getItem("utm_medium") || null,
-        utm_campaign: localStorage.getItem("utm_campaign") || null,
-        utm_term: localStorage.getItem("utm_term") || null,
-        utm_content: localStorage.getItem("utm_content") || null,
-      };
+      // Dispara webhook de forma assíncrona com UTMs corretos
+      const utmData = getStoredUTM();
 
       supabase.functions.invoke("process-lead", {
         body: {
           nome: nomeFormatado,
-          email: "",
+          email: data.email,
           telefone: telefoneFormatado,
           produto_interesse: data.produto,
           mensagem: data.mensagem,
@@ -150,19 +148,19 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-1 min-h-0">
             {/* Chat Area */}
-            <ScrollArea className="whatsapp-chat-area flex-1 min-h-0 max-h-[350px]">
-              <div className="p-4 space-y-3">
+            <ScrollArea className="whatsapp-chat-area flex-1 min-h-0 max-h-[380px]">
+              <div className="p-3 space-y-2">
                 {/* Welcome Message Bubble */}
                 <div className="whatsapp-bubble-received animate-fade-in">
                   <p className="text-sm leading-relaxed">
-                    Olá! 👋 Preencha os dados abaixo para iniciar sua conversa.
+                    Olá! 👋 Preencha os dados abaixo.
                   </p>
                   <span className="whatsapp-time">agora</span>
                 </div>
 
                 {/* Form Fields Bubble */}
-                <div className="whatsapp-bubble-sent animate-fade-in" style={{ animationDelay: "0.1s" }}>
-                  <div className="space-y-2.5">
+                <div className="whatsapp-bubble-sent animate-fade-in">
+                  <div className="space-y-2">
                     <FormField
                       control={form.control}
                       name="nome"
@@ -171,12 +169,30 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
                           <FormControl>
                             <Input 
                               placeholder="Seu nome" 
-                              className="whatsapp-input h-9 text-sm"
+                              className="whatsapp-input h-8 text-sm"
                               {...field} 
                               onBlur={(e) => {
                                 field.onBlur();
                                 handleNameBlur(e);
                               }}
+                            />
+                          </FormControl>
+                          <FormMessage className="text-xs text-red-600" />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input 
+                              type="email"
+                              placeholder="Seu e-mail" 
+                              className="whatsapp-input h-8 text-sm"
+                              {...field}
                             />
                           </FormControl>
                           <FormMessage className="text-xs text-red-600" />
@@ -192,7 +208,7 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
                           <FormControl>
                             <Input 
                               placeholder="Seu WhatsApp: (21) 99999-9999" 
-                              className="whatsapp-input h-9 text-sm"
+                              className="whatsapp-input h-8 text-sm"
                               {...field}
                               onChange={(e) => handlePhoneChange(e, field.onChange)}
                               maxLength={15}
@@ -210,7 +226,7 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
                         <FormItem>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
-                              <SelectTrigger className="whatsapp-input h-9 text-sm">
+                              <SelectTrigger className="whatsapp-input h-8 text-sm">
                                 <SelectValue placeholder="Selecione o produto" />
                               </SelectTrigger>
                             </FormControl>
@@ -235,7 +251,7 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
                           <FormControl>
                             <Textarea 
                               placeholder="Descreva seu projeto..."
-                              className="whatsapp-input min-h-[60px] text-sm resize-none"
+                              className="whatsapp-input min-h-[50px] text-sm resize-none"
                               {...field} 
                             />
                           </FormControl>
