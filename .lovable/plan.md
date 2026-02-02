@@ -1,73 +1,131 @@
 
-# Plano: Melhorar Página de Termo de Uso
+# Plano: Adicionar E-mail Obrigatório com Botão Sempre Visível
 
 ## Resumo
-Atualizar a página de Termo de Uso para seguir o mesmo padrão visual e de qualidade de conteúdo da Política de Privacidade, incluindo listas organizadas, seções mais detalhadas e melhor formatação.
+
+Vou adicionar o campo de e-mail obrigatório nos modais do WhatsApp e otimizar o layout para garantir que o botão "Iniciar Conversa" fique sempre visível sem necessidade de scroll, mesmo com o campo adicional.
 
 ---
 
-## Melhorias a serem feitas
+## Estratégia para Manter o Botão Visível
 
-### 1. Subtítulo do Hero
-**De:** "Termos e condições de uso do site"
-**Para:** "Regras e condições para utilização dos nossos serviços"
+Para acomodar o campo de e-mail extra sem exigir scroll, farei os seguintes ajustes:
 
-### 2. Seções com Listas Organizadas
-Converter parágrafos em listas com bullets onde apropriado, especialmente nas seções:
-- **Uso do Site** - listar proibições específicas
-- **Propriedade Intelectual** - listar tipos de conteúdo protegido
-- **Limitação de Responsabilidade** - listar isenções específicas
-
-### 3. Adicionar Novas Seções
-Incluir seções adicionais para completude jurídica:
-- **Cadastro e Conta do Usuário** (se aplicável)
-- **Condições de Compra** (referência à política de venda)
-- **Rescisão** (condições de encerramento)
-
-### 4. Melhorar Caixa de Contato
-- Adicionar título "Dúvidas sobre os Termos"
-- Incluir WhatsApp junto com e-mail e telefone
-- Atualizar data: "Última atualização: Fevereiro de 2026"
+| Componente | Ajuste |
+|------------|--------|
+| Inputs | Reduzir altura de `h-9` para `h-8` |
+| Textarea | Reduzir altura mínima de `60px` para `50px` |
+| Espaçamento | Reduzir gap entre campos de `2.5` para `2` |
+| Mensagem de boas-vindas | Simplificar para ocupar menos espaço |
+| ScrollArea | Aumentar `max-h` para acomodar melhor o conteúdo |
 
 ---
 
-## Comparativo Visual
+## Alterações por Arquivo
 
-```text
-ANTES                              DEPOIS
-├── Hero simples                   ├── Hero descritivo
-├── Parágrafos de texto            ├── Listas organizadas (ul/li)
-├── 8 seções básicas               ├── 10+ seções detalhadas
-└── Caixa contato simples          └── Caixa contato completa
+### 1. WhatsAppModal.tsx (Modal Central)
+
+**Adicionar campo de e-mail:**
+- Novo campo entre Nome e WhatsApp
+- Validação com Zod: `email: z.string().trim().email("E-mail inválido").max(255)`
+- Placeholder: "Seu e-mail"
+
+**Corrigir captura de UTMs:**
+- Importar `getStoredUTM` de `@/hooks/useUTM`
+- Substituir chamadas `localStorage.getItem()` por `getStoredUTM()`
+
+**Incluir e-mail na mensagem do WhatsApp:**
+```
+E-mail: ${data.email}
+```
+
+**Otimizar layout:**
+- Inputs com `h-8` (mais compactos)
+- Textarea com `min-h-[50px]`
+- Espaçamento `space-y-2`
+- Remover animação de delay do formulário
+
+### 2. WhatsAppChatWidget.tsx (Widget Flutuante)
+
+**Mesmas alterações do Modal:**
+- Adicionar campo de e-mail
+- Corrigir UTMs com `getStoredUTM()`
+- Incluir e-mail na mensagem
+- Otimizar layout para caber sem scroll
+
+### 3. process-lead/index.ts (Edge Function)
+
+**Simplificar classificação de webhook:**
+```typescript
+function getWebhookType(produto: string): "chapas" | "geral" {
+  if (produto === "Chapa Inteira ou Cortada") {
+    return "chapas";
+  }
+  return "geral";
+}
 ```
 
 ---
 
-## Arquivo a ser modificado
+## Layout Otimizado
 
-| Arquivo | Ação |
-|---------|------|
-| `src/pages/TermoUso.tsx` | Atualizar estrutura e conteúdo |
+O formulário terá a seguinte estrutura compacta:
+
+```text
+┌─────────────────────────────────────┐
+│  🟢 Lab Acrílicos - Online          │  ← Header
+├─────────────────────────────────────┤
+│  💬 Olá! 👋 Preencha os dados...    │  ← Mensagem curta
+│                                     │
+│  ┌───────────────────────────────┐  │
+│  │ Seu nome                       │  │  ← h-8
+│  ├───────────────────────────────┤  │
+│  │ Seu e-mail                     │  │  ← h-8 (NOVO)
+│  ├───────────────────────────────┤  │
+│  │ Seu WhatsApp                   │  │  ← h-8
+│  ├───────────────────────────────┤  │
+│  │ Selecione o produto ▼         │  │  ← h-8
+│  ├───────────────────────────────┤  │
+│  │ Descreva seu projeto...       │  │  ← min-h-[50px]
+│  └───────────────────────────────┘  │
+├─────────────────────────────────────┤
+│  [ 🚀 Iniciar Conversa ]            │  ← Sempre visível
+└─────────────────────────────────────┘
+```
 
 ---
 
-## Estrutura Final da Página
+## Dados Enviados ao Webhook
 
-```text
-TermoUso.tsx (atualizado)
-├── Hero Section
-│   ├── Título: "Termo de Uso"
-│   └── Subtítulo: "Regras e condições para utilização..."
-└── Conteúdo (prose prose-lg)
-    ├── 1. Aceitação dos Termos (com lista)
-    ├── 2. Uso do Site (com lista de proibições)
-    ├── 3. Propriedade Intelectual (com lista)
-    ├── 4. Informações do Usuário
-    ├── 5. Condições de Compra
-    ├── 6. Limitação de Responsabilidade (com lista)
-    ├── 7. Links Externos
-    ├── 8. Rescisão
-    ├── 9. Modificações
-    ├── 10. Lei Aplicável
-    └── Caixa de Contato (completa com WhatsApp)
-```
+| Campo | Origem | Obrigatório |
+|-------|--------|-------------|
+| `nome` | Formulário | Sim |
+| `email` | Formulário | Sim |
+| `telefone` | Formulário | Sim |
+| `produto_interesse` | Formulário | Sim |
+| `mensagem` | Formulário | Sim |
+| `utm_source` | URL (via getStoredUTM) | Não |
+| `utm_medium` | URL (via getStoredUTM) | Não |
+| `utm_campaign` | URL (via getStoredUTM) | Não |
+| `utm_term` | URL (via getStoredUTM) | Não |
+| `utm_content` | URL (via getStoredUTM) | Não |
+
+---
+
+## Arquivos a Modificar
+
+| Arquivo | Alterações |
+|---------|------------|
+| `src/components/layout/WhatsAppModal.tsx` | + campo email, + getStoredUTM, layout compacto |
+| `src/components/layout/WhatsAppChatWidget.tsx` | + campo email, + getStoredUTM, layout compacto |
+| `supabase/functions/process-lead/index.ts` | Simplificar getWebhookType |
+
+---
+
+## Resultado Esperado
+
+1. Campo de e-mail obrigatório em ambos os modais
+2. Botão "Iniciar Conversa" sempre visível sem scroll
+3. UTMs capturadas corretamente da URL
+4. Webhook disparado para Kinbox com todos os dados
+5. Lead salvo no banco com todas as informações
