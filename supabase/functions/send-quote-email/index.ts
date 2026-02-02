@@ -29,21 +29,11 @@ interface GeoData {
 }
 
 // Determina qual webhook usar baseado no produto
-function getWebhookType(produto: string): "chapas" | "geral" {
-  const produtosChapas = ["chapas", "pedaços", "placas", "chapa", "pedaço", "placa"];
-  const produtoLower = produto.toLowerCase();
-  
-  for (const termo of produtosChapas) {
-    if (produtoLower.includes(termo)) {
-      return "chapas";
-    }
-  }
-  
-  if (produto === "Chapas e Pedaços de Placas") {
+function getWebhookType(produto: string): "chapas" | "peca" {
+  if (produto === "Chapa Inteira ou Cortada") {
     return "chapas";
   }
-  
-  return "geral";
+  return "peca";
 }
 
 // Obtém timestamp no fuso de São Paulo
@@ -237,11 +227,11 @@ serve(async (req) => {
       console.error("Erro ao consultar geolocalização:", geoError);
     }
 
-    // Determina tipo de webhook
+    // Determina tipo de webhook (Email)
     const webhookType = getWebhookType(payload.produto_interesse);
     const webhookUrl = webhookType === "chapas" 
-      ? Deno.env.get("WEBHOOK_CHAPAS") 
-      : Deno.env.get("WEBHOOK_GERAL");
+      ? Deno.env.get("WEBHOOK_EMAIL_CHAPA") 
+      : Deno.env.get("WEBHOOK_EMAIL_PECA");
 
     // Cria cliente Supabase com service role
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -348,7 +338,7 @@ serve(async (req) => {
         });
 
         const emailResponse = await resend.emails.send({
-          from: "Lab Acrílicos <noreply@labacrilicos.com.br>",
+          from: "Lab Acrílicos <noreply@email.labacrilicos.com.br>",
           to: ["comercial@labacrilicos.com.br"],
           reply_to: payload.email,
           subject: `Novo Orçamento - ${payload.produto_interesse} - ${payload.nome}`,
