@@ -36,16 +36,16 @@ export const PRODUTOS_IMAGES = {
   caixasSobMedida: img("produtos/pulpito.jpg"),
   trofeus: img("produtos/trofeus.jpg"),
   medalhas: img("produtos/medalhas.jpg"),
-  // Linha 3 (novas imagens locais)
-  displayA4: "/src/assets/produtos/display-a4.webp",
-  medalhasPremiacoes: "/src/assets/produtos/medalhas-premiacoes.webp",
-  placasPersonalizadas: "/src/assets/produtos/placas-personalizadas.jpg",
-  urnaPiramidal: "/src/assets/produtos/urna-piramidal.webp",
-  // Linha 4 (novas imagens)
-  caixaDoces: "/src/assets/produtos/caixa-doces.webp",
-  displayA4Parede: "/src/assets/produtos/display-a4-parede.webp",
-  displayA6Mesa: "/src/assets/produtos/display-a6-mesa.webp",
-  poteAGranel: "/src/assets/produtos/pote-a-granel.webp",
+  // Linha 3
+  displayA4: img("produtos/display-a4.webp"),
+  medalhasPremiacoes: img("produtos/medalhas-premiacoes.webp"),
+  placasPersonalizadas: img("produtos/placas-personalizadas.jpg"),
+  urnaPiramidal: img("produtos/urna-piramidal.webp"),
+  // Linha 4
+  caixaDoces: img("produtos/caixa-doces.webp"),
+  displayA4Parede: img("produtos/display-a4-parede.webp"),
+  displayA6Mesa: img("produtos/display-a6-mesa.webp"),
+  poteAGranel: img("produtos/pote-a-granel.webp"),
 } as const;
 
 // ========================================
@@ -54,12 +54,12 @@ export const PRODUTOS_IMAGES = {
 export const CHAPAS_IMAGES = {
   acrilicoCristal: img("chapas/acrilico-cristal.jpg"),
   acrilicoColorido: img("chapas/acrilico-colorido.jpg"),
-  acrilicoLeitoso: "/src/assets/chapas/ps-poliestireno.jpg",
-  acrilicoEspelhado: "/src/assets/chapas/policarbonato-compacto.jpg",
-  policarbonato: "/src/assets/chapas/policarbonato-alveolar.jpg",
-  petg: "/src/assets/chapas/pet-g.jpg",
-  pvcExpandido: "/src/assets/chapas/pvc-expandido.jpg",
-  pedacosRetalhos: "/src/assets/chapas/acm.jpg",
+  acrilicoLeitoso: img("chapas/ps-poliestireno.jpg"),
+  acrilicoEspelhado: img("chapas/policarbonato-compacto.jpg"),
+  policarbonato: img("chapas/policarbonato-alveolar.jpg"),
+  petg: img("chapas/pet-g.jpg"),
+  pvcExpandido: img("chapas/pvc-expandido.jpg"),
+  pedacosRetalhos: img("chapas/acm.jpg"),
 } as const;
 
 // ========================================
@@ -89,12 +89,12 @@ export const DEPOIMENTOS_IMAGES = {
 // ========================================
 export const CHAPAS_PAGINA_IMAGES = {
   cast: img("chapas-pagina/cast.jpg"),
-  poliestireno: "/src/assets/chapas/ps-poliestireno-2.jpg",
-  petg: "/src/assets/chapas/pet-g-2.jpg",
-  policarbonatoAlveolar: "/src/assets/chapas/policarbonato-alveolar-2.jpg",
-  policarbonatoCompacto: "/src/assets/chapas/policarbonato-compacto-2.jpg",
-  pvc: "/src/assets/chapas/pvc-expandido-2.jpg",
-  acm: "/src/assets/chapas/acm-2.jpg",
+  poliestireno: img("chapas/ps-poliestireno-2.jpg"),
+  petg: img("chapas/pet-g-2.jpg"),
+  policarbonatoAlveolar: img("chapas/policarbonato-alveolar-2.jpg"),
+  policarbonatoCompacto: img("chapas/policarbonato-compacto-2.jpg"),
+  pvc: img("chapas/pvc-expandido-2.jpg"),
+  acm: img("chapas/acm-2.jpg"),
 } as const;
 
 // ========================================
@@ -107,17 +107,16 @@ export const SOBMEDIDA_IMAGES = {
   potesGraos: img("sobmedida/potes-graos.jpg"),
   medalhas: img("sobmedida/medalhas.jpg"),
   trofeus: img("sobmedida/trofeus.jpg"),
-  display: "/src/assets/produtos/display-acrilico.webp",
-  urna: "/src/assets/produtos/urna-acrilico.webp",
-  caixaSugestao: "/src/assets/produtos/caixa-sugestao.webp",
+  display: img("produtos/display-acrilico.webp"),
+  urna: img("produtos/urna-acrilico.webp"),
+  caixaSugestao: img("produtos/caixa-sugestao.webp"),
   expositoresBijuterias: img("sobmedida/expositores-bijuterias.jpg"),
-  expositoresCalcados: "/src/assets/produtos/expositor-calcados.webp",
-  portaFolder: "/src/assets/produtos/porta-folder.webp",
-  // Novas imagens locais
-  trofeuSobMedida: "/src/assets/produtos/trofeu-sob-medida.webp",
-  medalhaPersonalizada: "/src/assets/produtos/medalha-personalizada.webp",
-  quadroAvisos: "/src/assets/produtos/quadro-avisos.jpg",
-  boloFake: "/src/assets/produtos/bolo-fake.jpeg",
+  expositoresCalcados: img("produtos/expositor-calcados.webp"),
+  portaFolder: img("produtos/porta-folder.webp"),
+  trofeuSobMedida: img("produtos/trofeu-sob-medida.webp"),
+  medalhaPersonalizada: img("produtos/medalha-personalizada.webp"),
+  quadroAvisos: img("produtos/quadro-avisos.jpg"),
+  boloFake: img("produtos/bolo-fake.jpeg"),
 } as const;
 
 // ========================================
