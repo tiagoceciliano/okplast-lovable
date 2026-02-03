@@ -1,10 +1,9 @@
 
-
-# Plano: Ajustar JSON do Webhook para Kinbox
+# Plano: Ajustar JSON do Webhook WhatsApp para Kinbox
 
 ## Objetivo
 
-Modificar a estrutura do JSON enviado para o webhook do Kinbox para corresponder exatamente ao formato esperado.
+Modificar a estrutura do JSON enviado pela Edge Function `process-lead` (formulario WhatsApp) para corresponder exatamente ao formato esperado pelo Kinbox.
 
 ---
 
@@ -12,28 +11,47 @@ Modificar a estrutura do JSON enviado para o webhook do Kinbox para corresponder
 
 | Campo Atual | Campo Kinbox |
 |-------------|--------------|
-| `nome` | `Dados do Contato` |
-| `email` | `No Label email` |
-| `telefone` | `No Label telefone` |
-| `produto_interesse` | `Qual Produto de Interesse?` |
-| `mensagem` | `Descreva seu Orçamento:` |
-| `timestamp_sao_paulo` | `submission_date` + `submission_time` (separados) |
-| `cidade` | `city` |
-| `estado` | `state` |
-| `pais` | `country` |
-| - | `geolocation` (novo) |
-| - | `Page URL` (novo) |
-| - | `form_id` (novo) |
-| - | `form_name` (novo) |
-| `canal` | `canal` (manter) |
+| `nome` | `name` |
+| `email` | `email` |
+| `telefone` | `phone` (sem formatacao) |
+| `produto_interesse` | `product` |
+| `mensagem` | `message` |
+| `cidade` | `location.city` (objeto aninhado) |
+| `estado` | `location.state` (objeto aninhado) |
+| `pais` | `location.country` (objeto aninhado) |
+| `utm_source` | `utm_source` (manter) |
+| `utm_medium` | `utm_medium` (manter) |
+| `utm_campaign` | `utm_campaign` (manter) |
+| `utm_term` | `utm_term` (manter) |
+| `utm_content` | `utm_content` (manter) |
+| `timestamp_sao_paulo` | `submitted_at` + `submitted_time` (separados) |
+| - | `current_url` (novo) |
 
 ---
 
-## Alteracoes no Arquivo
+## Alteracoes Necessarias
 
-### Arquivo: `supabase/functions/send-quote-email/index.ts`
+### 1. Edge Function: `supabase/functions/process-lead/index.ts`
 
-### 1. Adicionar funcao para separar data e hora
+#### Adicionar campo `current_url` ao payload de entrada
+
+```typescript
+interface LeadPayload {
+  nome: string;
+  email: string;
+  telefone: string;
+  produto_interesse: string;
+  mensagem?: string;
+  utm_source?: string | null;
+  utm_medium?: string | null;
+  utm_campaign?: string | null;
+  utm_term?: string | null;
+  utm_content?: string | null;
+  current_url?: string | null;  // NOVO
+}
+```
+
+#### Adicionar funcao para separar data e hora
 
 ```typescript
 function getSaoPauloDateTime(): { date: string; time: string } {
@@ -50,93 +68,68 @@ function getSaoPauloDateTime(): { date: string; time: string } {
 }
 ```
 
-### 2. Adicionar campo page_url ao payload de entrada
+#### Funcao para limpar telefone (apenas numeros)
 
 ```typescript
-interface LeadPayload {
-  nome: string;
-  email: string;
-  telefone: string;
-  produto_interesse: string;
-  mensagem?: string;
-  utm_source?: string | null;
-  utm_medium?: string | null;
-  utm_campaign?: string | null;
-  utm_term?: string | null;
-  utm_content?: string | null;
-  page_url?: string | null;  // NOVO
+function cleanPhone(phone: string): string {
+  return phone.replace(/\D/g, "");
 }
 ```
 
-### 3. Capturar geolocalizacao completa (latitude/longitude)
-
-```typescript
-interface GeoData {
-  city?: string;
-  region?: string;
-  country_name?: string;
-  ip?: string;
-  latitude?: number;   // NOVO
-  longitude?: number;  // NOVO
-}
-```
-
-### 4. Novo formato do webhookPayload
+#### Novo formato do webhookPayload
 
 ```typescript
 const { date, time } = getSaoPauloDateTime();
 
 const webhookPayload = {
   // Dados do contato
-  "Dados do Contato": payload.nome,
-  "No Label email": payload.email,
-  "No Label telefone": payload.telefone,
+  name: payload.nome,
+  email: payload.email,
+  phone: cleanPhone(payload.telefone), // Remove formatacao
+  product: payload.produto_interesse,
+  message: payload.mensagem || "",
   
-  // Produto e mensagem
-  "Qual Produto de Interesse?": payload.produto_interesse,
-  "Descreva seu Orçamento:": payload.mensagem || "",
+  // Localizacao como objeto aninhado
+  location: {
+    city: geoData.city || "",
+    state: geoData.region || "",
+    country: geoData.country_name || "Brazil",
+  },
   
   // UTMs
-  "utm_campaign": payload.utm_campaign || "",
-  "utm_source": payload.utm_source || "",
-  "utm_medium": payload.utm_medium || "",
-  "utm_term": payload.utm_term || "",
-  "utm_content": payload.utm_content || "",
-  
-  // Geolocalizacao
-  "geolocation": geoData.latitude && geoData.longitude 
-    ? `${geoData.latitude},${geoData.longitude}` 
-    : "",
-  "city": geoData.city || "Não disponível",
-  "state": geoData.region || "Não disponível",
-  "country": geoData.country_name || "Não disponível",
+  utm_source: payload.utm_source || "",
+  utm_medium: payload.utm_medium || "",
+  utm_campaign: payload.utm_campaign || "",
+  utm_term: payload.utm_term || "",
+  utm_content: payload.utm_content || "",
   
   // Data e hora separados (fuso Sao Paulo)
-  "submission_date": date,  // "03/02/2026"
-  "submission_time": time,  // "15:30:45"
+  submitted_at: date,   // "03/02/2026"
+  submitted_time: time, // "15:30:45"
   
-  // Metadados do formulario
-  "Page URL": payload.page_url || "",
-  "form_id": "email_quote_form",
-  "form_name": "Formulário de Orçamento por Email",
-  
-  // Canal
-  "canal": "email",
-  
-  // ID interno (opcional manter)
-  "lead_id": leadData.id,
+  // URL atual
+  current_url: payload.current_url || "",
 };
 ```
 
 ---
 
-## Atualizacao no Frontend
+### 2. Frontend: `src/components/layout/WhatsAppModal.tsx`
 
-O formulario precisa enviar o `page_url` para que chegue no webhook:
+Adicionar `current_url` ao body enviado para a Edge Function:
 
 ```typescript
-// Em EmbeddedQuoteForm.tsx ou similar
-page_url: window.location.href,
+supabase.functions.invoke("process-lead", {
+  body: {
+    nome: nomeFormatado,
+    email: data.email,
+    telefone: telefoneFormatado,
+    produto_interesse: data.produto,
+    mensagem: data.mensagem,
+    current_url: window.location.href,  // NOVO
+    ...utmData,
+  },
+}).catch(console.error);
 ```
 
 ---
@@ -145,27 +138,24 @@ page_url: window.location.href,
 
 ```json
 {
-  "Dados do Contato": "Tiago Ceciliano",
-  "No Label email": "ceciliano.tiago@gmail.com",
-  "No Label telefone": "(21) 98939-8711",
-  "Qual Produto de Interesse?": "Chapa Inteira ou Cortada",
-  "Descreva seu Orçamento:": "Preciso de 5 chapas de acrílico 2mm",
-  "utm_campaign": "",
-  "utm_source": "google",
-  "utm_medium": "cpc",
-  "utm_term": "",
-  "utm_content": "",
-  "geolocation": "-22.9068,-43.1729",
-  "city": "Rio de Janeiro",
-  "state": "Rio de Janeiro",
-  "country": "Brazil",
-  "submission_date": "03/02/2026",
-  "submission_time": "15:30:45",
-  "Page URL": "https://pagelabacrilicos.lovable.app/chapas-de-acrilico",
-  "form_id": "email_quote_form",
-  "form_name": "Formulário de Orçamento por Email",
-  "canal": "email",
-  "lead_id": "abc123-uuid"
+  "name": "Teste Tiago",
+  "email": "ceciliano.tiago@gmail.com",
+  "phone": "21989398711",
+  "product": "Chapa Inteira ou Cortada",
+  "message": "testes testes2",
+  "location": {
+    "city": "Sao Jose",
+    "state": "Santa Catarina",
+    "country": "Brazil"
+  },
+  "utm_source": "instagram",
+  "utm_medium": "manychat",
+  "utm_campaign": "sde-jan25",
+  "utm_term": "org",
+  "utm_content": "convite",
+  "submitted_at": "13/01/2025",
+  "submitted_time": "16:46:57",
+  "current_url": "https://pagelabacrilicos.lovable.app/chapas-de-acrilico/?utm_source=instagram"
 }
 ```
 
@@ -175,12 +165,11 @@ page_url: window.location.href,
 
 | Arquivo | Alteracao |
 |---------|-----------|
-| `supabase/functions/send-quote-email/index.ts` | Ajustar estrutura do webhookPayload e adicionar funcao de data/hora |
-| `src/components/forms/EmbeddedQuoteForm.tsx` | Adicionar envio do page_url |
+| `supabase/functions/process-lead/index.ts` | Ajustar estrutura do webhookPayload, adicionar funcao de data/hora e limpeza de telefone |
+| `src/components/layout/WhatsAppModal.tsx` | Adicionar envio do `current_url` |
 
 ---
 
 ## Apos Implementacao
 
-Sera necessario fazer um teste de envio pelo formulario para verificar se o Kinbox esta recebendo corretamente a nova estrutura.
-
+Sera necessario fazer um teste de envio pelo formulario WhatsApp para verificar se o Kinbox esta recebendo corretamente a nova estrutura.
