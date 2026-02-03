@@ -91,7 +91,11 @@ export function EmailQuoteModal({ open, onOpenChange, defaultProduto }: EmailQuo
         telefone: telefoneFormatado,
         produto_interesse: data.produto,
         mensagem: data.mensagem,
-        ...utmData,
+        utm_source: utmData.utm_source,
+        utm_medium: utmData.utm_medium,
+        utm_campaign: utmData.utm_campaign,
+        utm_term: utmData.utm_term,
+        utm_content: utmData.utm_content,
       };
       console.log("[EmailModal] Payload completo:", payload);
 
