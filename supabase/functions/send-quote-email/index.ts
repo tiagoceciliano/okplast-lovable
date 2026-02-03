@@ -227,6 +227,9 @@ serve(async (req) => {
 
   try {
     const payload: LeadPayload = await req.json();
+    
+    // DEBUG: Log payload recebido
+    console.log("[send-quote-email] Payload recebido:", JSON.stringify(payload));
 
     // Validação básica
     if (!payload.nome || !payload.email || !payload.telefone || !payload.produto_interesse) {

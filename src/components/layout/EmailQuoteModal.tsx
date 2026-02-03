@@ -80,19 +80,24 @@ export function EmailQuoteModal({ open, onOpenChange, defaultProduto }: EmailQuo
       const nomeFormatado = capitalizeName(data.nome);
       const telefoneFormatado = data.telefone;
 
-      // Coleta dados UTM usando a função centralizada
+      // DEBUG: Log UTMs no momento do envio
       const utmData = getStoredUTM();
+      console.log("[EmailModal] UTMs recuperados:", utmData);
+      console.log("[EmailModal] localStorage raw:", localStorage.getItem("lab_acrilicos_utm"));
+
+      const payload = {
+        nome: nomeFormatado,
+        email: data.email,
+        telefone: telefoneFormatado,
+        produto_interesse: data.produto,
+        mensagem: data.mensagem,
+        ...utmData,
+      };
+      console.log("[EmailModal] Payload completo:", payload);
 
       // Envia para edge function que salva no banco + envia email
       const { data: response, error } = await supabase.functions.invoke("send-quote-email", {
-        body: {
-          nome: nomeFormatado,
-          email: data.email,
-          telefone: telefoneFormatado,
-          produto_interesse: data.produto,
-          mensagem: data.mensagem,
-          ...utmData,
-        },
+        body: payload,
       });
 
       if (error) {
