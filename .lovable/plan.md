@@ -1,49 +1,113 @@
 
+# Plano: Corrigir Captura de UTMs no Modal de Email
 
-# Plano: Alterar Remetente do Email
+## Problema Identificado
 
-## Situação Atual
-
-```typescript
-from: "Lab Acrílicos <noreply@email.labacrilicos.com.br>"
-```
-
-## Alteração Proposta
-
-Combinar as duas mudanças: nome do cliente + email comercial:
+O `EmailQuoteModal.tsx` usa uma logica antiga para buscar UTMs:
 
 ```typescript
-from: `${payload.nome} via Lab Acrílicos <comercial@email.labacrilicos.com.br>`
+// CODIGO ATUAL (INCORRETO) - Linha 83-89
+const utmData = {
+  utm_source: localStorage.getItem("utm_source") || null,
+  utm_medium: localStorage.getItem("utm_medium") || null,
+  utm_campaign: localStorage.getItem("utm_campaign") || null,
+  utm_term: localStorage.getItem("utm_term") || null,
+  utm_content: localStorage.getItem("utm_content") || null,
+};
 ```
 
-### Resultado Visual no Kinbox
+Porem, o hook `useUTM.ts` salva os UTMs em uma **unica chave** `lab_acrilicos_utm`:
 
+```typescript
+// useUTM.ts salva assim:
+localStorage.setItem("lab_acrilicos_utm", JSON.stringify(utms));
 ```
-De: João Silva via Lab Acrílicos <comercial@email.labacrilicos.com.br>
-Reply-To: joao.silva@gmail.com
+
+**Resultado**: O modal busca em chaves inexistentes, recebendo `null` para tudo.
+
+---
+
+## Solucao
+
+Importar e usar a funcao `getStoredUTM()` do hook, que ja existe e funciona corretamente.
+
+### Alteracao no Codigo
+
+**Arquivo:** `src/components/layout/EmailQuoteModal.tsx`
+
+**1. Adicionar import (linha 2)**
+
+```typescript
+import { getStoredUTM } from "@/hooks/useUTM";
+```
+
+**2. Substituir coleta de UTMs (linhas 82-89)**
+
+De:
+```typescript
+// Coleta dados UTM
+const utmData = {
+  utm_source: localStorage.getItem("utm_source") || null,
+  utm_medium: localStorage.getItem("utm_medium") || null,
+  utm_campaign: localStorage.getItem("utm_campaign") || null,
+  utm_term: localStorage.getItem("utm_term") || null,
+  utm_content: localStorage.getItem("utm_content") || null,
+};
+```
+
+Para:
+```typescript
+// Coleta dados UTM usando a funcao centralizada
+const utmData = getStoredUTM();
 ```
 
 ---
 
-## Alteração no Código
+## Por Que Isso Resolve
 
-**Arquivo:** `supabase/functions/send-quote-email/index.ts`
-
-**Linha 390** - De:
-```typescript
-from: "Lab Acrílicos <noreply@email.labacrilicos.com.br>",
-```
-
-**Para:**
-```typescript
-from: `${payload.nome} via Lab Acrílicos <comercial@email.labacrilicos.com.br>`,
-```
+| Antes | Depois |
+|-------|--------|
+| Busca em 5 chaves individuais que nao existem | Busca na chave correta `lab_acrilicos_utm` |
+| Retorna `null` para todos UTMs | Retorna os UTMs salvos corretamente |
 
 ---
 
-## Nota sobre Domínio
+## Resumo das Alteracoes
 
-O subdomínio `email.labacrilicos.com.br` já está verificado no Resend, então `comercial@email.labacrilicos.com.br` funcionará imediatamente.
+| Arquivo | Alteracao |
+|---------|-----------|
+| `src/components/layout/EmailQuoteModal.tsx` | Importar `getStoredUTM` e usar no lugar da logica manual |
 
-Se preferir usar `comercial@labacrilicos.com.br` (sem o "email." no subdomínio), será necessário verificar o domínio raiz `labacrilicos.com.br` no painel do Resend em https://resend.com/domains.
+---
 
+## Secao Tecnica
+
+### Fluxo Atual (Quebrado)
+
+```text
+Usuario acessa URL com UTMs
+    |
+    v
+useUTM.ts salva em "lab_acrilicos_utm"
+    |
+    v
+Modal busca em "utm_source", "utm_medium"... (nao existe)
+    |
+    v
+UTMs = null
+```
+
+### Fluxo Corrigido
+
+```text
+Usuario acessa URL com UTMs
+    |
+    v
+useUTM.ts salva em "lab_acrilicos_utm"
+    |
+    v
+Modal usa getStoredUTM() que le "lab_acrilicos_utm"
+    |
+    v
+UTMs capturados corretamente
+```
