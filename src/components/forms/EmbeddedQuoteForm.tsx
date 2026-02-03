@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getStoredUTM } from "@/hooks/useUTM";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -51,12 +52,8 @@ export function EmbeddedQuoteForm({ className, variant = "dark" }: EmbeddedQuote
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
     try {
-      // Get UTM params from sessionStorage
-      const utmSource = sessionStorage.getItem("utm_source");
-      const utmMedium = sessionStorage.getItem("utm_medium");
-      const utmCampaign = sessionStorage.getItem("utm_campaign");
-      const utmTerm = sessionStorage.getItem("utm_term");
-      const utmContent = sessionStorage.getItem("utm_content");
+      // Get UTM params from localStorage (mesma logica do WhatsApp)
+      const utmData = getStoredUTM();
 
       // Get current page URL
       const pageUrl = window.location.href;
@@ -68,11 +65,11 @@ export function EmbeddedQuoteForm({ className, variant = "dark" }: EmbeddedQuote
           telefone: data.telefone,
           produto_interesse: data.produto_interesse,
           mensagem: data.mensagem || null,
-          utm_source: utmSource,
-          utm_medium: utmMedium,
-          utm_campaign: utmCampaign,
-          utm_term: utmTerm,
-          utm_content: utmContent,
+          utm_source: utmData.utm_source,
+          utm_medium: utmData.utm_medium,
+          utm_campaign: utmData.utm_campaign,
+          utm_term: utmData.utm_term,
+          utm_content: utmData.utm_content,
           page_url: pageUrl,
         },
       });
