@@ -10,41 +10,63 @@ export interface UTMParams {
 
 const UTM_STORAGE_KEY = "lab_acrilicos_utm";
 
-export function useUTM() {
-  const [utmParams, setUtmParams] = useState<UTMParams>({
-    utm_source: null,
-    utm_medium: null,
-    utm_campaign: null,
-    utm_term: null,
-    utm_content: null,
-  });
-
-  useEffect(() => {
-    // Tenta carregar do localStorage primeiro
-    const stored = localStorage.getItem(UTM_STORAGE_KEY);
-    if (stored) {
-      try {
-        setUtmParams(JSON.parse(stored));
-      } catch {
-        // Ignora erro de parse
-      }
-    }
-
-    // Captura UTMs da URL atual
+// Captura UTMs imediatamente no carregamento do módulo (antes de qualquer redirect)
+function captureUTMsFromUrl(): UTMParams {
+  try {
     const params = new URLSearchParams(window.location.search);
-    const newUtm: UTMParams = {
+    return {
       utm_source: params.get("utm_source"),
       utm_medium: params.get("utm_medium"),
       utm_campaign: params.get("utm_campaign"),
       utm_term: params.get("utm_term"),
       utm_content: params.get("utm_content"),
     };
+  } catch {
+    return {
+      utm_source: null,
+      utm_medium: null,
+      utm_campaign: null,
+      utm_term: null,
+      utm_content: null,
+    };
+  }
+}
 
-    // Se tem algum UTM na URL, salva no localStorage
-    const hasUtm = Object.values(newUtm).some((v) => v !== null);
-    if (hasUtm) {
-      localStorage.setItem(UTM_STORAGE_KEY, JSON.stringify(newUtm));
-      setUtmParams(newUtm);
+// Captura imediata no carregamento do módulo
+const initialUrlUtms = captureUTMsFromUrl();
+const hasInitialUtms = Object.values(initialUrlUtms).some((v) => v !== null);
+
+// Salva imediatamente se tiver UTMs na URL
+if (hasInitialUtms && typeof localStorage !== "undefined") {
+  try {
+    localStorage.setItem(UTM_STORAGE_KEY, JSON.stringify(initialUrlUtms));
+    console.log("[UTM] Capturados da URL:", initialUrlUtms);
+  } catch {
+    // Ignora erro de localStorage
+  }
+}
+
+export function useUTM() {
+  const [utmParams, setUtmParams] = useState<UTMParams>(() => {
+    // Prioriza UTMs da URL capturados no carregamento
+    if (hasInitialUtms) {
+      return initialUrlUtms;
+    }
+    // Fallback para localStorage
+    return getStoredUTM();
+  });
+
+  useEffect(() => {
+    // Se já capturamos da URL, não precisa fazer nada
+    if (hasInitialUtms) {
+      return;
+    }
+
+    // Tenta carregar do localStorage
+    const stored = getStoredUTM();
+    const hasStored = Object.values(stored).some((v) => v !== null);
+    if (hasStored) {
+      setUtmParams(stored);
     }
   }, []);
 
@@ -55,11 +77,14 @@ export function getStoredUTM(): UTMParams {
   try {
     const stored = localStorage.getItem(UTM_STORAGE_KEY);
     if (stored) {
-      return JSON.parse(stored);
+      const parsed = JSON.parse(stored);
+      console.log("[UTM] Lido do localStorage:", parsed);
+      return parsed;
     }
   } catch {
     // Ignora erro
   }
+  console.log("[UTM] Nenhum UTM encontrado no localStorage");
   return {
     utm_source: null,
     utm_medium: null,
