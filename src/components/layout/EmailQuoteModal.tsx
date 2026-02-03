@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { getStoredUTM } from "@/hooks/useUTM";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Mail, Send, CheckCircle, X } from "lucide-react";
@@ -79,14 +80,8 @@ export function EmailQuoteModal({ open, onOpenChange, defaultProduto }: EmailQuo
       const nomeFormatado = capitalizeName(data.nome);
       const telefoneFormatado = data.telefone;
 
-      // Coleta dados UTM
-      const utmData = {
-        utm_source: localStorage.getItem("utm_source") || null,
-        utm_medium: localStorage.getItem("utm_medium") || null,
-        utm_campaign: localStorage.getItem("utm_campaign") || null,
-        utm_term: localStorage.getItem("utm_term") || null,
-        utm_content: localStorage.getItem("utm_content") || null,
-      };
+      // Coleta dados UTM usando a função centralizada
+      const utmData = getStoredUTM();
 
       // Envia para edge function que salva no banco + envia email
       const { data: response, error } = await supabase.functions.invoke("send-quote-email", {
