@@ -387,7 +387,7 @@ serve(async (req) => {
         });
 
         const emailResponse = await resend.emails.send({
-          from: "Lab Acrílicos <noreply@email.labacrilicos.com.br>",
+          from: `${payload.nome} via Lab Acrílicos <comercial@email.labacrilicos.com.br>`,
           to: ["comercial@labacrilicos.com.br"],
           reply_to: payload.email,
           subject: `Novo Orçamento - ${payload.produto_interesse} - ${payload.nome}`,
