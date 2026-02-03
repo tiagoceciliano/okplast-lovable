@@ -32,8 +32,13 @@ function captureUTMsFromUrl(): UTMParams {
   }
 }
 
+// Debug: Log URL no momento do carregamento
+console.log("[UTM] Módulo carregado. URL:", window.location.href);
+console.log("[UTM] Search params:", window.location.search);
+
 // Captura imediata no carregamento do módulo
 const initialUrlUtms = captureUTMsFromUrl();
+console.log("[UTM] Resultado da captura:", initialUrlUtms);
 const hasInitialUtms = Object.values(initialUrlUtms).some((v) => v !== null);
 
 // Salva imediatamente se tiver UTMs na URL
