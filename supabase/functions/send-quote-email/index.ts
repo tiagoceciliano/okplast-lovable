@@ -149,7 +149,17 @@ ${data.mensagem || "Nenhuma mensagem adicional."}
               <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 24px;">
                 <tr>
                   <td align="center">
-                    <a href="mailto:${data.email}?subject=Re: Orçamento Lab Acrílicos - ${data.produto}" 
+                    <a href="mailto:${data.email}?subject=${encodeURIComponent(`Re: Orçamento ${data.nome} - Lab Acrílicos`)}&body=${encodeURIComponent(`
+
+
+------- Mensagem Original -------
+De: ${data.nome} <${data.email}>
+Telefone: ${data.telefone}
+Produto: ${data.produto}
+
+Mensagem:
+${data.mensagem || "Nenhuma mensagem adicional."}
+-----------------------------------`)}" 
                        style="display: inline-block; background-color: #25D366; color: #ffffff; padding: 14px 32px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px;">
                       📧 Responder Cliente
                     </a>
