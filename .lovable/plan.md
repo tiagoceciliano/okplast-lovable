@@ -1,64 +1,52 @@
 
-# Plano: Corrigir Captura de UTMs no Modal de Email
 
-## Problema Identificado
+# Plano: Garantir Captura de UTMs no Carregamento Inicial
 
-O `EmailQuoteModal.tsx` usa uma logica antiga para buscar UTMs:
+## Diagnostico
 
-```typescript
-// CODIGO ATUAL (INCORRETO) - Linha 83-89
-const utmData = {
-  utm_source: localStorage.getItem("utm_source") || null,
-  utm_medium: localStorage.getItem("utm_medium") || null,
-  utm_campaign: localStorage.getItem("utm_campaign") || null,
-  utm_term: localStorage.getItem("utm_term") || null,
-  utm_content: localStorage.getItem("utm_content") || null,
-};
-```
+O sistema atual captura UTMs no momento em que o modulo `useUTM.ts` e importado. Porem, ha uma **condicao de corrida** quando:
 
-Porem, o hook `useUTM.ts` salva os UTMs em uma **unica chave** `lab_acrilicos_utm`:
+1. O dominio custom (`labacrilicos.com.br`) pode ter um redirect no servidor
+2. O navegador pode ter cache de sessao anterior sem UTMs
+3. O modulo pode ser carregado antes de `window.location` estar atualizado
 
-```typescript
-// useUTM.ts salva assim:
-localStorage.setItem("lab_acrilicos_utm", JSON.stringify(utms));
-```
-
-**Resultado**: O modal busca em chaves inexistentes, recebendo `null` para tudo.
+**Evidencia**: Alguns leads capturam UTMs corretamente (`tititimkafj@gmail.com`), outros nao (`Jaifjoakjs@gmail.com.br`).
 
 ---
 
 ## Solucao
 
-Importar e usar a funcao `getStoredUTM()` do hook, que ja existe e funciona corretamente.
+Mover a captura de UTMs para o **ponto mais inicial possivel** do aplicativo: o `main.tsx`, **antes** do React renderizar.
 
-### Alteracao no Codigo
+### Alteracoes
 
-**Arquivo:** `src/components/layout/EmailQuoteModal.tsx`
+**Arquivo 1:** `src/main.tsx`
 
-**1. Adicionar import (linha 2)**
+Adicionar chamada de captura de UTMs antes do `createRoot`:
 
 ```typescript
-import { getStoredUTM } from "@/hooks/useUTM";
+import { createRoot } from "react-dom/client";
+import App from "./App.tsx";
+import "./index.css";
+
+// Captura UTMs imediatamente, antes do React inicializar
+import "@/hooks/useUTM";
+
+createRoot(document.getElementById("root")!).render(<App />);
 ```
 
-**2. Substituir coleta de UTMs (linhas 82-89)**
+**Arquivo 2:** `src/hooks/useUTM.ts`
 
-De:
-```typescript
-// Coleta dados UTM
-const utmData = {
-  utm_source: localStorage.getItem("utm_source") || null,
-  utm_medium: localStorage.getItem("utm_medium") || null,
-  utm_campaign: localStorage.getItem("utm_campaign") || null,
-  utm_term: localStorage.getItem("utm_term") || null,
-  utm_content: localStorage.getItem("utm_content") || null,
-};
-```
+Adicionar log mais detalhado para debug e garantir que a captura execute sempre:
 
-Para:
 ```typescript
-// Coleta dados UTM usando a funcao centralizada
-const utmData = getStoredUTM();
+// Adicionar console.log para debug
+console.log("[UTM] Modulo carregado. URL atual:", window.location.href);
+console.log("[UTM] Search params:", window.location.search);
+
+// Na captura, verificar se URL tem params
+const initialUrlUtms = captureUTMsFromUrl();
+console.log("[UTM] Capturados da URL:", initialUrlUtms);
 ```
 
 ---
@@ -67,8 +55,8 @@ const utmData = getStoredUTM();
 
 | Antes | Depois |
 |-------|--------|
-| Busca em 5 chaves individuais que nao existem | Busca na chave correta `lab_acrilicos_utm` |
-| Retorna `null` para todos UTMs | Retorna os UTMs salvos corretamente |
+| Modulo carregado quando Layout renderiza | Modulo carregado no `main.tsx` antes do React |
+| Pode perder UTMs se houver navegacao interna antes | Captura garantida no primeiro momento |
 
 ---
 
@@ -76,38 +64,45 @@ const utmData = getStoredUTM();
 
 | Arquivo | Alteracao |
 |---------|-----------|
-| `src/components/layout/EmailQuoteModal.tsx` | Importar `getStoredUTM` e usar no lugar da logica manual |
+| `src/main.tsx` | Importar `@/hooks/useUTM` antes do React renderizar |
+| `src/hooks/useUTM.ts` | Adicionar logs de debug para diagnosticar o problema |
 
 ---
 
 ## Secao Tecnica
 
-### Fluxo Atual (Quebrado)
+### Fluxo Atual
 
 ```text
-Usuario acessa URL com UTMs
+main.tsx carrega
     |
     v
-useUTM.ts salva em "lab_acrilicos_utm"
+React renderiza App
     |
     v
-Modal busca em "utm_source", "utm_medium"... (nao existe)
+Layout renderiza (importa useUTM)
     |
     v
-UTMs = null
+useUTM.ts modulo executa captura
 ```
+
+**Problema**: Se houver redirect/cache entre passos 1-4, UTMs podem ser perdidos.
 
 ### Fluxo Corrigido
 
 ```text
-Usuario acessa URL com UTMs
+main.tsx importa useUTM (captura imediata)
     |
     v
-useUTM.ts salva em "lab_acrilicos_utm"
+UTMs salvos no localStorage
     |
     v
-Modal usa getStoredUTM() que le "lab_acrilicos_utm"
-    |
-    v
-UTMs capturados corretamente
+React renderiza App (UTMs ja salvos)
 ```
+
+---
+
+## Proximo Passo
+
+Apos implementar, acessar `labacrilicos.com.br/?utm_source=teste` e verificar no console do navegador (F12) se os logs `[UTM]` aparecem corretamente.
+
