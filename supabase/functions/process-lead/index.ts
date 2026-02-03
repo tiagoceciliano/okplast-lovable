@@ -18,6 +18,7 @@ interface LeadPayload {
   utm_campaign?: string | null;
   utm_term?: string | null;
   utm_content?: string | null;
+  current_url?: string | null;
 }
 
 interface GeoData {
@@ -35,10 +36,23 @@ function getWebhookType(produto: string): "chapas" | "peca" {
   return "peca";
 }
 
-// Obtém timestamp no fuso de São Paulo
-function getSaoPauloTimestamp(): string {
+// Obtém data e hora separados no fuso de São Paulo
+function getSaoPauloDateTime(): { date: string; time: string } {
   const now = new Date();
-  return now.toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
+  const options: Intl.DateTimeFormatOptions = { timeZone: "America/Sao_Paulo" };
+  
+  const date = now.toLocaleDateString("pt-BR", options);
+  const time = now.toLocaleTimeString("pt-BR", { 
+    ...options, 
+    hour12: false 
+  });
+  
+  return { date, time };
+}
+
+// Remove formatação do telefone (apenas números)
+function cleanPhone(phone: string): string {
+  return phone.replace(/\D/g, "");
 }
 
 serve(async (req) => {
@@ -117,24 +131,27 @@ serve(async (req) => {
     }
 
     // Prepara payload para webhook Kinbox
+    const { date, time } = getSaoPauloDateTime();
+    
     const webhookPayload = {
-      lead_id: leadData.id,
-      nome: payload.nome,
+      name: payload.nome,
       email: payload.email,
-      telefone: payload.telefone,
-      produto_interesse: payload.produto_interesse,
-      mensagem: payload.mensagem || "",
+      phone: cleanPhone(payload.telefone),
+      product: payload.produto_interesse,
+      message: payload.mensagem || "",
+      location: {
+        city: geoData.city || "",
+        state: geoData.region || "",
+        country: geoData.country_name || "Brazil",
+      },
       utm_source: payload.utm_source || "",
       utm_medium: payload.utm_medium || "",
       utm_campaign: payload.utm_campaign || "",
       utm_term: payload.utm_term || "",
       utm_content: payload.utm_content || "",
-      cidade: geoData.city || "",
-      estado: geoData.region || "",
-      pais: geoData.country_name || "",
-      ip: clientIp,
-      timestamp_sao_paulo: getSaoPauloTimestamp(),
-      created_at: leadData.created_at,
+      submitted_at: date,
+      submitted_time: time,
+      current_url: payload.current_url || "",
     };
 
     // Envia para webhook se configurado

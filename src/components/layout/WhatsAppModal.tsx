@@ -103,6 +103,7 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
           telefone: telefoneFormatado,
           produto_interesse: data.produto,
           mensagem: data.mensagem,
+          current_url: window.location.href,
           ...utmData,
         },
       }).catch(console.error);
