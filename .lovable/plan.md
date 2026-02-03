@@ -1,101 +1,90 @@
 
 
-# Plano: Adicionar Debug na Edge Function + Verificar Payload do Modal
+# Plano: Unificar Lógica de UTM - Copiar Exatamente do WhatsApp para Email
 
-## Diagnostico Atual
+## Diagnóstico Final
 
-**Situação:**
-- Webhook de teste manual → UTMs chegam ✅
-- Modal de WhatsApp → UTMs chegam ✅  
-- Modal de Email → UTMs **NÃO** chegam ❌
+Comparando linha por linha:
 
-**Conclusão:** O problema está no **frontend**, especificamente no momento em que o `EmailQuoteModal` envia os dados.
+| Aspecto | WhatsAppModal | EmailQuoteModal |
+|---------|--------------|-----------------|
+| Import UTM | `import { getStoredUTM } from "@/hooks/useUTM";` | ✅ Igual |
+| Chamada | `const utmData = getStoredUTM();` | ✅ Igual |
+| Spread | `...utmData,` | ✅ Igual |
+| Edge Function | `process-lead` | `send-quote-email` |
 
----
+**O código é idêntico!** Se o WhatsApp funciona e o Email não, a diferença só pode estar:
+1. No momento exato em que cada modal é aberto/submetido
+2. Em algum comportamento específico do contexto de renderização
 
-## Hipótese
+## Solução: Passar UTMs Explicitamente (Garantia Total)
 
-O código do `EmailQuoteModal` usa spread operator (`...utmData`) que deveria funcionar, mas pode haver um problema de:
-1. `getStoredUTM()` retornando objeto vazio ao invés de objeto com valores
-2. O spread não está funcionando como esperado no contexto específico
+Como o `EmbeddedQuoteForm` funciona e usa campos explícitos, vamos copiar essa abordagem para o `EmailQuoteModal`:
 
----
+### Alteração
 
-## Solução: Adicionar Logs de Debug
+**Arquivo:** `src/components/layout/EmailQuoteModal.tsx`
 
-### Arquivo 1: `src/components/layout/EmailQuoteModal.tsx`
-
-Adicionar console.log antes de enviar para ver exatamente o que está sendo enviado:
-
+**De:**
 ```typescript
-const onSubmit = async (data: EmailFormData) => {
-  setIsSubmitting(true);
-
-  try {
-    const nomeFormatado = capitalizeName(data.nome);
-    const telefoneFormatado = data.telefone;
-
-    // DEBUG: Log UTMs no momento do envio
-    const utmData = getStoredUTM();
-    console.log("[EmailModal] UTMs recuperados:", utmData);
-    console.log("[EmailModal] localStorage raw:", localStorage.getItem("lab_acrilicos_utm"));
-
-    const payload = {
-      nome: nomeFormatado,
-      email: data.email,
-      telefone: telefoneFormatado,
-      produto_interesse: data.produto,
-      mensagem: data.mensagem,
-      ...utmData,
-    };
-    console.log("[EmailModal] Payload completo:", payload);
-
-    // Envia para edge function
-    const { data: response, error } = await supabase.functions.invoke("send-quote-email", {
-      body: payload,
-    });
-    // ... resto do código
+const payload = {
+  nome: nomeFormatado,
+  email: data.email,
+  telefone: telefoneFormatado,
+  produto_interesse: data.produto,
+  mensagem: data.mensagem,
+  ...utmData,  // ← Pode estar causando problema
+};
 ```
 
-### Arquivo 2: `supabase/functions/send-quote-email/index.ts`
-
-Adicionar log no início para ver o que chega na edge function:
-
+**Para:**
 ```typescript
-// Logo após receber o payload
-const payload: LeadPayload = await req.json();
-console.log("[send-quote-email] Payload recebido:", JSON.stringify(payload));
+const payload = {
+  nome: nomeFormatado,
+  email: data.email,
+  telefone: telefoneFormatado,
+  produto_interesse: data.produto,
+  mensagem: data.mensagem,
+  utm_source: utmData.utm_source,
+  utm_medium: utmData.utm_medium,
+  utm_campaign: utmData.utm_campaign,
+  utm_term: utmData.utm_term,
+  utm_content: utmData.utm_content,
+};
 ```
 
----
+## Por Que Isso Pode Funcionar
 
-## Por Que Isso Resolve
+O spread operator (`...`) com objetos que contêm valores `null` pode ter comportamentos inesperados em certos contextos de serialização. Ao passar cada campo explicitamente:
 
-Com esses logs, conseguiremos identificar exatamente onde os UTMs estão sendo perdidos:
+1. Garante que cada propriedade existe no objeto final
+2. Remove qualquer ambiguidade do spread
+3. É a mesma abordagem do `EmbeddedQuoteForm` que funciona
 
-| Cenário | Log EmailModal | Log Edge Function | Problema |
-|---------|----------------|-------------------|----------|
-| UTMs no localStorage mas não enviados | UTMs aparecem | UTMs null | Spread operator |
-| localStorage vazio | UTMs null | UTMs null | Captura inicial |
-| UTMs enviados mas não salvos | UTMs aparecem | UTMs aparecem | Edge function |
+## Alternativa B: Usar a Edge Function do WhatsApp
 
----
+Se a Opção A não funcionar, podemos fazer o modal de email usar a mesma edge function `process-lead` (que sabemos que funciona), apenas adicionando um parâmetro para indicar que é lead de email:
+
+```typescript
+// Ao invés de chamar send-quote-email
+supabase.functions.invoke("process-lead", {
+  body: {
+    ...payload,
+    canal: "email", // Para diferenciar no backend
+  },
+});
+```
 
 ## Resumo das Alterações
 
 | Arquivo | Alteração |
 |---------|-----------|
-| `src/components/layout/EmailQuoteModal.tsx` | Adicionar 3 console.log para debug |
-| `supabase/functions/send-quote-email/index.ts` | Adicionar 1 console.log para debug |
-
----
+| `src/components/layout/EmailQuoteModal.tsx` | Trocar spread por campos UTM explícitos |
 
 ## Próximo Passo
 
 Após implementar:
 1. Acessar `labacrilicos.com.br/?utm_source=teste&utm_campaign=debug`
-2. Abrir o console do navegador (F12)
-3. Abrir o modal de email e enviar
-4. Verificar os logs `[EmailModal]` no console
-5. Me enviar os logs para análise
+2. Enviar orçamento pelo modal de email
+3. Verificar se os UTMs chegaram no banco
 
