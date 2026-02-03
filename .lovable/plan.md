@@ -1,108 +1,101 @@
 
 
-# Plano: Garantir Captura de UTMs no Carregamento Inicial
+# Plano: Adicionar Debug na Edge Function + Verificar Payload do Modal
 
-## Diagnostico
+## Diagnostico Atual
 
-O sistema atual captura UTMs no momento em que o modulo `useUTM.ts` e importado. Porem, ha uma **condicao de corrida** quando:
+**Situação:**
+- Webhook de teste manual → UTMs chegam ✅
+- Modal de WhatsApp → UTMs chegam ✅  
+- Modal de Email → UTMs **NÃO** chegam ❌
 
-1. O dominio custom (`labacrilicos.com.br`) pode ter um redirect no servidor
-2. O navegador pode ter cache de sessao anterior sem UTMs
-3. O modulo pode ser carregado antes de `window.location` estar atualizado
-
-**Evidencia**: Alguns leads capturam UTMs corretamente (`tititimkafj@gmail.com`), outros nao (`Jaifjoakjs@gmail.com.br`).
+**Conclusão:** O problema está no **frontend**, especificamente no momento em que o `EmailQuoteModal` envia os dados.
 
 ---
 
-## Solucao
+## Hipótese
 
-Mover a captura de UTMs para o **ponto mais inicial possivel** do aplicativo: o `main.tsx`, **antes** do React renderizar.
+O código do `EmailQuoteModal` usa spread operator (`...utmData`) que deveria funcionar, mas pode haver um problema de:
+1. `getStoredUTM()` retornando objeto vazio ao invés de objeto com valores
+2. O spread não está funcionando como esperado no contexto específico
 
-### Alteracoes
+---
 
-**Arquivo 1:** `src/main.tsx`
+## Solução: Adicionar Logs de Debug
 
-Adicionar chamada de captura de UTMs antes do `createRoot`:
+### Arquivo 1: `src/components/layout/EmailQuoteModal.tsx`
+
+Adicionar console.log antes de enviar para ver exatamente o que está sendo enviado:
 
 ```typescript
-import { createRoot } from "react-dom/client";
-import App from "./App.tsx";
-import "./index.css";
+const onSubmit = async (data: EmailFormData) => {
+  setIsSubmitting(true);
 
-// Captura UTMs imediatamente, antes do React inicializar
-import "@/hooks/useUTM";
+  try {
+    const nomeFormatado = capitalizeName(data.nome);
+    const telefoneFormatado = data.telefone;
 
-createRoot(document.getElementById("root")!).render(<App />);
+    // DEBUG: Log UTMs no momento do envio
+    const utmData = getStoredUTM();
+    console.log("[EmailModal] UTMs recuperados:", utmData);
+    console.log("[EmailModal] localStorage raw:", localStorage.getItem("lab_acrilicos_utm"));
+
+    const payload = {
+      nome: nomeFormatado,
+      email: data.email,
+      telefone: telefoneFormatado,
+      produto_interesse: data.produto,
+      mensagem: data.mensagem,
+      ...utmData,
+    };
+    console.log("[EmailModal] Payload completo:", payload);
+
+    // Envia para edge function
+    const { data: response, error } = await supabase.functions.invoke("send-quote-email", {
+      body: payload,
+    });
+    // ... resto do código
 ```
 
-**Arquivo 2:** `src/hooks/useUTM.ts`
+### Arquivo 2: `supabase/functions/send-quote-email/index.ts`
 
-Adicionar log mais detalhado para debug e garantir que a captura execute sempre:
+Adicionar log no início para ver o que chega na edge function:
 
 ```typescript
-// Adicionar console.log para debug
-console.log("[UTM] Modulo carregado. URL atual:", window.location.href);
-console.log("[UTM] Search params:", window.location.search);
-
-// Na captura, verificar se URL tem params
-const initialUrlUtms = captureUTMsFromUrl();
-console.log("[UTM] Capturados da URL:", initialUrlUtms);
+// Logo após receber o payload
+const payload: LeadPayload = await req.json();
+console.log("[send-quote-email] Payload recebido:", JSON.stringify(payload));
 ```
 
 ---
 
 ## Por Que Isso Resolve
 
-| Antes | Depois |
-|-------|--------|
-| Modulo carregado quando Layout renderiza | Modulo carregado no `main.tsx` antes do React |
-| Pode perder UTMs se houver navegacao interna antes | Captura garantida no primeiro momento |
+Com esses logs, conseguiremos identificar exatamente onde os UTMs estão sendo perdidos:
+
+| Cenário | Log EmailModal | Log Edge Function | Problema |
+|---------|----------------|-------------------|----------|
+| UTMs no localStorage mas não enviados | UTMs aparecem | UTMs null | Spread operator |
+| localStorage vazio | UTMs null | UTMs null | Captura inicial |
+| UTMs enviados mas não salvos | UTMs aparecem | UTMs aparecem | Edge function |
 
 ---
 
-## Resumo das Alteracoes
+## Resumo das Alterações
 
-| Arquivo | Alteracao |
+| Arquivo | Alteração |
 |---------|-----------|
-| `src/main.tsx` | Importar `@/hooks/useUTM` antes do React renderizar |
-| `src/hooks/useUTM.ts` | Adicionar logs de debug para diagnosticar o problema |
+| `src/components/layout/EmailQuoteModal.tsx` | Adicionar 3 console.log para debug |
+| `supabase/functions/send-quote-email/index.ts` | Adicionar 1 console.log para debug |
 
 ---
 
-## Secao Tecnica
+## Próximo Passo
 
-### Fluxo Atual
-
-```text
-main.tsx carrega
-    |
-    v
-React renderiza App
-    |
-    v
-Layout renderiza (importa useUTM)
-    |
-    v
-useUTM.ts modulo executa captura
-```
-
-**Problema**: Se houver redirect/cache entre passos 1-4, UTMs podem ser perdidos.
-
-### Fluxo Corrigido
-
-```text
-main.tsx importa useUTM (captura imediata)
-    |
-    v
-UTMs salvos no localStorage
-    |
-    v
-React renderiza App (UTMs ja salvos)
-```
-
----
-
-## Proximo Passo
-
-Apos implementar, acessar `labacrilicos.com.br/?utm_source=teste` e verificar no console do navegador (F12) se os logs `[UTM]` aparecem corretamente.
+Após implementar:
+1. Acessar `labacrilicos.com.br/?utm_source=teste&utm_campaign=debug`
+2. Abrir o console do navegador (F12)
+3. Abrir o modal de email e enviar
+4. Verificar os logs `[EmailModal]` no console
+5. Me enviar os logs para análise
 
