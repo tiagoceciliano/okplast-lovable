@@ -19,6 +19,7 @@ interface LeadPayload {
   utm_campaign?: string | null;
   utm_term?: string | null;
   utm_content?: string | null;
+  page_url?: string | null;
 }
 
 interface GeoData {
@@ -26,6 +27,8 @@ interface GeoData {
   region?: string;
   country_name?: string;
   ip?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 // Determina qual webhook usar baseado no produto
@@ -40,6 +43,20 @@ function getWebhookType(produto: string): "chapas" | "peca" {
 function getSaoPauloTimestamp(): string {
   const now = new Date();
   return now.toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
+}
+
+// Obtém data e hora separados no fuso de São Paulo
+function getSaoPauloDateTime(): { date: string; time: string } {
+  const now = new Date();
+  const options: Intl.DateTimeFormatOptions = { timeZone: "America/Sao_Paulo" };
+  
+  const date = now.toLocaleDateString("pt-BR", options); // "03/02/2026"
+  const time = now.toLocaleTimeString("pt-BR", { 
+    ...options, 
+    hour12: false 
+  }); // "15:30:45"
+  
+  return { date, time };
 }
 
 // Gera HTML do email
@@ -279,26 +296,48 @@ serve(async (req) => {
 
     const timestamp = getSaoPauloTimestamp();
 
-    // Prepara payload para webhook Kinbox
+    // Prepara payload para webhook Kinbox no formato esperado
+    const { date, time } = getSaoPauloDateTime();
+    
     const webhookPayload = {
-      lead_id: leadData.id,
-      nome: payload.nome,
-      email: payload.email,
-      telefone: payload.telefone,
-      produto_interesse: payload.produto_interesse,
-      mensagem: payload.mensagem || "",
-      utm_source: payload.utm_source || "",
-      utm_medium: payload.utm_medium || "",
-      utm_campaign: payload.utm_campaign || "",
-      utm_term: payload.utm_term || "",
-      utm_content: payload.utm_content || "",
-      cidade: geoData.city || "",
-      estado: geoData.region || "",
-      pais: geoData.country_name || "",
-      ip: clientIp,
-      timestamp_sao_paulo: timestamp,
-      created_at: leadData.created_at,
-      canal: "email", // Indica que veio do formulário de email
+      // Dados do contato
+      "Dados do Contato": payload.nome,
+      "No Label email": payload.email,
+      "No Label telefone": payload.telefone,
+      
+      // Produto e mensagem
+      "Qual Produto de Interesse?": payload.produto_interesse,
+      "Descreva seu Orçamento:": payload.mensagem || "",
+      
+      // UTMs
+      "utm_campaign": payload.utm_campaign || "",
+      "utm_source": payload.utm_source || "",
+      "utm_medium": payload.utm_medium || "",
+      "utm_term": payload.utm_term || "",
+      "utm_content": payload.utm_content || "",
+      
+      // Geolocalização
+      "geolocation": geoData.latitude && geoData.longitude 
+        ? `${geoData.latitude},${geoData.longitude}` 
+        : "",
+      "city": geoData.city || "Não disponível",
+      "state": geoData.region || "Não disponível",
+      "country": geoData.country_name || "Não disponível",
+      
+      // Data e hora separados (fuso São Paulo)
+      "submission_date": date,
+      "submission_time": time,
+      
+      // Metadados do formulário
+      "Page URL": payload.page_url || "",
+      "form_id": "email_quote_form",
+      "form_name": "Formulário de Orçamento por Email",
+      
+      // Canal
+      "canal": "email",
+      
+      // ID interno
+      "lead_id": leadData.id,
     };
 
     // Envia para webhook Kinbox

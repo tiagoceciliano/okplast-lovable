@@ -58,17 +58,23 @@ export function EmbeddedQuoteForm({ className, variant = "dark" }: EmbeddedQuote
       const utmTerm = sessionStorage.getItem("utm_term");
       const utmContent = sessionStorage.getItem("utm_content");
 
-      const { error } = await supabase.from("leads").insert({
-        nome: data.nome,
-        email: data.email,
-        telefone: data.telefone,
-        produto_interesse: data.produto_interesse,
-        mensagem: data.mensagem || null,
-        utm_source: utmSource,
-        utm_medium: utmMedium,
-        utm_campaign: utmCampaign,
-        utm_term: utmTerm,
-        utm_content: utmContent,
+      // Get current page URL
+      const pageUrl = window.location.href;
+
+      const { error } = await supabase.functions.invoke("send-quote-email", {
+        body: {
+          nome: data.nome,
+          email: data.email,
+          telefone: data.telefone,
+          produto_interesse: data.produto_interesse,
+          mensagem: data.mensagem || null,
+          utm_source: utmSource,
+          utm_medium: utmMedium,
+          utm_campaign: utmCampaign,
+          utm_term: utmTerm,
+          utm_content: utmContent,
+          page_url: pageUrl,
+        },
       });
 
       if (error) throw error;
