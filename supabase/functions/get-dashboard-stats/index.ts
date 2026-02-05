@@ -5,6 +5,19 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+// São Paulo timezone offset (UTC-3)
+const SAO_PAULO_OFFSET = -3 * 60 * 60 * 1000
+
+function getSaoPauloDate(date: Date = new Date()): Date {
+  const utc = date.getTime() + (date.getTimezoneOffset() * 60000)
+  return new Date(utc + SAO_PAULO_OFFSET)
+}
+
+function formatDateSaoPaulo(date: Date): string {
+  const spDate = getSaoPauloDate(date)
+  return spDate.toISOString().split('T')[0]
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
@@ -21,11 +34,11 @@ Deno.serve(async (req) => {
     const period = url.searchParams.get('period') || 'all' // '7d', '30d', 'all'
     
     let dateFilter = null
-    const now = new Date()
+    const nowSP = getSaoPauloDate()
     if (period === '7d') {
-      dateFilter = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString()
+      dateFilter = new Date(nowSP.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString()
     } else if (period === '30d') {
-      dateFilter = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString()
+      dateFilter = new Date(nowSP.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString()
     }
 
     // Fetch all page visits
@@ -93,17 +106,19 @@ Deno.serve(async (req) => {
       .slice(0, 5)
       .map(([location, count]) => ({ location, count }))
 
-    // Visits over time (last 7 days for chart)
+    // Visits over time (last 7 days for chart) - São Paulo timezone
     const visitsOverTime: Record<string, number> = {}
-    const last7Days = []
+    const last7Days: string[] = []
     for (let i = 6; i >= 0; i--) {
-      const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000)
-      const dateStr = date.toISOString().split('T')[0]
+      const date = new Date(nowSP.getTime() - i * 24 * 60 * 60 * 1000)
+      const dateStr = formatDateSaoPaulo(date)
       last7Days.push(dateStr)
       visitsOverTime[dateStr] = 0
     }
     visits?.forEach(v => {
-      const dateStr = v.created_at.split('T')[0]
+      // Convert visit timestamp to São Paulo timezone
+      const visitDate = new Date(v.created_at)
+      const dateStr = formatDateSaoPaulo(visitDate)
       if (visitsOverTime[dateStr] !== undefined) {
         visitsOverTime[dateStr]++
       }
