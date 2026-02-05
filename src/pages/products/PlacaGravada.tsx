@@ -19,7 +19,7 @@
          "Ideal para premiações e homenagens",
        ]}
        variations={[
-         "Placa de homenagem com estojo",
+        "Placa de Homenagem",
          "Placa de formatura",
          "Placa de reconhecimento profissional",
          "Placa comemorativa",
