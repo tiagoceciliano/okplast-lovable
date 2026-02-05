@@ -1,4 +1,5 @@
 import { useState } from "react";
+ import { SEOHead } from "@/components/SEOHead";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -98,6 +99,12 @@ export default function Orcamento() {
 
   return (
     <>
+       <SEOHead
+         title="Solicitar Orçamento - Lab Acrílicos"
+         description="Solicite seu orçamento grátis para produtos em acrílico sob medida. Resposta em até 24 horas. Fábrica no Rio de Janeiro."
+         canonical="/home/orcamento"
+       />
+ 
       {/* Hero */}
       <section className="gradient-primary text-primary-foreground py-16 md:py-24">
         <div className="container-custom">

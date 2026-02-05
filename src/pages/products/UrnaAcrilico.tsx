@@ -7,6 +7,8 @@ export default function UrnaAcrilico() {
       title="Urna de Acrílico"
       description="Urnas de acrílico para sorteios, votações, promoções e coleta de cupons. Fabricadas com acrílico de alta qualidade, nossas urnas são transparentes para demonstrar a lisura do processo, ou podem ser opacas para garantir sigilo. Personalizamos conforme a necessidade do seu evento ou estabelecimento."
       imageUrl={SOBMEDIDA_IMAGES.urna}
+       seoTitle="Urna de Acrílico para Sorteios e Votações - RJ"
+       seoDescription="Urnas de acrílico transparentes e opacas para sorteios, votações e promoções. Fabricação sob medida. Orçamento grátis. Rio de Janeiro."
       benefits={[
         "Transparência para processos públicos",
         "Opção com acrílico opaco para sigilo",

@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+ import { SEOHead, createFAQSchema } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { MessageCircle } from "lucide-react";
 import { COMPANY } from "@/lib/constants";
@@ -17,6 +18,13 @@ import {
 import Autoplay from "embla-carousel-autoplay";
 import { useRef } from "react";
 
+ // FAQ para Schema
+ const faqItems = [
+   { question: "Qual o prazo para fabricação de produtos sob medida?", answer: "O prazo varia de 5 a 15 dias úteis, dependendo da complexidade e quantidade. Após aprovação da arte e pagamento." },
+   { question: "Vocês fazem apenas uma unidade?", answer: "Sim, fabricamos a partir de uma única peça. Consulte valores mínimos para pessoa física." },
+   { question: "É possível personalizar com logotipo?", answer: "Sim! Oferecemos gravação a laser, impressão UV e adesivagem para personalização." },
+ ];
+ 
 // Imagens do carrossel hero - reutilizando algumas imagens dos produtos
 const heroCarouselImages = [
   { src: SOBMEDIDA_IMAGES.cupulas, alt: "Cúpulas e Redomas de Acrílico" },
@@ -83,6 +91,13 @@ export default function AcrilicoSobMedida() {
 
   return (
     <>
+       <SEOHead
+         title="Acrílico Sob Medida RJ - Fabricação Personalizada"
+         description="Produtos personalizados em acrílico: caixas, displays, troféus, medalhas, urnas. Fabricação sob medida no Rio de Janeiro. Orçamento em 24h."
+         canonical="/acrilico-sob-medida"
+         schema={createFAQSchema(faqItems)}
+       />
+ 
       {/* Hero - 2 Colunas (igual à página de Chapas) */}
       <section className="bg-muted py-16 md:py-20">
         <div className="container-custom">

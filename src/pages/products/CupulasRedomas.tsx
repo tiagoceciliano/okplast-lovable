@@ -7,6 +7,8 @@ export default function CupulasRedomas() {
       title="Cúpulas e Redomas"
       description="Nossas cúpulas e redomas de acrílico são perfeitas para exposição e proteção de produtos, peças de colecionador, bolos, doces e muito mais. Fabricadas em acrílico cristal de alta transparência, proporcionam visibilidade total do conteúdo com proteção contra poeira e manuseio."
       imageUrl={SOBMEDIDA_IMAGES.cupulas}
+       seoTitle="Cúpulas e Redomas de Acrílico - Exposição"
+       seoDescription="Cúpulas e redomas de acrílico para exposição e proteção. Diversos formatos. Fabricação sob medida no Rio de Janeiro."
       benefits={[
         "Alta transparência para visibilidade perfeita",
         "Proteção contra poeira e umidade",

@@ -5,6 +5,8 @@ export default function ExpositoresOculos() {
     <ProductPage
       title="Expositores para Óculos"
       description="Expositores de acrílico desenvolvidos para óticas, lojas de acessórios e showrooms de óculos. Nossos expositores organizam e destacam cada modelo, facilitando a escolha do cliente e mantendo os produtos protegidos e bem apresentados."
+       seoTitle="Expositores para Óculos em Acrílico - Óticas"
+       seoDescription="Expositores de acrílico para óticas e lojas de óculos. Mesa e parede. Fabricação personalizada no RJ."
       benefits={[
         "Organização clara dos modelos",
         "Proteção das armações",

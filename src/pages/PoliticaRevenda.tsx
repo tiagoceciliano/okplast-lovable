@@ -1,8 +1,16 @@
 import { COMPANY } from "@/lib/constants";
+ import { SEOHead } from "@/components/SEOHead";
 
 export default function PoliticaRevenda() {
   return (
     <>
+       <SEOHead
+         title="Política de Revenda - Lab Acrílicos"
+         description="Programa de revenda e condições especiais para revendedores da Lab Acrílicos."
+         canonical="/politica-revenda"
+         noindex={true}
+       />
+ 
       {/* Hero */}
       <section className="gradient-primary text-primary-foreground py-16 md:py-24">
         <div className="container-custom">

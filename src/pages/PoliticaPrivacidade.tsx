@@ -1,8 +1,16 @@
 import { COMPANY } from "@/lib/constants";
+ import { SEOHead } from "@/components/SEOHead";
 
 export default function PoliticaPrivacidade() {
   return (
     <>
+       <SEOHead
+         title="Política de Privacidade - Lab Acrílicos"
+         description="Como protegemos seus dados pessoais conforme a LGPD. Política de privacidade da Lab Acrílicos."
+         canonical="/politica-privacidade"
+         noindex={true}
+       />
+ 
       {/* Hero */}
       <section className="gradient-primary text-primary-foreground py-16 md:py-24">
         <div className="container-custom">

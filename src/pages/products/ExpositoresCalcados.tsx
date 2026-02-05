@@ -7,6 +7,8 @@ export default function ExpositoresCalcados() {
       title="Expositores para Calçados"
       description="Expositores de acrílico para apresentação de calçados em lojas, vitrines e showrooms. Nossos expositores elevam o produto, proporcionando melhor visibilidade e uma apresentação profissional que valoriza o calçado e atrai a atenção do cliente."
       imageUrl={SOBMEDIDA_IMAGES.expositoresCalcados}
+       seoTitle="Expositores para Calçados em Acrílico"
+       seoDescription="Expositores de acrílico para apresentação de calçados em lojas. Design elegante. Fabricação sob medida no Rio de Janeiro."
       benefits={[
         "Eleva o produto para destaque",
         "Design minimalista e elegante",

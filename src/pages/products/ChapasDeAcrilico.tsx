@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+ import { SEOHead, createFAQSchema } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { MessageCircle } from "lucide-react";
 import { COMPANY } from "@/lib/constants";
@@ -21,6 +22,13 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
+ // FAQ para Schema
+ const faqItems = [
+   { question: "Qual o prazo de entrega das chapas de acrílico?", answer: "O prazo varia de 3 a 10 dias úteis, dependendo do tipo de chapa e quantidade. Consulte-nos para prazo exato." },
+   { question: "Vocês fazem corte sob medida?", answer: "Sim! Realizamos cortes de chapas de acrílico, policarbonato, PETG, PS, PVC e ACM em qualquer medida." },
+   { question: "Qual a espessura mínima e máxima disponível?", answer: "Trabalhamos com espessuras de 1mm até 50mm, dependendo do tipo de chapa." },
+ ];
+ 
 // Imagens do carrossel hero
 import heroAcm from "@/assets/chapas-hero/acm.jpg";
 import heroAcrilicoColorido from "@/assets/chapas-hero/acrilico-colorido.jpg";
@@ -217,6 +225,13 @@ export default function ChapasDeAcrilico() {
 
   return (
     <>
+       <SEOHead
+         title="Chapas de Acrílico RJ - Preço de Fábrica"
+         description="Chapas de acrílico cristal, colorido, PS, PETG, Policarbonato e ACM. Corte sob medida. Melhor preço do Rio de Janeiro. Orçamento grátis."
+         canonical="/chapas-de-acrilico"
+         schema={createFAQSchema(faqItems)}
+       />
+ 
       {/* Hero - 2 Colunas */}
       <section className="bg-muted py-16 md:py-20">
         <div className="container-custom">
