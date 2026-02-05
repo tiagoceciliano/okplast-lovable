@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
-import { ReactNode } from "react";
+ import { ReactNode, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle, MessageCircle } from "lucide-react";
 import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
+ import { SEOHead, createBreadcrumbSchema, createProductSchema } from "@/components/SEOHead";
 
 interface ProductPageProps {
   title: string;
@@ -12,22 +13,58 @@ interface ProductPageProps {
   variations?: string[];
   imageUrl?: string;
   children?: ReactNode;
+   seoTitle?: string;
+   seoDescription?: string;
 }
 
-export function ProductPage({ title, description, benefits, variations, imageUrl, children }: ProductPageProps) {
+ export function ProductPage({ 
+   title, 
+   description, 
+   benefits, 
+   variations, 
+   imageUrl, 
+   children,
+   seoTitle,
+   seoDescription,
+ }: ProductPageProps) {
   const { openWhatsAppModal } = useWhatsAppModal();
+ 
+   const schemas = useMemo(() => {
+     const breadcrumb = createBreadcrumbSchema([
+       { name: "Home", url: "/" },
+       { name: "Acrílico Sob Medida", url: "/acrilico-sob-medida" },
+       { name: title },
+     ]);
+     
+     const product = createProductSchema({
+       name: title,
+       description: description.substring(0, 200),
+       image: imageUrl,
+     });
+     
+     return {
+       "@context": "https://schema.org",
+       "@graph": [breadcrumb, product],
+     };
+   }, [title, description, imageUrl]);
 
   return (
     <>
+       <SEOHead
+         title={seoTitle || `${title} - Acrílico Sob Medida RJ`}
+         description={seoDescription || `${description.substring(0, 150)}... Fabricação sob medida. Orçamento grátis.`}
+         schema={schemas}
+       />
+ 
       {/* Hero */}
       <section className="gradient-primary text-primary-foreground py-16 md:py-24">
         <div className="container-custom">
-          <nav className="text-sm text-primary-foreground/70 mb-4">
+           <nav className="text-sm text-primary-foreground/70 mb-4" aria-label="Breadcrumb">
             <Link to="/" className="hover:text-primary-foreground">Home</Link>
             {" / "}
             <Link to="/acrilico-sob-medida" className="hover:text-primary-foreground">Acrílico Sob Medida</Link>
             {" / "}
-            <span className="text-primary-foreground">{title}</span>
+             <span className="text-primary-foreground" aria-current="page">{title}</span>
           </nav>
           <h1 className="font-display text-3xl md:text-4xl font-bold mb-4">
             {title}
@@ -46,9 +83,12 @@ export function ProductPage({ title, description, benefits, variations, imageUrl
                 <div className="aspect-video rounded-lg overflow-hidden bg-muted">
                   <img 
                     src={imageUrl} 
-                    alt={title} 
+                   alt={`${title} - Fabricação em acrílico sob medida - Lab Acrílicos`}
+                   width={800}
+                   height={450}
                     className="w-full h-full object-cover"
-                    loading="lazy"
+                   loading="eager"
+                   fetchPriority="high"
                   />
                 </div>
               )}
@@ -61,7 +101,7 @@ export function ProductPage({ title, description, benefits, variations, imageUrl
               <Card>
                 <CardContent className="pt-6">
                   <h2 className="font-display text-xl font-bold mb-4">Benefícios e Diferenciais</h2>
-                  <ul className="space-y-3">
+                 <ul className="space-y-3" role="list">
                     {benefits.map((benefit, index) => (
                       <li key={index} className="flex items-start gap-3">
                         <CheckCircle className="h-5 w-5 text-accent shrink-0 mt-0.5" />
@@ -77,7 +117,7 @@ export function ProductPage({ title, description, benefits, variations, imageUrl
                 <Card>
                   <CardContent className="pt-6">
                     <h2 className="font-display text-xl font-bold mb-4">Variações Disponíveis</h2>
-                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                   <ul className="grid grid-cols-1 md:grid-cols-2 gap-2" role="list">
                       {variations.map((variation, index) => (
                         <li key={index} className="flex items-center gap-2 text-muted-foreground">
                           <span className="w-2 h-2 rounded-full bg-accent" />

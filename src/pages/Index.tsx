@@ -1,16 +1,36 @@
-import { Link } from "react-router-dom";
-import { ArrowRight, CheckCircle, Phone, Award, DollarSign, ShoppingCart, MessageCircle, Mail } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { COMPANY } from "@/lib/constants";
-import { DecorativeDivider } from "@/components/ui/DecorativeDivider";
-import { BlueBanner } from "@/components/ui/BlueBanner";
-import { TestimonialCard } from "@/components/ui/TestimonialCard";
-import { ClientLogos } from "@/components/ui/ClientLogos";
-import { GoogleMapEmbed } from "@/components/ui/GoogleMapEmbed";
-import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
-import { useEmailQuoteModal } from "@/contexts/EmailQuoteModalContext";
-import { MotivosCarousel } from "@/components/home/MotivosCarousel";
-import { PRODUTOS_IMAGES, CHAPAS_IMAGES, DEPOIMENTOS_IMAGES } from "@/lib/images";
+ import { Link } from "react-router-dom";
+ import { ArrowRight, CheckCircle, Phone, Award, DollarSign, ShoppingCart, MessageCircle } from "lucide-react";
+ import { Button } from "@/components/ui/button";
+ import { COMPANY } from "@/lib/constants";
+ import { DecorativeDivider } from "@/components/ui/DecorativeDivider";
+ import { BlueBanner } from "@/components/ui/BlueBanner";
+ import { TestimonialCard } from "@/components/ui/TestimonialCard";
+ import { ClientLogos } from "@/components/ui/ClientLogos";
+ import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
+ import { useEmailQuoteModal } from "@/contexts/EmailQuoteModalContext";
+ import { MotivosCarousel } from "@/components/home/MotivosCarousel";
+ import { PRODUTOS_IMAGES, CHAPAS_IMAGES, DEPOIMENTOS_IMAGES } from "@/lib/images";
+ import { SEOHead, createFAQSchema } from "@/components/SEOHead";
+ 
+ // FAQ para Schema
+ const faqItems = [
+   {
+     question: "Qual o prazo de entrega dos produtos em acrílico?",
+     answer: "O prazo varia de acordo com o produto e complexidade. Produtos padrão de 3 a 7 dias úteis. Projetos sob medida de 7 a 15 dias úteis.",
+   },
+   {
+     question: "Vocês fazem corte de chapas sob medida?",
+     answer: "Sim! Cortamos chapas de acrílico, policarbonato, PS, PETG e PVC nas medidas que você precisar.",
+   },
+   {
+     question: "Como solicitar um orçamento?",
+     answer: "Você pode solicitar orçamento pelo WhatsApp, e-mail ou formulário do site. Resposta em até 24 horas úteis.",
+   },
+   {
+     question: "Vocês entregam para todo o Brasil?",
+     answer: "Sim, enviamos para todo o Brasil via transportadora.",
+   },
+ ];
 
 // Produtos Sob Medida - Grid de 8 produtos
 const produtosSobMedida = [
@@ -118,21 +138,25 @@ export default function Index() {
   const { openEmailModal } = useEmailQuoteModal();
   return (
     <>
+       <SEOHead
+         title="Lab Acrílicos | Fábrica de Acrílico no Rio de Janeiro"
+         description="Fábrica de produtos em acrílico sob medida no RJ. Troféus, medalhas, displays, urnas, chapas de acrílico, policarbonato, PETG. Orçamento em 24h."
+         canonical="/"
+         schema={createFAQSchema(faqItems)}
+       />
+ 
       {/* Hero Section */}
       <section className="bg-background py-12 md:py-16 lg:py-20">
         <div className="container-custom">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="font-bold text-3xl md:text-4xl lg:text-5xl text-foreground mb-6 leading-tight">
-              FÁBRICA DE PRODUTOS PERSONALIZADOS e DISTRIBUIDORA DE CHAPAS DE{" "}
-              <span className="text-accent">ACRÍLICO</span> E SIMILARES.
+             <h1 className="font-bold text-3xl md:text-4xl lg:text-5xl text-foreground mb-4 leading-tight">
+               Fábrica de <span className="text-accent">Acrílico</span> no Rio de Janeiro
             </h1>
-            <p className="text-lg md:text-xl text-accent font-medium mb-6">
-              Acrílico Transparente e Colorido, PS, Policarbonato, PETG, PVC e muito mais.
-            </p>
+             <h2 className="text-lg md:text-xl text-accent font-medium mb-6">
+               Produtos Personalizados e Chapas de Acrílico, PS, Policarbonato, PETG
+             </h2>
             <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
-              A <strong className="text-foreground">{COMPANY.name}</strong> é especializada na fabricação e venda de
-              chapas de acrílico e produtos personalizados. Há mais de 30 anos oferecendo qualidade, inovação e as
-              melhores soluções em acrílico.
+               A <strong className="text-foreground">{COMPANY.name}</strong> é especializada na fabricação de produtos em acrílico sob medida e venda de chapas. Há mais de 30 anos oferecendo qualidade, inovação e as melhores soluções em acrílico para todo o Brasil.
             </p>
             <div className="flex flex-col items-center gap-4">
               <Button size="lg" className="btn-whatsapp text-lg px-8 py-6" onClick={() => openWhatsAppModal()}>
@@ -168,9 +192,12 @@ export default function Index() {
                 <div className="aspect-square bg-muted overflow-hidden">
                   <img
                     src={produto.imageUrl}
-                    alt={produto.nome}
+                   alt={`${produto.nome} em acrílico - Lab Acrílicos RJ`}
+                   width={400}
+                   height={400}
                     className="w-full h-full object-cover"
-                    loading="lazy"
+                   loading={index < 4 ? "eager" : "lazy"}
+                   fetchPriority={index === 0 ? "high" : undefined}
                   />
                 </div>
                 <div className="p-3 text-center">
@@ -211,7 +238,14 @@ export default function Index() {
             {tiposChapas.map((chapa, index) => (
               <div key={index} className="bg-background rounded-lg overflow-hidden shadow-sm border">
                 <div className="aspect-square bg-muted overflow-hidden">
-                  <img src={chapa.imageUrl} alt={chapa.nome} className="w-full h-full object-cover" loading="lazy" />
+                 <img 
+                   src={chapa.imageUrl} 
+                   alt={`Chapa de ${chapa.nome} - Distribuidora Lab Acrílicos`} 
+                   width={400}
+                   height={400}
+                   className="w-full h-full object-cover" 
+                   loading="lazy" 
+                 />
                 </div>
                 <div className="p-3 text-center">
                   <span className="text-sm font-medium text-foreground">{chapa.nome}</span>
