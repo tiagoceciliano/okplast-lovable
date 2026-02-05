@@ -77,6 +77,66 @@ export type Database = {
         }
         Relationships: []
       }
+      page_visits: {
+        Row: {
+          cidade: string | null
+          created_at: string
+          estado: string | null
+          id: string
+          ip_address: string | null
+          page_path: string
+          page_url: string
+          pais: string | null
+          referrer: string | null
+          session_id: string
+          user_agent: string | null
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          utm_term: string | null
+          visitor_id: string
+        }
+        Insert: {
+          cidade?: string | null
+          created_at?: string
+          estado?: string | null
+          id?: string
+          ip_address?: string | null
+          page_path: string
+          page_url: string
+          pais?: string | null
+          referrer?: string | null
+          session_id: string
+          user_agent?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+          visitor_id: string
+        }
+        Update: {
+          cidade?: string | null
+          created_at?: string
+          estado?: string | null
+          id?: string
+          ip_address?: string | null
+          page_path?: string
+          page_url?: string
+          pais?: string | null
+          referrer?: string | null
+          session_id?: string
+          user_agent?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+          visitor_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
