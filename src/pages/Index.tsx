@@ -192,7 +192,7 @@ export default function Index() {
         <div className="container-custom">
           <div className="max-w-4xl mx-auto text-center">
              <h1 className="font-bold text-3xl md:text-4xl lg:text-5xl text-foreground mb-4 leading-tight">
-               Fábrica de <span className="text-accent">Acrílico</span> no Rio de Janeiro
+               Produtos de <span className="text-accent">Acrílicos</span> e Chapas diversas
             </h1>
              <h2 className="text-lg md:text-xl text-accent font-medium mb-6">
                Produtos Personalizados e Chapas de Acrílico, PS, Policarbonato, PETG
