@@ -24,7 +24,6 @@ export default function CupulasRedomas() {
         "Cúpula para bolo",
         "Cúpula para relógios e joias",
         "Redoma com base em acrílico preto",
-        "Redoma com base em madeira",
       ]}
     />
   );
