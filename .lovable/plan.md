@@ -1,114 +1,166 @@
 
-# Plano: Padronizar CTA Final de Todas as Páginas de Chapas
 
-## Problema
+# Plano: Atualizar Páginas de Produtos e Adicionar Links
 
-O bloco CTA Final nas páginas específicas de materiais está com estilo diferente do padrão da página hub `/chapas`:
+## Objetivo
 
-| Elemento | Atual (Páginas Específicas) | Desejado (Hub /chapas) |
-|----------|----------------------------|------------------------|
-| Background | Azul escuro (`bg-primary`) | Cinza claro (`bg-muted`) |
-| Título | Branco | Preto (`text-foreground`) |
-| Botões | 2 lado a lado | 1 botão + link texto abaixo |
-| E-mail | Botão outline | Link "Prefere orçamento via e-mail?" |
+1. **Adicionar as 3 fotos faltantes** para os produtos sem imagem
+2. **Refatorar o componente `ProductPage.tsx`** para seguir o mesmo visual das páginas de chapas
+3. **Atualizar os links** nas categorias da página `/acrilico-sob-medida` para levar às páginas específicas de cada produto
 
-## Alterações Necessárias
+---
 
-### Arquivos a Modificar (7 páginas)
+## Parte 1: Upload das Imagens Faltantes
 
-| Arquivo | Status |
-|---------|--------|
-| `src/pages/chapas/Acrilico.tsx` | Atualizar CTA |
-| `src/pages/chapas/Poliestireno.tsx` | Atualizar CTA |
-| `src/pages/chapas/Petg.tsx` | Atualizar CTA |
-| `src/pages/chapas/PolicarbonatoAlveolar.tsx` | Atualizar CTA |
-| `src/pages/chapas/PolicarbonatoCompacto.tsx` | Atualizar CTA |
-| `src/pages/chapas/PvcExpandido.tsx` | Atualizar CTA |
-| `src/pages/chapas/Acm.tsx` | Atualizar CTA |
+### Imagens Enviadas pelo Usuário
 
-## Código Padrão para CTA Final
+| Arquivo Enviado | Produto | Destino no Storage |
+|-----------------|---------|-------------------|
+| `placa-customizada.jpg` | Placa Customizada | `sobmedida/placa-customizada.jpg` |
+| `placa-sinalizacao.webp` | Placa de Sinalização | `sobmedida/placa-sinalizacao.webp` |
+| `expositor-oculos-otica-2.webp` | Expositores para Óculos | `sobmedida/expositor-oculos.webp` |
 
-De:
-```tsx
-{/* CTA Final */}
-<section className="section-padding bg-primary text-primary-foreground">
-  <div className="container-custom text-center">
-    <h2 className="font-bold text-2xl md:text-3xl mb-4">
-      Solicite seu Orçamento de Chapas PETG
-    </h2>
-    <p className="mb-8 max-w-xl mx-auto opacity-90">
-      Informe a espessura e dimensões desejadas...
-    </p>
-    <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-      <Button variant="secondary">WhatsApp</Button>
-      <Button variant="outline">E-mail</Button>
-    </div>
-  </div>
-</section>
+### Atualizar `src/lib/images.ts`
+
+Adicionar novas entradas em `SOBMEDIDA_IMAGES`:
+
+```typescript
+export const SOBMEDIDA_IMAGES = {
+  // ... existentes ...
+  placaCustomizada: img("sobmedida/placa-customizada.jpg"),
+  placaSinalizacao: img("sobmedida/placa-sinalizacao.webp"),
+  expositoresOculos: img("sobmedida/expositor-oculos.webp"),
+} as const;
 ```
 
-Para:
-```tsx
-{/* CTA Final */}
-<section className="section-padding bg-muted">
-  <div className="container-custom text-center">
-    <h2 className="font-bold text-2xl md:text-3xl text-foreground mb-4">
-      Solicite seu Orçamento
-    </h2>
-    <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
-      Informe o tipo de chapa, espessura e dimensões desejadas para receber um orçamento personalizado.
-    </p>
-    <div className="flex flex-col items-center gap-4">
-      <Button 
-        size="lg" 
-        className="btn-whatsapp text-lg px-8 py-6"
-        onClick={() => openWhatsAppModal("[Nome do Material]")}
-      >
-        <MessageCircle className="h-5 w-5 mr-2" />
-        Orçamento via WhatsApp
-      </Button>
-      <button 
-        onClick={() => openEmailModal("[Nome do Material]")}
-        className="text-muted-foreground hover:text-foreground text-sm underline underline-offset-4"
-      >
-        Prefere orçamento via e-mail?
-      </button>
-    </div>
-  </div>
-</section>
+---
+
+## Parte 2: Refatorar o Componente `ProductPage.tsx`
+
+### Layout Atual (Problema)
+
+```text
+┌──────────────────────────────────────────────────────┐
+│  HERO AZUL com gradient                              │
+│  └─ Breadcrumb + H1 (só texto)                       │
+├──────────────────────────────────────────────────────┤
+│  CONTEÚDO 3 COLUNAS                                  │
+│  ├─ 2 colunas: Imagem + Benefícios + Variações       │
+│  └─ 1 coluna: Sidebar sticky com CTAs                │
+└──────────────────────────────────────────────────────┘
 ```
 
-## Detalhes das Mudanças
+### Layout Desejado (Igual às Chapas)
+
+```text
+┌──────────────────────────────────────────────────────┐
+│  BREADCRUMB: Home > Sob Medida > [Produto]           │
+├──────────────────────────────────────────────────────┤
+│  HERO CINZA (2 colunas)                              │
+│  ├─ Esquerda: H1 + descrição + WhatsApp + email      │
+│  └─ Direita: Imagem do produto                       │
+├──────────────────────────────────────────────────────┤
+│  SEÇÃO: Benefícios e Diferenciais                    │
+│  └─ Lista com checkmarks                             │
+├──────────────────────────────────────────────────────┤
+│  SEÇÃO: Variações Disponíveis (opcional)             │
+│  └─ Badges em grid                                   │
+├──────────────────────────────────────────────────────┤
+│  CTA FINAL (fundo cinza)                             │
+│  ├─ Botão verde WhatsApp grande                      │
+│  └─ Link "Prefere orçamento via e-mail?"             │
+└──────────────────────────────────────────────────────┘
+```
+
+### Mudanças no `ProductPage.tsx`
 
 | Elemento | Antes | Depois |
 |----------|-------|--------|
-| `section` | `bg-primary text-primary-foreground` | `bg-muted` |
-| `h2` | Sem classe de cor (herdava branco) | `text-foreground` |
-| `p` | `opacity-90` | `text-muted-foreground` |
-| Layout botões | `flex-col sm:flex-row` (2 botões) | `flex-col` (1 botão + 1 link) |
-| Botão WhatsApp | `variant="secondary"` | `className="btn-whatsapp"` |
-| E-mail | `Button variant="outline"` | `button` com estilo de link |
+| Hero | `gradient-primary` (azul escuro) | `bg-muted` (cinza claro) |
+| Breadcrumb | Dentro do hero azul | Em barra separada acima do hero |
+| Layout | 3 colunas com sidebar | Seções verticais full-width |
+| Imagem | Dentro do conteúdo | No hero, lado direito |
+| CTA Sidebar | Card sticky lateral | Seção final centralizada |
+| Texto | Branco sobre azul | Preto sobre cinza |
 
-## Também Remover
+---
 
-- Import `Mail` de `lucide-react` pode ser removido se não for usado em outro lugar da página
+## Parte 3: Atualizar Links na Página Sob Medida
 
-## Resultado Visual Esperado
+### Arquivo: `src/pages/products/AcrilicoSobMedida.tsx`
 
-```text
-┌────────────────────────────────────────────────────┐
-│          (fundo cinza claro)                       │
-│                                                    │
-│         Solicite seu Orçamento                     │
-│                                                    │
-│   Informe o tipo de chapa, espessura e dimensões   │
-│   desejadas para receber um orçamento...           │
-│                                                    │
-│        ┌─────────────────────────────┐             │
-│        │  🟢 Orçamento via WhatsApp  │             │
-│        └─────────────────────────────┘             │
-│                                                    │
-│        Prefere orçamento via e-mail?               │
-│                                                    │
-└────────────────────────────────────────────────────┘
-```
+### Mapeamento de Links
+
+#### Categoria: CAIXAS, POTES, CÚPULAS, REDOMAS
+
+| Produto | Link Atual | Link Novo |
+|---------|-----------|-----------|
+| Caixas Sob Medida | `/acrilico-sob-medida` | `/caixas-sob-medida` |
+| Cúpulas e Redomas | `/acrilico-sob-medida` | `/cupulas-redomas` |
+| Potes para Doces | `/acrilico-sob-medida` | `/potes-doces` |
+| Potes para Grãos | `/acrilico-sob-medida` | `/potes-graos` |
+
+#### Categoria: MEDALHAS E TROFÉUS PERSONALIZADOS
+
+| Produto | Link Atual | Link Novo |
+|---------|-----------|-----------|
+| Medalhas Sob Medida | `/acrilico-sob-medida` | `/medalhas-personalizadas` |
+| Troféus Personalizados | `/acrilico-sob-medida` | `/trofeus-personalizados` |
+| Medalhas Personalizadas | `/acrilico-sob-medida` | `/medalhas-personalizadas` |
+| Troféus Sob Medida | `/acrilico-sob-medida` | `/trofeus-personalizados` |
+
+#### Categoria: DISPLAY, URNAS E QUADROS
+
+| Produto | Link Atual | Link Novo |
+|---------|-----------|-----------|
+| Display de Parede e Mesa | `/acrilico-sob-medida` | `/display-acrilico` |
+| Urnas Transparentes | `/acrilico-sob-medida` | `/urna-acrilico` |
+| Caixas de Sugestões | `/acrilico-sob-medida` | `/caixa-sugestao` |
+| Quadro de Avisos | `/acrilico-sob-medida` | `/display-acrilico` |
+
+#### Categoria: EXPOSITORES E CONFEITARIA
+
+| Produto | Link Atual | Link Novo |
+|---------|-----------|-----------|
+| Expositores para Bijuterias | `/acrilico-sob-medida` | `/expositores-bijuterias` |
+| Expositores para Calçados | `/acrilico-sob-medida` | `/expositores-calcados` |
+| Expositor de Óculos Ótica | `/acrilico-sob-medida` | `/expositores-oculos` |
+| Bolo Fake | `/acrilico-sob-medida` | `/cupulas-redomas` |
+
+---
+
+## Parte 4: Adicionar Imagens aos Produtos Faltantes
+
+### Páginas a Atualizar
+
+| Arquivo | Adicionar `imageUrl` |
+|---------|---------------------|
+| `PlacaCustomizada.tsx` | `SOBMEDIDA_IMAGES.placaCustomizada` |
+| `PlacaSinalizacao.tsx` | `SOBMEDIDA_IMAGES.placaSinalizacao` |
+| `ExpositoresOculos.tsx` | `SOBMEDIDA_IMAGES.expositoresOculos` |
+
+---
+
+## Resumo de Arquivos
+
+| Ação | Arquivo |
+|------|---------|
+| Copiar | `user-uploads://placa-customizada.jpg` → `src/assets/sobmedida/` |
+| Copiar | `user-uploads://placa-sinalizacao.webp` → `src/assets/sobmedida/` |
+| Copiar | `user-uploads://expositor-oculos-otica-2.webp` → `src/assets/sobmedida/` |
+| Modificar | `src/lib/images.ts` (adicionar 3 novas entradas) |
+| Modificar | `src/components/products/ProductPage.tsx` (refatorar layout) |
+| Modificar | `src/pages/products/AcrilicoSobMedida.tsx` (atualizar hrefs) |
+| Modificar | `src/pages/products/PlacaCustomizada.tsx` (adicionar imageUrl) |
+| Modificar | `src/pages/products/PlacaSinalizacao.tsx` (adicionar imageUrl) |
+| Modificar | `src/pages/products/ExpositoresOculos.tsx` (adicionar imageUrl) |
+
+---
+
+## Resultado Final
+
+1. **Todas as páginas de produtos** terão o mesmo visual padronizado das páginas de chapas
+2. **As 3 imagens faltantes** serão adicionadas e exibidas nos respectivos produtos
+3. **Os links dos produtos** na página sob medida levarão diretamente às páginas específicas (melhor para SEO e UX)
+4. **Layout consistente** em todo o site para indexação
+
