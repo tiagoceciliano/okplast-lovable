@@ -1,7 +1,7 @@
  import { Link } from "react-router-dom";
  import { SEOHead, createBreadcrumbSchema } from "@/components/SEOHead";
  import { Button } from "@/components/ui/button";
- import { MessageCircle, Mail } from "lucide-react";
+import { MessageCircle } from "lucide-react";
  import { DecorativeDivider } from "@/components/ui/DecorativeDivider";
  import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
  import { useEmailQuoteModal } from "@/contexts/EmailQuoteModalContext";
@@ -178,34 +178,29 @@
        </section>
  
        {/* CTA Final */}
-       <section className="section-padding bg-primary text-primary-foreground">
+      <section className="section-padding bg-muted">
          <div className="container-custom text-center">
-           <h2 className="font-bold text-2xl md:text-3xl mb-4">
-             Solicite seu Orçamento de PVC Expandido
+          <h2 className="font-bold text-2xl md:text-3xl text-foreground mb-4">
+            Solicite seu Orçamento
            </h2>
-           <p className="mb-8 max-w-xl mx-auto opacity-90">
-             Informe a espessura e dimensões desejadas para receber um orçamento personalizado. 
-             Atendimento em até 24 horas úteis.
+          <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
+            Informe o tipo de chapa, espessura e dimensões desejadas para receber um orçamento personalizado.
            </p>
-           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col items-center gap-4">
              <Button 
                size="lg" 
-               variant="secondary"
-               className="text-lg px-8 py-6"
+              className="btn-whatsapp text-lg px-8 py-6"
                onClick={() => openWhatsAppModal("Chapa PVC Expandido")}
              >
                <MessageCircle className="h-5 w-5 mr-2" />
-               WhatsApp
+              Orçamento via WhatsApp
              </Button>
-             <Button 
-               size="lg" 
-               variant="outline"
-               className="text-lg px-8 py-6 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary"
+            <button 
                onClick={() => openEmailModal("Chapa PVC Expandido")}
+              className="text-muted-foreground hover:text-foreground text-sm underline underline-offset-4"
              >
-               <Mail className="h-5 w-5 mr-2" />
-               E-mail
-             </Button>
+              Prefere orçamento via e-mail?
+            </button>
            </div>
          </div>
        </section>
