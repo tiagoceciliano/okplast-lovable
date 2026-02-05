@@ -27,6 +27,12 @@ import { EmailQuoteModalProvider } from "@/contexts/EmailQuoteModalContext";
 
  // Lazy loaded chapas pages
  const Acrilico = lazy(() => import("./pages/chapas/Acrilico"));
+ const Poliestireno = lazy(() => import("./pages/chapas/Poliestireno"));
+ const Petg = lazy(() => import("./pages/chapas/Petg"));
+ const PolicarbonatoAlveolar = lazy(() => import("./pages/chapas/PolicarbonatoAlveolar"));
+ const PolicarbonatoCompacto = lazy(() => import("./pages/chapas/PolicarbonatoCompacto"));
+ const PvcExpandido = lazy(() => import("./pages/chapas/PvcExpandido"));
+ const Acm = lazy(() => import("./pages/chapas/Acm"));
 
  // Lazy loaded product detail pages
  const CaixasSobMedida = lazy(() => import("./pages/products/CaixasSobMedida"));
@@ -85,6 +91,12 @@ const queryClient = new QueryClient();
 
               {/* Chapas Detail Pages */}
               <Route path="/chapas/acrilico" element={<Acrilico />} />
+               <Route path="/chapas/poliestireno" element={<Poliestireno />} />
+               <Route path="/chapas/petg" element={<Petg />} />
+               <Route path="/chapas/policarbonato-alveolar" element={<PolicarbonatoAlveolar />} />
+               <Route path="/chapas/policarbonato-compacto" element={<PolicarbonatoCompacto />} />
+               <Route path="/chapas/pvc-expandido" element={<PvcExpandido />} />
+               <Route path="/chapas/acm" element={<Acm />} />
 
               {/* Product Detail Pages - Acrílico Sob Medida */}
               <Route path="/acrilico-sob-medida/caixas-sob-medida" element={<CaixasSobMedida />} />
