@@ -1,6 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { MessageCircle, X } from "lucide-react";
-import { WhatsAppChatWidget } from "./WhatsAppChatWidget";
+
+// Lazy load do widget de chat (não-crítico)
+const WhatsAppChatWidget = lazy(() => import("./WhatsAppChatWidget").then(m => ({ default: m.WhatsAppChatWidget })));
 
 export function WhatsAppFloatingButton() {
   const [showProactiveMessage, setShowProactiveMessage] = useState(false);
@@ -10,12 +12,18 @@ export function WhatsAppFloatingButton() {
     const timer = setTimeout(() => {
       setShowProactiveMessage(true);
       
-      // Tocar som de notificação
-      const audio = new Audio('/sounds/notification.mp3');
-      audio.volume = 0.5;
-      audio.play().catch(() => {
-        // Ignora erro se autoplay bloqueado pelo navegador
-      });
+      // Tocar som de notificação (defer para não bloquear render)
+      if (typeof window !== 'undefined') {
+        requestIdleCallback?.(() => {
+          const audio = new Audio('/sounds/notification.mp3');
+          audio.volume = 0.5;
+          audio.play().catch(() => {});
+        }) ?? setTimeout(() => {
+          const audio = new Audio('/sounds/notification.mp3');
+          audio.volume = 0.5;
+          audio.play().catch(() => {});
+        }, 100);
+      }
     }, 5000);
     
     return () => clearTimeout(timer);
@@ -45,7 +53,11 @@ export function WhatsAppFloatingButton() {
   return (
     <>
       {/* Chat Widget */}
-      <WhatsAppChatWidget open={isWidgetOpen} onOpenChange={setIsWidgetOpen} />
+      {isWidgetOpen && (
+        <Suspense fallback={null}>
+          <WhatsAppChatWidget open={isWidgetOpen} onOpenChange={setIsWidgetOpen} />
+        </Suspense>
+      )}
 
       <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
         {/* Proactive Message */}

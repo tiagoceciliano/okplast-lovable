@@ -221,14 +221,26 @@ export default function Index() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            {produtosSobMedida.map((produto, index) => <div key={index} className="bg-background rounded-lg overflow-hidden shadow-sm">
+            {produtosSobMedida.map((produto, index) => {
+              const isAboveFold = index < 4;
+              return <div key={index} className="bg-background rounded-lg overflow-hidden shadow-sm">
                 <div className="aspect-square bg-muted overflow-hidden">
-                  <img src={produto.imageUrl} alt={`${produto.nome} em acrílico - Lab Acrílicos RJ`} width={400} height={400} className="w-full h-full object-cover" loading={index < 4 ? "eager" : "lazy"} fetchPriority={index === 0 ? "high" : undefined} />
+                  <img 
+                    src={produto.imageUrl} 
+                    alt={`${produto.nome} em acrílico - Lab Acrílicos RJ`} 
+                    width={400} 
+                    height={400} 
+                    className="w-full h-full object-cover" 
+                    loading={isAboveFold ? "eager" : "lazy"} 
+                    fetchPriority={isAboveFold ? "high" : undefined}
+                    decoding={isAboveFold ? "sync" : "async"}
+                  />
                 </div>
                 <div className="p-3 text-center">
                   <span className="text-sm font-medium text-foreground">{produto.nome}</span>
                 </div>
-              </div>)}
+              </div>;
+            })}
           </div>
 
           <div className="flex flex-col items-center gap-3 mt-8">
@@ -259,14 +271,24 @@ export default function Index() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            {tiposChapas.map((chapa, index) => <div key={index} className="bg-background rounded-lg overflow-hidden shadow-sm border">
+            {tiposChapas.map((chapa, index) => (
+              <div key={index} className="bg-background rounded-lg overflow-hidden shadow-sm border">
                 <div className="aspect-square bg-muted overflow-hidden">
-                 <img src={chapa.imageUrl} alt={`Chapa de ${chapa.nome} - Distribuidora Lab Acrílicos`} width={400} height={400} className="w-full h-full object-cover" loading="lazy" />
+                  <img 
+                    src={chapa.imageUrl} 
+                    alt={`Chapa de ${chapa.nome} - Distribuidora Lab Acrílicos`} 
+                    width={400} 
+                    height={400} 
+                    className="w-full h-full object-cover" 
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </div>
                 <div className="p-3 text-center">
                   <span className="text-sm font-medium text-foreground">{chapa.nome}</span>
                 </div>
-              </div>)}
+              </div>
+            ))}
           </div>
 
           <div className="flex flex-col items-center gap-3 mt-8">

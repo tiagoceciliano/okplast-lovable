@@ -3,7 +3,6 @@ import { MessageCircle, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
 import { useEmailQuoteModal } from "@/contexts/EmailQuoteModalContext";
-import logoImg from "@/assets/logos/logo-horizontal.png";
 
 export function Header() {
   const { openWhatsAppModal } = useWhatsAppModal();
@@ -16,9 +15,12 @@ export function Header() {
           {/* Logo - Larger */}
           <Link to="/" className="flex items-center">
             <img
-              src={logoImg}
+              src="/logo-horizontal.png"
               alt="Lab Acrílicos"
               className="h-32 md:h-40 lg:h-48 w-auto brightness-0 invert object-contain"
+              width={320}
+              height={120}
+              fetchPriority="high"
             />
           </Link>
 
