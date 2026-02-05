@@ -1,8 +1,16 @@
 import { COMPANY } from "@/lib/constants";
+ import { SEOHead } from "@/components/SEOHead";
 
 export default function TermoUso() {
   return (
     <>
+       <SEOHead
+         title="Termo de Uso - Lab Acrílicos"
+         description="Termos e condições de uso do site da Lab Acrílicos."
+         canonical="/termo-uso"
+         noindex={true}
+       />
+ 
       {/* Hero */}
       <section className="gradient-primary text-primary-foreground py-16 md:py-24">
         <div className="container-custom">

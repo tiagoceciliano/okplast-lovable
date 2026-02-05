@@ -1,8 +1,15 @@
 import { COMPANY } from "@/lib/constants";
+ import { SEOHead } from "@/components/SEOHead";
 
 export default function SobreNos() {
   return (
     <>
+       <SEOHead
+         title="Sobre Nós - Lab Acrílicos - 30 Anos de Experiência"
+         description="Conheça a Lab Acrílicos: mais de 30 anos fabricando produtos em acrílico de alta qualidade no Rio de Janeiro. Tecnologia de ponta e equipe qualificada."
+         canonical="/sobre-nos"
+       />
+ 
       {/* Hero */}
       <section className="gradient-primary text-primary-foreground py-16 md:py-24">
         <div className="container-custom">

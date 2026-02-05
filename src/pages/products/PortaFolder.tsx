@@ -7,6 +7,8 @@ export default function PortaFolder() {
       title="Porta Folder"
       description="Porta folders de acrílico para organização e distribuição de materiais promocionais, folhetos, revistas e catálogos. Disponíveis em versões de mesa e parede, nossos porta folders são ideais para recepções, consultórios, lojas e espaços corporativos, mantendo os materiais organizados e acessíveis."
       imageUrl={SOBMEDIDA_IMAGES.portaFolder}
+       seoTitle="Porta Folder de Acrílico - Mesa e Parede"
+       seoDescription="Porta folders em acrílico para organização de folhetos e catálogos. Versões de mesa e parede. Fabricação sob medida no RJ."
       benefits={[
         "Organização de materiais impressos",
         "Versões de mesa e parede",

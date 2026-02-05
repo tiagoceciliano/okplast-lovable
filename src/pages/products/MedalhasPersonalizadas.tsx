@@ -7,6 +7,8 @@ export default function MedalhasPersonalizadas() {
       title="Medalhas Personalizadas"
       description="Medalhas de acrílico personalizadas para eventos esportivos, corporativos, escolares e premiações diversas. Nossas medalhas são fabricadas com acrílico de alta qualidade, podendo receber gravação a laser, impressão UV ou aplicação de adesivos com design exclusivo."
       imageUrl={SOBMEDIDA_IMAGES.medalhas}
+       seoTitle="Medalhas de Acrílico Personalizadas - Eventos"
+       seoDescription="Medalhas de acrílico personalizadas para eventos esportivos e corporativos. Gravação a laser. Cordão incluso. RJ."
       benefits={[
         "Personalização completa do design",
         "Gravação a laser de alta precisão",

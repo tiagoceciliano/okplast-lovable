@@ -5,6 +5,8 @@ export default function PlacaCustomizada() {
     <ProductPage
       title="Placa de Acrílico Customizada"
       description="Placas de acrílico personalizadas para identificação, premiação, homenagens e decoração. Trabalhamos com corte a laser de precisão e gravação para criar placas únicas que atendem às suas especificações de design, tamanho e acabamento."
+       seoTitle="Placas de Acrílico Personalizadas - Gravação Laser"
+       seoDescription="Placas de acrílico personalizadas para identificação, premiação e decoração. Corte e gravação a laser. Rio de Janeiro."
       benefits={[
         "Corte a laser de alta precisão",
         "Gravação permanente",
