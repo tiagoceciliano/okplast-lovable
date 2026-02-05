@@ -9,6 +9,7 @@ export default function ExpositoresBijuterias() {
       imageUrl={SOBMEDIDA_IMAGES.expositoresBijuterias}
        seoTitle="Expositores para Bijuterias em Acrílico"
        seoDescription="Expositores de acrílico para bijuterias, joias e acessórios. Diversos modelos para vitrine e balcão. Fabricação no RJ."
+       canonical="/acrilico-sob-medida/expositores-para-bijuterias"
       benefits={[
         "Design que valoriza cada peça",
         "Acrílico cristal de alta transparência",

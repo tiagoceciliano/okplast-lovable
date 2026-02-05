@@ -9,6 +9,7 @@ export default function ExpositoresOculos() {
        imageUrl={SOBMEDIDA_IMAGES.expositoresOculos}
        seoTitle="Expositores para Óculos em Acrílico - Óticas"
        seoDescription="Expositores de acrílico para óticas e lojas de óculos. Mesa e parede. Fabricação personalizada no RJ."
+       canonical="/acrilico-sob-medida/expositores-para-oculos"
       benefits={[
         "Organização clara dos modelos",
         "Proteção das armações",

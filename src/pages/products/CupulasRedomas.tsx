@@ -9,6 +9,7 @@ export default function CupulasRedomas() {
       imageUrl={SOBMEDIDA_IMAGES.cupulas}
        seoTitle="Cúpulas e Redomas de Acrílico - Exposição"
        seoDescription="Cúpulas e redomas de acrílico para exposição e proteção. Diversos formatos. Fabricação sob medida no Rio de Janeiro."
+       canonical="/acrilico-sob-medida/cupulas-e-redomas"
       benefits={[
         "Alta transparência para visibilidade perfeita",
         "Proteção contra poeira e umidade",

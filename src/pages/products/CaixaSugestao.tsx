@@ -9,6 +9,7 @@ export default function CaixaSugestao() {
       imageUrl={SOBMEDIDA_IMAGES.caixaSugestao}
        seoTitle="Caixa de Sugestão em Acrílico - Empresas"
        seoDescription="Caixas de sugestão em acrílico para feedback de clientes. Mesa ou parede. Personalização com logotipo. Rio de Janeiro."
+       canonical="/acrilico-sob-medida/caixa-de-sugestao"
       benefits={[
         "Design profissional e discreto",
         "Abertura para inserção de formulários",

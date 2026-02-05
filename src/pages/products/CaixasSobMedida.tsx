@@ -9,6 +9,7 @@ export default function CaixasSobMedida() {
       imageUrl={SOBMEDIDA_IMAGES.caixas}
        seoTitle="Caixas de Acrílico Sob Medida - Todos os Tamanhos"
        seoDescription="Fabricamos caixas de acrílico em qualquer tamanho. Cristal, colorido ou fumê. Acabamento impecável. Orçamento grátis no RJ."
+       canonical="/acrilico-sob-medida/caixas-sob-medida"
       benefits={[
         "Fabricação personalizada nas medidas exatas do seu projeto",
         "Acrílico de alta transparência e resistência",

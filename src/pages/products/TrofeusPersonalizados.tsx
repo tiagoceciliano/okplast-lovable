@@ -9,6 +9,7 @@ export default function TrofeusPersonalizados() {
       imageUrl={SOBMEDIDA_IMAGES.trofeus}
        seoTitle="Troféus de Acrílico Personalizados - Premiações"
        seoDescription="Troféus em acrílico personalizados para eventos e premiações corporativas. Gravação a laser e impressão UV. Rio de Janeiro."
+       canonical="/acrilico-sob-medida/trofeus-personalizados"
       benefits={[
         "Design exclusivo para sua premiação",
         "Combinação de materiais (acrílico + madeira/metal)",

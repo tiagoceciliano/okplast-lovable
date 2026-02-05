@@ -9,6 +9,7 @@ export default function DisplayAcrilico() {
       imageUrl={SOBMEDIDA_IMAGES.display}
        seoTitle="Display de Acrílico - Mesa e Parede"
        seoDescription="Displays de acrílico para comunicação visual e exposição de produtos. Diversos tamanhos. Fabricação sob medida no RJ."
+       canonical="/acrilico-sob-medida/display-de-acrilico"
       benefits={[
         "Comunicação visual de alta qualidade",
         "Múltiplos formatos disponíveis",

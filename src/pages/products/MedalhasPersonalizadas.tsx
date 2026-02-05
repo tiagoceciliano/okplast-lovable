@@ -9,6 +9,7 @@ export default function MedalhasPersonalizadas() {
       imageUrl={SOBMEDIDA_IMAGES.medalhas}
        seoTitle="Medalhas de Acrílico Personalizadas - Eventos"
        seoDescription="Medalhas de acrílico personalizadas para eventos esportivos e corporativos. Gravação a laser. Cordão incluso. RJ."
+       canonical="/acrilico-sob-medida/medalhas-personalizadas"
       benefits={[
         "Personalização completa do design",
         "Gravação a laser de alta precisão",

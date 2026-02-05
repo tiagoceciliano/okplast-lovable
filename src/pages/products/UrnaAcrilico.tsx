@@ -9,6 +9,7 @@ export default function UrnaAcrilico() {
       imageUrl={SOBMEDIDA_IMAGES.urna}
        seoTitle="Urna de Acrílico para Sorteios e Votações - RJ"
        seoDescription="Urnas de acrílico transparentes e opacas para sorteios, votações e promoções. Fabricação sob medida. Orçamento grátis. Rio de Janeiro."
+       canonical="/acrilico-sob-medida/urna-de-acrilico"
       benefits={[
         "Transparência para processos públicos",
         "Opção com acrílico opaco para sigilo",

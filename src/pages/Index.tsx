@@ -12,6 +12,42 @@
  import { PRODUTOS_IMAGES, CHAPAS_IMAGES, DEPOIMENTOS_IMAGES } from "@/lib/images";
  import { SEOHead, createFAQSchema } from "@/components/SEOHead";
  
+ // LocalBusiness Schema para SEO local
+ const localBusinessSchema = {
+   "@context": "https://schema.org",
+   "@type": "LocalBusiness",
+   "name": "Lab Acrílicos",
+   "description": "Fábrica de produtos em acrílico sob medida e distribuidora de chapas no Rio de Janeiro. Troféus, medalhas, displays, urnas e muito mais.",
+   "image": "https://labacrilicos.com.br/og-image.jpg",
+   "address": {
+     "@type": "PostalAddress",
+     "streetAddress": "Rua Cordovil 259",
+     "addressLocality": "Rio de Janeiro",
+     "addressRegion": "RJ",
+     "postalCode": "21012-080",
+     "addressCountry": "BR"
+   },
+   "geo": {
+     "@type": "GeoCoordinates",
+     "latitude": -22.8282,
+     "longitude": -43.2658
+   },
+   "telephone": "(21) 3372-3797",
+   "url": "https://labacrilicos.com.br",
+   "openingHoursSpecification": {
+     "@type": "OpeningHoursSpecification",
+     "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+     "opens": "08:00",
+     "closes": "17:00"
+   },
+   "priceRange": "$$",
+   "paymentAccepted": "Dinheiro, Cartão de Crédito, Pix, Boleto",
+   "areaServed": {
+     "@type": "Country",
+     "name": "Brasil"
+   }
+ };
+ 
  // FAQ para Schema
  const faqItems = [
    {
@@ -142,7 +178,13 @@ export default function Index() {
          title="Lab Acrílicos | Fábrica de Acrílico no Rio de Janeiro"
          description="Fábrica de produtos em acrílico sob medida no RJ. Troféus, medalhas, displays, urnas, chapas de acrílico, policarbonato, PETG. Orçamento em 24h."
          canonical="/"
-         schema={createFAQSchema(faqItems)}
+         schema={{
+           "@context": "https://schema.org",
+           "@graph": [
+             localBusinessSchema,
+             createFAQSchema(faqItems)
+           ]
+         }}
        />
  
       {/* Hero Section */}

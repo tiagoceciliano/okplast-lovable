@@ -9,6 +9,7 @@
        imageUrl={SOBMEDIDA_IMAGES.boloFake}
        seoTitle="Produtos para Confeitaria em Acrílico RJ - Bolo Fake e Expositores"
        seoDescription="Bolo fake, suportes e expositores para confeitaria em acrílico. Produtos sob medida no Rio de Janeiro. Perfeitos para festas e eventos. Orçamento grátis."
+       canonical="/acrilico-sob-medida/confeitaria"
        benefits={[
          "Acabamento premium para valorizar seus doces",
          "Material atóxico e seguro para contato com alimentos",

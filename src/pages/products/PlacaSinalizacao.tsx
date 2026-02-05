@@ -9,6 +9,7 @@ export default function PlacaSinalizacao() {
        imageUrl={SOBMEDIDA_IMAGES.placaSinalizacao}
        seoTitle="Placas de Sinalização em Acrílico - Empresas"
        seoDescription="Placas de sinalização em acrílico para empresas e espaços públicos. Opções com braile. Fabricação no RJ."
+       canonical="/acrilico-sob-medida/placa-de-sinalizacao"
       benefits={[
         "Durabilidade e resistência ao tempo",
         "Conformidade com normas de sinalização",

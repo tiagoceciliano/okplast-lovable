@@ -9,6 +9,7 @@
        imageUrl={SOBMEDIDA_IMAGES.quadroAvisos}
        seoTitle="Quadro de Avisos em Acrílico RJ - Murais Personalizados"
        seoDescription="Quadros de avisos em acrílico sob medida no Rio de Janeiro. Murais para empresas, escolas e condomínios. Com ou sem porta. Orçamento grátis em 24h."
+       canonical="/acrilico-sob-medida/quadro-de-avisos"
        benefits={[
          "Estrutura em acrílico cristal de alta durabilidade",
          "Fácil fixação na parede com kit incluso",

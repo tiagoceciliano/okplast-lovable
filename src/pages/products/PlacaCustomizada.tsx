@@ -9,6 +9,7 @@ export default function PlacaCustomizada() {
        imageUrl={SOBMEDIDA_IMAGES.placaCustomizada}
        seoTitle="Placas de Acrílico Personalizadas - Gravação Laser"
        seoDescription="Placas de acrílico personalizadas para identificação, premiação e decoração. Corte e gravação a laser. Rio de Janeiro."
+       canonical="/acrilico-sob-medida/placa-customizada"
       benefits={[
         "Corte a laser de alta precisão",
         "Gravação permanente",
