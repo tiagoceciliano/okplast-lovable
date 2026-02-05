@@ -19,7 +19,6 @@ export default function PotesDoces() {
       ]}
       variations={[
         "Pote redondo grande (acima de 1L)",
-        "Pote quadrado",
         "Pote com colher dosadora",
         "Bomboniere de acrílico",
         "Pote para confeitaria com tampa",
