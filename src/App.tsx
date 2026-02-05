@@ -1,3 +1,4 @@
+ import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,39 +9,46 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppModalProvider } from "@/contexts/WhatsAppModalContext";
 import { EmailQuoteModalProvider } from "@/contexts/EmailQuoteModalContext";
 
-// Pages
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-import SobreNos from "./pages/SobreNos";
-import Orcamento from "./pages/Orcamento";
-import PoliticaRevenda from "./pages/PoliticaRevenda";
-import PoliticaVenda from "./pages/PoliticaVenda";
-import TermoUso from "./pages/TermoUso";
-import PoliticaPrivacidade from "./pages/PoliticaPrivacidade";
+ // Lazy loaded pages
+ const Index = lazy(() => import("./pages/Index"));
+ const NotFound = lazy(() => import("./pages/NotFound"));
+ const SobreNos = lazy(() => import("./pages/SobreNos"));
+ const Orcamento = lazy(() => import("./pages/Orcamento"));
+ const PoliticaRevenda = lazy(() => import("./pages/PoliticaRevenda"));
+ const PoliticaVenda = lazy(() => import("./pages/PoliticaVenda"));
+ const TermoUso = lazy(() => import("./pages/TermoUso"));
+ const PoliticaPrivacidade = lazy(() => import("./pages/PoliticaPrivacidade"));
 
-// Product Hub Pages
-import AcrilicoSobMedida from "./pages/products/AcrilicoSobMedida";
-import ChapasDeAcrilico from "./pages/products/ChapasDeAcrilico";
+ // Lazy loaded product hub pages
+ const AcrilicoSobMedida = lazy(() => import("./pages/products/AcrilicoSobMedida"));
+ const ChapasDeAcrilico = lazy(() => import("./pages/products/ChapasDeAcrilico"));
 
-// Product Detail Pages
-import CaixasSobMedida from "./pages/products/CaixasSobMedida";
-import CupulasRedomas from "./pages/products/CupulasRedomas";
-import PotesDoces from "./pages/products/PotesDoces";
-import PotesGraos from "./pages/products/PotesGraos";
-import UrnaAcrilico from "./pages/products/UrnaAcrilico";
-import CaixaSugestao from "./pages/products/CaixaSugestao";
-import MedalhasPersonalizadas from "./pages/products/MedalhasPersonalizadas";
-import TrofeusPersonalizados from "./pages/products/TrofeusPersonalizados";
-import PlacaCustomizada from "./pages/products/PlacaCustomizada";
-import PlacaSinalizacao from "./pages/products/PlacaSinalizacao";
-import ExpositoresBijuterias from "./pages/products/ExpositoresBijuterias";
-import ExpositoresCalcados from "./pages/products/ExpositoresCalcados";
-import ExpositoresOculos from "./pages/products/ExpositoresOculos";
-import DisplayAcrilico from "./pages/products/DisplayAcrilico";
-import PortaFolder from "./pages/products/PortaFolder";
+ // Lazy loaded product detail pages
+ const CaixasSobMedida = lazy(() => import("./pages/products/CaixasSobMedida"));
+ const CupulasRedomas = lazy(() => import("./pages/products/CupulasRedomas"));
+ const PotesDoces = lazy(() => import("./pages/products/PotesDoces"));
+ const PotesGraos = lazy(() => import("./pages/products/PotesGraos"));
+ const UrnaAcrilico = lazy(() => import("./pages/products/UrnaAcrilico"));
+ const CaixaSugestao = lazy(() => import("./pages/products/CaixaSugestao"));
+ const MedalhasPersonalizadas = lazy(() => import("./pages/products/MedalhasPersonalizadas"));
+ const TrofeusPersonalizados = lazy(() => import("./pages/products/TrofeusPersonalizados"));
+ const PlacaCustomizada = lazy(() => import("./pages/products/PlacaCustomizada"));
+ const PlacaSinalizacao = lazy(() => import("./pages/products/PlacaSinalizacao"));
+ const ExpositoresBijuterias = lazy(() => import("./pages/products/ExpositoresBijuterias"));
+ const ExpositoresCalcados = lazy(() => import("./pages/products/ExpositoresCalcados"));
+ const ExpositoresOculos = lazy(() => import("./pages/products/ExpositoresOculos"));
+ const DisplayAcrilico = lazy(() => import("./pages/products/DisplayAcrilico"));
+ const PortaFolder = lazy(() => import("./pages/products/PortaFolder"));
 
 const queryClient = new QueryClient();
 
+ // Page loader component
+ const PageLoader = () => (
+   <div className="flex items-center justify-center min-h-screen bg-background">
+     <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+   </div>
+ );
+ 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -51,6 +59,7 @@ const App = () => (
         <WhatsAppModalProvider>
           <EmailQuoteModalProvider>
             <Layout>
+             <Suspense fallback={<PageLoader />}>
             <Routes>
               {/* Home */}
               <Route path="/" element={<Index />} />
@@ -87,6 +96,7 @@ const App = () => (
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
+             </Suspense>
             </Layout>
           </EmailQuoteModalProvider>
         </WhatsAppModalProvider>
