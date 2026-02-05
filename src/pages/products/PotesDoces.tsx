@@ -18,7 +18,6 @@ export default function PotesDoces() {
         "Empilháveis para otimizar espaço",
       ]}
       variations={[
-        "Pote redondo grande (acima de 1L)",
         "Pote com colher dosadora",
         "Bomboniere de acrílico",
         "Pote para confeitaria com tampa",
