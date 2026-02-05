@@ -19,7 +19,6 @@ export default function TrofeusPersonalizados() {
       ]}
       variations={[
         "Troféu em placa de acrílico",
-        "Troféu com base em madeira",
         "Troféu corporativo",
         "Troféu esportivo",
         "Troféu comemorativo",
