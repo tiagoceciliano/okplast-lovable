@@ -22,7 +22,6 @@ export default function CaixasSobMedida() {
         "Caixa com tampa articulada",
         "Caixa sem tampa",
         "Caixa com divisórias internas",
-        "Caixa com base em madeira ou MDF",
       ]}
     />
   );
