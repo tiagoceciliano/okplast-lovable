@@ -22,7 +22,6 @@ export default function UrnaAcrilico() {
         "Urna com acrílico branco/opaco",
         "Urna com suporte de mesa",
         "Urna de piso (tamanho grande)",
-        "Urna com cadeado incluso",
         "Urna personalizada com adesivo",
         "Urna para votação eletrônica",
       ]}
