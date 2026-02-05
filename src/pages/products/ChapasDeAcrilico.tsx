@@ -54,7 +54,8 @@ const heroCarouselImages = [
 const tiposChapas = [
   {
     id: "cast",
-    nome: "CHAPAS Acrílico CAST (100% Virgem)",
+    slug: "acrilico",
+    nome: "CHAPAS de Acrílico",
     desc: "O acrílico CAST é produzido pelo processo de vazamento (casting), resultando em chapas de alta qualidade com excelente transparência e resistência. Ideal para projetos que exigem perfeição óptica e durabilidade superior.",
     imageUrl: CHAPAS_PAGINA_IMAGES.cast,
     aplicacoes: [
@@ -75,6 +76,7 @@ const tiposChapas = [
   },
   {
     id: "ps",
+    slug: "poliestireno",
     nome: "CHAPAS Poliestireno (PS e PSAI)",
     desc: "O Poliestireno é uma alternativa econômica ao acrílico, oferecendo boa transparência e facilidade de trabalho. Disponível nas versões PS (cristal) e PSAI (alto impacto).",
     imageUrl: CHAPAS_PAGINA_IMAGES.poliestireno,
@@ -96,6 +98,7 @@ const tiposChapas = [
   },
   {
     id: "petg",
+    slug: "petg",
     nome: "CHAPAS PETG",
     desc: "O PETG combina transparência semelhante ao acrílico com alta resistência ao impacto. É ideal para aplicações que exigem segurança e durabilidade.",
     imageUrl: CHAPAS_PAGINA_IMAGES.petg,
@@ -117,6 +120,7 @@ const tiposChapas = [
   },
   {
     id: "pc-alveolar",
+    slug: "policarbonato-alveolar",
     nome: "CHAPAS Policarbonato Alveolar",
     desc: "O Policarbonato Alveolar é uma chapa multicamadas com câmaras de ar, oferecendo excelente isolamento térmico e leveza. Ideal para coberturas e fechamentos.",
     imageUrl: CHAPAS_PAGINA_IMAGES.policarbonatoAlveolar,
@@ -138,6 +142,7 @@ const tiposChapas = [
   },
   {
     id: "pc-compacto",
+    slug: "policarbonato-compacto",
     nome: "CHAPAS Policarbonato Compacto",
     desc: "O Policarbonato Compacto é uma das chapas mais resistentes do mercado, com resistência ao impacto 250 vezes maior que o vidro comum.",
     imageUrl: CHAPAS_PAGINA_IMAGES.policarbonatoCompacto,
@@ -159,6 +164,7 @@ const tiposChapas = [
   },
   {
     id: "pvc",
+    slug: "pvc-expandido",
     nome: "CHAPAS de PVC Expandido",
     desc: "O PVC Expandido é uma chapa leve e versátil, ideal para comunicação visual e aplicações internas. Fácil de cortar, colar e pintar.",
     imageUrl: CHAPAS_PAGINA_IMAGES.pvc,
@@ -180,6 +186,7 @@ const tiposChapas = [
   },
   {
     id: "acm",
+    slug: "acm",
     nome: "CHAPAS ACM",
     desc: "O ACM (Alumínio Composto) é formado por duas lâminas de alumínio com núcleo de polietileno. Ideal para fachadas, letreiros e revestimentos externos.",
     imageUrl: CHAPAS_PAGINA_IMAGES.acm,
@@ -201,22 +208,6 @@ const tiposChapas = [
   },
 ];
 
-// Cores disponíveis
-const coresDisponiveis = [
-  { nome: "Cristal", cor: "transparent" },
-  { nome: "Branco", cor: "#FFFFFF" },
-  { nome: "Preto", cor: "#000000" },
-  { nome: "Vermelho", cor: "#E53935" },
-  { nome: "Azul", cor: "#1E88E5" },
-  { nome: "Verde", cor: "#43A047" },
-  { nome: "Amarelo", cor: "#FDD835" },
-  { nome: "Laranja", cor: "#FB8C00" },
-  { nome: "Fumê", cor: "#424242" },
-  { nome: "Espelhado", cor: "linear-gradient(135deg, #C0C0C0, #FFFFFF, #C0C0C0)" },
-  { nome: "Leitoso", cor: "#F5F5F5" },
-  { nome: "Fluorescente", cor: "linear-gradient(135deg, #FF1493, #00FF00)" },
-];
-
 export default function ChapasDeAcrilico() {
   const { openWhatsAppModal } = useWhatsAppModal();
   const autoplayPlugin = useRef(
@@ -225,12 +216,12 @@ export default function ChapasDeAcrilico() {
 
   return (
     <>
-       <SEOHead
-         title="Chapas de Acrílico RJ - Preço de Fábrica"
-         description="Chapas de acrílico cristal, colorido, PS, PETG, Policarbonato e ACM. Corte sob medida. Melhor preço do Rio de Janeiro. Orçamento grátis."
-         canonical="/chapas-de-acrilico"
-         schema={createFAQSchema(faqItems)}
-       />
+      <SEOHead
+        title="Chapas no RJ - Acrílico, Policarbonato, PS, PETG, ACM"
+        description="Distribuidora de chapas plásticas: Acrílico, Policarbonato alveolar e compacto, PETG, Poliestireno, PVC Expandido e ACM. Corte sob medida. Melhor preço do Rio de Janeiro."
+        canonical="/chapas"
+        schema={createFAQSchema(faqItems)}
+      />
  
       {/* Hero - 2 Colunas */}
       <section className="bg-muted py-16 md:py-20">
@@ -239,14 +230,13 @@ export default function ChapasDeAcrilico() {
             {/* Left - Text */}
             <div>
               <h1 className="font-bold text-3xl md:text-4xl lg:text-5xl text-foreground mb-6">
-                CHAPAS DE ACRÍLICO
+                CHAPAS DE ACRÍLICO POLICARBONATOS E OUTROS PLÁSTICOS
               </h1>
               <p className="text-lg text-accent font-medium mb-4">
-                A melhor fábrica de acrílico com o melhor preço do Rio de Janeiro
+                Distribuidora de chapas plásticas com o melhor preço do Rio de Janeiro
               </p>
               <p className="text-muted-foreground mb-8">
-                Trabalhamos com chapas de acrílico cristal, colorido, leitoso, espelhado, fumê e muito mais. 
-                Atendemos projetos de todos os portes com qualidade e preço justo.
+                Trabalhamos com Acrílico (cristal, colorido, leitoso, espelhado), Policarbonato (alveolar e compacto), PETG, Poliestireno (PS), PVC Expandido e ACM. Corte sob medida para projetos de todos os portes.
               </p>
               <div className="flex flex-col items-start gap-3">
                 <Button 
@@ -291,40 +281,6 @@ export default function ChapasDeAcrilico() {
         </div>
       </section>
 
-      {/* Introdução + Cores */}
-      <section className="section-padding">
-        <div className="container-custom">
-          <DecorativeDivider />
-          
-          <div className="text-center mb-12">
-            <h2 className="font-bold text-2xl md:text-3xl text-foreground mb-4">
-              Chapas de acrílico cristal e diversas cores
-            </h2>
-            <p className="text-muted-foreground max-w-3xl mx-auto">
-              Trabalhamos com uma ampla variedade de cores e acabamentos para atender qualquer projeto. 
-              Todas as chapas passam por rigoroso controle de qualidade.
-            </p>
-          </div>
-
-          {/* Grid de cores */}
-          <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-3 mb-12">
-            {coresDisponiveis.map((cor, index) => (
-              <div key={index} className="text-center">
-                <div 
-                  className="w-full aspect-square rounded-lg border-2 border-border shadow-sm mb-2"
-                  style={{ 
-                    background: cor.cor === "transparent" 
-                      ? "repeating-conic-gradient(#ccc 0% 25%, transparent 0% 50%) 50% / 10px 10px"
-                      : cor.cor
-                  }}
-                />
-                <span className="text-xs text-muted-foreground">{cor.nome}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Banner Azul */}
       <BlueBanner>
         Chapas de Acrílico cristal e diversas cores, Poliestireno (PS e PSAI), PETG, Policarbonato, ACM e PVC.
@@ -342,21 +298,25 @@ export default function ChapasDeAcrilico() {
             >
               {/* Image */}
               <div className={`${chapa.imagePosition === "right" ? "lg:order-2" : "lg:order-1"}`}>
-                <div className="aspect-video bg-muted rounded-lg overflow-hidden">
-                  <img 
-                    src={chapa.imageUrl} 
-                    alt={chapa.nome}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                </div>
+                <Link to={`/chapas/${chapa.slug}`} className="block">
+                  <div className="aspect-video bg-muted rounded-lg overflow-hidden hover:opacity-90 transition-opacity cursor-pointer">
+                    <img 
+                      src={chapa.imageUrl} 
+                      alt={chapa.nome}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+                </Link>
               </div>
 
               {/* Content */}
               <div className={`${chapa.imagePosition === "right" ? "lg:order-1" : "lg:order-2"}`}>
-                <h3 className="font-bold text-xl md:text-2xl text-primary mb-4">
-                  {chapa.nome}
-                </h3>
+                <Link to={`/chapas/${chapa.slug}`}>
+                  <h3 className="font-bold text-xl md:text-2xl text-primary mb-4 hover:underline cursor-pointer">
+                    {chapa.nome}
+                  </h3>
+                </Link>
                 <p className="text-muted-foreground mb-6">
                   {chapa.desc}
                 </p>

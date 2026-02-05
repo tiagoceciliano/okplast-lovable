@@ -256,7 +256,7 @@ export default function Index() {
 
           <div className="flex flex-col items-center gap-3 mt-8">
             <Button size="lg" variant="outline" asChild className="gap-2">
-              <Link to="/chapas-de-acrilico" onClick={() => window.scrollTo(0, 0)}>
+              <Link to="/chapas" onClick={() => window.scrollTo(0, 0)}>
                 Ver mais chapas e materiais
                 <ArrowRight className="h-5 w-5" />
               </Link>
