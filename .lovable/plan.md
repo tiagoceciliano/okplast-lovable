@@ -1,169 +1,116 @@
 
-# Plano: Adicionar Categoria de Placas e Reorganizar Página Sob Medida
+# Plano de Otimização de Performance - GTmetrix
 
-## Resumo
+## Diagnóstico
 
-Vou adicionar a nova categoria "PLACAS SOB MEDIDA, PERSONALIZADAS E GRAVADAS" com 4 produtos (2 páginas existentes + 2 novas) e reorganizar a ordem das categorias conforme solicitado.
+O GTmetrix identificou os seguintes problemas principais:
 
----
+| Metrica | Valor Atual | Meta Ideal |
+|---------|-------------|------------|
+| First Contentful Paint (FCP) | 2.5s | < 1.8s |
+| Speed Index | 3.9s | < 3.4s |
+| Largest Contentful Paint (LCP) | 4.1s | < 2.5s |
+| Performance Grade | C (61%) | B+ (80%+) |
 
-## Etapa 1: Upload das Imagens para o Storage
-
-### Imagens a copiar:
-| Arquivo enviado | Destino no Storage |
-|-----------------|-------------------|
-| placa-customizada-2.jpg | sobmedida/placa-customizada-2.jpg |
-| placa-gravada.jpg | sobmedida/placa-gravada.jpg |
-| placa-sinalizacao-2.webp | sobmedida/placa-sinalizacao-2.webp |
-| placa-personalizada.jpg | sobmedida/placa-personalizada.jpg |
+Os pontos positivos (TBT 0ms, CLS 0.01) indicam que o problema está no **carregamento inicial de recursos**, não na interatividade ou estabilidade visual.
 
 ---
 
-## Etapa 2: Atualizar Mapeamento de Imagens
+## Estratégia de Otimização em 4 Frentes
 
-### Arquivo: `src/lib/images.ts`
+### 1. Otimizar Carregamento de Imagens Críticas (LCP/FCP)
 
-Adicionar novas referências no objeto `SOBMEDIDA_IMAGES`:
+**Problema:** As imagens do grid de produtos (12 itens) e chapas (8 itens) carregam todas simultaneamente, competindo por banda.
+
+**Soluções:**
+
+- Adicionar `preload` para as primeiras 4 imagens do grid de produtos no `index.html`
+- Usar `fetchPriority="high"` nas imagens acima da dobra (above the fold)
+- Implementar `loading="lazy"` corretamente apenas para imagens abaixo da dobra
+- Adicionar dimensões explícitas (`width`/`height`) em todas as imagens para evitar recálculos de layout
+
+### 2. Otimizar Carregamento do Logo (Header)
+
+**Problema:** O logo do header é importado como módulo ES6, o que atrasa a renderização inicial.
+
+**Solucoes:**
+- Mover o logo para `/public` e referenciar diretamente
+- Adicionar `preload` no `index.html` para o logo
+- Usar `fetchPriority="high"` no elemento `<img>` do logo
+
+### 3. Eliminar Recursos Não-Críticos do Bundle Inicial
+
+**Problema:** Componentes do Footer (GoogleMapEmbed) e modais (WhatsApp/Email) estão no bundle principal.
+
+**Soluções:**
+- Aplicar lazy loading nos modais (WhatsAppModal, EmailQuoteModal)
+- O GoogleMapEmbed já usa IntersectionObserver (OK)
+- Remover o áudio de notificação do carregamento inicial (defer para depois de DOMContentLoaded)
+
+### 4. Otimizar Preconnects e DNS-Prefetch
+
+**Problema:** Apenas o Supabase tem preconnect configurado.
+
+**Solucoes:**
+- Revisar se há outras origens que precisam de preconnect
+- Adicionar `preload` para recursos críticos do primeiro viewport
+
+---
+
+## Detalhes Técnicos de Implementação
+
+### Arquivo: `index.html`
+
+Adicionar preloads para recursos críticos:
 
 ```text
-placaGravada: img("sobmedida/placa-gravada.jpg"),
-placaPersonalizada: img("sobmedida/placa-personalizada.jpg"),
+<!-- Preload logo do header -->
+<link rel="preload" as="image" href="/logo-horizontal.png" fetchpriority="high" />
+
+<!-- Preload das 4 primeiras imagens de produtos (LCP candidates) -->
+<link rel="preload" as="image" href="https://dikfllrqtcdexvnlczsz.supabase.co/storage/v1/object/public/site-images/produtos/cupula-preta.jpg" />
+<link rel="preload" as="image" href="https://dikfllrqtcdexvnlczsz.supabase.co/storage/v1/object/public/site-images/produtos/trofeus.jpg" />
 ```
 
----
+### Arquivo: `src/pages/Index.tsx`
 
-## Etapa 3: Criar 2 Novas Páginas de Produto
-
-### Arquivo 1: `src/pages/products/PlacaGravada.tsx`
-
-Página para placas com gravação a laser, homenagens e premiações com estojo.
-
-**Conteúdo:**
-- Titulo: "Placa de Acrílico Gravada"
-- Foco: Premiações, homenagens, reconhecimentos
-- Variações: Com estojo, sem estojo, diferentes tamanhos
-- SEO otimizado para "placa gravada acrílico RJ"
-
-### Arquivo 2: `src/pages/products/PlacaPersonalizada.tsx`
-
-Página para placas de identificação de ambientes e portas.
-
-**Conteúdo:**
-- Titulo: "Placa Personalizada de Acrílico"
-- Foco: Identificação de salas, departamentos, portas
-- Variações: Diferentes cores, tamanhos, fixações
-- SEO otimizado para "placa personalizada acrílico RJ"
-
----
-
-## Etapa 4: Registrar Novas Rotas
-
-### Arquivo: `src/App.tsx`
-
-Adicionar:
-```text
-// Lazy imports
-const PlacaGravada = lazy(() => import("./pages/products/PlacaGravada"));
-const PlacaPersonalizada = lazy(() => import("./pages/products/PlacaPersonalizada"));
-
-// Routes
-<Route path="/acrilico-sob-medida/placa-gravada" element={<PlacaGravada />} />
-<Route path="/acrilico-sob-medida/placa-personalizada" element={<PlacaPersonalizada />} />
-```
-
----
-
-## Etapa 5: Reorganizar Categorias na Página Sob Medida
-
-### Arquivo: `src/pages/products/AcrilicoSobMedida.tsx`
-
-**Nova ordem das categorias:**
+Modificar o grid de produtos para usar `fetchPriority` e lazy loading seletivo:
 
 ```text
-1. PLACAS SOB MEDIDA, PERSONALIZADAS E GRAVADAS (NOVA)
-   - Placa Customizada → /acrilico-sob-medida/placa-de-acrilico-customizada
-   - Placa Personalizada → /acrilico-sob-medida/placa-personalizada
-   - Placa de Sinalização → /acrilico-sob-medida/placa-de-acrilico-sinalizacao
-   - Placa Gravada → /acrilico-sob-medida/placa-gravada
-
-2. DISPLAY, URNAS E QUADROS
-   - Display de Parede e Mesa
-   - Urnas Transparente ou Coloridas
-   - Caixas de Sugestões
-   - Quadro de Avisos
-
-3. MEDALHAS E TROFÉUS PERSONALIZADOS
-   - Medalhas Sob Medida
-   - Troféus Personalizados
-   - Medalhas Personalizadas
-   - Troféus Sob Medida
-
-4. CAIXAS, POTES, CÚPULAS, REDOMAS
-   - Caixas Sob Medida
-   - Cúpulas e Redomas
-   - Potes para Doces
-   - Potes para Grãos
-
-5. EXPOSITORES E CONFEITARIA
-   - Expositores para Bijuterias
-   - Expositores para Calçados
-   - Expositor de Óculos Ótica
-   - Bolo Fake
+- Imagens 0-3 (primeira linha): fetchPriority="high", loading="eager"
+- Imagens 4-7 (segunda linha): loading="lazy"
+- Imagens 8-11 (terceira linha): loading="lazy"
 ```
+
+### Arquivo: `src/components/layout/Header.tsx`
+
+- Mover logo para `/public` e adicionar `fetchPriority="high"`
+- Usar referência direta ao invés de import de módulo
+
+### Arquivo: `src/components/layout/WhatsAppFloatingButton.tsx`
+
+- Postergar carregamento do áudio de notificação
+- Usar lazy import para o componente `WhatsAppChatWidget`
 
 ---
 
-## Resumo das Alterações
+## Arquivos a Modificar
 
-| Tipo | Quantidade |
-|------|------------|
-| Copiar imagens para assets | 4 arquivos |
-| Atualizar images.ts | 1 arquivo |
-| Criar páginas de produto | 2 arquivos |
-| Atualizar App.tsx (rotas) | 1 arquivo |
-| Reorganizar AcrilicoSobMedida.tsx | 1 arquivo |
-| **Total** | **9 alterações** |
+1. `index.html` - Adicionar preloads de recursos críticos
+2. `src/pages/Index.tsx` - Otimizar loading/priority das imagens
+3. `src/components/layout/Header.tsx` - Otimizar carregamento do logo
+4. `src/components/layout/WhatsAppFloatingButton.tsx` - Postergar recursos não-críticos
+5. `public/` - Copiar logo para pasta pública
 
 ---
 
-## Estrutura Final da Categoria Placas
+## Impacto Esperado
 
-```text
-PLACAS SOB MEDIDA, PERSONALIZADAS E GRAVADAS
-├── Placa Customizada (imagem: advogados)
-├── Placa Personalizada (imagem: administração)  ← NOVA
-├── Placa de Sinalização (imagem: vestiário)
-└── Placa Gravada (imagem: estojo)              ← NOVA
-```
+| Metrica | Antes | Esperado |
+|---------|-------|----------|
+| FCP | 2.5s | ~1.5s |
+| LCP | 4.1s | ~2.5s |
+| Speed Index | 3.9s | ~2.5s |
+| Grade | C (61%) | B (75-85%) |
 
----
-
-## Detalhes Técnicos das Novas Páginas
-
-### PlacaGravada.tsx
-```typescript
-<ProductPage
-  title="Placa de Acrílico Gravada"
-  description="Placas de acrílico com gravação a laser para homenagens, premiações e reconhecimentos..."
-  imageUrl={SOBMEDIDA_IMAGES.placaGravada}
-  seoTitle="Placas de Acrílico Gravadas - Homenagens e Premiações"
-  seoDescription="Placas gravadas a laser para homenagens e premiações. Com ou sem estojo. Fabricação no Rio de Janeiro."
-  canonical="/acrilico-sob-medida/placa-gravada"
-  benefits={[...]}
-  variations={[...]}
-/>
-```
-
-### PlacaPersonalizada.tsx
-```typescript
-<ProductPage
-  title="Placa Personalizada de Acrílico"
-  description="Placas de acrílico personalizadas para identificação de ambientes, departamentos e salas..."
-  imageUrl={SOBMEDIDA_IMAGES.placaPersonalizada}
-  seoTitle="Placas Personalizadas de Acrílico - Identificação"
-  seoDescription="Placas personalizadas para identificação de ambientes. Fabricação sob medida no Rio de Janeiro."
-  canonical="/acrilico-sob-medida/placa-personalizada"
-  benefits={[...]}
-  variations={[...]}
-/>
-```
+A otimização foca em **priorizar os recursos críticos** (logo, primeiras imagens) e **postergar recursos não-críticos** (modais, áudio, imagens abaixo da dobra).
