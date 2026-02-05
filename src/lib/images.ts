@@ -117,6 +117,9 @@ export const SOBMEDIDA_IMAGES = {
   medalhaPersonalizada: img("produtos/medalha-personalizada.webp"),
   quadroAvisos: img("produtos/quadro-avisos.jpg"),
   boloFake: img("produtos/bolo-fake.jpeg"),
+   placaCustomizada: img("sobmedida/placa-customizada.jpg"),
+   placaSinalizacao: img("sobmedida/placa-sinalizacao.webp"),
+   expositoresOculos: img("sobmedida/expositor-oculos.webp"),
 } as const;
 
 // ========================================

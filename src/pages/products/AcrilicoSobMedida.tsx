@@ -40,37 +40,37 @@ const categorias = [
   {
     titulo: "CAIXAS, POTES, CÚPULAS, REDOMAS",
     produtos: [
-      { nome: "Caixas Sob Medida", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.caixas },
-      { nome: "Cúpulas e Redomas", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.cupulas },
-      { nome: "Potes para Doces", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.potesDoces },
-      { nome: "Potes para Grãos", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.potesGraos },
+       { nome: "Caixas Sob Medida", href: "/caixas-sob-medida", imageUrl: SOBMEDIDA_IMAGES.caixas },
+       { nome: "Cúpulas e Redomas", href: "/cupulas-redomas", imageUrl: SOBMEDIDA_IMAGES.cupulas },
+       { nome: "Potes para Doces", href: "/potes-doces", imageUrl: SOBMEDIDA_IMAGES.potesDoces },
+       { nome: "Potes para Grãos", href: "/potes-graos", imageUrl: SOBMEDIDA_IMAGES.potesGraos },
     ],
   },
   {
     titulo: "MEDALHAS E TROFÉUS PERSONALIZADOS",
     produtos: [
-      { nome: "Medalhas Sob Medida", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.medalhas },
-      { nome: "Troféus Personalizados", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.trofeus },
-      { nome: "Medalhas Personalizadas", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.medalhaPersonalizada },
-      { nome: "Troféus Sob Medida", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.trofeuSobMedida },
+       { nome: "Medalhas Sob Medida", href: "/medalhas-personalizadas", imageUrl: SOBMEDIDA_IMAGES.medalhas },
+       { nome: "Troféus Personalizados", href: "/trofeus-personalizados", imageUrl: SOBMEDIDA_IMAGES.trofeus },
+       { nome: "Medalhas Personalizadas", href: "/medalhas-personalizadas", imageUrl: SOBMEDIDA_IMAGES.medalhaPersonalizada },
+       { nome: "Troféus Sob Medida", href: "/trofeus-personalizados", imageUrl: SOBMEDIDA_IMAGES.trofeuSobMedida },
     ],
   },
   {
     titulo: "DISPLAY, URNAS E QUADROS",
     produtos: [
-      { nome: "Display de Parede e Mesa", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.display },
-      { nome: "Urnas Transparente ou Coloridas", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.urna },
-      { nome: "Caixas de Sugestões", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.caixaSugestao },
-      { nome: "Quadro de Avisos", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.quadroAvisos },
+       { nome: "Display de Parede e Mesa", href: "/display-acrilico", imageUrl: SOBMEDIDA_IMAGES.display },
+       { nome: "Urnas Transparente ou Coloridas", href: "/urna-acrilico", imageUrl: SOBMEDIDA_IMAGES.urna },
+       { nome: "Caixas de Sugestões", href: "/caixa-sugestao", imageUrl: SOBMEDIDA_IMAGES.caixaSugestao },
+       { nome: "Quadro de Avisos", href: "/display-acrilico", imageUrl: SOBMEDIDA_IMAGES.quadroAvisos },
     ],
   },
   {
     titulo: "EXPOSITORES E CONFEITARIA",
     produtos: [
-      { nome: "Expositores para Bijuterias", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.expositoresBijuterias },
-      { nome: "Expositores para Calçados", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.expositoresCalcados },
-      { nome: "Expositor de Óculos Ótica", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.portaFolder },
-      { nome: "Bolo Fake", href: "/acrilico-sob-medida", imageUrl: SOBMEDIDA_IMAGES.boloFake },
+       { nome: "Expositores para Bijuterias", href: "/expositores-bijuterias", imageUrl: SOBMEDIDA_IMAGES.expositoresBijuterias },
+       { nome: "Expositores para Calçados", href: "/expositores-calcados", imageUrl: SOBMEDIDA_IMAGES.expositoresCalcados },
+       { nome: "Expositor de Óculos Ótica", href: "/expositores-oculos", imageUrl: SOBMEDIDA_IMAGES.expositoresOculos },
+       { nome: "Bolo Fake", href: "/cupulas-redomas", imageUrl: SOBMEDIDA_IMAGES.boloFake },
     ],
   },
 ];
