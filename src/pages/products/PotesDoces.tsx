@@ -18,7 +18,6 @@ export default function PotesDoces() {
         "Empilháveis para otimizar espaço",
       ]}
       variations={[
-        "Pote redondo médio (500ml a 1L)",
         "Pote redondo grande (acima de 1L)",
         "Pote quadrado",
         "Pote com colher dosadora",
