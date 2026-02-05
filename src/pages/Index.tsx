@@ -193,7 +193,7 @@ export default function Index() {
                PRODUTOS DE <span className="text-accent">ACRÍLICO</span> E CHAPAS DIVERSAS
             </h1>
              <h2 className="text-lg md:text-xl text-accent font-medium mb-6">Acrílico, PS, Policarbonato, PETG, PVC, Poliestireno (PS), ACM.</h2>
-            <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">Lab Acrílicos é especializada na fabricação de produtos em acrílico sob medida e venda de chapas. Há  anos oferecendo qualidade, inovação e as melhores soluções.<strong className="text-foreground">{COMPANY.name}</strong> é especializada na fabricação de produtos em acrílico sob medida e venda de chapas. Há mais de 30 anos oferecendo qualidade, inovação e as melhores soluções em acrílico para todo o Brasil.
+            <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">​<strong className="text-foreground">{COMPANY.name}</strong> ​
             </p>
             <div className="flex flex-col items-center gap-4">
               <Button size="lg" className="btn-whatsapp text-lg px-8 py-6" onClick={() => openWhatsAppModal()}>
@@ -221,26 +221,14 @@ export default function Index() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            {produtosSobMedida.map((produto, index) => {
-              const isAboveFold = index < 4;
-              return <div key={index} className="bg-background rounded-lg overflow-hidden shadow-sm">
+            {produtosSobMedida.map((produto, index) => <div key={index} className="bg-background rounded-lg overflow-hidden shadow-sm">
                 <div className="aspect-square bg-muted overflow-hidden">
-                  <img 
-                    src={produto.imageUrl} 
-                    alt={`${produto.nome} em acrílico - Lab Acrílicos RJ`} 
-                    width={400} 
-                    height={400} 
-                    className="w-full h-full object-cover" 
-                    loading={isAboveFold ? "eager" : "lazy"} 
-                    fetchPriority={isAboveFold ? "high" : undefined}
-                    decoding={isAboveFold ? "sync" : "async"}
-                  />
+                  <img src={produto.imageUrl} alt={`${produto.nome} em acrílico - Lab Acrílicos RJ`} width={400} height={400} className="w-full h-full object-cover" loading={index < 4 ? "eager" : "lazy"} fetchPriority={index === 0 ? "high" : undefined} />
                 </div>
                 <div className="p-3 text-center">
                   <span className="text-sm font-medium text-foreground">{produto.nome}</span>
                 </div>
-              </div>;
-            })}
+              </div>)}
           </div>
 
           <div className="flex flex-col items-center gap-3 mt-8">
@@ -271,24 +259,14 @@ export default function Index() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            {tiposChapas.map((chapa, index) => (
-              <div key={index} className="bg-background rounded-lg overflow-hidden shadow-sm border">
+            {tiposChapas.map((chapa, index) => <div key={index} className="bg-background rounded-lg overflow-hidden shadow-sm border">
                 <div className="aspect-square bg-muted overflow-hidden">
-                  <img 
-                    src={chapa.imageUrl} 
-                    alt={`Chapa de ${chapa.nome} - Distribuidora Lab Acrílicos`} 
-                    width={400} 
-                    height={400} 
-                    className="w-full h-full object-cover" 
-                    loading="lazy"
-                    decoding="async"
-                  />
+                 <img src={chapa.imageUrl} alt={`Chapa de ${chapa.nome} - Distribuidora Lab Acrílicos`} width={400} height={400} className="w-full h-full object-cover" loading="lazy" />
                 </div>
                 <div className="p-3 text-center">
                   <span className="text-sm font-medium text-foreground">{chapa.nome}</span>
                 </div>
-              </div>
-            ))}
+              </div>)}
           </div>
 
           <div className="flex flex-col items-center gap-3 mt-8">
