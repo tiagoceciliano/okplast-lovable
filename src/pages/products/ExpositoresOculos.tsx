@@ -18,7 +18,6 @@ export default function ExpositoresOculos() {
         "Personalizável com a marca da loja",
       ]}
       variations={[
-        "Expositor de mesa giratório",
         "Expositor de parede",
         "Expositor de balcão",
         "Expositor torre",
