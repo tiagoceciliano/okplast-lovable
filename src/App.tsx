@@ -5,6 +5,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { Layout } from "@/components/layout";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppModalProvider } from "@/contexts/WhatsAppModalContext";
@@ -23,6 +24,9 @@ import { EmailQuoteModalProvider } from "@/contexts/EmailQuoteModalContext";
  // Lazy loaded product hub pages
  const AcrilicoSobMedida = lazy(() => import("./pages/products/AcrilicoSobMedida"));
  const ChapasDeAcrilico = lazy(() => import("./pages/products/ChapasDeAcrilico"));
+
+ // Lazy loaded chapas pages
+ const Acrilico = lazy(() => import("./pages/chapas/Acrilico"));
 
  // Lazy loaded product detail pages
  const CaixasSobMedida = lazy(() => import("./pages/products/CaixasSobMedida"));
@@ -76,7 +80,11 @@ const queryClient = new QueryClient();
 
               {/* Product Hub Pages */}
               <Route path="/acrilico-sob-medida" element={<AcrilicoSobMedida />} />
-              <Route path="/chapas-de-acrilico" element={<ChapasDeAcrilico />} />
+              <Route path="/chapas" element={<ChapasDeAcrilico />} />
+              <Route path="/chapas-de-acrilico" element={<Navigate to="/chapas" replace />} />
+
+              {/* Chapas Detail Pages */}
+              <Route path="/chapas/acrilico" element={<Acrilico />} />
 
               {/* Product Detail Pages - Acrílico Sob Medida */}
               <Route path="/acrilico-sob-medida/caixas-sob-medida" element={<CaixasSobMedida />} />
