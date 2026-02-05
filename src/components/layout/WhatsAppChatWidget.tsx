@@ -6,13 +6,8 @@ import { X, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import {
   Form,
   FormControl,
@@ -239,20 +234,29 @@ export function WhatsAppChatWidget({ open, onOpenChange }: WhatsAppChatWidgetPro
                     name="produto"
                     render={({ field }) => (
                       <FormItem>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger className="whatsapp-input h-8 text-sm">
-                              <SelectValue placeholder="Selecione o produto" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={field.onChange}
+                            value={field.value}
+                            className="flex flex-row gap-3"
+                          >
                             {PRODUTOS_WHATSAPP.map((produto) => (
-                              <SelectItem key={produto} value={produto}>
-                                {produto}
-                              </SelectItem>
+                              <div key={produto} className="flex items-center space-x-1.5">
+                                <RadioGroupItem 
+                                  value={produto} 
+                                  id={`widget-${produto}`}
+                                  className="h-3.5 w-3.5 border-gray-400"
+                                />
+                                <Label 
+                                  htmlFor={`widget-${produto}`}
+                                  className="text-xs text-gray-700 cursor-pointer leading-tight"
+                                >
+                                  {produto === "Chapa Inteira ou Cortada" ? "Chapa" : "Personalizado"}
+                                </Label>
+                              </div>
                             ))}
-                          </SelectContent>
-                        </Select>
+                          </RadioGroup>
+                        </FormControl>
                         <FormMessage className="text-xs text-red-600" />
                       </FormItem>
                     )}
