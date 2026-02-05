@@ -18,7 +18,6 @@ export default function PotesGraos() {
         "Resistente e durável para uso comercial intenso",
       ]}
       variations={[
-        "Dispenser com válvula dosadora",
         "Pote com tampa articulada",
         "Pote com tampa removível",
         "Conjunto com múltiplos potes",
