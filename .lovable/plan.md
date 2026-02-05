@@ -1,140 +1,238 @@
 
-# Plano: Nova OG-Image e Meta Tags SEO Completas
+
+# Plano: Reestruturar Página Hub de Chapas + Criar Página Acrílico
 
 ## Objetivo
 
-1. Gerar uma nova `og-image.jpg` profissional com o texto correto "Lab Acrílicos"
-2. Adicionar o componente `SEOHead` em todas as páginas que ainda não possuem meta tags dinâmicas
+1. Atualizar a página hub `/chapas` com novo H1 e sem bloco de cores
+2. Criar página única `/chapas/acrilico` que unifica cristal + colorido com o bloco de cores
+3. Adicionar hyperlinks nas fotos e títulos dos cards
 
 ---
 
-## Problema Atual da og-image.jpg
+## PARTE 1: Alterações na Página Hub `/chapas`
 
-A imagem atual tem erros de texto: aparece "CHARICOS" em vez de "Acrílicos". Vou gerar uma nova imagem profissional usando IA.
+### Arquivo: `src/pages/products/ChapasDeAcrilico.tsx`
+
+| Elemento | Atual | Novo |
+|----------|-------|------|
+| H1 | "CHAPAS DE ACRÍLICO" | "CHAPAS DE ACRÍLICO POLICARBONATOS E OUTROS PLÁSTICOS" |
+| Title SEO | "Chapas de Acrílico RJ - Preço de Fábrica" | "Chapas no RJ - Acrílico, Policarbonato, PS, PETG, ACM" |
+| Canonical | `/chapas-de-acrilico` | `/chapas` |
+| Subtítulo | "A melhor fábrica de acrílico..." | "Distribuidora de chapas plásticas com o melhor preço do RJ" |
+| Descrição | Fala só de acrílico | Lista todos os materiais disponíveis |
+| Seção de cores | Presente | **REMOVER** (vai para `/chapas/acrilico`) |
+
+### Novo Texto do Hero
+
+```
+H1: CHAPAS DE ACRÍLICO POLICARBONATOS E OUTROS PLÁSTICOS
+
+Subtítulo: Distribuidora de chapas plásticas com o melhor preço do Rio de Janeiro
+
+Descrição: Trabalhamos com Acrílico (cristal, colorido, leitoso, espelhado), 
+Policarbonato (alveolar e compacto), PETG, Poliestireno (PS), PVC Expandido e ACM. 
+Corte sob medida para projetos de todos os portes.
+```
+
+### Adicionar Hyperlinks nos Cards
+
+Cada card terá imagem e título clicáveis:
+
+| Card Atual | Slug para Link |
+|------------|----------------|
+| Acrílico CAST (100% Virgem) | `/chapas/acrilico` |
+| Poliestireno (PS e PSAI) | `/chapas/poliestireno` |
+| PETG | `/chapas/petg` |
+| Policarbonato Alveolar | `/chapas/policarbonato-alveolar` |
+| Policarbonato Compacto | `/chapas/policarbonato-compacto` |
+| PVC Expandido | `/chapas/pvc-expandido` |
+| ACM | `/chapas/acm` |
+
+### Código dos Cards com Links
+
+```tsx
+{tiposChapas.map((chapa) => (
+  <div key={chapa.id}>
+    {/* Image com Link */}
+    <Link to={`/chapas/${chapa.slug}`}>
+      <div className="aspect-video bg-muted rounded-lg overflow-hidden 
+                      hover:opacity-90 transition-opacity cursor-pointer">
+        <img src={chapa.imageUrl} alt={chapa.nome} />
+      </div>
+    </Link>
+
+    {/* Título com Link */}
+    <Link to={`/chapas/${chapa.slug}`}>
+      <h3 className="font-bold text-xl md:text-2xl text-primary 
+                     hover:underline cursor-pointer">
+        {chapa.nome}
+      </h3>
+    </Link>
+    
+    {/* Restante igual */}
+  </div>
+))}
+```
+
+### Atualizar Array `tiposChapas`
+
+Adicionar campo `slug` e mudar nome do primeiro item:
+
+```tsx
+const tiposChapas = [
+  {
+    id: "acrilico",
+    slug: "acrilico",  // NOVO
+    nome: "CHAPAS de Acrílico",  // Mudou de "CAST (100% Virgem)"
+    desc: "...",
+    // ...
+  },
+  {
+    id: "ps",
+    slug: "poliestireno",  // NOVO
+    nome: "CHAPAS Poliestireno (PS e PSAI)",
+    // ...
+  },
+  // ... demais com slug
+];
+```
 
 ---
 
-## Parte 1: Nova og-image.jpg
+## PARTE 2: Nova Página `/chapas/acrilico`
 
-Vou usar a API de geração de imagem para criar uma nova og-image.jpg com:
+### Arquivo: `src/pages/chapas/Acrilico.tsx`
 
-- Dimensões: 1200x630px (padrão Open Graph)
-- Fundo azul moderno (Primária #0F4C81)
-- Texto claro: "Lab Acrílicos"
-- Subtítulo: "Fábrica de Acrílico no Rio de Janeiro"
-- Visual com produtos de acrílico (chapas, troféus, displays)
-- Estilo profissional e limpo
+Esta página unifica cristal + colorido e inclui o bloco de cores.
 
----
+### Estrutura da Página
 
-## Parte 2: Páginas que Precisam de SEOHead
+```
+┌────────────────────────────────────────────────────┐
+│  HERO: "CHAPAS DE ACRÍLICO" + Carrossel           │
+│  Subtítulo: Cristal, colorido, leitoso, espelhado │
+├────────────────────────────────────────────────────┤
+│  SEÇÃO DE CORES (12 quadrados coloridos)          │
+│  H2: "Chapas de acrílico cristal e diversas cores"│
+├────────────────────────────────────────────────────┤
+│  ACRÍLICO CRISTAL                                  │
+│  • O que é                                         │
+│  • Aplicações                                      │
+│  • Características                                 │
+├────────────────────────────────────────────────────┤
+│  ACRÍLICO COLORIDO                                │
+│  • Variedades: fumê, espelhado, fluorescente      │
+│  • Aplicações específicas                          │
+├────────────────────────────────────────────────────┤
+│  ESPESSURAS DISPONÍVEIS                            │
+│  1mm a 50mm                                        │
+├────────────────────────────────────────────────────┤
+│  CTA FINAL: WhatsApp + Email                       │
+└────────────────────────────────────────────────────┘
+```
 
-| Página | Arquivo | Status Atual |
-|--------|---------|--------------|
-| Chapas de Acrílico | `ChapasDeAcrilico.tsx` | Sem SEOHead |
-| Orçamento | `Orcamento.tsx` | Sem SEOHead |
-| Sobre Nós | `SobreNos.tsx` | Sem SEOHead |
-| Acrílico Sob Medida | `AcrilicoSobMedida.tsx` | Sem SEOHead |
-| Urna de Acrílico | `UrnaAcrilico.tsx` | Sem SEOHead |
-| Porta Folder | `PortaFolder.tsx` | Sem SEOHead |
-| Caixas Sob Medida | `CaixasSobMedida.tsx` | Sem SEOHead |
-| Troféus | `TrofeusPersonalizados.tsx` | Sem SEOHead |
-| Medalhas | `MedalhasPersonalizadas.tsx` | Sem SEOHead |
-| Display | `DisplayAcrilico.tsx` | Sem SEOHead |
-| Cúpulas e Redomas | `CupulasRedomas.tsx` | Sem SEOHead |
-| Potes para Doces | `PotesDoces.tsx` | Sem SEOHead |
-| Potes para Grãos | `PotesGraos.tsx` | Sem SEOHead |
-| Caixa de Sugestão | `CaixaSugestao.tsx` | Sem SEOHead |
-| Expositores Bijuterias | `ExpositoresBijuterias.tsx` | Sem SEOHead |
-| Expositores Calçados | `ExpositoresCalcados.tsx` | Sem SEOHead |
-| Expositores Óculos | `ExpositoresOculos.tsx` | Sem SEOHead |
-| Placa Customizada | `PlacaCustomizada.tsx` | Sem SEOHead |
-| Placa Sinalização | `PlacaSinalizacao.tsx` | Sem SEOHead |
-| Política de Privacidade | `PoliticaPrivacidade.tsx` | Sem SEOHead |
-| Política de Revenda | `PoliticaRevenda.tsx` | Sem SEOHead |
-| Política de Venda | `PoliticaVenda.tsx` | Sem SEOHead |
-| Termo de Uso | `TermoUso.tsx` | Sem SEOHead |
+### SEO da Página
 
----
+| Campo | Valor |
+|-------|-------|
+| Title | "Chapas de Acrílico RJ - Cristal, Colorido, Espelhado, Fumê" |
+| Description | "Chapas de acrílico 100% virgem. Cristal transparente, colorido, leitoso, espelhado e fumê. Corte sob medida. Melhor preço do Rio de Janeiro." |
+| Canonical | `/chapas/acrilico` |
+| H1 | "CHAPAS DE ACRÍLICO" |
 
-## Parte 3: Meta Tags Otimizadas por Página
+### Cores Disponíveis (Grid)
 
-### Páginas Principais
-
-| Página | Title | Description |
-|--------|-------|-------------|
-| Chapas de Acrílico | Chapas de Acrílico RJ - Preço de Fábrica | Chapas de acrílico cristal, colorido, PS, PETG, Policarbonato e ACM. Corte sob medida. Melhor preço do Rio de Janeiro. Orçamento grátis. |
-| Acrílico Sob Medida | Acrílico Sob Medida RJ - Fabricação Personalizada | Produtos personalizados em acrílico: caixas, displays, troféus, medalhas, urnas. Fabricação sob medida no Rio de Janeiro. Orçamento em 24h. |
-| Orçamento | Solicitar Orçamento - Lab Acrílicos | Solicite seu orçamento grátis para produtos em acrílico sob medida. Resposta em até 24 horas. Fábrica no Rio de Janeiro. |
-| Sobre Nós | Sobre Nós - Lab Acrílicos - 30 Anos de Experiência | Conheça a Lab Acrílicos: mais de 30 anos fabricando produtos em acrílico de alta qualidade no Rio de Janeiro. |
-
-### Páginas de Produto (usando ProductPage com seoTitle/seoDescription)
-
-| Produto | Title Otimizado | Description |
-|---------|-----------------|-------------|
-| Urna de Acrílico | Urna de Acrílico para Sorteios e Votações - RJ | Urnas de acrílico transparentes e opacas para sorteios, votações e promoções. Fabricação sob medida. Orçamento grátis. Rio de Janeiro. |
-| Porta Folder | Porta Folder de Acrílico - Mesa e Parede | Porta folders em acrílico para organização de folhetos e catálogos. Versões de mesa e parede. Fabricação sob medida no RJ. |
-| Caixas Sob Medida | Caixas de Acrílico Sob Medida - Todos os Tamanhos | Fabricamos caixas de acrílico em qualquer tamanho. Cristal, colorido ou fumê. Acabamento impecável. Orçamento grátis no RJ. |
-| Troféus | Troféus de Acrílico Personalizados - Premiações | Troféus em acrílico personalizados para eventos e premiações corporativas. Gravação a laser e impressão UV. Rio de Janeiro. |
-| Medalhas | Medalhas de Acrílico Personalizadas - Eventos | Medalhas de acrílico personalizadas para eventos esportivos e corporativos. Gravação a laser. Cordão incluso. RJ. |
-| Display | Display de Acrílico - Mesa e Parede | Displays de acrílico para comunicação visual e exposição de produtos. Diversos tamanhos. Fabricação sob medida no RJ. |
-| Cúpulas e Redomas | Cúpulas e Redomas de Acrílico - Exposição | Cúpulas e redomas de acrílico para exposição e proteção. Diversos formatos. Fabricação sob medida no Rio de Janeiro. |
-| Potes Doces | Potes de Acrílico para Doces e Confeitaria | Potes de acrílico para confeitarias e buffets. Atóxico e seguro para alimentos. Tampa hermética. Fabricação no RJ. |
-| Potes Grãos | Potes para Grãos e Cereais a Granel - Acrílico | Potes e dispensers de acrílico para lojas de produtos naturais. Sistema de dispensação. Fabricação sob medida no RJ. |
-| Caixa Sugestão | Caixa de Sugestão em Acrílico - Empresas | Caixas de sugestão em acrílico para feedback de clientes. Mesa ou parede. Personalização com logotipo. Rio de Janeiro. |
-| Expositores Bijuterias | Expositores para Bijuterias em Acrílico | Expositores de acrílico para bijuterias, joias e acessórios. Diversos modelos para vitrine e balcão. Fabricação no RJ. |
-| Expositores Calçados | Expositores para Calçados em Acrílico | Expositores de acrílico para apresentação de calçados em lojas. Design elegante. Fabricação sob medida no Rio de Janeiro. |
-| Expositores Óculos | Expositores para Óculos em Acrílico - Óticas | Expositores de acrílico para óticas e lojas de óculos. Mesa e parede. Fabricação personalizada no RJ. |
-| Placa Customizada | Placas de Acrílico Personalizadas - Gravação Laser | Placas de acrílico personalizadas para identificação, premiação e decoração. Corte e gravação a laser. Rio de Janeiro. |
-| Placa Sinalização | Placas de Sinalização em Acrílico - Empresas | Placas de sinalização em acrílico para empresas e espaços públicos. Opções com braile. Fabricação no RJ. |
-
-### Páginas Legais (noindex)
-
-| Página | Title | noindex |
-|--------|-------|---------|
-| Política de Privacidade | Política de Privacidade - Lab Acrílicos | Sim |
-| Política de Revenda | Política de Revenda - Lab Acrílicos | Sim |
-| Política de Venda | Política de Venda - Lab Acrílicos | Sim |
-| Termo de Uso | Termo de Uso - Lab Acrílicos | Sim |
+O grid de 12 cores será movido para esta página:
+- Cristal, Branco, Preto, Vermelho, Azul, Verde
+- Amarelo, Laranja, Fumê, Espelhado, Leitoso, Fluorescente
 
 ---
 
-## Resumo das Alterações
+## PARTE 3: Arquivos a Criar/Modificar
 
-| Arquivo | Tipo | Descrição |
+| Arquivo | Ação | Descrição |
 |---------|------|-----------|
-| `public/og-image.jpg` | Imagem | Nova imagem gerada por IA com texto correto |
-| `ChapasDeAcrilico.tsx` | SEO | Adicionar SEOHead com meta tags otimizadas |
-| `AcrilicoSobMedida.tsx` | SEO | Adicionar SEOHead com meta tags otimizadas |
-| `Orcamento.tsx` | SEO | Adicionar SEOHead com meta tags otimizadas |
-| `SobreNos.tsx` | SEO | Adicionar SEOHead com meta tags otimizadas |
-| `UrnaAcrilico.tsx` | SEO | Adicionar seoTitle e seoDescription |
-| `PortaFolder.tsx` | SEO | Adicionar seoTitle e seoDescription |
-| `CaixasSobMedida.tsx` | SEO | Adicionar seoTitle e seoDescription |
-| `TrofeusPersonalizados.tsx` | SEO | Adicionar seoTitle e seoDescription |
-| `MedalhasPersonalizadas.tsx` | SEO | Adicionar seoTitle e seoDescription |
-| `DisplayAcrilico.tsx` | SEO | Adicionar seoTitle e seoDescription |
-| `CupulasRedomas.tsx` | SEO | Adicionar seoTitle e seoDescription |
-| `PotesDoces.tsx` | SEO | Adicionar seoTitle e seoDescription |
-| `PotesGraos.tsx` | SEO | Adicionar seoTitle e seoDescription |
-| `CaixaSugestao.tsx` | SEO | Adicionar seoTitle e seoDescription |
-| `ExpositoresBijuterias.tsx` | SEO | Adicionar seoTitle e seoDescription |
-| `ExpositoresCalcados.tsx` | SEO | Adicionar seoTitle e seoDescription |
-| `ExpositoresOculos.tsx` | SEO | Adicionar seoTitle e seoDescription |
-| `PlacaCustomizada.tsx` | SEO | Adicionar seoTitle e seoDescription |
-| `PlacaSinalizacao.tsx` | SEO | Adicionar seoTitle e seoDescription |
-| `PoliticaPrivacidade.tsx` | SEO | Adicionar SEOHead com noindex |
-| `PoliticaRevenda.tsx` | SEO | Adicionar SEOHead com noindex |
-| `PoliticaVenda.tsx` | SEO | Adicionar SEOHead com noindex |
-| `TermoUso.tsx` | SEO | Adicionar SEOHead com noindex |
+| `src/pages/products/ChapasDeAcrilico.tsx` | Modificar | Novo H1, remover cores, adicionar links |
+| `src/pages/chapas/Acrilico.tsx` | **Criar** | Página única de acrílico com cores |
+| `src/App.tsx` | Modificar | Adicionar rota `/chapas/acrilico` |
+| `public/sitemap.xml` | Modificar | Adicionar nova URL |
 
 ---
 
-## Benefícios Esperados
+## PARTE 4: Rotas no App.tsx
 
-1. Compartilhamento profissional em redes sociais com og-image correta
-2. Cada página terá title e description únicos (evita conteúdo duplicado)
-3. Melhor CTR nos resultados de busca com descrições específicas
-4. Páginas legais com noindex não competem por ranking
-5. Breadcrumbs estruturados nas páginas de produto
-6. Product Schema para aparecer como produto no Google
+```tsx
+// Página Hub
+<Route path="/chapas" element={<Chapas />} />
+
+// Redirect da URL antiga
+<Route path="/chapas-de-acrilico" element={<Navigate to="/chapas" replace />} />
+
+// Página específica de Acrílico
+<Route path="/chapas/acrilico" element={<Acrilico />} />
+
+// Futuras páginas (preparadas para implementação posterior)
+<Route path="/chapas/poliestireno" element={<Poliestireno />} />
+<Route path="/chapas/petg" element={<Petg />} />
+// etc...
+```
+
+---
+
+## PARTE 5: Sitemap Atualizado
+
+Adicionar ao `public/sitemap.xml`:
+
+```xml
+<url>
+  <loc>https://labacrilicos.com.br/chapas</loc>
+  <lastmod>2025-02-05</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.9</priority>
+</url>
+<url>
+  <loc>https://labacrilicos.com.br/chapas/acrilico</loc>
+  <lastmod>2025-02-05</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.8</priority>
+</url>
+```
+
+---
+
+## Resumo Visual
+
+```
+ANTES:
+/chapas-de-acrilico
+├── Hero "CHAPAS DE ACRÍLICO"
+├── Bloco de cores (12 cores)
+├── Cards SEM links
+└── (tudo junto)
+
+DEPOIS:
+/chapas (hub geral)
+├── Hero "CHAPAS DE ACRÍLICO POLICARBONATOS E OUTROS PLÁSTICOS"
+├── SEM bloco de cores
+├── Cards COM links (imagem + título clicáveis)
+└── Banner com todos os materiais
+
+/chapas/acrilico (página específica)
+├── Hero "CHAPAS DE ACRÍLICO"
+├── Bloco de cores (12 cores) ← movido para cá
+├── Seção Cristal (características, aplicações)
+├── Seção Colorido (variedades, aplicações)
+├── Espessuras disponíveis
+└── CTA WhatsApp
+```
+
+---
+
+## Benefícios
+
+1. **SEO**: Página hub ranqueia para "chapas RJ" e página específica para "acrílico cristal/colorido"
+2. **UX**: Usuário navega facilmente entre tipos de materiais
+3. **Conversão**: Cada página tem CTA específico para o material
+4. **Manutenção**: Estrutura modular facilita adicionar novos materiais
+
