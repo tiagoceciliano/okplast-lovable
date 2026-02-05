@@ -23,7 +23,6 @@ export default function UrnaAcrilico() {
         "Urna com suporte de mesa",
         "Urna de piso (tamanho grande)",
         "Urna personalizada com adesivo",
-        "Urna para votação eletrônica",
       ]}
     />
   );
