@@ -1,10 +1,12 @@
 import { ProductPage } from "@/components/products/ProductPage";
+ import { SOBMEDIDA_IMAGES } from "@/lib/images";
 
 export default function PlacaCustomizada() {
   return (
     <ProductPage
       title="Placa de Acrílico Customizada"
       description="Placas de acrílico personalizadas para identificação, premiação, homenagens e decoração. Trabalhamos com corte a laser de precisão e gravação para criar placas únicas que atendem às suas especificações de design, tamanho e acabamento."
+       imageUrl={SOBMEDIDA_IMAGES.placaCustomizada}
        seoTitle="Placas de Acrílico Personalizadas - Gravação Laser"
        seoDescription="Placas de acrílico personalizadas para identificação, premiação e decoração. Corte e gravação a laser. Rio de Janeiro."
       benefits={[
