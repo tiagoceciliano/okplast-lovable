@@ -9,6 +9,7 @@ export default function PotesGraos() {
       imageUrl={SOBMEDIDA_IMAGES.potesGraos}
        seoTitle="Potes para Grãos e Cereais a Granel - Acrílico"
        seoDescription="Potes e dispensers de acrílico para lojas de produtos naturais. Sistema de dispensação. Fabricação sob medida no RJ."
+       canonical="/acrilico-sob-medida/potes-para-graos-e-cereais-a-granel"
       benefits={[
         "Sistema de dispensação prático",
         "Tampa com vedação para proteção do produto",

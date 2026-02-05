@@ -9,6 +9,7 @@ export default function PotesDoces() {
       imageUrl={SOBMEDIDA_IMAGES.potesDoces}
        seoTitle="Potes de Acrílico para Doces e Confeitaria"
        seoDescription="Potes de acrílico para confeitarias e buffets. Atóxico e seguro para alimentos. Tampa hermética. Fabricação no RJ."
+       canonical="/acrilico-sob-medida/potes-para-doces-e-guloseimas"
       benefits={[
         "Acrílico atóxico e seguro para alimentos",
         "Tampa hermética para manter a frescura",

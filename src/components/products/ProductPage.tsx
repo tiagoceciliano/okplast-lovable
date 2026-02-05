@@ -16,6 +16,7 @@ interface ProductPageProps {
   children?: ReactNode;
    seoTitle?: string;
    seoDescription?: string;
+   canonical?: string;
 }
 
  export function ProductPage({ 
@@ -27,6 +28,7 @@ interface ProductPageProps {
    children,
    seoTitle,
    seoDescription,
+   canonical,
  }: ProductPageProps) {
   const { openWhatsAppModal } = useWhatsAppModal();
    const { openEmailModal } = useEmailQuoteModal();
@@ -55,6 +57,7 @@ interface ProductPageProps {
        <SEOHead
          title={seoTitle || `${title} - Acrílico Sob Medida RJ`}
          description={seoDescription || `${description.substring(0, 150)}... Fabricação sob medida. Orçamento grátis.`}
+         canonical={canonical}
          schema={schemas}
        />
  

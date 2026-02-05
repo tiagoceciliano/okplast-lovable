@@ -9,6 +9,7 @@ export default function ExpositoresCalcados() {
       imageUrl={SOBMEDIDA_IMAGES.expositoresCalcados}
        seoTitle="Expositores para Calçados em Acrílico"
        seoDescription="Expositores de acrílico para apresentação de calçados em lojas. Design elegante. Fabricação sob medida no Rio de Janeiro."
+       canonical="/acrilico-sob-medida/expositores-para-calcados"
       benefits={[
         "Eleva o produto para destaque",
         "Design minimalista e elegante",

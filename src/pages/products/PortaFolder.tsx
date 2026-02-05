@@ -9,6 +9,7 @@ export default function PortaFolder() {
       imageUrl={SOBMEDIDA_IMAGES.portaFolder}
        seoTitle="Porta Folder de Acrílico - Mesa e Parede"
        seoDescription="Porta folders em acrílico para organização de folhetos e catálogos. Versões de mesa e parede. Fabricação sob medida no RJ."
+       canonical="/acrilico-sob-medida/porta-folder"
       benefits={[
         "Organização de materiais impressos",
         "Versões de mesa e parede",
