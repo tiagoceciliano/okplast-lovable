@@ -23,7 +23,6 @@ export default function MedalhasPersonalizadas() {
         "Medalha formato estrela",
         "Medalha com recorte especial",
         "Medalha com acrílico espelhado",
-        "Medalha com inserção de metal",
         "Kit medalhas 1º, 2º e 3º lugar",
       ]}
     />
