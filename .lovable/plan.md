@@ -1,166 +1,144 @@
 
+# Plano: Otimização SEO Completa para Todas as Páginas de Produtos
 
-# Plano: Atualizar Páginas de Produtos e Adicionar Links
+## Resumo da Situação Atual
 
-## Objetivo
-
-1. **Adicionar as 3 fotos faltantes** para os produtos sem imagem
-2. **Refatorar o componente `ProductPage.tsx`** para seguir o mesmo visual das páginas de chapas
-3. **Atualizar os links** nas categorias da página `/acrilico-sob-medida` para levar às páginas específicas de cada produto
+Após análise completa, identifiquei que:
+- **17 páginas de produtos sob medida** estão com SEO parcial (têm seoTitle e seoDescription, mas faltam canonical URLs)
+- O componente ProductPage gera Schema Product + Breadcrumb automaticamente
+- Páginas institucionais estão bem configuradas
 
 ---
 
-## Parte 1: Upload das Imagens Faltantes
+## Etapa 1: Adicionar Canonical URL ao Componente ProductPage
 
-### Imagens Enviadas pelo Usuário
+### Arquivo: `src/components/products/ProductPage.tsx`
 
-| Arquivo Enviado | Produto | Destino no Storage |
-|-----------------|---------|-------------------|
-| `placa-customizada.jpg` | Placa Customizada | `sobmedida/placa-customizada.jpg` |
-| `placa-sinalizacao.webp` | Placa de Sinalização | `sobmedida/placa-sinalizacao.webp` |
-| `expositor-oculos-otica-2.webp` | Expositores para Óculos | `sobmedida/expositor-oculos.webp` |
+**Alteração:** Adicionar prop `canonical` opcional para permitir URLs canônicas em todas as páginas de produto.
 
-### Atualizar `src/lib/images.ts`
+```text
+interface ProductPageProps {
+  ...
+  canonical?: string;  // NOVA PROP
+}
 
-Adicionar novas entradas em `SOBMEDIDA_IMAGES`:
+<SEOHead
+  title={...}
+  description={...}
+  canonical={canonical}  // PASSAR PARA SEOHead
+  schema={schemas}
+/>
+```
+
+---
+
+## Etapa 2: Atualizar Todas as Páginas de Produtos com Canonical
+
+### Arquivos a Modificar (17 páginas):
+
+| Arquivo | Canonical URL |
+|---------|---------------|
+| QuadroAvisos.tsx | /acrilico-sob-medida/quadro-de-avisos |
+| Confeitaria.tsx | /acrilico-sob-medida/confeitaria |
+| CaixaSugestao.tsx | /acrilico-sob-medida/caixa-de-sugestao |
+| CaixasSobMedida.tsx | /acrilico-sob-medida/caixas-sob-medida |
+| CupulasRedomas.tsx | /acrilico-sob-medida/cupulas-e-redomas |
+| DisplayAcrilico.tsx | /acrilico-sob-medida/display-de-acrilico |
+| ExpositoresBijuterias.tsx | /acrilico-sob-medida/expositores-para-bijuterias |
+| ExpositoresCalcados.tsx | /acrilico-sob-medida/expositores-para-calcados |
+| ExpositoresOculos.tsx | /acrilico-sob-medida/expositores-para-oculos |
+| MedalhasPersonalizadas.tsx | /acrilico-sob-medida/medalhas-personalizadas |
+| PlacaCustomizada.tsx | /acrilico-sob-medida/placa-customizada |
+| PlacaSinalizacao.tsx | /acrilico-sob-medida/placa-de-sinalizacao |
+| PortaFolder.tsx | /acrilico-sob-medida/porta-folder |
+| PotesDoces.tsx | /acrilico-sob-medida/potes-para-doces-e-guloseimas |
+| PotesGraos.tsx | /acrilico-sob-medida/potes-para-graos-e-cereais-a-granel |
+| TrofeusPersonalizados.tsx | /acrilico-sob-medida/trofeus-personalizados |
+| UrnaAcrilico.tsx | /acrilico-sob-medida/urna-de-acrilico |
+
+---
+
+## Etapa 3: Adicionar LocalBusiness Schema na Home
+
+### Arquivo: `src/pages/Index.tsx`
+
+Adicionar Schema LocalBusiness para melhorar visibilidade em buscas locais:
+
+```text
+const localBusinessSchema = {
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "Lab Acrílicos",
+  "description": "Fábrica de produtos em acrílico sob medida e distribuidora de chapas",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Rua Cordovil 259",
+    "addressLocality": "Rio de Janeiro",
+    "addressRegion": "RJ",
+    "addressCountry": "BR"
+  },
+  "telephone": "(21) 3372-3797",
+  "url": "https://labacrilicos.com.br"
+}
+```
+
+---
+
+## Etapa 4: Melhorar Descrições SEO para ChatGPT/IA
+
+As meta descriptions atuais são boas, mas podem ser otimizadas para IA:
+- Adicionar "fabricação própria" ou "fábrica"
+- Incluir "entrega para todo Brasil" quando relevante
+- Manter formato: Produto | Diferencial | Localização | CTA
+
+---
+
+## Resumo das Alterações
+
+| Tipo | Quantidade |
+|------|------------|
+| Modificar ProductPage.tsx | 1 arquivo |
+| Adicionar canonical em produtos | 17 arquivos |
+| Adicionar LocalBusiness na Home | 1 arquivo |
+| **Total** | **19 arquivos** |
+
+---
+
+## Benefícios Esperados
+
+1. **Google:** Canonical URLs evitam conteúdo duplicado e consolidam autoridade
+2. **ChatGPT/IA:** Schemas estruturados facilitam extração de informações
+3. **Buscas Locais:** LocalBusiness Schema melhora resultados "acrílico RJ"
+4. **Rich Snippets:** Product Schema pode gerar cards visuais nos resultados
+
+---
+
+## Detalhes Técnicos
+
+### Estrutura do Schema combinado (exemplo):
+
+```json
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    { "@type": "BreadcrumbList", ... },
+    { "@type": "Product", "name": "...", "description": "..." }
+  ]
+}
+```
+
+### Props atualizadas do ProductPage:
 
 ```typescript
-export const SOBMEDIDA_IMAGES = {
-  // ... existentes ...
-  placaCustomizada: img("sobmedida/placa-customizada.jpg"),
-  placaSinalizacao: img("sobmedida/placa-sinalizacao.webp"),
-  expositoresOculos: img("sobmedida/expositor-oculos.webp"),
-} as const;
+interface ProductPageProps {
+  title: string;
+  description: string;
+  benefits: string[];
+  variations?: string[];
+  imageUrl?: string;
+  children?: ReactNode;
+  seoTitle?: string;
+  seoDescription?: string;
+  canonical?: string;  // NOVO
+}
 ```
-
----
-
-## Parte 2: Refatorar o Componente `ProductPage.tsx`
-
-### Layout Atual (Problema)
-
-```text
-┌──────────────────────────────────────────────────────┐
-│  HERO AZUL com gradient                              │
-│  └─ Breadcrumb + H1 (só texto)                       │
-├──────────────────────────────────────────────────────┤
-│  CONTEÚDO 3 COLUNAS                                  │
-│  ├─ 2 colunas: Imagem + Benefícios + Variações       │
-│  └─ 1 coluna: Sidebar sticky com CTAs                │
-└──────────────────────────────────────────────────────┘
-```
-
-### Layout Desejado (Igual às Chapas)
-
-```text
-┌──────────────────────────────────────────────────────┐
-│  BREADCRUMB: Home > Sob Medida > [Produto]           │
-├──────────────────────────────────────────────────────┤
-│  HERO CINZA (2 colunas)                              │
-│  ├─ Esquerda: H1 + descrição + WhatsApp + email      │
-│  └─ Direita: Imagem do produto                       │
-├──────────────────────────────────────────────────────┤
-│  SEÇÃO: Benefícios e Diferenciais                    │
-│  └─ Lista com checkmarks                             │
-├──────────────────────────────────────────────────────┤
-│  SEÇÃO: Variações Disponíveis (opcional)             │
-│  └─ Badges em grid                                   │
-├──────────────────────────────────────────────────────┤
-│  CTA FINAL (fundo cinza)                             │
-│  ├─ Botão verde WhatsApp grande                      │
-│  └─ Link "Prefere orçamento via e-mail?"             │
-└──────────────────────────────────────────────────────┘
-```
-
-### Mudanças no `ProductPage.tsx`
-
-| Elemento | Antes | Depois |
-|----------|-------|--------|
-| Hero | `gradient-primary` (azul escuro) | `bg-muted` (cinza claro) |
-| Breadcrumb | Dentro do hero azul | Em barra separada acima do hero |
-| Layout | 3 colunas com sidebar | Seções verticais full-width |
-| Imagem | Dentro do conteúdo | No hero, lado direito |
-| CTA Sidebar | Card sticky lateral | Seção final centralizada |
-| Texto | Branco sobre azul | Preto sobre cinza |
-
----
-
-## Parte 3: Atualizar Links na Página Sob Medida
-
-### Arquivo: `src/pages/products/AcrilicoSobMedida.tsx`
-
-### Mapeamento de Links
-
-#### Categoria: CAIXAS, POTES, CÚPULAS, REDOMAS
-
-| Produto | Link Atual | Link Novo |
-|---------|-----------|-----------|
-| Caixas Sob Medida | `/acrilico-sob-medida` | `/caixas-sob-medida` |
-| Cúpulas e Redomas | `/acrilico-sob-medida` | `/cupulas-redomas` |
-| Potes para Doces | `/acrilico-sob-medida` | `/potes-doces` |
-| Potes para Grãos | `/acrilico-sob-medida` | `/potes-graos` |
-
-#### Categoria: MEDALHAS E TROFÉUS PERSONALIZADOS
-
-| Produto | Link Atual | Link Novo |
-|---------|-----------|-----------|
-| Medalhas Sob Medida | `/acrilico-sob-medida` | `/medalhas-personalizadas` |
-| Troféus Personalizados | `/acrilico-sob-medida` | `/trofeus-personalizados` |
-| Medalhas Personalizadas | `/acrilico-sob-medida` | `/medalhas-personalizadas` |
-| Troféus Sob Medida | `/acrilico-sob-medida` | `/trofeus-personalizados` |
-
-#### Categoria: DISPLAY, URNAS E QUADROS
-
-| Produto | Link Atual | Link Novo |
-|---------|-----------|-----------|
-| Display de Parede e Mesa | `/acrilico-sob-medida` | `/display-acrilico` |
-| Urnas Transparentes | `/acrilico-sob-medida` | `/urna-acrilico` |
-| Caixas de Sugestões | `/acrilico-sob-medida` | `/caixa-sugestao` |
-| Quadro de Avisos | `/acrilico-sob-medida` | `/display-acrilico` |
-
-#### Categoria: EXPOSITORES E CONFEITARIA
-
-| Produto | Link Atual | Link Novo |
-|---------|-----------|-----------|
-| Expositores para Bijuterias | `/acrilico-sob-medida` | `/expositores-bijuterias` |
-| Expositores para Calçados | `/acrilico-sob-medida` | `/expositores-calcados` |
-| Expositor de Óculos Ótica | `/acrilico-sob-medida` | `/expositores-oculos` |
-| Bolo Fake | `/acrilico-sob-medida` | `/cupulas-redomas` |
-
----
-
-## Parte 4: Adicionar Imagens aos Produtos Faltantes
-
-### Páginas a Atualizar
-
-| Arquivo | Adicionar `imageUrl` |
-|---------|---------------------|
-| `PlacaCustomizada.tsx` | `SOBMEDIDA_IMAGES.placaCustomizada` |
-| `PlacaSinalizacao.tsx` | `SOBMEDIDA_IMAGES.placaSinalizacao` |
-| `ExpositoresOculos.tsx` | `SOBMEDIDA_IMAGES.expositoresOculos` |
-
----
-
-## Resumo de Arquivos
-
-| Ação | Arquivo |
-|------|---------|
-| Copiar | `user-uploads://placa-customizada.jpg` → `src/assets/sobmedida/` |
-| Copiar | `user-uploads://placa-sinalizacao.webp` → `src/assets/sobmedida/` |
-| Copiar | `user-uploads://expositor-oculos-otica-2.webp` → `src/assets/sobmedida/` |
-| Modificar | `src/lib/images.ts` (adicionar 3 novas entradas) |
-| Modificar | `src/components/products/ProductPage.tsx` (refatorar layout) |
-| Modificar | `src/pages/products/AcrilicoSobMedida.tsx` (atualizar hrefs) |
-| Modificar | `src/pages/products/PlacaCustomizada.tsx` (adicionar imageUrl) |
-| Modificar | `src/pages/products/PlacaSinalizacao.tsx` (adicionar imageUrl) |
-| Modificar | `src/pages/products/ExpositoresOculos.tsx` (adicionar imageUrl) |
-
----
-
-## Resultado Final
-
-1. **Todas as páginas de produtos** terão o mesmo visual padronizado das páginas de chapas
-2. **As 3 imagens faltantes** serão adicionadas e exibidas nos respectivos produtos
-3. **Os links dos produtos** na página sob medida levarão diretamente às páginas específicas (melhor para SEO e UX)
-4. **Layout consistente** em todo o site para indexação
-
