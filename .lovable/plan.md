@@ -1,132 +1,89 @@
 
-# Dashboard Administrativo com Menu de Páginas
+# Página de Leads no Admin
 
 ## Objetivo
 
-Criar uma página de dashboard administrativo (`/admin`) com:
-1. Métricas de conversão e performance do site
-2. Sidebar com menu hierárquico de todas as páginas
+Criar uma nova página `/admin/leads` com tabela de leads e modal de detalhes, além de adicionar o item "Leads" no sidebar.
 
 ---
 
 ## Estrutura de Arquivos
 
-### Novos Arquivos a Criar
+### Novos Arquivos
 
 ```text
 src/pages/admin/
-├── Dashboard.tsx          # Página principal do dashboard
-├── AdminLayout.tsx        # Layout com sidebar
+├── Leads.tsx                    # Página de listagem de leads
 └── components/
-    ├── AdminSidebar.tsx   # Sidebar com menu de páginas
-    ├── StatsCards.tsx     # Cards de métricas
-    ├── ConversionChart.tsx # Gráfico de conversão
-    └── PagesList.tsx      # Lista de páginas do site
+    └── LeadDetailsModal.tsx     # Modal com detalhes completos do lead
 ```
 
----
+### Arquivos a Modificar
 
-## Métricas do Dashboard
-
-### Cards Principais
-
-| Métrica | Descrição |
-|---------|-----------|
-| Total de Visitas | Contagem de page_visits |
-| Total de Leads | Contagem de leads |
-| Taxa de Conversão | (leads / visitantes únicos) x 100 |
-| Sessões Únicas | Contagem de session_id distintos |
-
-### Métricas Secundárias
-
-- **Top 5 Páginas Mais Visitadas** - Ranking por page_path
-- **Origem do Tráfego** - Distribuição por utm_source
-- **Leads por Produto** - Agrupamento por produto_interesse
-- **Leads por Cidade/Estado** - Distribuição geográfica
+- `src/pages/admin/components/AdminSidebar.tsx` - Adicionar menu "Leads"
+- `src/App.tsx` - Adicionar rota `/admin/leads`
+- `supabase/functions/get-dashboard-stats/index.ts` - Adicionar endpoint para buscar leads com detalhes
 
 ---
 
-## Menu de Páginas (Sidebar)
+## Tabela de Leads
 
-### Hierarquia
+### Colunas na Ordem Solicitada
+
+| Coluna | Campo |
+|--------|-------|
+| Data | created_at (formato DD/MM/YYYY) |
+| Hora | created_at (formato HH:MM) |
+| Nome | nome |
+| Campaign | utm_campaign |
+| Source | utm_source |
+| Medium | utm_medium |
+| Content | utm_content |
+| Term | utm_term |
+| Ações | Ícone de olho para ver detalhes |
+
+---
+
+## Modal de Detalhes (Olhinho)
+
+### Informações Completas
+
+- **Dados pessoais**: Nome, E-mail, Telefone
+- **Produto de interesse**
+- **Mensagem** (se houver)
+- **UTM completo**: source, medium, campaign, content, term
+- **Localização**: Cidade, Estado, País
+- **IP Address**
+- **Data/Hora do cadastro**
+- **Histórico de cadastros**: Quantidade de vezes que esse e-mail/telefone já se cadastrou
+
+---
+
+## Edge Function
+
+### Nova função: `get-leads`
+
+Endpoint que retorna:
+- Lista de leads com todos os campos
+- Para cada lead, contagem de cadastros anteriores com mesmo e-mail ou telefone
+
+---
+
+## Sidebar
+
+Adicionar item "Leads" com ícone `Users` logo abaixo de "Dashboard":
 
 ```text
-Dashboard
-├── Home (/)
-├── Acrílico Sob Medida (/acrilico-sob-medida)
-│   ├── Caixas Sob Medida
-│   ├── Cúpulas e Redomas
-│   ├── Potes para Doces
-│   ├── Potes para Grãos
-│   ├── Urna de Acrílico
-│   ├── Caixa de Sugestão
-│   ├── Medalhas Personalizadas
-│   ├── Troféus Personalizados
-│   ├── Placa Customizada
-│   ├── Placa Sinalização
-│   ├── Expositores Bijuterias
-│   ├── Expositores Calçados
-│   ├── Expositores Óculos
-│   ├── Display de Acrílico
-│   ├── Porta Folder
-│   ├── Quadro de Avisos
-│   ├── Confeitaria
-│   ├── Placa Gravada
-│   └── Placa Personalizada
-├── Chapas (/chapas)
-│   ├── Acrílico
-│   ├── Poliestireno
-│   ├── PETG
-│   ├── Policarbonato Alveolar
-│   ├── Policarbonato Compacto
-│   ├── PVC Expandido
-│   └── ACM
-└── Institucional (/home)
-    ├── Sobre Nós
-    ├── Política de Venda
-    ├── Termo de Uso
-    └── Política de Privacidade
+Menu
+├── Dashboard
+├── Leads        ← NOVO
 ```
 
 ---
 
 ## Implementação Técnica
 
-### 1. RLS Policies
-
-Será necessário criar políticas de SELECT para as tabelas `leads` e `page_visits` para que o dashboard possa consultar os dados. Como não há autenticação no sistema, usaremos uma rota protegida por URL obscuro (ex: `/admin-xyz123`).
-
-### 2. Edge Function para Métricas
-
-Criar uma edge function `get-dashboard-stats` que:
-- Consulta as tabelas usando service role
-- Retorna os dados agregados
-- Não expõe dados sensíveis diretamente
-
-### 3. Componentes
-
-- **AdminLayout**: Layout com sidebar usando os componentes Shadcn já existentes
-- **Dashboard**: Página com grid de cards e gráficos usando Recharts (já instalado)
-- **AdminSidebar**: Menu colapsável com grupos hierárquicos
-
-### 4. Rota
-
-Adicionar rota `/admin` no App.tsx (fora do Layout principal para não mostrar header/footer do site)
-
----
-
-## Dados Atuais no Banco
-
-- **99 visitas** registradas
-- **1 lead** capturado
-- Taxa de conversão atual: ~1%
-
----
-
-## Resultado Esperado
-
-Dashboard limpo e funcional com:
-- Visão geral das métricas de conversão
-- Navegação rápida para todas as páginas do site
-- Filtros por período (7 dias, 30 dias, todos)
-- Design consistente com Shadcn/Tailwind
+1. **Edge Function `get-leads`**: Busca todos os leads ordenados por data decrescente, calcula duplicatas
+2. **Página Leads.tsx**: Tabela usando componentes Table do Shadcn, com filtro por período
+3. **LeadDetailsModal.tsx**: Dialog com todas as informações + contagem de cadastros anteriores
+4. **Fuso horário**: Todas as datas/horas formatadas para São Paulo (America/Sao_Paulo)
