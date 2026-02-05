@@ -23,7 +23,6 @@ export default function PlacaCustomizada() {
         "Placa de inauguração",
         "Placa de homenagem",
         "Placa de mesa",
-        "Placa com foto impressa",
         "Placa com QR Code",
         "Placa com suporte incluso",
       ]}
