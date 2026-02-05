@@ -27,7 +27,6 @@
          "Bandeja para doces finos",
          "Suporte para brigadeiros",
          "Torre de doces em cascata",
-         "Base para bolo com LED",
        ]}
      />
    );
