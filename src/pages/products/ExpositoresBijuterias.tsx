@@ -22,7 +22,6 @@ export default function ExpositoresBijuterias() {
         "Expositor de colares",
         "Expositor de pulseiras",
         "Expositor de anéis",
-        "Expositor giratório",
         "Expositor de conjunto completo",
         "Expositor de vitrine",
         "Expositor de balcão",
