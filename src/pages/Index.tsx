@@ -193,7 +193,7 @@ export default function Index() {
                PRODUTOS DE <span className="text-accent">ACRÍLICO</span> E CHAPAS DIVERSAS
             </h1>
              <h2 className="text-lg md:text-xl text-accent font-medium mb-6">Acrílico, PS, Policarbonato, PETG, PVC, Poliestireno (PS), ACM.</h2>
-            <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">A Lab Acrílicos é especializada na fabricação de produtos em acrílico sob medida e venda de chapas. Há anos oferecendo qualidade, inovação e as melhores soluções em acrílico.<strong className="text-foreground">{COMPANY.name}</strong> é especializada na fabricação de produtos em acrílico sob medida e venda de chapas. Há mais de 30 anos oferecendo qualidade, inovação e as melhores soluções em acrílico para todo o Brasil.
+            <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">Lab Acrílicos é especializada na fabricação de produtos em acrílico sob medida e venda de chapas. Há  anos oferecendo qualidade, inovação e as melhores soluções.<strong className="text-foreground">{COMPANY.name}</strong> é especializada na fabricação de produtos em acrílico sob medida e venda de chapas. Há mais de 30 anos oferecendo qualidade, inovação e as melhores soluções em acrílico para todo o Brasil.
             </p>
             <div className="flex flex-col items-center gap-4">
               <Button size="lg" className="btn-whatsapp text-lg px-8 py-6" onClick={() => openWhatsAppModal()}>
