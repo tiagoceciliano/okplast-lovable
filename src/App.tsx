@@ -15,7 +15,6 @@ import { EmailQuoteModalProvider } from "@/contexts/EmailQuoteModalContext";
  const Index = lazy(() => import("./pages/Index"));
  const NotFound = lazy(() => import("./pages/NotFound"));
  const SobreNos = lazy(() => import("./pages/SobreNos"));
- const Orcamento = lazy(() => import("./pages/Orcamento"));
  const PoliticaRevenda = lazy(() => import("./pages/PoliticaRevenda"));
  const PoliticaVenda = lazy(() => import("./pages/PoliticaVenda"));
  const TermoUso = lazy(() => import("./pages/TermoUso"));
@@ -80,7 +79,6 @@ const queryClient = new QueryClient();
 
               {/* Institutional Pages */}
               <Route path="/home/sobre-nos" element={<SobreNos />} />
-              <Route path="/home/orcamento" element={<Orcamento />} />
               <Route path="/home/politica-de-revenda" element={<PoliticaRevenda />} />
               <Route path="/home/politica-de-venda" element={<PoliticaVenda />} />
               <Route path="/home/termo-de-uso" element={<TermoUso />} />

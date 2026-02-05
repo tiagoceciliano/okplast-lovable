@@ -9,6 +9,7 @@ import { TestimonialCard } from "@/components/ui/TestimonialCard";
 import { ClientLogos } from "@/components/ui/ClientLogos";
 import { ProductCategoryGrid } from "@/components/home/ProductCategoryGrid";
 import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
+ import { useEmailQuoteModal } from "@/contexts/EmailQuoteModalContext";
 import { SOBMEDIDA_IMAGES, DEPOIMENTOS_IMAGES } from "@/lib/images";
 import {
   Carousel,
@@ -85,6 +86,7 @@ const depoimentos = [
 
 export default function AcrilicoSobMedida() {
   const { openWhatsAppModal } = useWhatsAppModal();
+   const { openEmailModal } = useEmailQuoteModal();
   const autoplayPlugin = useRef(
     Autoplay({ delay: 1000, stopOnInteraction: false })
   );
@@ -123,12 +125,12 @@ export default function AcrilicoSobMedida() {
                   <MessageCircle className="h-5 w-5 mr-2" />
                   Orçamento via WhatsApp
                 </Button>
-                <Link 
-                  to="/home/orcamento" 
+                 <button 
+                   onClick={() => openEmailModal("Produto Personalizado")}
                   className="text-muted-foreground hover:text-foreground text-sm underline underline-offset-4"
                 >
                   Prefere orçamento via e-mail?
-                </Link>
+                 </button>
               </div>
             </div>
 
@@ -256,12 +258,12 @@ export default function AcrilicoSobMedida() {
               <MessageCircle className="h-5 w-5 mr-2" />
               Orçamento via WhatsApp
             </Button>
-            <Link 
-              to="/home/orcamento" 
+             <button 
+               onClick={() => openEmailModal("Produto Personalizado")}
               className="text-muted-foreground hover:text-foreground text-sm underline underline-offset-4"
             >
               Prefere orçamento via e-mail?
-            </Link>
+             </button>
           </div>
         </div>
       </section>
