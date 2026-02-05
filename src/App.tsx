@@ -1,4 +1,5 @@
  import { lazy, Suspense } from "react";
+ import { HelmetProvider } from "react-helmet-async";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -49,18 +50,19 @@ const queryClient = new QueryClient();
    </div>
  );
  
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <ScrollToTop />
-        <WhatsAppModalProvider>
-          <EmailQuoteModalProvider>
-            <Layout>
-             <Suspense fallback={<PageLoader />}>
-            <Routes>
+ const App = () => (
+   <HelmetProvider>
+     <QueryClientProvider client={queryClient}>
+       <TooltipProvider>
+         <Toaster />
+         <Sonner />
+         <BrowserRouter>
+           <ScrollToTop />
+           <WhatsAppModalProvider>
+             <EmailQuoteModalProvider>
+               <Layout>
+                 <Suspense fallback={<PageLoader />}>
+                   <Routes>
               {/* Home */}
               <Route path="/" element={<Index />} />
 
@@ -93,16 +95,17 @@ const App = () => (
               <Route path="/acrilico-sob-medida/display-de-acrilico" element={<DisplayAcrilico />} />
               <Route path="/acrilico-sob-medida/porta-folder" element={<PortaFolder />} />
 
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-             </Suspense>
-            </Layout>
-          </EmailQuoteModalProvider>
-        </WhatsAppModalProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
-
-export default App;
+                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                     <Route path="*" element={<NotFound />} />
+                   </Routes>
+                 </Suspense>
+               </Layout>
+             </EmailQuoteModalProvider>
+           </WhatsAppModalProvider>
+         </BrowserRouter>
+       </TooltipProvider>
+     </QueryClientProvider>
+   </HelmetProvider>
+ );
+ 
+ export default App;
