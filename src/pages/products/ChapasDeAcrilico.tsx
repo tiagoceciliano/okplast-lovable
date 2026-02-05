@@ -6,6 +6,7 @@ import { COMPANY } from "@/lib/constants";
 import { DecorativeDivider } from "@/components/ui/DecorativeDivider";
 import { BlueBanner } from "@/components/ui/BlueBanner";
 import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
+ import { useEmailQuoteModal } from "@/contexts/EmailQuoteModalContext";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { useRef } from "react";
@@ -128,6 +129,7 @@ export default function ChapasDeAcrilico() {
   const {
     openWhatsAppModal
   } = useWhatsAppModal();
+   const { openEmailModal } = useEmailQuoteModal();
   const autoplayPlugin = useRef(Autoplay({
     delay: 1000,
     stopOnInteraction: false
@@ -153,9 +155,9 @@ export default function ChapasDeAcrilico() {
                   <MessageCircle className="h-5 w-5 mr-2" />
                   Orçamento via WhatsApp
                 </Button>
-                <Link to="/home/orcamento" className="text-muted-foreground hover:text-foreground text-sm underline underline-offset-4">
+                 <button onClick={() => openEmailModal("Chapas de Acrílico")} className="text-muted-foreground hover:text-foreground text-sm underline underline-offset-4">
                   Prefere orçamento via e-mail?
-                </Link>
+                 </button>
               </div>
             </div>
 
@@ -253,9 +255,9 @@ export default function ChapasDeAcrilico() {
               <MessageCircle className="h-5 w-5 mr-2" />
               Orçamento via WhatsApp
             </Button>
-            <Link to="/home/orcamento" className="text-muted-foreground hover:text-foreground text-sm underline underline-offset-4">
+             <button onClick={() => openEmailModal("Chapas de Acrílico")} className="text-muted-foreground hover:text-foreground text-sm underline underline-offset-4">
               Prefere orçamento via e-mail?
-            </Link>
+             </button>
           </div>
         </div>
       </section>

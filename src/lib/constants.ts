@@ -51,7 +51,6 @@ export const NAV_ITEMS = [
     label: "Institucional",
     children: [
       { label: "Sobre Nós", href: "/home/sobre-nos" },
-      { label: "Orçamento", href: "/home/orcamento" },
       { label: "Política de Revenda", href: "/home/politica-de-revenda" },
       { label: "Política de Venda", href: "/home/politica-de-venda" },
       { label: "Termo de Uso", href: "/home/termo-de-uso" },
