@@ -25,7 +25,6 @@
          "Quadro de avisos aberto",
          "Quadro com divisórias internas",
          "Quadro com suporte para caneta",
-         "Mural de recados magnético",
          "Quadro para cardápio",
        ]}
      />
