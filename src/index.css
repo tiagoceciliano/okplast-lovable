@@ -6,8 +6,6 @@
    Primary: #0F4C81 (azul petróleo) / Accent: #00B4D8 (turquesa moderno)
    All colors in HSL format */
 
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap');
-
 @layer base {
   :root {
     /* Core Brand Colors - Modern Blue */
@@ -113,12 +111,12 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
-    font-family: 'Open Sans', system-ui, sans-serif;
+     @apply bg-background text-foreground antialiased;
+     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Open Sans', system-ui, sans-serif;
+     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     font-weight: 700;
   }
 }
