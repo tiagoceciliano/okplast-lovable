@@ -50,6 +50,8 @@ import { EmailQuoteModalProvider } from "@/contexts/EmailQuoteModalContext";
  const ExpositoresOculos = lazy(() => import("./pages/products/ExpositoresOculos"));
  const DisplayAcrilico = lazy(() => import("./pages/products/DisplayAcrilico"));
  const PortaFolder = lazy(() => import("./pages/products/PortaFolder"));
+ const QuadroAvisos = lazy(() => import("./pages/products/QuadroAvisos"));
+ const Confeitaria = lazy(() => import("./pages/products/Confeitaria"));
 
 const queryClient = new QueryClient();
 
@@ -114,6 +116,8 @@ const queryClient = new QueryClient();
               <Route path="/acrilico-sob-medida/expositores-para-oculos" element={<ExpositoresOculos />} />
               <Route path="/acrilico-sob-medida/display-de-acrilico" element={<DisplayAcrilico />} />
               <Route path="/acrilico-sob-medida/porta-folder" element={<PortaFolder />} />
+              <Route path="/acrilico-sob-medida/quadro-de-avisos" element={<QuadroAvisos />} />
+              <Route path="/acrilico-sob-medida/confeitaria" element={<Confeitaria />} />
 
                      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                      <Route path="*" element={<NotFound />} />

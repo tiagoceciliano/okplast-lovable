@@ -61,7 +61,7 @@ const categorias = [
        { nome: "Display de Parede e Mesa", href: "/acrilico-sob-medida/display-de-acrilico", imageUrl: SOBMEDIDA_IMAGES.display },
        { nome: "Urnas Transparente ou Coloridas", href: "/acrilico-sob-medida/urna-de-acrilico", imageUrl: SOBMEDIDA_IMAGES.urna },
        { nome: "Caixas de Sugestões", href: "/acrilico-sob-medida/caixa-de-sugestao", imageUrl: SOBMEDIDA_IMAGES.caixaSugestao },
-       { nome: "Quadro de Avisos", href: "/acrilico-sob-medida/display-de-acrilico", imageUrl: SOBMEDIDA_IMAGES.quadroAvisos },
+      { nome: "Quadro de Avisos", href: "/acrilico-sob-medida/quadro-de-avisos", imageUrl: SOBMEDIDA_IMAGES.quadroAvisos },
     ],
   },
   {
@@ -70,7 +70,7 @@ const categorias = [
        { nome: "Expositores para Bijuterias", href: "/acrilico-sob-medida/expositores-para-bijuterias", imageUrl: SOBMEDIDA_IMAGES.expositoresBijuterias },
        { nome: "Expositores para Calçados", href: "/acrilico-sob-medida/expositores-para-calcados", imageUrl: SOBMEDIDA_IMAGES.expositoresCalcados },
        { nome: "Expositor de Óculos Ótica", href: "/acrilico-sob-medida/expositores-para-oculos", imageUrl: SOBMEDIDA_IMAGES.expositoresOculos },
-       { nome: "Bolo Fake", href: "/acrilico-sob-medida/cupulas-e-redomas", imageUrl: SOBMEDIDA_IMAGES.boloFake },
+      { nome: "Bolo Fake", href: "/acrilico-sob-medida/confeitaria", imageUrl: SOBMEDIDA_IMAGES.boloFake },
     ],
   },
 ];
