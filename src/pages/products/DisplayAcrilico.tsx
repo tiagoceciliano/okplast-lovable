@@ -24,7 +24,6 @@ export default function DisplayAcrilico() {
         "Display em L",
         "Display em T",
         "Display de chão",
-        "Display giratório",
         "Porta-cardápio",
         "Porta-preço",
       ]}
