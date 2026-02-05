@@ -24,7 +24,6 @@ export default function ExpositoresOculos() {
         "Expositor individual",
         "Expositor para óculos de sol",
         "Expositor para óculos de grau",
-        "Expositor com espelho",
       ]}
     />
   );
