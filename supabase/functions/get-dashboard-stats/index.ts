@@ -1,0 +1,139 @@
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders })
+  }
+
+  try {
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    
+    const supabase = createClient(supabaseUrl, supabaseServiceKey)
+
+    // Parse query params for date filtering
+    const url = new URL(req.url)
+    const period = url.searchParams.get('period') || 'all' // '7d', '30d', 'all'
+    
+    let dateFilter = null
+    const now = new Date()
+    if (period === '7d') {
+      dateFilter = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString()
+    } else if (period === '30d') {
+      dateFilter = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString()
+    }
+
+    // Fetch all page visits
+    let visitsQuery = supabase.from('page_visits').select('*')
+    if (dateFilter) {
+      visitsQuery = visitsQuery.gte('created_at', dateFilter)
+    }
+    const { data: visits, error: visitsError } = await visitsQuery
+
+    if (visitsError) throw visitsError
+
+    // Fetch all leads
+    let leadsQuery = supabase.from('leads').select('*')
+    if (dateFilter) {
+      leadsQuery = leadsQuery.gte('created_at', dateFilter)
+    }
+    const { data: leads, error: leadsError } = await leadsQuery
+
+    if (leadsError) throw leadsError
+
+    // Calculate metrics
+    const totalVisits = visits?.length || 0
+    const totalLeads = leads?.length || 0
+    const uniqueVisitors = new Set(visits?.map(v => v.visitor_id) || []).size
+    const uniqueSessions = new Set(visits?.map(v => v.session_id) || []).size
+    const conversionRate = uniqueVisitors > 0 ? ((totalLeads / uniqueVisitors) * 100).toFixed(2) : '0.00'
+
+    // Top 5 pages by visits
+    const pageVisitCounts: Record<string, number> = {}
+    visits?.forEach(v => {
+      pageVisitCounts[v.page_path] = (pageVisitCounts[v.page_path] || 0) + 1
+    })
+    const topPages = Object.entries(pageVisitCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([path, count]) => ({ path, count }))
+
+    // Traffic sources
+    const sourceCounts: Record<string, number> = {}
+    visits?.forEach(v => {
+      const source = v.utm_source || 'Direto'
+      sourceCounts[source] = (sourceCounts[source] || 0) + 1
+    })
+    const trafficSources = Object.entries(sourceCounts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([source, count]) => ({ source, count }))
+
+    // Leads by product
+    const productCounts: Record<string, number> = {}
+    leads?.forEach(l => {
+      productCounts[l.produto_interesse] = (productCounts[l.produto_interesse] || 0) + 1
+    })
+    const leadsByProduct = Object.entries(productCounts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([product, count]) => ({ product, count }))
+
+    // Leads by location
+    const locationCounts: Record<string, number> = {}
+    leads?.forEach(l => {
+      const location = l.cidade && l.estado ? `${l.cidade}, ${l.estado}` : (l.estado || 'Desconhecido')
+      locationCounts[location] = (locationCounts[location] || 0) + 1
+    })
+    const leadsByLocation = Object.entries(locationCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([location, count]) => ({ location, count }))
+
+    // Visits over time (last 7 days for chart)
+    const visitsOverTime: Record<string, number> = {}
+    const last7Days = []
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000)
+      const dateStr = date.toISOString().split('T')[0]
+      last7Days.push(dateStr)
+      visitsOverTime[dateStr] = 0
+    }
+    visits?.forEach(v => {
+      const dateStr = v.created_at.split('T')[0]
+      if (visitsOverTime[dateStr] !== undefined) {
+        visitsOverTime[dateStr]++
+      }
+    })
+    const chartData = last7Days.map(date => ({
+      date,
+      visits: visitsOverTime[date]
+    }))
+
+    return new Response(
+      JSON.stringify({
+        totalVisits,
+        totalLeads,
+        uniqueVisitors,
+        uniqueSessions,
+        conversionRate,
+        topPages,
+        trafficSources,
+        leadsByProduct,
+        leadsByLocation,
+        chartData
+      }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
+  } catch (error) {
+    console.error('Dashboard stats error:', error)
+    const message = error instanceof Error ? error.message : 'Unknown error'
+    return new Response(
+      JSON.stringify({ error: message }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
+  }
+})
