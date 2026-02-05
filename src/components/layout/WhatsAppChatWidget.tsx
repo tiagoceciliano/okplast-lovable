@@ -251,7 +251,7 @@ export function WhatsAppChatWidget({ open, onOpenChange }: WhatsAppChatWidgetPro
                                   htmlFor={`widget-${produto}`}
                                   className="text-xs text-gray-700 cursor-pointer leading-tight"
                                 >
-                                  {produto === "Chapa Inteira ou Cortada" ? "Chapa" : "Personalizado"}
+                                  {produto}
                                 </Label>
                               </div>
                             ))}

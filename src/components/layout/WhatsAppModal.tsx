@@ -237,7 +237,7 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
                                     htmlFor={`modal-${produto}`}
                                     className="text-xs text-gray-700 cursor-pointer leading-tight"
                                   >
-                                    {produto === "Chapa Inteira ou Cortada" ? "Chapa" : "Personalizado"}
+                                    {produto}
                                   </Label>
                                 </div>
                               ))}
