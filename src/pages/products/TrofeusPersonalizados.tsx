@@ -21,7 +21,6 @@ export default function TrofeusPersonalizados() {
         "Troféu em placa de acrílico",
         "Troféu com base em madeira",
         "Troféu com elementos 3D",
-        "Troféu com LED interno",
         "Troféu corporativo",
         "Troféu esportivo",
         "Troféu comemorativo",
