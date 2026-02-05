@@ -18,7 +18,6 @@ export default function CupulasRedomas() {
         "Acabamento premium com polimento",
       ]}
       variations={[
-        "Redoma redonda",
         "Redoma quadrada",
         "Redoma retangular",
         "Cúpula para bolo",
