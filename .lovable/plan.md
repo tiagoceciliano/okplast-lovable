@@ -1,226 +1,197 @@
 
 
-# Plano: Otimizacao de Performance e SEO
+# Plano: Sistema de Rastreamento de Visitas para Calculo de Taxa de Conversao
 
 ## Objetivo
 
-Reduzir o tempo de carregamento para menos de 1 segundo e otimizar a pagina para SEO, melhorando o ranqueamento no Google.
+Criar uma tabela `page_visits` no banco de dados para registrar todas as visitas ao site, capturando UTMs e dados do visitante. Isso permitira cruzar com a tabela `leads` e calcular a taxa de conversao por campanha.
 
 ---
 
-## Diagnostico Atual
-
-| Problema | Impacto |
-|----------|---------|
-| Meta tags genericas no `index.html` | SEO prejudicado - Google indexa "Lovable App" |
-| Fonte externa Google Fonts bloqueante | +200-400ms de carregamento |
-| Todas as imagens carregam simultaneamente | Bundle inicial pesado |
-| Falta de sitemap.xml | Google nao indexa todas as paginas |
-| Falta de dados estruturados (Schema.org) | Rich snippets nao aparecem |
-| Falta de preconnect para CDNs | Latencia adicional |
-| Componentes nao sao lazy-loaded | JavaScript inicial muito grande |
-
----
-
-## Solucao em 4 Etapas
-
-### ETAPA 1: SEO - Meta Tags e Dados Estruturados
-
-**Arquivo: `index.html`**
-
-```html
-<!doctype html>
-<html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
-    <!-- SEO Principal -->
-    <title>Lab Acrilicos | Fabrica de Acrilico e Chapas no Rio de Janeiro</title>
-    <meta name="description" content="Fabrica de produtos em acrilico sob medida e distribuidora de chapas. Trofeus, medalhas, displays, urnas e mais. Atendimento em 24h. Rio de Janeiro." />
-    <meta name="keywords" content="acrilico, chapas de acrilico, fabrica de acrilico, trofeus personalizados, medalhas, displays, Rio de Janeiro" />
-    <meta name="author" content="Lab Acrilicos" />
-    <meta name="robots" content="index, follow" />
-    <link rel="canonical" href="https://labacrilicos.com.br/" />
-    
-    <!-- Open Graph -->
-    <meta property="og:title" content="Lab Acrilicos | Fabrica de Acrilico no RJ" />
-    <meta property="og:description" content="Fabrica de produtos em acrilico sob medida. Trofeus, medalhas, displays e chapas. Orcamento em 24h." />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://labacrilicos.com.br/" />
-    <meta property="og:image" content="https://labacrilicos.com.br/og-image.jpg" />
-    <meta property="og:locale" content="pt_BR" />
-    <meta property="og:site_name" content="Lab Acrilicos" />
-    
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Lab Acrilicos | Fabrica de Acrilico no RJ" />
-    <meta name="twitter:description" content="Fabrica de produtos em acrilico sob medida. Orcamento em 24h." />
-    <meta name="twitter:image" content="https://labacrilicos.com.br/og-image.jpg" />
-    
-    <!-- Performance: Preconnects -->
-    <link rel="preconnect" href="https://dikfllrqtcdexvnlczsz.supabase.co" />
-    <link rel="dns-prefetch" href="https://dikfllrqtcdexvnlczsz.supabase.co" />
-    
-    <!-- Dados Estruturados - LocalBusiness -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "LocalBusiness",
-      "name": "Lab Acrilicos",
-      "description": "Fabrica de produtos em acrilico sob medida e distribuidora de chapas",
-      "url": "https://labacrilicos.com.br",
-      "telephone": "+55-21-3372-3797",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "Rua Cordovil 259",
-        "addressLocality": "Rio de Janeiro",
-        "addressRegion": "RJ",
-        "addressCountry": "BR"
-      },
-      "openingHours": "Mo-Fr 09:00-17:00",
-      "priceRange": "$$"
-    }
-    </script>
-  </head>
-```
-
----
-
-### ETAPA 2: Performance - Fonte Local + Preloads
-
-**Arquivo: `src/index.css`**
-
-Remover import do Google Fonts e usar fonte do sistema:
-
-```css
-/* REMOVER esta linha: */
-/* @import url('https://fonts.googleapis.com/css2?family=Open+Sans...'); */
-
-/* SUBSTITUIR por: */
-body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-}
-```
-
-**Economia estimada: 200-400ms**
-
----
-
-### ETAPA 3: Lazy Loading de Componentes
-
-**Arquivo: `src/App.tsx`**
-
-Usar React.lazy para carregar paginas sob demanda:
-
-```typescript
-import { lazy, Suspense } from "react";
-
-// Lazy load das paginas
-const Index = lazy(() => import("./pages/Index"));
-const AcrilicoSobMedida = lazy(() => import("./pages/products/AcrilicoSobMedida"));
-const ChapasDeAcrilico = lazy(() => import("./pages/products/ChapasDeAcrilico"));
-// ... demais paginas
-
-// Componente de loading
-const PageLoader = () => (
-  <div className="flex items-center justify-center min-h-screen">
-    <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
-  </div>
-);
-
-// Usar Suspense nas rotas
-<Suspense fallback={<PageLoader />}>
-  <Routes>
-    <Route path="/" element={<Index />} />
-    ...
-  </Routes>
-</Suspense>
-```
-
-**Economia estimada: 30-50% do bundle inicial**
-
----
-
-### ETAPA 4: SEO - Sitemap e Robots
-
-**Novo arquivo: `public/sitemap.xml`**
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://labacrilicos.com.br/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>https://labacrilicos.com.br/acrilico-sob-medida</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://labacrilicos.com.br/chapas-de-acrilico</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-</urlset>
-```
-
-**Atualizar: `public/robots.txt`**
+## Arquitetura da Solucao
 
 ```text
-User-agent: *
-Allow: /
++------------------+       +-------------------+       +------------------+
+|   Usuario        |       |   Frontend        |       |   Edge Function  |
+|   Acessa Site    | ----> |   Hook useVisit   | ----> |   track-visit    |
+|   com UTMs       |       |   (captura UTMs)  |       |   (salva no DB)  |
++------------------+       +-------------------+       +------------------+
+                                                              |
+                                                              v
+                                                       +------------------+
+                                                       |   Tabela         |
+                                                       |   page_visits    |
+                                                       +------------------+
+                                                              |
+                                                              v
+                                                       +------------------+
+                                                       |   Cruzamento     |
+                                                       |   visits x leads |
+                                                       +------------------+
+```
 
-Sitemap: https://labacrilicos.com.br/sitemap.xml
+---
+
+## Etapa 1: Criar Tabela page_visits no Banco
+
+Nova tabela para armazenar cada visita unica:
+
+| Coluna | Tipo | Descricao |
+|--------|------|-----------|
+| id | uuid | ID unico da visita |
+| visitor_id | text | ID anonimo do visitante (localStorage) |
+| session_id | text | ID da sessao atual |
+| page_url | text | URL completa visitada |
+| page_path | text | Apenas o path (ex: /acrilico-sob-medida) |
+| referrer | text | URL de origem |
+| utm_source | text | Parametro utm_source |
+| utm_medium | text | Parametro utm_medium |
+| utm_campaign | text | Parametro utm_campaign |
+| utm_term | text | Parametro utm_term |
+| utm_content | text | Parametro utm_content |
+| user_agent | text | Navegador/dispositivo |
+| ip_address | text | IP do visitante |
+| cidade | text | Cidade (via geolocalizacao) |
+| estado | text | Estado (via geolocalizacao) |
+| pais | text | Pais (via geolocalizacao) |
+| created_at | timestamp | Data/hora da visita |
+
+**RLS Policy**: Permitir INSERT sem autenticacao (visitantes anonimos)
+
+---
+
+## Etapa 2: Criar Edge Function track-visit
+
+Nova edge function para processar a visita no backend:
+
+```typescript
+// supabase/functions/track-visit/index.ts
+
+- Recebe dados da visita via POST
+- Captura IP do cliente
+- Consulta geolocalizacao (ipapi.co)
+- Salva na tabela page_visits
+- Retorna sucesso (nao bloqueia a experiencia do usuario)
+```
+
+**Importante**: A funcao sera chamada de forma assincrona para nao afetar performance.
+
+---
+
+## Etapa 3: Criar Hook usePageVisit
+
+Novo hook React para capturar e enviar visitas:
+
+```typescript
+// src/hooks/usePageVisit.ts
+
+- Gera visitor_id unico (persistido no localStorage)
+- Gera session_id por sessao (sessionStorage)
+- Captura UTMs da URL
+- Captura page URL, path, referrer
+- Envia para edge function de forma nao-bloqueante
+- Previne multiplos registros da mesma pagina na sessao
+```
+
+---
+
+## Etapa 4: Integrar no App.tsx
+
+Adicionar o hook no componente principal:
+
+```typescript
+// src/App.tsx
+
+import { usePageVisit } from "@/hooks/usePageVisit";
+
+// Dentro do App, chamar o hook para rastrear visitas
+usePageVisit();
+```
+
+---
+
+## Etapa 5: Como Calcular Taxa de Conversao
+
+Com as duas tabelas, voce podera fazer queries como:
+
+```sql
+-- Visitas por campanha
+SELECT utm_campaign, COUNT(*) as visitas
+FROM page_visits
+WHERE created_at >= '2024-01-01'
+GROUP BY utm_campaign;
+
+-- Leads por campanha
+SELECT utm_campaign, COUNT(*) as leads
+FROM leads
+WHERE created_at >= '2024-01-01'
+GROUP BY utm_campaign;
+
+-- Taxa de conversao (visitas -> leads)
+SELECT 
+  v.utm_campaign,
+  v.visitas,
+  COALESCE(l.leads, 0) as leads,
+  ROUND(COALESCE(l.leads, 0)::numeric / v.visitas * 100, 2) as taxa_conversao
+FROM (
+  SELECT utm_campaign, COUNT(*) as visitas
+  FROM page_visits
+  GROUP BY utm_campaign
+) v
+LEFT JOIN (
+  SELECT utm_campaign, COUNT(*) as leads
+  FROM leads
+  GROUP BY utm_campaign
+) l ON v.utm_campaign = l.utm_campaign;
 ```
 
 ---
 
 ## Resumo das Alteracoes
 
-| Arquivo | Alteracao |
-|---------|-----------|
-| `index.html` | Meta tags SEO, Open Graph, Schema.org, preconnects |
-| `src/index.css` | Remover Google Fonts, usar fonte do sistema |
-| `src/App.tsx` | Lazy loading de todas as paginas |
-| `public/sitemap.xml` | Novo arquivo com mapa do site |
-| `public/robots.txt` | Adicionar referencia ao sitemap |
+| Arquivo/Recurso | Tipo | Descricao |
+|-----------------|------|-----------|
+| Tabela `page_visits` | Database | Nova tabela para visitas |
+| RLS Policy | Database | Permitir insert anonimo |
+| `supabase/functions/track-visit/index.ts` | Edge Function | Processar e salvar visitas |
+| `supabase/config.toml` | Config | Configurar verify_jwt = false |
+| `src/hooks/usePageVisit.ts` | Hook | Capturar e enviar dados de visita |
+| `src/App.tsx` | Component | Integrar hook de rastreamento |
 
 ---
 
-## Impacto Esperado
+## Dados que serao Capturados
 
-| Metrica | Antes | Depois |
-|---------|-------|--------|
-| First Contentful Paint | ~2-3s | < 1s |
-| Largest Contentful Paint | ~3-4s | < 1.5s |
-| Bundle JS inicial | ~400KB | ~200KB |
-| SEO Score (Lighthouse) | ~50 | ~90+ |
+Para cada visita:
+
+- **Identificacao**: visitor_id (unico por navegador), session_id (por sessao)
+- **Pagina**: URL completa, path, referrer
+- **Campanha**: Todos os 5 parametros UTM
+- **Dispositivo**: User agent
+- **Localizacao**: IP, cidade, estado, pais
+
+---
+
+## Beneficios
+
+1. **Taxa de conversao por campanha** - Saber quais anuncios trazem mais leads
+2. **Funil completo** - Ver quantos visitam vs quantos convertem
+3. **Comportamento** - Quais paginas sao mais visitadas
+4. **ROI de marketing** - Comparar investimento vs resultados por fonte
 
 ---
 
 ## Secao Tecnica
 
-### Por que remover Google Fonts?
+### Visitor ID
+Gerado uma vez e persistido no localStorage. Permite identificar visitantes recorrentes sem login.
 
-O Google Fonts adiciona:
-1. DNS lookup para fonts.googleapis.com
-2. Requisicao CSS para a stylesheet
-3. Download das fontes WOFF2
+### Session ID
+Gerado por sessao (sessionStorage). Permite agrupar pageviews de uma mesma sessao.
 
-Isso bloqueia a renderizacao por 200-400ms. Fontes do sistema sao instantaneas.
+### Prevencao de Duplicatas
+O hook registra apenas uma vez por pagina por sessao, evitando multiplos registros ao navegar para a mesma pagina.
 
-### Por que React.lazy?
-
-O Vite ja faz code-splitting automatico, mas sem lazy loading, todas as paginas sao carregadas no bundle inicial. Com lazy, cada pagina so e carregada quando acessada.
-
-### Schema.org LocalBusiness
-
-Permite que o Google exiba informacoes ricas como:
-- Endereco com link para Maps
-- Telefone clicavel
-- Horario de funcionamento
-- Avaliacao (se configurada)
+### Performance
+A chamada ao backend e feita com `fetch` assincrono sem `await`, nao bloqueando a renderizacao da pagina.
 
