@@ -1,116 +1,43 @@
 
-# Plano de Otimização de Performance - GTmetrix
+# Instalação do Google Tag Manager
 
-## Diagnóstico
+## O que será feito
 
-O GTmetrix identificou os seguintes problemas principais:
+Adicionar o código do Google Tag Manager (GTM-NBNNC5V) no arquivo `index.html` para rastreamento em todas as páginas do site.
 
-| Metrica | Valor Atual | Meta Ideal |
-|---------|-------------|------------|
-| First Contentful Paint (FCP) | 2.5s | < 1.8s |
-| Speed Index | 3.9s | < 3.4s |
-| Largest Contentful Paint (LCP) | 4.1s | < 2.5s |
-| Performance Grade | C (61%) | B+ (80%+) |
-
-Os pontos positivos (TBT 0ms, CLS 0.01) indicam que o problema está no **carregamento inicial de recursos**, não na interatividade ou estabilidade visual.
-
----
-
-## Estratégia de Otimização em 4 Frentes
-
-### 1. Otimizar Carregamento de Imagens Críticas (LCP/FCP)
-
-**Problema:** As imagens do grid de produtos (12 itens) e chapas (8 itens) carregam todas simultaneamente, competindo por banda.
-
-**Soluções:**
-
-- Adicionar `preload` para as primeiras 4 imagens do grid de produtos no `index.html`
-- Usar `fetchPriority="high"` nas imagens acima da dobra (above the fold)
-- Implementar `loading="lazy"` corretamente apenas para imagens abaixo da dobra
-- Adicionar dimensões explícitas (`width`/`height`) em todas as imagens para evitar recálculos de layout
-
-### 2. Otimizar Carregamento do Logo (Header)
-
-**Problema:** O logo do header é importado como módulo ES6, o que atrasa a renderização inicial.
-
-**Solucoes:**
-- Mover o logo para `/public` e referenciar diretamente
-- Adicionar `preload` no `index.html` para o logo
-- Usar `fetchPriority="high"` no elemento `<img>` do logo
-
-### 3. Eliminar Recursos Não-Críticos do Bundle Inicial
-
-**Problema:** Componentes do Footer (GoogleMapEmbed) e modais (WhatsApp/Email) estão no bundle principal.
-
-**Soluções:**
-- Aplicar lazy loading nos modais (WhatsAppModal, EmailQuoteModal)
-- O GoogleMapEmbed já usa IntersectionObserver (OK)
-- Remover o áudio de notificação do carregamento inicial (defer para depois de DOMContentLoaded)
-
-### 4. Otimizar Preconnects e DNS-Prefetch
-
-**Problema:** Apenas o Supabase tem preconnect configurado.
-
-**Solucoes:**
-- Revisar se há outras origens que precisam de preconnect
-- Adicionar `preload` para recursos críticos do primeiro viewport
-
----
-
-## Detalhes Técnicos de Implementação
+## Alterações
 
 ### Arquivo: `index.html`
 
-Adicionar preloads para recursos críticos:
+1. **No `<head>`** - Adicionar o script do GTM o mais alto possível (logo após as meta tags iniciais)
 
-```text
-<!-- Preload logo do header -->
-<link rel="preload" as="image" href="/logo-horizontal.png" fetchpriority="high" />
-
-<!-- Preload das 4 primeiras imagens de produtos (LCP candidates) -->
-<link rel="preload" as="image" href="https://dikfllrqtcdexvnlczsz.supabase.co/storage/v1/object/public/site-images/produtos/cupula-preta.jpg" />
-<link rel="preload" as="image" href="https://dikfllrqtcdexvnlczsz.supabase.co/storage/v1/object/public/site-images/produtos/trofeus.jpg" />
-```
-
-### Arquivo: `src/pages/Index.tsx`
-
-Modificar o grid de produtos para usar `fetchPriority` e lazy loading seletivo:
-
-```text
-- Imagens 0-3 (primeira linha): fetchPriority="high", loading="eager"
-- Imagens 4-7 (segunda linha): loading="lazy"
-- Imagens 8-11 (terceira linha): loading="lazy"
-```
-
-### Arquivo: `src/components/layout/Header.tsx`
-
-- Mover logo para `/public` e adicionar `fetchPriority="high"`
-- Usar referência direta ao invés de import de módulo
-
-### Arquivo: `src/components/layout/WhatsAppFloatingButton.tsx`
-
-- Postergar carregamento do áudio de notificação
-- Usar lazy import para o componente `WhatsAppChatWidget`
+2. **Após `<body>`** - Adicionar o código noscript imediatamente após a abertura da tag body
 
 ---
 
-## Arquivos a Modificar
+## Código a ser inserido
 
-1. `index.html` - Adicionar preloads de recursos críticos
-2. `src/pages/Index.tsx` - Otimizar loading/priority das imagens
-3. `src/components/layout/Header.tsx` - Otimizar carregamento do logo
-4. `src/components/layout/WhatsAppFloatingButton.tsx` - Postergar recursos não-críticos
-5. `public/` - Copiar logo para pasta pública
+**No head (após charset e viewport):**
+```html
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NBNNC5V');</script>
+<!-- End Google Tag Manager -->
+```
+
+**Após abertura do body:**
+```html
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NBNNC5V"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+```
 
 ---
 
-## Impacto Esperado
+## Resultado
 
-| Metrica | Antes | Esperado |
-|---------|-------|----------|
-| FCP | 2.5s | ~1.5s |
-| LCP | 4.1s | ~2.5s |
-| Speed Index | 3.9s | ~2.5s |
-| Grade | C (61%) | B (75-85%) |
-
-A otimização foca em **priorizar os recursos críticos** (logo, primeiras imagens) e **postergar recursos não-críticos** (modais, áudio, imagens abaixo da dobra).
+O GTM será carregado em todas as páginas do site, permitindo rastrear eventos, conversões e integrar com Google Analytics, Google Ads e outras ferramentas de marketing.
