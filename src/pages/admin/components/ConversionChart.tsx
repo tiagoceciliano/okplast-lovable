@@ -14,9 +14,10 @@ interface ConversionChartProps {
 export function ConversionChart({ data, isLoading }: ConversionChartProps) {
   const formattedData = data.map(item => ({
     ...item,
-    dateFormatted: new Date(item.date).toLocaleDateString('pt-BR', { 
+    dateFormatted: new Date(item.date + 'T12:00:00-03:00').toLocaleDateString('pt-BR', { 
       day: '2-digit', 
-      month: 'short' 
+      month: 'short',
+      timeZone: 'America/Sao_Paulo'
     })
   }));
 
