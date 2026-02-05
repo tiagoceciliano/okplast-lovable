@@ -39,12 +39,21 @@ const heroCarouselImages = [
 // Categories with products
 const categorias = [
   {
-    titulo: "CAIXAS, POTES, CÚPULAS, REDOMAS",
+    titulo: "PLACAS SOB MEDIDA, PERSONALIZADAS E GRAVADAS",
     produtos: [
-       { nome: "Caixas Sob Medida", href: "/acrilico-sob-medida/caixas-sob-medida", imageUrl: SOBMEDIDA_IMAGES.caixas },
-       { nome: "Cúpulas e Redomas", href: "/acrilico-sob-medida/cupulas-e-redomas", imageUrl: SOBMEDIDA_IMAGES.cupulas },
-       { nome: "Potes para Doces", href: "/acrilico-sob-medida/potes-para-doces-e-guloseimas", imageUrl: SOBMEDIDA_IMAGES.potesDoces },
-       { nome: "Potes para Grãos", href: "/acrilico-sob-medida/potes-para-graos-e-cereais-a-granel", imageUrl: SOBMEDIDA_IMAGES.potesGraos },
+       { nome: "Placa Customizada", href: "/acrilico-sob-medida/placa-de-acrilico-customizada", imageUrl: SOBMEDIDA_IMAGES.placaCustomizada2 },
+       { nome: "Placa Personalizada", href: "/acrilico-sob-medida/placa-personalizada", imageUrl: SOBMEDIDA_IMAGES.placaPersonalizada },
+       { nome: "Placa de Sinalização", href: "/acrilico-sob-medida/placa-de-acrilico-sinalizacao", imageUrl: SOBMEDIDA_IMAGES.placaSinalizacao2 },
+       { nome: "Placa Gravada", href: "/acrilico-sob-medida/placa-gravada", imageUrl: SOBMEDIDA_IMAGES.placaGravada },
+    ],
+  },
+  {
+    titulo: "DISPLAY, URNAS E QUADROS",
+    produtos: [
+       { nome: "Display de Parede e Mesa", href: "/acrilico-sob-medida/display-de-acrilico", imageUrl: SOBMEDIDA_IMAGES.display },
+       { nome: "Urnas Transparente ou Coloridas", href: "/acrilico-sob-medida/urna-de-acrilico", imageUrl: SOBMEDIDA_IMAGES.urna },
+       { nome: "Caixas de Sugestões", href: "/acrilico-sob-medida/caixa-de-sugestao", imageUrl: SOBMEDIDA_IMAGES.caixaSugestao },
+       { nome: "Quadro de Avisos", href: "/acrilico-sob-medida/quadro-de-avisos", imageUrl: SOBMEDIDA_IMAGES.quadroAvisos },
     ],
   },
   {
@@ -57,12 +66,12 @@ const categorias = [
     ],
   },
   {
-    titulo: "DISPLAY, URNAS E QUADROS",
+    titulo: "CAIXAS, POTES, CÚPULAS, REDOMAS",
     produtos: [
-       { nome: "Display de Parede e Mesa", href: "/acrilico-sob-medida/display-de-acrilico", imageUrl: SOBMEDIDA_IMAGES.display },
-       { nome: "Urnas Transparente ou Coloridas", href: "/acrilico-sob-medida/urna-de-acrilico", imageUrl: SOBMEDIDA_IMAGES.urna },
-       { nome: "Caixas de Sugestões", href: "/acrilico-sob-medida/caixa-de-sugestao", imageUrl: SOBMEDIDA_IMAGES.caixaSugestao },
-      { nome: "Quadro de Avisos", href: "/acrilico-sob-medida/quadro-de-avisos", imageUrl: SOBMEDIDA_IMAGES.quadroAvisos },
+       { nome: "Caixas Sob Medida", href: "/acrilico-sob-medida/caixas-sob-medida", imageUrl: SOBMEDIDA_IMAGES.caixas },
+       { nome: "Cúpulas e Redomas", href: "/acrilico-sob-medida/cupulas-e-redomas", imageUrl: SOBMEDIDA_IMAGES.cupulas },
+       { nome: "Potes para Doces", href: "/acrilico-sob-medida/potes-para-doces-e-guloseimas", imageUrl: SOBMEDIDA_IMAGES.potesDoces },
+       { nome: "Potes para Grãos", href: "/acrilico-sob-medida/potes-para-graos-e-cereais-a-granel", imageUrl: SOBMEDIDA_IMAGES.potesGraos },
     ],
   },
   {

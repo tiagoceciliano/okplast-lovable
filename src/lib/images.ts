@@ -120,6 +120,10 @@ export const SOBMEDIDA_IMAGES = {
    placaCustomizada: img("sobmedida/placa-customizada.jpg"),
    placaSinalizacao: img("sobmedida/placa-sinalizacao.webp"),
    expositoresOculos: img("sobmedida/expositor-oculos.webp"),
+   placaCustomizada2: img("sobmedida/placa-customizada-2.jpg"),
+   placaGravada: img("sobmedida/placa-gravada.jpg"),
+   placaSinalizacao2: img("sobmedida/placa-sinalizacao-2.webp"),
+   placaPersonalizada: img("sobmedida/placa-personalizada.jpg"),
 } as const;
 
 // ========================================
