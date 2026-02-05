@@ -292,9 +292,7 @@ export default function ChapasDeAcrilico() {
           {tiposChapas.map((chapa) => (
             <div 
               key={chapa.id}
-              className={`grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start ${
-                chapa.imagePosition === "right" ? "" : "lg:flex-row-reverse"
-              }`}
+              className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start"
             >
               {/* Image */}
               <div className={`${chapa.imagePosition === "right" ? "lg:order-2" : "lg:order-1"}`}>
