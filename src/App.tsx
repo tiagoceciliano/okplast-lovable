@@ -14,6 +14,7 @@ import { EmailQuoteModalProvider } from "@/contexts/EmailQuoteModalContext";
 const Index = lazy(() => import("./pages/Index"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
+const AdminLeads = lazy(() => import("./pages/admin/Leads"));
 const SobreNos = lazy(() => import("./pages/SobreNos"));
 const PoliticaVenda = lazy(() => import("./pages/PoliticaVenda"));
 const TermoUso = lazy(() => import("./pages/TermoUso"));
@@ -134,6 +135,7 @@ const App = () => (
             <Routes>
               {/* Admin Dashboard - Outside main layout */}
               <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/leads" element={<AdminLeads />} />
               
               {/* Main site routes */}
               <Route path="/*" element={<MainSite />} />
