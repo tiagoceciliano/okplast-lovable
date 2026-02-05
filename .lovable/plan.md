@@ -1,89 +1,109 @@
 
-# Página de Leads no Admin
+# Substituir Select por RadioGroup nos Modais WhatsApp
 
-## Objetivo
+## Problema Identificado
 
-Criar uma nova página `/admin/leads` com tabela de leads e modal de detalhes, além de adicionar o item "Leads" no sidebar.
+O componente `Select` do Radix UI dentro do `Dialog` causa conflito: ao selecionar um item, o foco é perdido e o modal fecha inesperadamente.
+
+## Solucao Proposta
+
+Substituir o `Select` (dropdown) por `RadioGroup` com opcoes visiveis inline, mantendo o layout compacto.
 
 ---
 
-## Estrutura de Arquivos
+## Arquivos a Modificar
 
-### Novos Arquivos
+1. `src/components/layout/WhatsAppModal.tsx`
+2. `src/components/layout/WhatsAppChatWidget.tsx`
 
-```text
-src/pages/admin/
-├── Leads.tsx                    # Página de listagem de leads
-└── components/
-    └── LeadDetailsModal.tsx     # Modal com detalhes completos do lead
+---
+
+## Mudancas no Codigo
+
+### Para ambos os arquivos:
+
+1. **Remover imports do Select**:
+```typescript
+// REMOVER
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 ```
 
-### Arquivos a Modificar
+2. **Adicionar imports do RadioGroup**:
+```typescript
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+```
 
-- `src/pages/admin/components/AdminSidebar.tsx` - Adicionar menu "Leads"
-- `src/App.tsx` - Adicionar rota `/admin/leads`
-- `supabase/functions/get-dashboard-stats/index.ts` - Adicionar endpoint para buscar leads com detalhes
-
----
-
-## Tabela de Leads
-
-### Colunas na Ordem Solicitada
-
-| Coluna | Campo |
-|--------|-------|
-| Data | created_at (formato DD/MM/YYYY) |
-| Hora | created_at (formato HH:MM) |
-| Nome | nome |
-| Campaign | utm_campaign |
-| Source | utm_source |
-| Medium | utm_medium |
-| Content | utm_content |
-| Term | utm_term |
-| Ações | Ícone de olho para ver detalhes |
+3. **Substituir o FormField do produto**:
+   - Trocar de `Select` para `RadioGroup` horizontal
+   - Duas opcoes lado a lado: "Chapa Inteira ou Cortada" e "Produto Personalizado"
+   - Estilo compacto com botoes em formato de chip/pill
 
 ---
 
-## Modal de Detalhes (Olhinho)
-
-### Informações Completas
-
-- **Dados pessoais**: Nome, E-mail, Telefone
-- **Produto de interesse**
-- **Mensagem** (se houver)
-- **UTM completo**: source, medium, campaign, content, term
-- **Localização**: Cidade, Estado, País
-- **IP Address**
-- **Data/Hora do cadastro**
-- **Histórico de cadastros**: Quantidade de vezes que esse e-mail/telefone já se cadastrou
-
----
-
-## Edge Function
-
-### Nova função: `get-leads`
-
-Endpoint que retorna:
-- Lista de leads com todos os campos
-- Para cada lead, contagem de cadastros anteriores com mesmo e-mail ou telefone
-
----
-
-## Sidebar
-
-Adicionar item "Leads" com ícone `Users` logo abaixo de "Dashboard":
+## Layout do RadioGroup
 
 ```text
-Menu
-├── Dashboard
-├── Leads        ← NOVO
++-----------------------------------+
+| O Chapa Inteira    O Personalizado|
++-----------------------------------+
+```
+
+- Layout horizontal (`flex flex-row`)
+- Labels curtos para economizar espaco
+- Altura similar aos inputs (`h-8`)
+- Estilo visual que combina com o tema WhatsApp
+
+---
+
+## Beneficios
+
+1. **Corrige o bug**: RadioGroup nao fecha o modal
+2. **Melhor UX**: Usuario ve as opcoes imediatamente
+3. **Menos cliques**: Selecao direta sem dropdown
+4. **Layout compacto**: Mantem o botao visivel sem scroll
+
+---
+
+## Codigo Final do RadioGroup
+
+```tsx
+<FormField
+  control={form.control}
+  name="produto"
+  render={({ field }) => (
+    <FormItem>
+      <FormControl>
+        <RadioGroup
+          onValueChange={field.onChange}
+          value={field.value}
+          className="flex flex-row gap-3"
+        >
+          {PRODUTOS_WHATSAPP.map((produto) => (
+            <div key={produto} className="flex items-center space-x-1.5">
+              <RadioGroupItem 
+                value={produto} 
+                id={produto}
+                className="h-3.5 w-3.5 border-gray-400"
+              />
+              <Label 
+                htmlFor={produto}
+                className="text-xs text-gray-700 cursor-pointer leading-tight"
+              >
+                {produto === "Chapa Inteira ou Cortada" ? "Chapa" : "Personalizado"}
+              </Label>
+            </div>
+          ))}
+        </RadioGroup>
+      </FormControl>
+      <FormMessage className="text-xs text-red-600" />
+    </FormItem>
+  )}
+/>
 ```
 
 ---
 
-## Implementação Técnica
+## Atualizacao das Constantes
 
-1. **Edge Function `get-leads`**: Busca todos os leads ordenados por data decrescente, calcula duplicatas
-2. **Página Leads.tsx**: Tabela usando componentes Table do Shadcn, com filtro por período
-3. **LeadDetailsModal.tsx**: Dialog com todas as informações + contagem de cadastros anteriores
-4. **Fuso horário**: Todas as datas/horas formatadas para São Paulo (America/Sao_Paulo)
+Tambem podemos simplificar os labels em `PRODUTOS_WHATSAPP` se preferir, mas o valor enviado no formulario continuara completo.
