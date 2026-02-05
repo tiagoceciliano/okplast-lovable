@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.get-dashboard-stats]
 verify_jwt = false
+
+[functions.get-leads]
+verify_jwt = false
