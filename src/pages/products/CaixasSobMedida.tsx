@@ -23,7 +23,6 @@ export default function CaixasSobMedida() {
         "Caixa sem tampa",
         "Caixa com divisórias internas",
         "Caixa com base em madeira ou MDF",
-        "Caixa hermética",
       ]}
     />
   );
