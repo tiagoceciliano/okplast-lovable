@@ -221,7 +221,7 @@ export default function Index() {
         <div className="container-custom">
           <div className="text-center mb-10">
             <h2 className="font-bold text-2xl md:text-3xl lg:text-4xl text-accent uppercase tracking-wide">
-              Produtos Sob Medida
+              PRODUTOS SOB MEDIDA E PERSONALIZADOS
             </h2>
             <p className="text-muted-foreground mt-2">
               Fabricamos produtos personalizados em acrílico de alta qualidade
