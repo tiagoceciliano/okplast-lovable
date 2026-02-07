@@ -1,109 +1,63 @@
 
-# Substituir Select por RadioGroup nos Modais WhatsApp
+# Corrigir Links do Sidebar Admin para Domínio Público
 
-## Problema Identificado
+## Problema
 
-O componente `Select` do Radix UI dentro do `Dialog` causa conflito: ao selecionar um item, o foco é perdido e o modal fecha inesperadamente.
-
-## Solucao Proposta
-
-Substituir o `Select` (dropdown) por `RadioGroup` com opcoes visiveis inline, mantendo o layout compacto.
+Os links das páginas no sidebar do painel admin estão usando caminhos relativos (ex: `/acrilico-sob-medida`), fazendo com que abram dentro do Lovable em vez de direcionar para o domínio público da empresa (`https://labacrilicos.com.br`).
 
 ---
 
-## Arquivos a Modificar
+## Solução
 
-1. `src/components/layout/WhatsAppModal.tsx`
-2. `src/components/layout/WhatsAppChatWidget.tsx`
+Modificar o componente `AdminSidebar.tsx` para concatenar o domínio público da empresa antes de cada caminho de página.
 
 ---
 
-## Mudancas no Codigo
+## Arquivo a Modificar
 
-### Para ambos os arquivos:
+`src/pages/admin/components/AdminSidebar.tsx`
 
-1. **Remover imports do Select**:
+---
+
+## Mudanças
+
+### 1. Importar a constante COMPANY
+
+Adicionar import do arquivo de constantes para usar o domínio configurado:
+
 ```typescript
-// REMOVER
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { COMPANY } from "@/lib/constants";
 ```
 
-2. **Adicionar imports do RadioGroup**:
-```typescript
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-```
+### 2. Atualizar o componente CollapsibleMenu
 
-3. **Substituir o FormField do produto**:
-   - Trocar de `Select` para `RadioGroup` horizontal
-   - Duas opcoes lado a lado: "Chapa Inteira ou Cortada" e "Produto Personalizado"
-   - Estilo compacto com botoes em formato de chip/pill
+Modificar os links `<a href>` para usar URL completa:
+
+- **Antes**: `href={hubPath}` e `href={page.path}`
+- **Depois**: `href={COMPANY.domain + hubPath}` e `href={COMPANY.domain + page.path}`
+
+### 3. Atualizar o link da Home
+
+Modificar o link da Home no sidebar:
+
+- **Antes**: `href="/"`
+- **Depois**: `href={COMPANY.domain}`
 
 ---
 
-## Layout do RadioGroup
+## Resultado Esperado
 
-```text
-+-----------------------------------+
-| O Chapa Inteira    O Personalizado|
-+-----------------------------------+
-```
+Ao clicar em qualquer link de página no sidebar, o navegador abrirá uma nova aba direcionando para:
 
-- Layout horizontal (`flex flex-row`)
-- Labels curtos para economizar espaco
-- Altura similar aos inputs (`h-8`)
-- Estilo visual que combina com o tema WhatsApp
+- `https://labacrilicos.com.br/` (Home)
+- `https://labacrilicos.com.br/acrilico-sob-medida` (Hub Acrílico)
+- `https://labacrilicos.com.br/chapas/acrilico` (Chapas Acrílico)
+- etc.
 
 ---
 
-## Beneficios
+## Benefícios
 
-1. **Corrige o bug**: RadioGroup nao fecha o modal
-2. **Melhor UX**: Usuario ve as opcoes imediatamente
-3. **Menos cliques**: Selecao direta sem dropdown
-4. **Layout compacto**: Mantem o botao visivel sem scroll
-
----
-
-## Codigo Final do RadioGroup
-
-```tsx
-<FormField
-  control={form.control}
-  name="produto"
-  render={({ field }) => (
-    <FormItem>
-      <FormControl>
-        <RadioGroup
-          onValueChange={field.onChange}
-          value={field.value}
-          className="flex flex-row gap-3"
-        >
-          {PRODUTOS_WHATSAPP.map((produto) => (
-            <div key={produto} className="flex items-center space-x-1.5">
-              <RadioGroupItem 
-                value={produto} 
-                id={produto}
-                className="h-3.5 w-3.5 border-gray-400"
-              />
-              <Label 
-                htmlFor={produto}
-                className="text-xs text-gray-700 cursor-pointer leading-tight"
-              >
-                {produto === "Chapa Inteira ou Cortada" ? "Chapa" : "Personalizado"}
-              </Label>
-            </div>
-          ))}
-        </RadioGroup>
-      </FormControl>
-      <FormMessage className="text-xs text-red-600" />
-    </FormItem>
-  )}
-/>
-```
-
----
-
-## Atualizacao das Constantes
-
-Tambem podemos simplificar os labels em `PRODUTOS_WHATSAPP` se preferir, mas o valor enviado no formulario continuara completo.
+1. Links abrem no domínio público correto
+2. Usa constante centralizada (fácil manutenção)
+3. Mantém `target="_blank"` para abrir em nova aba
