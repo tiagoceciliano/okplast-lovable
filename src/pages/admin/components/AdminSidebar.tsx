@@ -12,6 +12,7 @@ import {
   Users
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { COMPANY } from "@/lib/constants";
 import {
   Sidebar,
   SidebarContent,
@@ -97,7 +98,7 @@ const CollapsibleMenu = ({ title, icon: Icon, hubPath, subPages, collapsed }: Co
       {!collapsed && (
         <CollapsibleContent className="pl-6 space-y-1 mt-1">
           <a
-            href={hubPath}
+            href={COMPANY.domain + hubPath}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md"
@@ -108,7 +109,7 @@ const CollapsibleMenu = ({ title, icon: Icon, hubPath, subPages, collapsed }: Co
           {subPages.map((page) => (
             <a
               key={page.path}
-              href={page.path}
+              href={COMPANY.domain + page.path}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md"
@@ -177,7 +178,7 @@ export function AdminSidebar() {
           <SidebarGroupLabel className={cn(collapsed && "sr-only")}>Páginas do Site</SidebarGroupLabel>
           <SidebarGroupContent className="space-y-1">
             <a
-              href="/"
+              href={COMPANY.domain}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-muted"
