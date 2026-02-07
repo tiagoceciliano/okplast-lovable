@@ -15,16 +15,44 @@ Deno.serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const { action, leadId, data } = await req.json();
+    const { action, leadId, leadIds, data } = await req.json();
 
-    if (!action || !leadId) {
+    if (!action) {
       return new Response(
-        JSON.stringify({ error: 'Missing action or leadId' }),
+        JSON.stringify({ error: 'Missing action' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
+    if (action === 'bulk-delete') {
+      if (!leadIds || !Array.isArray(leadIds) || leadIds.length === 0) {
+        return new Response(
+          JSON.stringify({ error: 'Missing or invalid leadIds array' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const { error } = await supabase
+        .from('leads')
+        .delete()
+        .in('id', leadIds);
+
+      if (error) throw error;
+
+      return new Response(
+        JSON.stringify({ success: true, message: `${leadIds.length} leads deleted successfully` }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     if (action === 'delete') {
+      if (!leadId) {
+        return new Response(
+          JSON.stringify({ error: 'Missing leadId' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
       const { error } = await supabase
         .from('leads')
         .delete()
