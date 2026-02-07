@@ -1,9 +1,17 @@
 import { useState, useEffect } from "react";
-import { Eye, RefreshCw } from "lucide-react";
+import { Eye, Pencil, Trash2, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminLayout } from "./AdminLayout";
 import { LeadDetailsModal } from "./components/LeadDetailsModal";
+import { LeadEditModal } from "./components/LeadEditModal";
+import { LeadDeleteDialog } from "./components/LeadDeleteDialog";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   Table,
   TableBody,
@@ -37,7 +45,9 @@ const Leads = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
-  const [modalOpen, setModalOpen] = useState(false);
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -72,7 +82,17 @@ const Leads = () => {
 
   const handleViewLead = (lead: Lead) => {
     setSelectedLead(lead);
-    setModalOpen(true);
+    setDetailsModalOpen(true);
+  };
+
+  const handleEditLead = (lead: Lead) => {
+    setSelectedLead(lead);
+    setEditModalOpen(true);
+  };
+
+  const handleDeleteLead = (lead: Lead) => {
+    setSelectedLead(lead);
+    setDeleteDialogOpen(true);
   };
 
   return (
@@ -129,14 +149,49 @@ const Leads = () => {
                     <TableCell className="text-sm">{lead.utm_content || '-'}</TableCell>
                     <TableCell className="text-sm">{lead.utm_term || '-'}</TableCell>
                     <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleViewLead(lead)}
-                        title="Ver detalhes"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
+                      <TooltipProvider>
+                        <div className="flex items-center gap-1">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() => handleViewLead(lead)}
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Ver detalhes</TooltipContent>
+                          </Tooltip>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() => handleEditLead(lead)}
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Editar</TooltipContent>
+                          </Tooltip>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-destructive hover:text-destructive"
+                                onClick={() => handleDeleteLead(lead)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Excluir</TooltipContent>
+                          </Tooltip>
+                        </div>
+                      </TooltipProvider>
                     </TableCell>
                   </TableRow>
                 ))
@@ -148,8 +203,22 @@ const Leads = () => {
 
       <LeadDetailsModal
         lead={selectedLead}
-        open={modalOpen}
-        onOpenChange={setModalOpen}
+        open={detailsModalOpen}
+        onOpenChange={setDetailsModalOpen}
+      />
+
+      <LeadEditModal
+        lead={selectedLead}
+        open={editModalOpen}
+        onOpenChange={setEditModalOpen}
+        onSuccess={fetchLeads}
+      />
+
+      <LeadDeleteDialog
+        lead={selectedLead}
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onSuccess={fetchLeads}
       />
     </AdminLayout>
   );
