@@ -46,6 +46,9 @@ export function PeriodStatsTable({ periodStats, isLoading }: PeriodStatsTablePro
       <TableCell className="text-center"><Skeleton className="h-4 w-12 mx-auto" /></TableCell>
       <TableCell className="text-center"><Skeleton className="h-4 w-10 mx-auto" /></TableCell>
       <TableCell className="text-center"><Skeleton className="h-4 w-14 mx-auto" /></TableCell>
+      <TableCell className="text-center"><Skeleton className="h-4 w-12 mx-auto" /></TableCell>
+      <TableCell className="text-center"><Skeleton className="h-4 w-10 mx-auto" /></TableCell>
+      <TableCell className="text-center"><Skeleton className="h-4 w-14 mx-auto" /></TableCell>
     </TableRow>
   );
 
@@ -63,9 +66,13 @@ export function PeriodStatsTable({ periodStats, isLoading }: PeriodStatsTablePro
             <TableRow>
               <TableHead rowSpan={2} className="align-bottom border-r">Período</TableHead>
               <TableHead colSpan={3} className="text-center border-r bg-muted/30">PRODUTOS</TableHead>
-              <TableHead colSpan={3} className="text-center bg-muted/30">CHAPAS</TableHead>
+              <TableHead colSpan={3} className="text-center border-r bg-muted/30">CHAPAS</TableHead>
+              <TableHead colSpan={3} className="text-center bg-primary/10">TOTAL</TableHead>
             </TableRow>
             <TableRow>
+              <TableHead className="text-center text-xs">Visitas</TableHead>
+              <TableHead className="text-center text-xs">Leads</TableHead>
+              <TableHead className="text-center text-xs border-r">Tx Conversão</TableHead>
               <TableHead className="text-center text-xs">Visitas</TableHead>
               <TableHead className="text-center text-xs">Leads</TableHead>
               <TableHead className="text-center text-xs border-r">Tx Conversão</TableHead>
@@ -82,23 +89,33 @@ export function PeriodStatsTable({ periodStats, isLoading }: PeriodStatsTablePro
                 {renderSkeletonRow()}
               </>
             ) : periodStats ? (
-              periodOrder.map((periodKey) => {
-                const data = periodStats[periodKey];
-                return (
-                  <TableRow key={periodKey}>
-                    <TableCell className="font-medium border-r">{periodLabels[periodKey]}</TableCell>
-                    <TableCell className="text-center">{formatNumber(data.produtos.visits)}</TableCell>
-                    <TableCell className="text-center">{formatNumber(data.produtos.leads)}</TableCell>
-                    <TableCell className="text-center border-r">{data.produtos.conversionRate}%</TableCell>
-                    <TableCell className="text-center">{formatNumber(data.chapas.visits)}</TableCell>
-                    <TableCell className="text-center">{formatNumber(data.chapas.leads)}</TableCell>
-                    <TableCell className="text-center">{data.chapas.conversionRate}%</TableCell>
-                  </TableRow>
-                );
-              })
+              <>
+                {periodOrder.map((periodKey) => {
+                  const data = periodStats[periodKey];
+                  const totalVisits = data.produtos.visits + data.chapas.visits;
+                  const totalLeads = data.produtos.leads + data.chapas.leads;
+                  const totalConversion = totalVisits > 0 
+                    ? ((totalLeads / totalVisits) * 100).toFixed(2) 
+                    : '0.00';
+                  return (
+                    <TableRow key={periodKey}>
+                      <TableCell className="font-medium border-r">{periodLabels[periodKey]}</TableCell>
+                      <TableCell className="text-center">{formatNumber(data.produtos.visits)}</TableCell>
+                      <TableCell className="text-center">{formatNumber(data.produtos.leads)}</TableCell>
+                      <TableCell className="text-center border-r">{data.produtos.conversionRate}%</TableCell>
+                      <TableCell className="text-center">{formatNumber(data.chapas.visits)}</TableCell>
+                      <TableCell className="text-center">{formatNumber(data.chapas.leads)}</TableCell>
+                      <TableCell className="text-center border-r">{data.chapas.conversionRate}%</TableCell>
+                      <TableCell className="text-center font-semibold">{formatNumber(totalVisits)}</TableCell>
+                      <TableCell className="text-center font-semibold">{formatNumber(totalLeads)}</TableCell>
+                      <TableCell className="text-center font-semibold">{totalConversion}%</TableCell>
+                    </TableRow>
+                  );
+                })}
+              </>
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="text-center text-muted-foreground">
+                <TableCell colSpan={10} className="text-center text-muted-foreground">
                   Nenhum dado disponível
                 </TableCell>
               </TableRow>
