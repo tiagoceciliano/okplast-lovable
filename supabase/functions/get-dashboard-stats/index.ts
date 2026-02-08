@@ -51,6 +51,18 @@ interface PeriodStats {
   last7days: PeriodMetrics
 }
 
+interface LeadsByPeriodItem {
+  produtos: number
+  chapas: number
+  total: number
+}
+
+interface LeadsByPeriod {
+  today: LeadsByPeriodItem
+  yesterday: LeadsByPeriodItem
+  last7days: LeadsByPeriodItem
+}
+
 function isChapasCategory(utmCampaign: string | null): boolean {
   return utmCampaign?.includes('chapas') ?? false
 }
@@ -102,6 +114,34 @@ function calculateCategoryMetrics(
       leads: chapasLeads.length,
       conversionRate: chapasConversion
     }
+  }
+}
+
+// Calculate leads by period based on produto_interesse field
+function calculateLeadsByPeriod(
+  leads: any[],
+  startDate: Date,
+  endDate: Date
+): LeadsByPeriodItem {
+  const startISO = startDate.toISOString()
+  const endISO = endDate.toISOString()
+
+  const periodLeads = leads.filter(l => 
+    l.created_at >= startISO && l.created_at <= endISO
+  )
+
+  const chapas = periodLeads.filter(l => 
+    l.produto_interesse === 'Chapa Inteira ou Cortada'
+  ).length
+  
+  const produtos = periodLeads.filter(l => 
+    l.produto_interesse === 'Produto Personalizado'
+  ).length
+
+  return {
+    produtos,
+    chapas,
+    total: produtos + chapas
   }
 }
 
@@ -157,6 +197,13 @@ Deno.serve(async (req) => {
       today: calculateCategoryMetrics(visits || [], leads || [], todayStart, todayEnd),
       yesterday: calculateCategoryMetrics(visits || [], leads || [], yesterdayStart, yesterdayEnd),
       last7days: calculateCategoryMetrics(visits || [], leads || [], last7DaysStart, todayEnd)
+    }
+
+    // Calculate leads by period based on produto_interesse
+    const leadsByPeriod: LeadsByPeriod = {
+      today: calculateLeadsByPeriod(leads || [], todayStart, todayEnd),
+      yesterday: calculateLeadsByPeriod(leads || [], yesterdayStart, yesterdayEnd),
+      last7days: calculateLeadsByPeriod(leads || [], last7DaysStart, todayEnd)
     }
 
     // Filter data for other metrics based on period param
@@ -316,6 +363,7 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({
         periodStats,
+        leadsByPeriod,
         totalVisits,
         totalLeads,
         uniqueVisitors,
