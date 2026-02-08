@@ -106,6 +106,83 @@ Deno.serve(async (req) => {
       .slice(0, 5)
       .map(([location, count]) => ({ location, count }))
 
+    // Campaign Stats - visitantes unicos por campanha
+    const campaignVisitors: Record<string, Set<string>> = {}
+    const campaignLeadCounts: Record<string, number> = {}
+
+    visits?.forEach(v => {
+      const campaign = v.utm_campaign || '(Direto)'
+      if (!campaignVisitors[campaign]) {
+        campaignVisitors[campaign] = new Set()
+      }
+      campaignVisitors[campaign].add(v.visitor_id)
+    })
+
+    leads?.forEach(l => {
+      const campaign = l.utm_campaign || '(Direto)'
+      campaignLeadCounts[campaign] = (campaignLeadCounts[campaign] || 0) + 1
+    })
+
+    const campaignStats = Object.keys(campaignVisitors)
+      .map(campaign => {
+        const uniqueVisits = campaignVisitors[campaign].size
+        const leadCount = campaignLeadCounts[campaign] || 0
+        const rate = uniqueVisits > 0 
+          ? ((leadCount / uniqueVisits) * 100).toFixed(2) 
+          : '0.00'
+        return {
+          campaign,
+          visits: uniqueVisits,
+          leads: leadCount,
+          conversionRate: rate
+        }
+      })
+      .sort((a, b) => b.visits - a.visits)
+
+    // Term Stats - mantendo referencia a campaign
+    const termVisitors: Record<string, { visitors: Set<string>; campaign: string }> = {}
+    const termLeadCounts: Record<string, { count: number; campaign: string }> = {}
+
+    visits?.forEach(v => {
+      const term = v.utm_term || '(Sem termo)'
+      const campaign = v.utm_campaign || '(Direto)'
+      const key = `${term}|${campaign}`
+      
+      if (!termVisitors[key]) {
+        termVisitors[key] = { visitors: new Set(), campaign }
+      }
+      termVisitors[key].visitors.add(v.visitor_id)
+    })
+
+    leads?.forEach(l => {
+      const term = l.utm_term || '(Sem termo)'
+      const campaign = l.utm_campaign || '(Direto)'
+      const key = `${term}|${campaign}`
+      
+      if (!termLeadCounts[key]) {
+        termLeadCounts[key] = { count: 0, campaign }
+      }
+      termLeadCounts[key].count++
+    })
+
+    const termStats = Object.entries(termVisitors)
+      .map(([key, { visitors, campaign }]) => {
+        const [term] = key.split('|')
+        const uniqueVisits = visitors.size
+        const leadCount = termLeadCounts[key]?.count || 0
+        const rate = uniqueVisits > 0 
+          ? ((leadCount / uniqueVisits) * 100).toFixed(2) 
+          : '0.00'
+        return {
+          term,
+          campaign,
+          visits: uniqueVisits,
+          leads: leadCount,
+          conversionRate: rate
+        }
+      })
+      .sort((a, b) => b.visits - a.visits)
+
     // Visits over time (last 7 days for chart) - São Paulo timezone
     const visitsOverTime: Record<string, number> = {}
     const last7Days: string[] = []
@@ -139,7 +216,9 @@ Deno.serve(async (req) => {
         trafficSources,
         leadsByProduct,
         leadsByLocation,
-        chartData
+        chartData,
+        campaignStats,
+        termStats
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
