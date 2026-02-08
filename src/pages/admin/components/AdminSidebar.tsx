@@ -7,7 +7,8 @@ import {
   Building2, 
   ChevronRight,
   ExternalLink,
-  Users
+  Users,
+  Tag
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { COMPANY } from "@/lib/constants";
@@ -218,6 +219,21 @@ export function AdminSidebar() {
                   >
                     <Users className="h-4 w-4" />
                     {!collapsed && <span>Leads</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip="UTM Termos">
+                  <NavLink
+                    to="/admin/utm-terms"
+                    className={({ isActive }) => cn(
+                      "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-muted",
+                      isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
+                      collapsed && "justify-center px-0"
+                    )}
+                  >
+                    <Tag className="h-4 w-4" />
+                    {!collapsed && <span>UTM Termos</span>}
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>

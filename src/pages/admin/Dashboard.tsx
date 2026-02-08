@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { AdminLayout } from "./AdminLayout";
 import { StatsCards } from "./components/StatsCards";
 import { ConversionChart } from "./components/ConversionChart";
@@ -24,13 +23,6 @@ interface DashboardStats {
     leads: number;
     conversionRate: string;
   }>;
-  termStats: Array<{
-    term: string;
-    campaign: string;
-    visits: number;
-    leads: number;
-    conversionRate: string;
-  }>;
 }
 
 export default function Dashboard() {
@@ -38,7 +30,6 @@ export default function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [campaignFilter, setCampaignFilter] = useState<string>("all");
 
   // Campaign data for table
   const campaignData = useMemo(() => {
@@ -50,38 +41,12 @@ export default function Dashboard() {
     }));
   }, [stats?.campaignStats]);
 
-  // Unique campaigns for filter
-  const uniqueCampaigns = useMemo(() => {
-    return (stats?.campaignStats || []).map(c => c.campaign);
-  }, [stats?.campaignStats]);
-
-  // Filtered term data
-  const termData = useMemo(() => {
-    const terms = stats?.termStats || [];
-    const filtered = campaignFilter === "all" 
-      ? terms 
-      : terms.filter(t => t.campaign === campaignFilter);
-    
-    return filtered.map(t => ({
-      name: t.term,
-      visits: t.visits,
-      leads: t.leads,
-      conversionRate: t.conversionRate
-    }));
-  }, [stats?.termStats, campaignFilter]);
-
   useEffect(() => {
     async function fetchStats() {
       setIsLoading(true);
       setError(null);
       
       try {
-        const { data, error } = await supabase.functions.invoke('get-dashboard-stats', {
-          body: {},
-          headers: {},
-        });
-
-        // Add query param to URL manually since invoke doesn't support it directly
         const response = await fetch(
           `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-dashboard-stats?period=${period}`,
           {
@@ -164,20 +129,6 @@ export default function Dashboard() {
           columnLabel="Campanha"
           data={campaignData}
           isLoading={isLoading}
-        />
-
-        {/* Tabela Performance por Termo */}
-        <UTMPerformanceTable
-          title="Performance por Termo"
-          description="Visitas, leads e conversão por utm_term"
-          columnLabel="Termo"
-          data={termData}
-          isLoading={isLoading}
-          showFilter
-          filterLabel="Filtrar por Campanha"
-          filterOptions={uniqueCampaigns}
-          filterValue={campaignFilter}
-          onFilterChange={setCampaignFilter}
         />
       </div>
     </AdminLayout>

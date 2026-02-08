@@ -15,6 +15,7 @@ const Index = lazy(() => import("./pages/Index"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
 const AdminLeads = lazy(() => import("./pages/admin/Leads"));
+const AdminUTMTerms = lazy(() => import("./pages/admin/UTMTerms"));
 const SobreNos = lazy(() => import("./pages/SobreNos"));
 const PoliticaVenda = lazy(() => import("./pages/PoliticaVenda"));
 const TermoUso = lazy(() => import("./pages/TermoUso"));
@@ -136,6 +137,7 @@ const App = () => (
               {/* Admin Dashboard - Outside main layout */}
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/leads" element={<AdminLeads />} />
+              <Route path="/admin/utm-terms" element={<AdminUTMTerms />} />
               
               {/* Main site routes */}
               <Route path="/*" element={<MainSite />} />
