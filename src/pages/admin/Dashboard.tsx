@@ -1,12 +1,30 @@
 import { useState, useEffect, useMemo } from "react";
 import { AdminLayout } from "./AdminLayout";
-import { StatsCards } from "./components/StatsCards";
+import { PeriodStatsTable } from "./components/PeriodStatsTable";
 import { ConversionChart } from "./components/ConversionChart";
 import { PagesList } from "./components/PagesList";
 import { UTMPerformanceTable } from "./components/UTMPerformanceTable";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+interface CategoryMetrics {
+  visits: number;
+  leads: number;
+  conversionRate: string;
+}
+
+interface PeriodMetrics {
+  produtos: CategoryMetrics;
+  chapas: CategoryMetrics;
+}
+
+interface PeriodStats {
+  today: PeriodMetrics;
+  yesterday: PeriodMetrics;
+  last7days: PeriodMetrics;
+}
+
 interface DashboardStats {
+  periodStats: PeriodStats;
   totalVisits: number;
   totalLeads: number;
   uniqueVisitors: number;
@@ -84,16 +102,6 @@ export default function Dashboard() {
               Métricas de conversão e performance do site
             </p>
           </div>
-          <Select value={period} onValueChange={setPeriod}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Período" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="7d">Últimos 7 dias</SelectItem>
-              <SelectItem value="30d">Últimos 30 dias</SelectItem>
-              <SelectItem value="all">Todo o período</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
 
         {error && (
@@ -102,11 +110,8 @@ export default function Dashboard() {
           </div>
         )}
 
-        <StatsCards
-          totalVisits={stats?.totalVisits || 0}
-          totalLeads={stats?.totalLeads || 0}
-          conversionRate={stats?.conversionRate || "0.00"}
-          uniqueSessions={stats?.uniqueSessions || 0}
+        <PeriodStatsTable
+          periodStats={stats?.periodStats || null}
           isLoading={isLoading}
         />
 
@@ -128,6 +133,8 @@ export default function Dashboard() {
           columnLabel="Campanha"
           data={campaignData}
           isLoading={isLoading}
+          periodValue={period}
+          onPeriodChange={setPeriod}
         />
       </div>
     </AdminLayout>
