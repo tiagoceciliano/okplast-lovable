@@ -6,11 +6,6 @@ interface TopPage {
   count: number;
 }
 
-interface TrafficSource {
-  source: string;
-  count: number;
-}
-
 interface LeadByProduct {
   product: string;
   count: number;
@@ -18,12 +13,11 @@ interface LeadByProduct {
 
 interface PagesListProps {
   topPages: TopPage[];
-  trafficSources: TrafficSource[];
   leadsByProduct: LeadByProduct[];
   isLoading?: boolean;
 }
 
-export function PagesList({ topPages, trafficSources, leadsByProduct, isLoading }: PagesListProps) {
+export function PagesList({ topPages, leadsByProduct, isLoading }: PagesListProps) {
   const SkeletonRows = () => (
     <>
       {[1, 2, 3, 4, 5].map((i) => (
@@ -36,7 +30,7 @@ export function PagesList({ topPages, trafficSources, leadsByProduct, isLoading 
   );
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-4 md:grid-cols-2">
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Top 5 Páginas</CardTitle>
@@ -60,41 +54,6 @@ export function PagesList({ topPages, trafficSources, leadsByProduct, isLoading 
                       {page.path === '/' ? 'Home' : page.path}
                     </TableCell>
                     <TableCell className="text-right">{page.count}</TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={2} className="text-center text-muted-foreground">
-                    Sem dados
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Origem do Tráfego</CardTitle>
-          <CardDescription>De onde vêm os visitantes</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Fonte</TableHead>
-                <TableHead className="text-right">Visitas</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                <SkeletonRows />
-              ) : trafficSources.length > 0 ? (
-                trafficSources.map((source) => (
-                  <TableRow key={source.source}>
-                    <TableCell className="font-medium">{source.source}</TableCell>
-                    <TableCell className="text-right">{source.count}</TableCell>
                   </TableRow>
                 ))
               ) : (
