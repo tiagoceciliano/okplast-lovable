@@ -1,85 +1,114 @@
 
 
-# Plano: Corrigir Categorização por UTM Campaign
+# Plano: Adicionar KPI Cards de Leads por Período
 
-## Mudança de Lógica
+## Objetivo
+Criar cards de KPI no topo do dashboard mostrando leads por período (Hoje, Ontem, Últimos 7 dias), categorizados pelo campo `produto_interesse` do formulário.
 
-**Antes (incorreto)**: Categorização baseada em `page_path`
-- Chapas = páginas começando com `/chapas`
-- Produtos = demais páginas
+## Dados de Categorização
 
-**Depois (correto)**: Categorização baseada em `utm_campaign`
-- **Chapas** = utm_campaign **contém** "chapas" (ex: `chapas-policarbonato-rj`, `chapas-acm-rj`)
-- **Produtos** = todo o resto (inclui `sobmedida-rj`, `institucional`, `imersao-dez25`, `pmax`, e visitas sem UTM)
+| Valor do Campo | Categoria |
+|----------------|-----------|
+| `Chapa Inteira ou Cortada` | Chapas |
+| `Produto Personalizado` | Produtos |
 
-## Campanhas Atuais no Banco
+## Layout dos Cards
 
-| Campanha | Categoria | Visitas | Leads |
-|----------|-----------|---------|-------|
-| sobmedida-rj | Produtos | 132 | 16 |
-| institucional | Produtos | 7 | 2 |
-| imersao-dez25 | Produtos | 15 | 0 |
-| pmax | Produtos | 1 | 0 |
-| (sem utm) | Produtos | 141 | 3 |
-| chapas-policarbonato-rj | Chapas | 194 | 8 |
-| chapas-ps-rj | Chapas | 74 | 0 |
-| chapas-acm-rj | Chapas | 45 | 1 |
-| chapas-acrilico-rj | Chapas | 42 | 3 |
-| chapas-petg-rj | Chapas | 13 | 1 |
-| chapas-pvc-rj | Chapas | 5 | 0 |
+Serão 3 cards no topo, cada um mostrando:
+- **Período** (Hoje / Ontem / Últimos 7 dias)
+- **Produtos**: X leads
+- **Chapas**: X leads
+- **Total**: X leads
+
+```text
++------------------------+  +------------------------+  +------------------------+
+|       HOJE             |  |       ONTEM            |  |   ÚLTIMOS 7 DIAS       |
+|                        |  |                        |  |                        |
+|  Produtos: 3           |  |  Produtos: 2           |  |  Produtos: 12          |
+|  Chapas: 2             |  |  Chapas: 1             |  |  Chapas: 8             |
+|  ─────────             |  |  ─────────             |  |  ─────────             |
+|  Total: 5              |  |  Total: 3              |  |  Total: 20             |
++------------------------+  +------------------------+  +------------------------+
+```
 
 ## Detalhes Técnicos
 
-### Arquivo a Modificar
-`supabase/functions/get-dashboard-stats/index.ts`
+### 1. Atualizar Edge Function (`get-dashboard-stats/index.ts`)
 
-### Nova Lógica de Categorização
+Adicionar novo objeto `leadsByPeriod` na resposta:
 
 ```typescript
-// ANTES (baseado em page_path)
-function isChapasPage(pagePath: string): boolean {
-  return pagePath.startsWith('/chapas')
+interface LeadsByPeriodItem {
+  produtos: number
+  chapas: number
+  total: number
 }
 
-// DEPOIS (baseado em utm_campaign)
-function isChapasVisit(utmCampaign: string | null): boolean {
-  return utmCampaign?.includes('chapas') ?? false
-}
-
-function isChapasLead(utmCampaign: string | null): boolean {
-  return utmCampaign?.includes('chapas') ?? false
+interface LeadsByPeriod {
+  today: LeadsByPeriodItem
+  yesterday: LeadsByPeriodItem
+  last7days: LeadsByPeriodItem
 }
 ```
 
-### Alterações na Função calculateCategoryMetrics
-
-1. Mudar filtro de visitas de `page_path` para `utm_campaign`
-2. Mudar filtro de leads de `produto_interesse` para `utm_campaign`
-3. Remover exclusões de páginas `/admin` (agora irrelevante)
+Nova função para calcular leads por período baseado em `produto_interesse`:
 
 ```typescript
-// Separar visitas por utm_campaign
-const chapasVisits = periodVisits.filter(v => 
-  v.utm_campaign?.includes('chapas')
-)
-const produtosVisits = periodVisits.filter(v => 
-  !v.utm_campaign?.includes('chapas')
-)
+function calculateLeadsByPeriod(
+  leads: any[],
+  startDate: Date,
+  endDate: Date
+): LeadsByPeriodItem {
+  const startISO = startDate.toISOString()
+  const endISO = endDate.toISOString()
 
-// Separar leads por utm_campaign
-const chapasLeads = periodLeads.filter(l => 
-  l.utm_campaign?.includes('chapas')
-)
-const produtosLeads = periodLeads.filter(l => 
-  !l.utm_campaign?.includes('chapas')
-)
+  const periodLeads = leads.filter(l => 
+    l.created_at >= startISO && l.created_at <= endISO
+  )
+
+  const chapas = periodLeads.filter(l => 
+    l.produto_interesse === 'Chapa Inteira ou Cortada'
+  ).length
+  
+  const produtos = periodLeads.filter(l => 
+    l.produto_interesse === 'Produto Personalizado'
+  ).length
+
+  return {
+    produtos,
+    chapas,
+    total: produtos + chapas
+  }
+}
 ```
 
-### Impacto em Outras Partes do Código
+### 2. Criar Novo Componente `LeadsKPICards.tsx`
 
-A mesma lógica de categorização pode ser usada em:
-- `campaignStats` - já agrupa por campanha
-- `termStats` - já agrupa por termo
+Localização: `src/pages/admin/components/LeadsKPICards.tsx`
 
-Apenas a tabela `periodStats` precisa da mudança.
+Props:
+```typescript
+interface LeadsKPICardsProps {
+  leadsByPeriod: {
+    today: { produtos: number; chapas: number; total: number }
+    yesterday: { produtos: number; chapas: number; total: number }
+    last7days: { produtos: number; chapas: number; total: number }
+  } | null
+  isLoading: boolean
+}
+```
+
+### 3. Atualizar Dashboard.tsx
+
+- Importar o novo componente `LeadsKPICards`
+- Adicionar `leadsByPeriod` na interface `DashboardStats`
+- Renderizar os cards no topo, antes da tabela de métricas
+
+### Ordem dos Elementos no Dashboard
+
+1. **LeadsKPICards** (novo) - Cards de leads por período
+2. PeriodStatsTable - Tabela de métricas por período (utm_campaign)
+3. ConversionChart - Gráfico de visitas
+4. PagesList - Top páginas e leads por produto
+5. UTMPerformanceTable - Performance por campanha
 
