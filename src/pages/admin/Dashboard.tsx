@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { AdminLayout } from "./AdminLayout";
+import { LeadsKPICards } from "./components/LeadsKPICards";
 import { PeriodStatsTable } from "./components/PeriodStatsTable";
 import { ConversionChart } from "./components/ConversionChart";
 import { PagesList } from "./components/PagesList";
@@ -23,8 +24,21 @@ interface PeriodStats {
   last7days: PeriodMetrics;
 }
 
+interface LeadsByPeriodItem {
+  produtos: number;
+  chapas: number;
+  total: number;
+}
+
+interface LeadsByPeriod {
+  today: LeadsByPeriodItem;
+  yesterday: LeadsByPeriodItem;
+  last7days: LeadsByPeriodItem;
+}
+
 interface DashboardStats {
   periodStats: PeriodStats;
+  leadsByPeriod: LeadsByPeriod;
   totalVisits: number;
   totalLeads: number;
   uniqueVisitors: number;
@@ -109,6 +123,11 @@ export default function Dashboard() {
             {error}
           </div>
         )}
+
+        <LeadsKPICards
+          leadsByPeriod={stats?.leadsByPeriod || null}
+          isLoading={isLoading}
+        />
 
         <PeriodStatsTable
           periodStats={stats?.periodStats || null}
