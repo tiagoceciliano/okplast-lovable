@@ -1,7 +1,13 @@
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+type SortField = "name" | "visits" | "leads" | "conversionRate";
+type SortDirection = "asc" | "desc";
 
 interface UTMPerformanceTableProps {
   title: string;
@@ -33,12 +39,77 @@ export function UTMPerformanceTable({
   filterValue = "all",
   onFilterChange,
 }: UTMPerformanceTableProps) {
+  const [sortField, setSortField] = useState<SortField>("visits");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("desc");
+    }
+  };
+
+  const sortedData = useMemo(() => {
+    return [...data].sort((a, b) => {
+      let comparison = 0;
+      
+      switch (sortField) {
+        case "name":
+          comparison = a.name.localeCompare(b.name);
+          break;
+        case "visits":
+          comparison = a.visits - b.visits;
+          break;
+        case "leads":
+          comparison = a.leads - b.leads;
+          break;
+        case "conversionRate":
+          comparison = parseFloat(a.conversionRate) - parseFloat(b.conversionRate);
+          break;
+      }
+      
+      return sortDirection === "asc" ? comparison : -comparison;
+    });
+  }, [data, sortField, sortDirection]);
+
   // Calculate totals
   const totalVisits = data.reduce((sum, row) => sum + row.visits, 0);
   const totalLeads = data.reduce((sum, row) => sum + row.leads, 0);
   const totalConversionRate = totalVisits > 0 
     ? ((totalLeads / totalVisits) * 100).toFixed(2) 
     : '0.00';
+
+  const SortIcon = ({ field }: { field: SortField }) => {
+    if (sortField !== field) {
+      return <ArrowUpDown className="h-4 w-4 ml-1 opacity-50" />;
+    }
+    return sortDirection === "asc" 
+      ? <ArrowUp className="h-4 w-4 ml-1" /> 
+      : <ArrowDown className="h-4 w-4 ml-1" />;
+  };
+
+  const SortableHeader = ({ field, children, className }: { field: SortField; children: React.ReactNode; className?: string }) => (
+    <TableHead 
+      className={cn("cursor-pointer select-none hover:bg-muted/50 transition-colors", className)}
+      onClick={() => handleSort(field)}
+    >
+      <div className="flex items-center justify-end">
+        {field === "name" ? (
+          <>
+            {children}
+            <SortIcon field={field} />
+          </>
+        ) : (
+          <>
+            {children}
+            <SortIcon field={field} />
+          </>
+        )}
+      </div>
+    </TableHead>
+  );
 
   if (isLoading) {
     return (
@@ -92,14 +163,16 @@ export function UTMPerformanceTable({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[40%]">{columnLabel}</TableHead>
-                <TableHead className="text-right">Visitas</TableHead>
-                <TableHead className="text-right">Leads</TableHead>
-                <TableHead className="text-right">Taxa de Conversão</TableHead>
+                <SortableHeader field="name" className="w-[40%] [&>div]:justify-start">
+                  {columnLabel}
+                </SortableHeader>
+                <SortableHeader field="visits">Visitas</SortableHeader>
+                <SortableHeader field="leads">Leads</SortableHeader>
+                <SortableHeader field="conversionRate">Taxa de Conversão</SortableHeader>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.map((row, index) => (
+              {sortedData.map((row, index) => (
                 <TableRow key={index}>
                   <TableCell className="font-medium">{row.name}</TableCell>
                   <TableCell className="text-right">{row.visits.toLocaleString('pt-BR')}</TableCell>
