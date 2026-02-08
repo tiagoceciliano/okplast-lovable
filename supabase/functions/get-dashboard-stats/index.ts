@@ -76,13 +76,13 @@ Deno.serve(async (req) => {
       .slice(0, 5)
       .map(([path, count]) => ({ path, count }))
 
-    // Traffic sources
-    const sourceCounts: Record<string, number> = {}
-    visits?.forEach(v => {
-      const source = v.utm_source || 'Direto'
-      sourceCounts[source] = (sourceCounts[source] || 0) + 1
+    // Traffic sources - baseado em leads ativos (não em visitas)
+    const sourceLeadCounts: Record<string, number> = {}
+    leads?.forEach(l => {
+      const source = l.utm_source || 'Direto'
+      sourceLeadCounts[source] = (sourceLeadCounts[source] || 0) + 1
     })
-    const trafficSources = Object.entries(sourceCounts)
+    const trafficSources = Object.entries(sourceLeadCounts)
       .sort((a, b) => b[1] - a[1])
       .map(([source, count]) => ({ source, count }))
 
