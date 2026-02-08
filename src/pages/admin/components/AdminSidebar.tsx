@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { 
   LayoutDashboard, 
@@ -6,7 +5,6 @@ import {
   Package, 
   Layers, 
   Building2, 
-  ChevronDown, 
   ChevronRight,
   ExternalLink,
   Users
@@ -19,13 +17,18 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const acrilicoSubPages = [
   { title: "Caixas Sob Medida", path: "/acrilico-sob-medida/caixas-sob-medida" },
@@ -66,7 +69,47 @@ const institucionalSubPages = [
   { title: "Política de Privacidade", path: "/home/politica-de-privacidade" },
 ];
 
-interface CollapsibleMenuProps {
+interface ExternalLinkItemProps {
+  icon: React.ElementType;
+  title: string;
+  href: string;
+  collapsed: boolean;
+}
+
+const ExternalLinkItem = ({ icon: Icon, title, href, collapsed }: ExternalLinkItemProps) => {
+  if (collapsed) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center h-8 w-8 rounded-md text-sm font-medium transition-colors hover:bg-muted mx-auto"
+          >
+            <Icon className="h-4 w-4" />
+          </a>
+        </TooltipTrigger>
+        <TooltipContent side="right">{title}</TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-muted"
+    >
+      <Icon className="h-4 w-4" />
+      <span>{title}</span>
+      <ExternalLink className="h-3 w-3 ml-auto" />
+    </a>
+  );
+};
+
+interface SubPagesSectionProps {
   title: string;
   icon: React.ElementType;
   hubPath: string;
@@ -74,53 +117,52 @@ interface CollapsibleMenuProps {
   collapsed: boolean;
 }
 
-const CollapsibleMenu = ({ title, icon: Icon, hubPath, subPages, collapsed }: CollapsibleMenuProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const location = useLocation();
-  const isActive = location.pathname.startsWith(hubPath);
-
-  return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-      <CollapsibleTrigger className="w-full">
-        <div className={cn(
-          "flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-muted",
-          isActive && "bg-muted text-primary"
-        )}>
-          <div className="flex items-center gap-2">
-            <Icon className="h-4 w-4" />
-            {!collapsed && <span>{title}</span>}
-          </div>
-          {!collapsed && (
-            isOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />
-          )}
-        </div>
-      </CollapsibleTrigger>
-      {!collapsed && (
-        <CollapsibleContent className="pl-6 space-y-1 mt-1">
+const SubPagesSection = ({ title, icon: Icon, hubPath, subPages, collapsed }: SubPagesSectionProps) => {
+  if (collapsed) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
           <a
             href={COMPANY.domain + hubPath}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center h-8 w-8 rounded-md text-sm font-medium transition-colors hover:bg-muted mx-auto"
+          >
+            <Icon className="h-4 w-4" />
+          </a>
+        </TooltipTrigger>
+        <TooltipContent side="right">{title}</TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  return (
+    <div className="space-y-1">
+      <a
+        href={COMPANY.domain + hubPath}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-muted"
+      >
+        <Icon className="h-4 w-4" />
+        <span>{title}</span>
+        <ExternalLink className="h-3 w-3 ml-auto" />
+      </a>
+      <div className="pl-6 space-y-1">
+        {subPages.map((page) => (
+          <a
+            key={page.path}
+            href={COMPANY.domain + page.path}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md"
           >
             <ExternalLink className="h-3 w-3" />
-            <span>Página Principal</span>
+            <span>{page.title}</span>
           </a>
-          {subPages.map((page) => (
-            <a
-              key={page.path}
-              href={COMPANY.domain + page.path}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md"
-            >
-              <ExternalLink className="h-3 w-3" />
-              <span>{page.title}</span>
-            </a>
-          ))}
-        </CollapsibleContent>
-      )}
-    </Collapsible>
+        ))}
+      </div>
+    </div>
   );
 };
 
@@ -130,11 +172,18 @@ export function AdminSidebar() {
   const location = useLocation();
 
   return (
-    <Sidebar className={cn(collapsed ? "w-14" : "w-64")} collapsible="icon">
-      <div className="flex items-center justify-between p-4 border-b">
-        {!collapsed && <h2 className="font-semibold text-lg">Admin</h2>}
-        <SidebarTrigger className={cn(collapsed && "mx-auto")} />
-      </div>
+    <Sidebar collapsible="icon">
+      <SidebarHeader className="border-b">
+        <div className="flex items-center justify-between p-2">
+          {!collapsed && <h2 className="font-semibold text-lg">Admin</h2>}
+          <SidebarTrigger className={cn(collapsed && "mx-auto")}>
+            <ChevronRight className={cn(
+              "h-4 w-4 transition-transform",
+              !collapsed && "rotate-180"
+            )} />
+          </SidebarTrigger>
+        </div>
+      </SidebarHeader>
 
       <SidebarContent className="p-2">
         <SidebarGroup>
@@ -142,13 +191,14 @@ export function AdminSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
+                <SidebarMenuButton asChild tooltip="Dashboard">
                   <NavLink
                     to="/admin"
                     end
                     className={({ isActive }) => cn(
                       "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-muted",
-                      isActive && "bg-primary text-primary-foreground hover:bg-primary/90"
+                      isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
+                      collapsed && "justify-center px-0"
                     )}
                   >
                     <LayoutDashboard className="h-4 w-4" />
@@ -157,12 +207,13 @@ export function AdminSidebar() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
+                <SidebarMenuButton asChild tooltip="Leads">
                   <NavLink
                     to="/admin/leads"
                     className={({ isActive }) => cn(
                       "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-muted",
-                      isActive && "bg-primary text-primary-foreground hover:bg-primary/90"
+                      isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
+                      collapsed && "justify-center px-0"
                     )}
                   >
                     <Users className="h-4 w-4" />
@@ -177,18 +228,14 @@ export function AdminSidebar() {
         <SidebarGroup>
           <SidebarGroupLabel className={cn(collapsed && "sr-only")}>Páginas do Site</SidebarGroupLabel>
           <SidebarGroupContent className="space-y-1">
-            <a
+            <ExternalLinkItem
+              icon={Home}
+              title="Home"
               href={COMPANY.domain}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-muted"
-            >
-              <Home className="h-4 w-4" />
-              {!collapsed && <span>Home</span>}
-              {!collapsed && <ExternalLink className="h-3 w-3 ml-auto" />}
-            </a>
+              collapsed={collapsed}
+            />
 
-            <CollapsibleMenu
+            <SubPagesSection
               title="Acrílico Sob Medida"
               icon={Package}
               hubPath="/acrilico-sob-medida"
@@ -196,7 +243,7 @@ export function AdminSidebar() {
               collapsed={collapsed}
             />
 
-            <CollapsibleMenu
+            <SubPagesSection
               title="Chapas"
               icon={Layers}
               hubPath="/chapas"
@@ -204,7 +251,7 @@ export function AdminSidebar() {
               collapsed={collapsed}
             />
 
-            <CollapsibleMenu
+            <SubPagesSection
               title="Institucional"
               icon={Building2}
               hubPath="/home"
