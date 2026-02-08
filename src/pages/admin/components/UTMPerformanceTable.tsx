@@ -25,6 +25,8 @@ interface UTMPerformanceTableProps {
   filterOptions?: string[];
   filterValue?: string;
   onFilterChange?: (value: string) => void;
+  periodValue?: string;
+  onPeriodChange?: (value: string) => void;
 }
 
 export function UTMPerformanceTable({
@@ -38,6 +40,8 @@ export function UTMPerformanceTable({
   filterOptions = [],
   filterValue = "all",
   onFilterChange,
+  periodValue,
+  onPeriodChange,
 }: UTMPerformanceTableProps) {
   const [sortField, setSortField] = useState<SortField>("visits");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
@@ -132,26 +136,40 @@ export function UTMPerformanceTable({
   return (
     <Card className="w-full">
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
             <CardTitle>{title}</CardTitle>
             <CardDescription>{description}</CardDescription>
           </div>
-          {showFilter && filterOptions.length > 0 && (
-            <Select value={filterValue} onValueChange={onFilterChange}>
-              <SelectTrigger className="w-[220px]">
-                <SelectValue placeholder={filterLabel} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todas as Campanhas</SelectItem>
-                {filterOptions.map((option) => (
-                  <SelectItem key={option} value={option}>
-                    {option}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
+          <div className="flex items-center gap-2">
+            {showFilter && filterOptions.length > 0 && (
+              <Select value={filterValue} onValueChange={onFilterChange}>
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue placeholder={filterLabel} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas as Campanhas</SelectItem>
+                  {filterOptions.map((option) => (
+                    <SelectItem key={option} value={option}>
+                      {option}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+            {periodValue && onPeriodChange && (
+              <Select value={periodValue} onValueChange={onPeriodChange}>
+                <SelectTrigger className="w-[160px]">
+                  <SelectValue placeholder="Período" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="7d">Últimos 7 dias</SelectItem>
+                  <SelectItem value="30d">Últimos 30 dias</SelectItem>
+                  <SelectItem value="all">Todo o período</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          </div>
         </div>
       </CardHeader>
       <CardContent>

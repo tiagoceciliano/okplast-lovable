@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { AdminLayout } from "./AdminLayout";
 import { UTMPerformanceTable } from "./components/UTMPerformanceTable";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface TermStat {
   term: string;
@@ -82,25 +81,6 @@ export default function UTMTerms() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Performance por Termo</h1>
-            <p className="text-muted-foreground">
-              Análise de conversão por utm_term
-            </p>
-          </div>
-          <Select value={period} onValueChange={setPeriod}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Período" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="7d">Últimos 7 dias</SelectItem>
-              <SelectItem value="30d">Últimos 30 dias</SelectItem>
-              <SelectItem value="all">Todo o período</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
         {error && (
           <div className="p-4 bg-destructive/10 text-destructive rounded-lg">
             {error}
@@ -118,6 +98,8 @@ export default function UTMTerms() {
           filterOptions={uniqueCampaigns}
           filterValue={campaignFilter}
           onFilterChange={setCampaignFilter}
+          periodValue={period}
+          onPeriodChange={setPeriod}
         />
       </div>
     </AdminLayout>
