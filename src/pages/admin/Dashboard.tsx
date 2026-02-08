@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminLayout } from "./AdminLayout";
 import { StatsCards } from "./components/StatsCards";
 import { ConversionChart } from "./components/ConversionChart";
 import { PagesList } from "./components/PagesList";
+import { UTMPerformanceTable } from "./components/UTMPerformanceTable";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface DashboardStats {
@@ -17,6 +18,19 @@ interface DashboardStats {
   leadsByProduct: { product: string; count: number }[];
   leadsByLocation: { location: string; count: number }[];
   chartData: { date: string; visits: number }[];
+  campaignStats: Array<{
+    campaign: string;
+    visits: number;
+    leads: number;
+    conversionRate: string;
+  }>;
+  termStats: Array<{
+    term: string;
+    campaign: string;
+    visits: number;
+    leads: number;
+    conversionRate: string;
+  }>;
 }
 
 export default function Dashboard() {
@@ -24,6 +38,37 @@ export default function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [campaignFilter, setCampaignFilter] = useState<string>("all");
+
+  // Campaign data for table
+  const campaignData = useMemo(() => {
+    return (stats?.campaignStats || []).map(c => ({
+      name: c.campaign,
+      visits: c.visits,
+      leads: c.leads,
+      conversionRate: c.conversionRate
+    }));
+  }, [stats?.campaignStats]);
+
+  // Unique campaigns for filter
+  const uniqueCampaigns = useMemo(() => {
+    return (stats?.campaignStats || []).map(c => c.campaign);
+  }, [stats?.campaignStats]);
+
+  // Filtered term data
+  const termData = useMemo(() => {
+    const terms = stats?.termStats || [];
+    const filtered = campaignFilter === "all" 
+      ? terms 
+      : terms.filter(t => t.campaign === campaignFilter);
+    
+    return filtered.map(t => ({
+      name: t.term,
+      visits: t.visits,
+      leads: t.leads,
+      conversionRate: t.conversionRate
+    }));
+  }, [stats?.termStats, campaignFilter]);
 
   useEffect(() => {
     async function fetchStats() {
@@ -110,6 +155,29 @@ export default function Dashboard() {
           trafficSources={stats?.trafficSources || []}
           leadsByProduct={stats?.leadsByProduct || []}
           isLoading={isLoading}
+        />
+
+        {/* Tabela Performance por Campanha */}
+        <UTMPerformanceTable
+          title="Performance por Campanha"
+          description="Visitas, leads e conversão por utm_campaign"
+          columnLabel="Campanha"
+          data={campaignData}
+          isLoading={isLoading}
+        />
+
+        {/* Tabela Performance por Termo */}
+        <UTMPerformanceTable
+          title="Performance por Termo"
+          description="Visitas, leads e conversão por utm_term"
+          columnLabel="Termo"
+          data={termData}
+          isLoading={isLoading}
+          showFilter
+          filterLabel="Filtrar por Campanha"
+          filterOptions={uniqueCampaigns}
+          filterValue={campaignFilter}
+          onFilterChange={setCampaignFilter}
         />
       </div>
     </AdminLayout>
