@@ -51,12 +51,8 @@ interface PeriodStats {
   last7days: PeriodMetrics
 }
 
-function isChapasPage(pagePath: string): boolean {
-  return pagePath.startsWith('/chapas')
-}
-
-function isChapasLead(produtoInteresse: string): boolean {
-  return produtoInteresse === 'Chapa Inteira ou Cortada'
+function isChapasCategory(utmCampaign: string | null): boolean {
+  return utmCampaign?.includes('chapas') ?? false
 }
 
 function calculateCategoryMetrics(
@@ -76,12 +72,12 @@ function calculateCategoryMetrics(
     l.created_at >= startISO && l.created_at <= endISO
   )
 
-  // Separate by category
-  const chapasVisits = periodVisits.filter(v => isChapasPage(v.page_path))
-  const produtosVisits = periodVisits.filter(v => !isChapasPage(v.page_path) && !v.page_path.startsWith('/admin'))
+  // Separate by category based on utm_campaign
+  const chapasVisits = periodVisits.filter(v => isChapasCategory(v.utm_campaign))
+  const produtosVisits = periodVisits.filter(v => !isChapasCategory(v.utm_campaign))
   
-  const chapasLeads = periodLeads.filter(l => isChapasLead(l.produto_interesse))
-  const produtosLeads = periodLeads.filter(l => !isChapasLead(l.produto_interesse))
+  const chapasLeads = periodLeads.filter(l => isChapasCategory(l.utm_campaign))
+  const produtosLeads = periodLeads.filter(l => !isChapasCategory(l.utm_campaign))
 
   // Count unique visitors for each category
   const chapasUniqueVisitors = new Set(chapasVisits.map(v => v.visitor_id)).size
