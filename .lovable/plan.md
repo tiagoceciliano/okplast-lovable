@@ -1,85 +1,85 @@
 
-# Plano: Nova Tabela de KPIs por Período e Categoria
 
-## Objetivo
-Substituir os 4 cards de KPI atuais por uma tabela que mostra as métricas divididas por:
-- **Linhas**: Hoje, Ontem, Últimos 7 dias
-- **Colunas**: Duas seções - Produtos (Visitas, Leads, Tx Conversão) e Chapas (Visitas, Leads, Tx Conversão)
+# Plano: Corrigir Categorização por UTM Campaign
 
-## Estrutura da Nova Tabela
+## Mudança de Lógica
 
-```text
-┌─────────────────┬─────────────────────────────────────┬─────────────────────────────────────┐
-│                 │            PRODUTOS                 │            CHAPAS                   │
-│    PERÍODO      ├───────────┬────────┬───────────────┼───────────┬────────┬───────────────┤
-│                 │  Visitas  │ Leads  │ Tx Conversão  │  Visitas  │ Leads  │ Tx Conversão  │
-├─────────────────┼───────────┼────────┼───────────────┼───────────┼────────┼───────────────┤
-│ Hoje            │    45     │   3    │    6.67%      │    23     │   1    │    4.35%      │
-├─────────────────┼───────────┼────────┼───────────────┼───────────┼────────┼───────────────┤
-│ Ontem           │    52     │   4    │    7.69%      │    31     │   2    │    6.45%      │
-├─────────────────┼───────────┼────────┼───────────────┼───────────┼────────┼───────────────┤
-│ Últimos 7 dias  │   320     │  18    │    5.63%      │   180     │   8    │    4.44%      │
-└─────────────────┴───────────┴────────┴───────────────┴───────────┴────────┴───────────────┘
-```
+**Antes (incorreto)**: Categorização baseada em `page_path`
+- Chapas = páginas começando com `/chapas`
+- Produtos = demais páginas
 
-## Lógica de Categorização
+**Depois (correto)**: Categorização baseada em `utm_campaign`
+- **Chapas** = utm_campaign **contém** "chapas" (ex: `chapas-policarbonato-rj`, `chapas-acm-rj`)
+- **Produtos** = todo o resto (inclui `sobmedida-rj`, `institucional`, `imersao-dez25`, `pmax`, e visitas sem UTM)
 
-**Visitas de Chapas** - Páginas que começam com `/chapas`:
-- `/chapas`, `/chapas/acrilico`, `/chapas/acm`, `/chapas/petg`, etc.
+## Campanhas Atuais no Banco
 
-**Visitas de Produtos** - Demais páginas do site (exceto admin):
-- `/`, `/acrilico-sob-medida`, `/acrilico-sob-medida/placa-personalizada`, etc.
-
-**Leads de Chapas** - Campo `produto_interesse = 'Chapa Inteira ou Cortada'`
-
-**Leads de Produtos** - Campo `produto_interesse = 'Produto Personalizado'`
+| Campanha | Categoria | Visitas | Leads |
+|----------|-----------|---------|-------|
+| sobmedida-rj | Produtos | 132 | 16 |
+| institucional | Produtos | 7 | 2 |
+| imersao-dez25 | Produtos | 15 | 0 |
+| pmax | Produtos | 1 | 0 |
+| (sem utm) | Produtos | 141 | 3 |
+| chapas-policarbonato-rj | Chapas | 194 | 8 |
+| chapas-ps-rj | Chapas | 74 | 0 |
+| chapas-acm-rj | Chapas | 45 | 1 |
+| chapas-acrilico-rj | Chapas | 42 | 3 |
+| chapas-petg-rj | Chapas | 13 | 1 |
+| chapas-pvc-rj | Chapas | 5 | 0 |
 
 ## Detalhes Técnicos
 
-### 1. Backend - Edge Function (get-dashboard-stats)
-Adicionar nova estrutura de dados `periodStats` que retorna métricas para cada período:
+### Arquivo a Modificar
+`supabase/functions/get-dashboard-stats/index.ts`
+
+### Nova Lógica de Categorização
 
 ```typescript
-// Definir início e fim de cada período em São Paulo timezone
-const todayStart = // início do dia atual
-const yesterdayStart = // início de ontem
-const yesterdayEnd = // fim de ontem
-const last7DaysStart = // 7 dias atrás
+// ANTES (baseado em page_path)
+function isChapasPage(pagePath: string): boolean {
+  return pagePath.startsWith('/chapas')
+}
 
-// Calcular para cada período:
-periodStats: {
-  today: {
-    produtos: { visits, leads, conversionRate },
-    chapas: { visits, leads, conversionRate }
-  },
-  yesterday: {
-    produtos: { visits, leads, conversionRate },
-    chapas: { visits, leads, conversionRate }
-  },
-  last7days: {
-    produtos: { visits, leads, conversionRate },
-    chapas: { visits, leads, conversionRate }
-  }
+// DEPOIS (baseado em utm_campaign)
+function isChapasVisit(utmCampaign: string | null): boolean {
+  return utmCampaign?.includes('chapas') ?? false
+}
+
+function isChapasLead(utmCampaign: string | null): boolean {
+  return utmCampaign?.includes('chapas') ?? false
 }
 ```
 
-### 2. Frontend - Novo Componente
-Criar `PeriodStatsTable.tsx` para substituir `StatsCards`:
-- Tabela com cabeçalhos de 2 níveis (Produtos | Chapas)
-- 3 linhas de dados (Hoje, Ontem, Últimos 7 dias)
-- Formatação numérica brasileira
-- Estado de loading com skeleton
+### Alterações na Função calculateCategoryMetrics
 
-### 3. Dashboard
-- Remover importação e uso de `StatsCards`
-- Remover seletor de período do header (métricas são fixas)
-- Adicionar novo componente `PeriodStatsTable`
+1. Mudar filtro de visitas de `page_path` para `utm_campaign`
+2. Mudar filtro de leads de `produto_interesse` para `utm_campaign`
+3. Remover exclusões de páginas `/admin` (agora irrelevante)
 
-## Arquivos a Modificar
+```typescript
+// Separar visitas por utm_campaign
+const chapasVisits = periodVisits.filter(v => 
+  v.utm_campaign?.includes('chapas')
+)
+const produtosVisits = periodVisits.filter(v => 
+  !v.utm_campaign?.includes('chapas')
+)
 
-| Arquivo | Ação |
-|---------|------|
-| `supabase/functions/get-dashboard-stats/index.ts` | Adicionar cálculo de `periodStats` com separação por categoria e período |
-| `src/pages/admin/components/PeriodStatsTable.tsx` | **CRIAR** - Novo componente de tabela |
-| `src/pages/admin/Dashboard.tsx` | Substituir `StatsCards` por `PeriodStatsTable`, remover seletor de período |
-| `src/pages/admin/components/StatsCards.tsx` | Pode ser mantido ou removido após a migração |
+// Separar leads por utm_campaign
+const chapasLeads = periodLeads.filter(l => 
+  l.utm_campaign?.includes('chapas')
+)
+const produtosLeads = periodLeads.filter(l => 
+  !l.utm_campaign?.includes('chapas')
+)
+```
+
+### Impacto em Outras Partes do Código
+
+A mesma lógica de categorização pode ser usada em:
+- `campaignStats` - já agrupa por campanha
+- `termStats` - já agrupa por termo
+
+Apenas a tabela `periodStats` precisa da mudança.
+
