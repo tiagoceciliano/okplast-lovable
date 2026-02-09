@@ -157,8 +157,10 @@ Deno.serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
     // Parse query params for date filtering
-    const url = new URL(req.url)
+  const url = new URL(req.url)
     const period = url.searchParams.get('period') || 'all' // '7d', '30d', 'all'
+    const customStartDate = url.searchParams.get('customStartDate')
+    const customEndDate = url.searchParams.get('customEndDate')
     
     let dateFilter = null
     const nowSP = getSaoPauloDate()
@@ -200,10 +202,27 @@ Deno.serve(async (req) => {
     }
 
     // Calculate leads by period based on produto_interesse
-    const leadsByPeriod: LeadsByPeriod = {
+    // Custom period calculation
+    let customStart: Date
+    let customEnd: Date
+    
+    if (customStartDate && customEndDate) {
+      customStart = getStartOfDaySaoPaulo(new Date(customStartDate))
+      customEnd = getEndOfDaySaoPaulo(new Date(customEndDate))
+    } else {
+      // Default: all time (from first record or a very old date)
+      const oldestLead = leads?.reduce((oldest, lead) => {
+        return !oldest || lead.created_at < oldest ? lead.created_at : oldest
+      }, null as string | null)
+      customStart = oldestLead ? getStartOfDaySaoPaulo(new Date(oldestLead)) : getStartOfDaySaoPaulo(new Date('2024-01-01'))
+      customEnd = todayEnd
+    }
+
+    const leadsByPeriod = {
       today: calculateLeadsByPeriod(leads || [], todayStart, todayEnd),
       yesterday: calculateLeadsByPeriod(leads || [], yesterdayStart, yesterdayEnd),
-      last7days: calculateLeadsByPeriod(leads || [], last7DaysStart, todayEnd)
+      last7days: calculateLeadsByPeriod(leads || [], last7DaysStart, todayEnd),
+      custom: calculateLeadsByPeriod(leads || [], customStart, customEnd)
     }
 
     // Filter data for other metrics based on period param

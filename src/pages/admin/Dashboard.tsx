@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { AdminLayout } from "./AdminLayout";
 import { LeadsKPICards } from "./components/LeadsKPICards";
 import { PeriodStatsTable } from "./components/PeriodStatsTable";
@@ -6,6 +6,8 @@ import { ConversionChart } from "./components/ConversionChart";
 import { PagesList } from "./components/PagesList";
 import { UTMPerformanceTable } from "./components/UTMPerformanceTable";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DateRange } from "react-day-picker";
+import { format } from "date-fns";
 
 interface CategoryMetrics {
   visits: number;
@@ -34,6 +36,7 @@ interface LeadsByPeriod {
   today: LeadsByPeriodItem;
   yesterday: LeadsByPeriodItem;
   last7days: LeadsByPeriodItem;
+  custom: LeadsByPeriodItem;
 }
 
 interface DashboardStats {
@@ -62,6 +65,7 @@ export default function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [customDateRange, setCustomDateRange] = useState<DateRange | undefined>(undefined);
 
   // Campaign data for table
   const campaignData = useMemo(() => {
@@ -73,21 +77,26 @@ export default function Dashboard() {
     }));
   }, [stats?.campaignStats]);
 
-  useEffect(() => {
-    async function fetchStats() {
-      setIsLoading(true);
-      setError(null);
+  const fetchStats = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      let url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-dashboard-stats?period=${period}`;
       
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-dashboard-stats?period=${period}`,
-          {
-            headers: {
-              'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
+      if (customDateRange?.from) {
+        url += `&customStartDate=${format(customDateRange.from, 'yyyy-MM-dd')}`;
+      }
+      if (customDateRange?.to) {
+        url += `&customEndDate=${format(customDateRange.to, 'yyyy-MM-dd')}`;
+      }
+      
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          'Content-Type': 'application/json',
+        },
+      });
 
         if (!response.ok) {
           throw new Error('Falha ao carregar estatísticas');
@@ -98,13 +107,18 @@ export default function Dashboard() {
       } catch (err) {
         console.error('Error fetching dashboard stats:', err);
         setError(err instanceof Error ? err.message : 'Erro desconhecido');
-      } finally {
-        setIsLoading(false);
-      }
+    } finally {
+      setIsLoading(false);
     }
+  }, [period, customDateRange]);
 
+  useEffect(() => {
     fetchStats();
-  }, [period]);
+  }, [fetchStats]);
+
+  const handleCustomDateChange = useCallback((range: DateRange | undefined) => {
+    setCustomDateRange(range);
+  }, []);
 
   return (
     <AdminLayout>
@@ -127,6 +141,8 @@ export default function Dashboard() {
         <LeadsKPICards
           leadsByPeriod={stats?.leadsByPeriod || null}
           isLoading={isLoading}
+          customDateRange={customDateRange}
+          onCustomDateChange={handleCustomDateChange}
         />
 
         <PeriodStatsTable
