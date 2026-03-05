@@ -1,91 +1,61 @@
 
 
-# Plano: Adicionar KPI Card "Total" com Filtro de Data Personalizado
+# Fix: Dashboard não puxa todos os dados do banco
 
-## Objetivo
-Adicionar um quarto KPI card que mostra o total de leads de todo o período, com a opção de selecionar um intervalo de datas personalizado via date range picker.
+## Problema
+O banco tem 1237 leads e 10258 visitas, mas o dashboard mostra números menores. Mesmo com `.limit(50000)`, o PostgREST pode estar ignorando limites acima do padrão configurado (1000).
 
-## Layout Atualizado
+## Solução: Migrar para agregação SQL via RPC
 
-```text
-+------------------+  +------------------+  +------------------+  +------------------------+
-|      HOJE        |  |      ONTEM       |  |   ÚLTIMOS 7 DIAS |  |   TOTAL PERÍODO        |
-|                  |  |                  |  |                  |  |   [📅 Selecionar]      |
-|  Produtos: 3     |  |  Produtos: 2     |  |  Produtos: 12    |  |                        |
-|  Chapas: 2       |  |  Chapas: 1       |  |  Chapas: 8       |  |  Produtos: 21          |
-|  ─────────       |  |  ─────────       |  |  ─────────       |  |  Chapas: 13            |
-|  Total: 5        |  |  Total: 3        |  |  Total: 20       |  |  ─────────             |
-+------------------+  +------------------+  +------------------+  |  Total: 34             |
-                                                                  +------------------------+
+Em vez de buscar todas as linhas e contar no JavaScript (sujeito ao limite do PostgREST), criar **funções SQL no banco** que fazem a contagem diretamente — sem limite de linhas.
+
+### 1. Criar funções SQL no banco (migration)
+
+**Função `get_leads_count_by_period`**: Conta leads agrupados por `produto_interesse` dentro de um intervalo de datas.
+
+```sql
+CREATE FUNCTION get_leads_count_by_period(p_start timestamptz, p_end timestamptz)
+RETURNS TABLE(produtos bigint, chapas bigint, total bigint)
+AS $$
+  SELECT 
+    COUNT(*) FILTER (WHERE produto_interesse = 'Produto Personalizado') as produtos,
+    COUNT(*) FILTER (WHERE produto_interesse = 'Chapa Inteira ou Cortada') as chapas,
+    COUNT(*) as total
+  FROM leads
+  WHERE created_at >= p_start AND created_at <= p_end;
+$$
 ```
 
-## Comportamento
+**Função `get_visits_count_by_period`**: Conta visitantes únicos por categoria (chapas vs produtos) baseado em `utm_campaign`.
 
-- **Padrão**: Mostra leads de todo o período (desde o primeiro registro)
-- **Filtro**: Ao clicar no botão de calendário, abre um date range picker para selecionar intervalo personalizado
-- **Feedback**: Exibe as datas selecionadas no header do card
+**Função `get_top_pages`**: Retorna top páginas por contagem.
 
-## Detalhes Técnicos
+**Função `get_campaign_stats`**: Retorna visits/leads/conversão por campanha.
 
-### 1. Atualizar Edge Function (`get-dashboard-stats/index.ts`)
+### 2. Atualizar Edge Function (`get-dashboard-stats/index.ts`)
 
-Adicionar suporte para filtro de data personalizado via query params:
+Substituir os dois `SELECT *` gigantes por chamadas `supabase.rpc(...)`:
 
 ```typescript
-// Novos query params
-const customStartDate = url.searchParams.get('customStartDate')
-const customEndDate = url.searchParams.get('customEndDate')
+// Antes (sujeito a limite de 1000):
+const { data: visits } = await supabase.from('page_visits').select('*').limit(50000)
 
-// Adicionar no objeto leadsByPeriod
-leadsByPeriod: {
-  today: {...},
-  yesterday: {...},
-  last7days: {...},
-  custom: calculateLeadsByPeriod(leads, customStart, customEnd)
-}
+// Depois (sem limite, agregação no banco):
+const { data: todayLeads } = await supabase.rpc('get_leads_count_by_period', {
+  p_start: todayStart.toISOString(),
+  p_end: todayEnd.toISOString()
+})
 ```
 
-### 2. Atualizar Interface no Dashboard.tsx
-
-Adicionar estados para controle do filtro:
-- `customDateRange: { from: Date | undefined, to: Date | undefined }`
-- Adicionar `custom` ao tipo `LeadsByPeriod`
-
-### 3. Atualizar Componente LeadsKPICards.tsx
-
-Criar um novo card especial com:
-- Botão de calendário no header
-- Popover com Calendar em modo `range`
-- Exibição das datas selecionadas
-- Callback para quando as datas mudarem
-
-Props adicionais:
-```typescript
-interface LeadsKPICardsProps {
-  leadsByPeriod: {
-    today: LeadsByPeriodItem;
-    yesterday: LeadsByPeriodItem;
-    last7days: LeadsByPeriodItem;
-    custom: LeadsByPeriodItem;
-  } | null;
-  isLoading: boolean;
-  customDateRange: { from: Date | undefined; to: Date | undefined };
-  onCustomDateChange: (range: { from: Date | undefined; to: Date | undefined }) => void;
-}
-```
-
-### 4. Fluxo de Dados
-
-1. Usuário abre o Dashboard -> API retorna `custom` com todos os leads (sem filtro de data)
-2. Usuário seleciona datas -> `onCustomDateChange` é chamado
-3. Dashboard atualiza estado e refaz requisição com `customStartDate` e `customEndDate`
-4. Edge function calcula `custom` baseado nas datas fornecidas
-
-### Arquivos a Modificar
+### 3. Arquivos a modificar
 
 | Arquivo | Alteração |
 |---------|-----------|
-| `supabase/functions/get-dashboard-stats/index.ts` | Adicionar query params e cálculo de `custom` |
-| `src/pages/admin/components/LeadsKPICards.tsx` | Adicionar 4º card com date range picker |
-| `src/pages/admin/Dashboard.tsx` | Adicionar estado de datas e passar para componente |
+| Migration SQL | Criar 4-5 funções RPC de agregação |
+| `supabase/functions/get-dashboard-stats/index.ts` | Trocar SELECT * por chamadas RPC |
+
+### Benefícios
+- Dados 100% precisos (sem truncamento)
+- Muito mais rápido (banco agrega em vez de transferir 10k+ linhas)
+- Escala para qualquer volume de dados
 
