@@ -13,15 +13,9 @@ function getSaoPauloDate(date: Date = new Date()): Date {
   return new Date(utc + SAO_PAULO_OFFSET)
 }
 
-function formatDateSaoPaulo(date: Date): string {
-  const spDate = getSaoPauloDate(date)
-  return spDate.toISOString().split('T')[0]
-}
-
 function getStartOfDaySaoPaulo(date: Date): Date {
   const spDate = getSaoPauloDate(date)
   spDate.setHours(0, 0, 0, 0)
-  // Convert back to UTC for database comparison
   const utc = spDate.getTime() - SAO_PAULO_OFFSET
   return new Date(utc)
 }
@@ -29,120 +23,8 @@ function getStartOfDaySaoPaulo(date: Date): Date {
 function getEndOfDaySaoPaulo(date: Date): Date {
   const spDate = getSaoPauloDate(date)
   spDate.setHours(23, 59, 59, 999)
-  // Convert back to UTC for database comparison
   const utc = spDate.getTime() - SAO_PAULO_OFFSET
   return new Date(utc)
-}
-
-interface CategoryMetrics {
-  visits: number
-  leads: number
-  conversionRate: string
-}
-
-interface PeriodMetrics {
-  produtos: CategoryMetrics
-  chapas: CategoryMetrics
-}
-
-interface PeriodStats {
-  today: PeriodMetrics
-  yesterday: PeriodMetrics
-  last7days: PeriodMetrics
-}
-
-interface LeadsByPeriodItem {
-  produtos: number
-  chapas: number
-  total: number
-}
-
-interface LeadsByPeriod {
-  today: LeadsByPeriodItem
-  yesterday: LeadsByPeriodItem
-  last7days: LeadsByPeriodItem
-}
-
-function isChapasCategory(utmCampaign: string | null): boolean {
-  return utmCampaign?.includes('chapas') ?? false
-}
-
-function calculateCategoryMetrics(
-  visits: any[],
-  leads: any[],
-  startDate: Date,
-  endDate: Date
-): PeriodMetrics {
-  const startISO = startDate.toISOString()
-  const endISO = endDate.toISOString()
-
-  // Filter visits and leads for the period
-  const periodVisits = visits.filter(v => 
-    v.created_at >= startISO && v.created_at <= endISO
-  )
-  const periodLeads = leads.filter(l => 
-    l.created_at >= startISO && l.created_at <= endISO
-  )
-
-  // Separate by category based on utm_campaign
-  const chapasVisits = periodVisits.filter(v => isChapasCategory(v.utm_campaign))
-  const produtosVisits = periodVisits.filter(v => !isChapasCategory(v.utm_campaign))
-  
-  const chapasLeads = periodLeads.filter(l => isChapasCategory(l.utm_campaign))
-  const produtosLeads = periodLeads.filter(l => !isChapasCategory(l.utm_campaign))
-
-  // Count unique visitors for each category
-  const chapasUniqueVisitors = new Set(chapasVisits.map(v => v.visitor_id)).size
-  const produtosUniqueVisitors = new Set(produtosVisits.map(v => v.visitor_id)).size
-
-  // Calculate conversion rates
-  const chapasConversion = chapasUniqueVisitors > 0 
-    ? ((chapasLeads.length / chapasUniqueVisitors) * 100).toFixed(2) 
-    : '0.00'
-  const produtosConversion = produtosUniqueVisitors > 0 
-    ? ((produtosLeads.length / produtosUniqueVisitors) * 100).toFixed(2) 
-    : '0.00'
-
-  return {
-    produtos: {
-      visits: produtosUniqueVisitors,
-      leads: produtosLeads.length,
-      conversionRate: produtosConversion
-    },
-    chapas: {
-      visits: chapasUniqueVisitors,
-      leads: chapasLeads.length,
-      conversionRate: chapasConversion
-    }
-  }
-}
-
-// Calculate leads by period based on produto_interesse field
-function calculateLeadsByPeriod(
-  leads: any[],
-  startDate: Date,
-  endDate: Date
-): LeadsByPeriodItem {
-  const startISO = startDate.toISOString()
-  const endISO = endDate.toISOString()
-
-  const periodLeads = leads.filter(l => 
-    l.created_at >= startISO && l.created_at <= endISO
-  )
-
-  const chapas = periodLeads.filter(l => 
-    l.produto_interesse === 'Chapa Inteira ou Cortada'
-  ).length
-  
-  const produtos = periodLeads.filter(l => 
-    l.produto_interesse === 'Produto Personalizado'
-  ).length
-
-  return {
-    produtos,
-    chapas,
-    total: produtos + chapas
-  }
 }
 
 Deno.serve(async (req) => {
@@ -153,40 +35,13 @@ Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // Parse query params for date filtering
-  const url = new URL(req.url)
-    const period = url.searchParams.get('period') || 'all' // '7d', '30d', 'all'
+    const url = new URL(req.url)
+    const period = url.searchParams.get('period') || 'all'
     const customStartDate = url.searchParams.get('customStartDate')
     const customEndDate = url.searchParams.get('customEndDate')
-    
-    let dateFilter = null
-    const nowSP = getSaoPauloDate()
-    if (period === '7d') {
-      dateFilter = new Date(nowSP.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString()
-    } else if (period === '30d') {
-      dateFilter = new Date(nowSP.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString()
-    }
 
-    // Fetch all page visits (we need all for periodStats calculation)
-    const { data: visits, error: visitsError } = await supabase
-      .from('page_visits')
-      .select('*')
-      .limit(50000)
-
-    if (visitsError) throw visitsError
-
-    // Fetch all leads
-    const { data: leads, error: leadsError } = await supabase
-      .from('leads')
-      .select('*')
-      .limit(50000)
-
-    if (leadsError) throw leadsError
-
-    // Calculate period stats for the new table
     const now = new Date()
     const todayStart = getStartOfDaySaoPaulo(now)
     const todayEnd = getEndOfDaySaoPaulo(now)
@@ -197,189 +52,166 @@ Deno.serve(async (req) => {
     
     const last7DaysStart = getStartOfDaySaoPaulo(new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000))
 
-    const periodStats: PeriodStats = {
-      today: calculateCategoryMetrics(visits || [], leads || [], todayStart, todayEnd),
-      yesterday: calculateCategoryMetrics(visits || [], leads || [], yesterdayStart, yesterdayEnd),
-      last7days: calculateCategoryMetrics(visits || [], leads || [], last7DaysStart, todayEnd)
+    // Determine filter range for general metrics
+    let filterStart: Date
+    let filterEnd: Date = todayEnd
+
+    if (period === '7d') {
+      filterStart = last7DaysStart
+    } else if (period === '30d') {
+      filterStart = getStartOfDaySaoPaulo(new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000))
+    } else {
+      filterStart = new Date('2024-01-01T00:00:00Z')
     }
 
-    // Calculate leads by period based on produto_interesse
-    // Custom period calculation
+    // Custom date range for leadsByPeriod.custom
     let customStart: Date
     let customEnd: Date
-    
     if (customStartDate && customEndDate) {
       customStart = getStartOfDaySaoPaulo(new Date(customStartDate))
       customEnd = getEndOfDaySaoPaulo(new Date(customEndDate))
     } else {
-      // Default: all time (from first record or a very old date)
-      const oldestLead = leads?.reduce((oldest, lead) => {
-        return !oldest || lead.created_at < oldest ? lead.created_at : oldest
-      }, null as string | null)
-      customStart = oldestLead ? getStartOfDaySaoPaulo(new Date(oldestLead)) : getStartOfDaySaoPaulo(new Date('2024-01-01'))
-      customEnd = todayEnd
+      customStart = filterStart
+      customEnd = filterEnd
+    }
+
+    // Run all RPC calls in parallel
+    const [
+      todayVisits, yesterdayVisits, last7dVisits,
+      todayLeads, yesterdayLeads, last7dLeads, customLeads,
+      generalMetrics,
+      topPages,
+      trafficSources,
+      leadsByProduct,
+      leadsByLocation,
+      campaignStats,
+      termStats,
+      dailyVisits
+    ] = await Promise.all([
+      // Period stats - visits by category
+      supabase.rpc('get_visits_count_by_period', { p_start: todayStart.toISOString(), p_end: todayEnd.toISOString() }),
+      supabase.rpc('get_visits_count_by_period', { p_start: yesterdayStart.toISOString(), p_end: yesterdayEnd.toISOString() }),
+      supabase.rpc('get_visits_count_by_period', { p_start: last7DaysStart.toISOString(), p_end: todayEnd.toISOString() }),
+      // Leads by period
+      supabase.rpc('get_leads_count_by_period', { p_start: todayStart.toISOString(), p_end: todayEnd.toISOString() }),
+      supabase.rpc('get_leads_count_by_period', { p_start: yesterdayStart.toISOString(), p_end: yesterdayEnd.toISOString() }),
+      supabase.rpc('get_leads_count_by_period', { p_start: last7DaysStart.toISOString(), p_end: todayEnd.toISOString() }),
+      supabase.rpc('get_leads_count_by_period', { p_start: customStart.toISOString(), p_end: customEnd.toISOString() }),
+      // General metrics
+      supabase.rpc('get_general_metrics', { p_start: filterStart.toISOString(), p_end: filterEnd.toISOString() }),
+      // Top pages
+      supabase.rpc('get_top_pages', { p_start: filterStart.toISOString(), p_end: filterEnd.toISOString(), p_limit: 5 }),
+      // Traffic sources
+      supabase.rpc('get_traffic_sources', { p_start: filterStart.toISOString(), p_end: filterEnd.toISOString() }),
+      // Leads by product
+      supabase.rpc('get_leads_by_product', { p_start: filterStart.toISOString(), p_end: filterEnd.toISOString() }),
+      // Leads by location
+      supabase.rpc('get_leads_by_location', { p_start: filterStart.toISOString(), p_end: filterEnd.toISOString(), p_limit: 5 }),
+      // Campaign stats
+      supabase.rpc('get_campaign_stats', { p_start: filterStart.toISOString(), p_end: filterEnd.toISOString() }),
+      // Term stats
+      supabase.rpc('get_term_stats', { p_start: filterStart.toISOString(), p_end: filterEnd.toISOString() }),
+      // Daily visits for chart (last 7 days)
+      supabase.rpc('get_daily_visits', { p_start: last7DaysStart.toISOString(), p_end: todayEnd.toISOString() }),
+    ])
+
+    // Helper to extract single row from RPC result
+    const row = (res: any) => Array.isArray(res.data) ? res.data[0] : res.data
+    const rows = (res: any) => res.data || []
+
+    // Build period stats
+    const buildPeriodMetrics = (visitsRes: any) => {
+      const v = row(visitsRes) || { produtos_visits: 0, chapas_visits: 0, produtos_leads: 0, chapas_leads: 0 }
+      const pv = Number(v.produtos_visits) || 0
+      const cv = Number(v.chapas_visits) || 0
+      const pl = Number(v.produtos_leads) || 0
+      const cl = Number(v.chapas_leads) || 0
+      return {
+        produtos: {
+          visits: pv,
+          leads: pl,
+          conversionRate: pv > 0 ? ((pl / pv) * 100).toFixed(2) : '0.00'
+        },
+        chapas: {
+          visits: cv,
+          leads: cl,
+          conversionRate: cv > 0 ? ((cl / cv) * 100).toFixed(2) : '0.00'
+        }
+      }
+    }
+
+    const periodStats = {
+      today: buildPeriodMetrics(todayVisits),
+      yesterday: buildPeriodMetrics(yesterdayVisits),
+      last7days: buildPeriodMetrics(last7dVisits)
+    }
+
+    const buildLeadsPeriod = (res: any) => {
+      const r = row(res) || { produtos: 0, chapas: 0, total: 0 }
+      return { produtos: Number(r.produtos) || 0, chapas: Number(r.chapas) || 0, total: Number(r.total) || 0 }
     }
 
     const leadsByPeriod = {
-      today: calculateLeadsByPeriod(leads || [], todayStart, todayEnd),
-      yesterday: calculateLeadsByPeriod(leads || [], yesterdayStart, yesterdayEnd),
-      last7days: calculateLeadsByPeriod(leads || [], last7DaysStart, todayEnd),
-      custom: calculateLeadsByPeriod(leads || [], customStart, customEnd)
+      today: buildLeadsPeriod(todayLeads),
+      yesterday: buildLeadsPeriod(yesterdayLeads),
+      last7days: buildLeadsPeriod(last7dLeads),
+      custom: buildLeadsPeriod(customLeads)
     }
 
-    // Filter data for other metrics based on period param
-    const filteredVisits = dateFilter 
-      ? visits?.filter(v => v.created_at >= dateFilter) || []
-      : visits || []
-    const filteredLeads = dateFilter
-      ? leads?.filter(l => l.created_at >= dateFilter) || []
-      : leads || []
-
-    // Calculate general metrics
-    const totalVisits = filteredVisits.length
-    const totalLeads = filteredLeads.length
-    const uniqueVisitors = new Set(filteredVisits.map(v => v.visitor_id)).size
-    const uniqueSessions = new Set(filteredVisits.map(v => v.session_id)).size
+    // General metrics
+    const gm = row(generalMetrics) || { total_visits: 0, total_leads: 0, unique_visitors: 0, unique_sessions: 0 }
+    const totalVisits = Number(gm.total_visits) || 0
+    const totalLeads = Number(gm.total_leads) || 0
+    const uniqueVisitors = Number(gm.unique_visitors) || 0
+    const uniqueSessions = Number(gm.unique_sessions) || 0
     const conversionRate = uniqueVisitors > 0 ? ((totalLeads / uniqueVisitors) * 100).toFixed(2) : '0.00'
 
-    // Top 5 pages by visits
-    const pageVisitCounts: Record<string, number> = {}
-    filteredVisits.forEach(v => {
-      pageVisitCounts[v.page_path] = (pageVisitCounts[v.page_path] || 0) + 1
-    })
-    const topPages = Object.entries(pageVisitCounts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5)
-      .map(([path, count]) => ({ path, count }))
+    // Top pages
+    const topPagesData = rows(topPages).map((p: any) => ({ path: p.page_path, count: Number(p.visit_count) }))
 
-    // Traffic sources - baseado em leads ativos (não em visitas)
-    const sourceLeadCounts: Record<string, number> = {}
-    filteredLeads.forEach(l => {
-      const source = l.utm_source || 'Direto'
-      sourceLeadCounts[source] = (sourceLeadCounts[source] || 0) + 1
-    })
-    const trafficSources = Object.entries(sourceLeadCounts)
-      .sort((a, b) => b[1] - a[1])
-      .map(([source, count]) => ({ source, count }))
+    // Traffic sources
+    const trafficSourcesData = rows(trafficSources).map((s: any) => ({ source: s.source, count: Number(s.lead_count) }))
 
     // Leads by product
-    const productCounts: Record<string, number> = {}
-    filteredLeads.forEach(l => {
-      productCounts[l.produto_interesse] = (productCounts[l.produto_interesse] || 0) + 1
-    })
-    const leadsByProduct = Object.entries(productCounts)
-      .sort((a, b) => b[1] - a[1])
-      .map(([product, count]) => ({ product, count }))
+    const leadsByProductData = rows(leadsByProduct).map((p: any) => ({ product: p.product, count: Number(p.lead_count) }))
 
     // Leads by location
-    const locationCounts: Record<string, number> = {}
-    filteredLeads.forEach(l => {
-      const location = l.cidade && l.estado ? `${l.cidade}, ${l.estado}` : (l.estado || 'Desconhecido')
-      locationCounts[location] = (locationCounts[location] || 0) + 1
-    })
-    const leadsByLocation = Object.entries(locationCounts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5)
-      .map(([location, count]) => ({ location, count }))
+    const leadsByLocationData = rows(leadsByLocation).map((l: any) => ({ location: l.location, count: Number(l.lead_count) }))
 
-    // Campaign Stats - baseado apenas em campanhas que têm leads
-    const campaignLeadCounts: Record<string, number> = {}
-    filteredLeads.forEach(l => {
-      const campaign = l.utm_campaign || '(Direto)'
-      campaignLeadCounts[campaign] = (campaignLeadCounts[campaign] || 0) + 1
-    })
+    // Campaign stats
+    const campaignStatsData = rows(campaignStats).map((c: any) => ({
+      campaign: c.campaign,
+      visits: Number(c.visits),
+      leads: Number(c.leads),
+      conversionRate: String(c.conversion_rate)
+    }))
 
-    const campaignVisitors: Record<string, Set<string>> = {}
-    filteredVisits.forEach(v => {
-      const campaign = v.utm_campaign || '(Direto)'
-      if (campaignLeadCounts[campaign] !== undefined) {
-        if (!campaignVisitors[campaign]) {
-          campaignVisitors[campaign] = new Set()
-        }
-        campaignVisitors[campaign].add(v.visitor_id)
-      }
-    })
+    // Term stats
+    const termStatsData = rows(termStats).map((t: any) => ({
+      term: t.term,
+      campaign: t.campaign,
+      visits: Number(t.visits),
+      leads: Number(t.leads),
+      conversionRate: String(t.conversion_rate)
+    }))
 
-    const campaignStats = Object.keys(campaignLeadCounts)
-      .map(campaign => {
-        const uniqueVisits = campaignVisitors[campaign]?.size || 0
-        const leadCount = campaignLeadCounts[campaign] || 0
-        const rate = uniqueVisits > 0 
-          ? ((leadCount / uniqueVisits) * 100).toFixed(2) 
-          : '0.00'
-        return {
-          campaign,
-          visits: uniqueVisits,
-          leads: leadCount,
-          conversionRate: rate
-        }
-      })
-      .sort((a, b) => b.leads - a.leads)
-
-    // Term Stats - baseado apenas em termos que têm leads
-    const termLeadCounts: Record<string, { count: number; campaign: string }> = {}
-    filteredLeads.forEach(l => {
-      const term = l.utm_term || '(Sem termo)'
-      const campaign = l.utm_campaign || '(Direto)'
-      const key = `${term}|${campaign}`
-      
-      if (!termLeadCounts[key]) {
-        termLeadCounts[key] = { count: 0, campaign }
-      }
-      termLeadCounts[key].count++
-    })
-
-    const termVisitors: Record<string, { visitors: Set<string>; campaign: string }> = {}
-    filteredVisits.forEach(v => {
-      const term = v.utm_term || '(Sem termo)'
-      const campaign = v.utm_campaign || '(Direto)'
-      const key = `${term}|${campaign}`
-      
-      if (termLeadCounts[key] !== undefined) {
-        if (!termVisitors[key]) {
-          termVisitors[key] = { visitors: new Set(), campaign }
-        }
-        termVisitors[key].visitors.add(v.visitor_id)
-      }
-    })
-
-    const termStats = Object.entries(termLeadCounts)
-      .map(([key, { count, campaign }]) => {
-        const [term] = key.split('|')
-        const uniqueVisits = termVisitors[key]?.visitors.size || 0
-        const rate = uniqueVisits > 0 
-          ? ((count / uniqueVisits) * 100).toFixed(2) 
-          : '0.00'
-        return {
-          term,
-          campaign,
-          visits: uniqueVisits,
-          leads: count,
-          conversionRate: rate
-        }
-      })
-      .sort((a, b) => b.leads - a.leads)
-
-    // Visits over time (last 7 days for chart) - São Paulo timezone
-    const visitsOverTime: Record<string, number> = {}
+    // Chart data - fill in missing days
+    const nowSP = getSaoPauloDate()
+    const chartMap: Record<string, number> = {}
     const last7Days: string[] = []
     for (let i = 6; i >= 0; i--) {
-      const date = new Date(nowSP.getTime() - i * 24 * 60 * 60 * 1000)
-      const dateStr = formatDateSaoPaulo(date)
+      const d = new Date(nowSP.getTime() - i * 24 * 60 * 60 * 1000)
+      const dateStr = d.toISOString().split('T')[0]
       last7Days.push(dateStr)
-      visitsOverTime[dateStr] = 0
+      chartMap[dateStr] = 0
     }
-    filteredVisits.forEach(v => {
-      const visitDate = new Date(v.created_at)
-      const dateStr = formatDateSaoPaulo(visitDate)
-      if (visitsOverTime[dateStr] !== undefined) {
-        visitsOverTime[dateStr]++
+    rows(dailyVisits).forEach((dv: any) => {
+      const dateStr = String(dv.visit_date)
+      if (chartMap[dateStr] !== undefined) {
+        chartMap[dateStr] = Number(dv.visit_count)
       }
     })
-    const chartData = last7Days.map(date => ({
-      date,
-      visits: visitsOverTime[date]
-    }))
+    const chartData = last7Days.map(date => ({ date, visits: chartMap[date] }))
 
     return new Response(
       JSON.stringify({
@@ -390,13 +222,13 @@ Deno.serve(async (req) => {
         uniqueVisitors,
         uniqueSessions,
         conversionRate,
-        topPages,
-        trafficSources,
-        leadsByProduct,
-        leadsByLocation,
+        topPages: topPagesData,
+        trafficSources: trafficSourcesData,
+        leadsByProduct: leadsByProductData,
+        leadsByLocation: leadsByLocationData,
         chartData,
-        campaignStats,
-        termStats
+        campaignStats: campaignStatsData,
+        termStats: termStatsData
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )

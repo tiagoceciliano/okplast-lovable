@@ -142,7 +142,86 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_campaign_stats: {
+        Args: { p_end: string; p_start: string }
+        Returns: {
+          campaign: string
+          conversion_rate: number
+          leads: number
+          visits: number
+        }[]
+      }
+      get_daily_visits: {
+        Args: { p_end: string; p_start: string }
+        Returns: {
+          visit_count: number
+          visit_date: string
+        }[]
+      }
+      get_general_metrics: {
+        Args: { p_end: string; p_start: string }
+        Returns: {
+          total_leads: number
+          total_visits: number
+          unique_sessions: number
+          unique_visitors: number
+        }[]
+      }
+      get_leads_by_location: {
+        Args: { p_end: string; p_limit?: number; p_start: string }
+        Returns: {
+          lead_count: number
+          location: string
+        }[]
+      }
+      get_leads_by_product: {
+        Args: { p_end: string; p_start: string }
+        Returns: {
+          lead_count: number
+          product: string
+        }[]
+      }
+      get_leads_count_by_period: {
+        Args: { p_end: string; p_start: string }
+        Returns: {
+          chapas: number
+          produtos: number
+          total: number
+        }[]
+      }
+      get_term_stats: {
+        Args: { p_end: string; p_start: string }
+        Returns: {
+          campaign: string
+          conversion_rate: number
+          leads: number
+          term: string
+          visits: number
+        }[]
+      }
+      get_top_pages: {
+        Args: { p_end: string; p_limit?: number; p_start: string }
+        Returns: {
+          page_path: string
+          visit_count: number
+        }[]
+      }
+      get_traffic_sources: {
+        Args: { p_end: string; p_start: string }
+        Returns: {
+          lead_count: number
+          source: string
+        }[]
+      }
+      get_visits_count_by_period: {
+        Args: { p_end: string; p_start: string }
+        Returns: {
+          chapas_leads: number
+          chapas_visits: number
+          produtos_leads: number
+          produtos_visits: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
