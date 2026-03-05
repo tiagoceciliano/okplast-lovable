@@ -18,7 +18,8 @@ Deno.serve(async (req) => {
     const { data: leads, error } = await supabase
       .from('leads')
       .select('*')
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(50000);
 
     if (error) throw error;
 
