@@ -174,6 +174,7 @@ Deno.serve(async (req) => {
     const { data: visits, error: visitsError } = await supabase
       .from('page_visits')
       .select('*')
+      .limit(50000)
 
     if (visitsError) throw visitsError
 
@@ -181,6 +182,7 @@ Deno.serve(async (req) => {
     const { data: leads, error: leadsError } = await supabase
       .from('leads')
       .select('*')
+      .limit(50000)
 
     if (leadsError) throw leadsError
 
