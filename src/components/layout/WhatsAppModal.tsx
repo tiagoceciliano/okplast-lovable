@@ -27,7 +27,7 @@ import { COMPANY, PRODUTOS_WHATSAPP } from "@/lib/constants";
 import { formatPhone, capitalizeName } from "./WhatsAppButton";
 import { supabase } from "@/integrations/supabase/client";
 import { getStoredUTM } from "@/hooks/useUTM";
-import logoImage from "@/assets/logo-lab-acrilicos.png";
+import logoImage from "@/assets/logo-okplast.png";
 
 // Schema de validação
 const whatsappFormSchema = z.object({
@@ -60,7 +60,6 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
     },
   });
 
-  // Atualiza produto padrão quando modal abre
   const handleOpenChange = (isOpen: boolean) => {
     if (isOpen && defaultProduto) {
       form.setValue("produto", defaultProduto);
@@ -88,7 +87,6 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
       const whatsappUrl = `https://api.whatsapp.com/send?phone=${COMPANY.whatsapp}&text=${encodeURIComponent(mensagemWhatsApp)}`;
       window.open(whatsappUrl, "_blank");
 
-      // Dispara webhook de forma assíncrona com UTMs corretos
       const utmData = getStoredUTM();
 
       supabase.functions.invoke("process-lead", {
@@ -128,12 +126,12 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
         {/* WhatsApp Header */}
         <DialogHeader className="whatsapp-header flex-row items-center gap-3 px-4 py-3 rounded-t-2xl space-y-0">
           <Avatar className="h-10 w-10 border-2 border-white/20">
-            <AvatarImage src={logoImage} alt="Lab Acrílicos" className="object-cover" />
-            <AvatarFallback className="bg-white/20 text-white text-sm font-semibold">LA</AvatarFallback>
+            <AvatarImage src={logoImage} alt="OK Plast" className="object-cover" />
+            <AvatarFallback className="bg-white/20 text-white text-sm font-semibold">OK</AvatarFallback>
           </Avatar>
           
           <div className="flex-1">
-            <DialogTitle className="text-white font-semibold text-base leading-tight">Lab Acrílicos</DialogTitle>
+            <DialogTitle className="text-white font-semibold text-base leading-tight">OK Plast</DialogTitle>
             <div className="flex items-center gap-1.5">
               <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
               <span className="text-white/80 text-xs">Online</span>
@@ -143,10 +141,8 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-1 min-h-0">
-            {/* Chat Area */}
             <ScrollArea className="whatsapp-chat-area flex-1 min-h-0 max-h-[380px]">
               <div className="p-3 space-y-2">
-                {/* Welcome Message Bubble */}
                 <div className="whatsapp-bubble-received animate-fade-in">
                   <p className="text-sm leading-relaxed">
                     Olá! 👋 Preencha os dados abaixo.
@@ -154,7 +150,6 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
                   <span className="whatsapp-time">agora</span>
                 </div>
 
-                {/* Form Fields Bubble */}
                 <div className="whatsapp-bubble-sent animate-fade-in">
                   <div className="space-y-2">
                     <FormField
@@ -256,7 +251,7 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
                         <FormItem>
                           <FormControl>
                             <Textarea 
-                              placeholder="Descreva seu projeto..."
+                              placeholder="Descreva o tipo de chapa, espessura, medidas..."
                               className="whatsapp-input min-h-[50px] text-sm resize-none"
                               {...field} 
                             />
@@ -270,7 +265,6 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
               </div>
             </ScrollArea>
 
-            {/* Fixed Send Button */}
             <div className="p-3 bg-[#F0F0F0] border-t border-gray-200 rounded-b-2xl">
               <Button 
                 type="submit" 

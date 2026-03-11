@@ -1,46 +1,39 @@
-// Lab Acrílicos - Dados da empresa e configurações
+// OK Plast - Dados da empresa e configurações
 export const COMPANY = {
-  name: "Lab Acrílicos",
-  slogan: "FÁBRICA e LOJA DE CHAPAS DE ACRÍLICO e PERSONALIZADOS",
+  name: "OK Plast",
+  legalName: "OK PLAST COMERCIO LTDA",
+  slogan: "TUDO OK PARA SEU PROJETO",
   address: "Rua Cordovil 259 – Cordovil – Rio de Janeiro – RJ",
   phone: "(21) 3372-3797",
   whatsapp: "5521923670633",
   whatsappFormatted: "(21) 92367-0633",
-  email: "comercial@labacrilicos.com.br",
-  domain: "https://labacrilicos.com.br",
-  businessHours: "Segunda a Sexta: 8h às 18h | Sábado: 8h às 12h",
+  email: "comercial@okplast.com.br",
+  domain: "https://okplast.com.br",
+  businessHours: "Segunda a Sexta: 9h às 17h",
 } as const;
 
 // Webhooks Kinbox
 export const WEBHOOKS = {
-  chapas: "WEBHOOK_CHAPAS", // Placeholder - configurar em secrets
-  geral: "WEBHOOK_GERAL", // Placeholder - configurar em secrets
+  chapas: "WEBHOOK_CHAPAS",
+  geral: "WEBHOOK_GERAL",
 } as const;
 
-// Produtos simplificados para modal WhatsApp
+// Produtos simplificados para modal WhatsApp (só chapas)
 export const PRODUTOS_WHATSAPP = [
-  "Chapa Inteira ou Cortada",
-  "Produto Personalizado",
+  "Chapa Inteira",
+  "Chapa Cortada sob Medida",
 ] as const;
 
-// Produtos para formulário de orçamento
+// Produtos para formulário de orçamento (só chapas)
 export const PRODUTOS_INTERESSE = [
-  "Caixas Sob Medida",
-  "Cúpulas e Redomas",
-  "Potes para Doces e Guloseimas",
-  "Potes para Grãos e Cereais a Granel",
-  "Urna de Acrílico",
-  "Caixa de Sugestão",
-  "Medalhas Personalizadas",
-  "Troféus Personalizados",
-  "Placa de Acrílico Customizada",
-  "Placa de Acrílico Sinalização",
-  "Expositores para Bijuterias",
-  "Expositores para Calçados",
-  "Expositores para Óculos",
-  "Display de Acrílico",
-  "Porta Folder",
-  "Chapas e Pedaços de Placas",
+  "Acrílico Transparente",
+  "Acrílico Colorido",
+  "Policarbonato Alveolar",
+  "Policarbonato Compacto",
+  "PETG",
+  "Poliestireno (PS)",
+  "PVC Expandido",
+  "ACM",
   "Outro",
 ] as const;
 
@@ -48,18 +41,23 @@ export const PRODUTOS_INTERESSE = [
 export const NAV_ITEMS = [
   { label: "Home", href: "/" },
   {
+    label: "Chapas",
+    children: [
+      { label: "Acrílico", href: "/chapas/acrilico" },
+      { label: "Policarbonato Alveolar", href: "/chapas/policarbonato-alveolar" },
+      { label: "Policarbonato Compacto", href: "/chapas/policarbonato-compacto" },
+      { label: "PETG", href: "/chapas/petg" },
+      { label: "Poliestireno (PS)", href: "/chapas/poliestireno" },
+      { label: "PVC Expandido", href: "/chapas/pvc-expandido" },
+      { label: "ACM", href: "/chapas/acm" },
+    ],
+  },
+  {
     label: "Institucional",
     children: [
       { label: "Sobre Nós", href: "/home/sobre-nos" },
       { label: "Política de Venda", href: "/home/politica-de-venda" },
       { label: "Termo de Uso", href: "/home/termo-de-uso" },
-    ],
-  },
-  {
-    label: "Produtos",
-    children: [
-      { label: "Acrílico Sob Medida", href: "/acrilico-sob-medida" },
-      { label: "Chapas de Acrílico", href: "/chapas-de-acrilico" },
     ],
   },
 ] as const;

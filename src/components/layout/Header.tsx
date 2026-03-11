@@ -12,11 +12,11 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full bg-primary">
       <div className="container-custom">
         <div className="flex h-20 md:h-24 items-center justify-between">
-          {/* Logo - Larger */}
+          {/* Logo */}
           <Link to="/" className="flex items-center">
             <img
               src="/logo-horizontal.png"
-              alt="Lab Acrílicos"
+              alt="OK Plast"
               className="h-32 md:h-40 lg:h-48 w-auto brightness-0 invert object-contain"
               width={320}
               height={120}
@@ -26,7 +26,6 @@ export function Header() {
 
           {/* CTA Buttons */}
           <div className="flex items-center gap-3 md:gap-4">
-            {/* WhatsApp Button - Green (Primary) */}
             <Button
               onClick={() => openWhatsAppModal()}
               className="btn-whatsapp rounded-full px-4 md:px-6 py-2 md:py-3 text-sm md:text-base font-semibold shadow-lg hover:shadow-xl transition-all"
@@ -35,7 +34,6 @@ export function Header() {
               <span className="hidden sm:inline">Orçamento via </span>WhatsApp
             </Button>
 
-            {/* Email Button - Discrete (Secondary) */}
             <Button
               onClick={() => openEmailModal()}
               variant="ghost"
