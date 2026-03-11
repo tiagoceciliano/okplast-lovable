@@ -83,7 +83,7 @@ export function EmailQuoteModal({ open, onOpenChange, defaultProduto }: EmailQuo
       // DEBUG: Log UTMs no momento do envio
       const utmData = getStoredUTM();
       console.log("[EmailModal] UTMs recuperados:", utmData);
-      console.log("[EmailModal] localStorage raw:", localStorage.getItem("lab_acrilicos_utm"));
+      console.log("[EmailModal] localStorage raw:", localStorage.getItem("okplast_utm"));
 
       const payload = {
         nome: nomeFormatado,

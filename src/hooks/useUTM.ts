@@ -8,7 +8,7 @@ export interface UTMParams {
   utm_content: string | null;
 }
 
-const UTM_STORAGE_KEY = "lab_acrilicos_utm";
+const UTM_STORAGE_KEY = "okplast_utm";
 
 // Captura UTMs imediatamente no carregamento do módulo (antes de qualquer redirect)
 function captureUTMsFromUrl(): UTMParams {
