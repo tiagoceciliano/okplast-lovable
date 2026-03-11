@@ -134,8 +134,8 @@ export function WhatsAppChatWidget({ open, onOpenChange }: WhatsAppChatWidgetPro
       {/* WhatsApp Header */}
       <div className="whatsapp-header flex items-center gap-3 px-4 py-3 rounded-t-2xl">
         <Avatar className="h-10 w-10 border-2 border-white/20">
-          <AvatarImage src={logoImage} alt="Lab Acrílicos" className="object-cover" />
-          <AvatarFallback className="bg-white/20 text-white text-sm font-semibold">LA</AvatarFallback>
+          <AvatarImage src={logoImage} alt="OK Plast" className="object-cover" />
+          <AvatarFallback className="bg-white/20 text-white text-sm font-semibold">OK</AvatarFallback>
         </Avatar>
         
         <div className="flex-1">
