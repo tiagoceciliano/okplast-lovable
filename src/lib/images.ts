@@ -1,4 +1,4 @@
-// Lab Acrílicos - URLs das imagens do storage
+// OK Plast - URLs das imagens do storage
 // Base URL do Supabase Storage
 const STORAGE_BASE = "https://dikfllrqtcdexvnlczsz.supabase.co/storage/v1/object/public/site-images";
 

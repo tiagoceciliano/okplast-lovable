@@ -2,9 +2,9 @@
  import { useLocation } from "react-router-dom";
  import { getStoredUTM } from "./useUTM";
  
- const VISITOR_ID_KEY = "lab_acrilicos_visitor_id";
- const SESSION_ID_KEY = "lab_acrilicos_session_id";
- const TRACKED_PAGES_KEY = "lab_acrilicos_tracked_pages";
+const VISITOR_ID_KEY = "okplast_visitor_id";
+const SESSION_ID_KEY = "okplast_session_id";
+const TRACKED_PAGES_KEY = "okplast_tracked_pages";
  
  function generateId(): string {
    return crypto.randomUUID ? crypto.randomUUID() : 

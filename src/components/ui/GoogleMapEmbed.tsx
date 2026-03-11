@@ -47,8 +47,8 @@ interface GoogleMapEmbedProps {
            allowFullScreen
            loading="lazy"
            referrerPolicy="no-referrer-when-downgrade"
-           title="Localização Lab Acrílicos"
-           aria-label="Mapa mostrando a localização da Lab Acrílicos no Rio de Janeiro"
+           title="Localização OK Plast"
+           aria-label="Mapa mostrando a localização da OK Plast no Rio de Janeiro"
          />
        ) : (
          <div 
