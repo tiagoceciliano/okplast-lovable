@@ -8,9 +8,18 @@ import { TestimonialCard } from "@/components/ui/TestimonialCard";
 import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
 import { useEmailQuoteModal } from "@/contexts/EmailQuoteModalContext";
 import { HeroSection } from "@/components/home/HeroSection";
-import { CHAPAS_IMAGES, DEPOIMENTOS_IMAGES } from "@/lib/images";
 import { SEOHead, createFAQSchema } from "@/components/SEOHead";
 import { MotivosCarousel } from "@/components/home/MotivosCarousel";
+
+// Imagens locais das chapas
+import imgAcrilicoTransparente from "@/assets/chapas-hero/acrilico-transparente.jpg";
+import imgAcrilicoColorido from "@/assets/chapas-hero/acrilico-colorido.jpg";
+import imgPetg from "@/assets/chapas-hero/petg.jpg";
+import imgPoliestireno from "@/assets/chapas-hero/poliestireno.jpg";
+import imgPolicarbonatoAlveolar from "@/assets/chapas-hero/policarbonato-alveolar.jpg";
+import imgPolicarbonatoCompacto from "@/assets/chapas-hero/policarbonato-compacto.jpg";
+import imgPvcExpandido from "@/assets/chapas-hero/pvc-expandido.jpg";
+import imgAcm from "@/assets/chapas-hero/acm.jpg";
 
 // LocalBusiness Schema para SEO local
 const localBusinessSchema = {
@@ -21,18 +30,19 @@ const localBusinessSchema = {
   "image": "https://okplast.com.br/og-image.jpg",
   "address": {
     "@type": "PostalAddress",
-    "streetAddress": "Rua Cordovil 259",
+    "streetAddress": "Rua Guatemala, 593 - Penha Circular",
     "addressLocality": "Rio de Janeiro",
     "addressRegion": "RJ",
-    "postalCode": "21012-080",
+    "postalCode": "21020-170",
     "addressCountry": "BR"
   },
   "geo": {
     "@type": "GeoCoordinates",
-    "latitude": -22.8282,
-    "longitude": -43.2658
+    "latitude": -22.8380,
+    "longitude": -43.2670
   },
   "telephone": "(21) 3372-3797",
+  "email": "vendas@okplast.com.br",
   "url": "https://okplast.com.br",
   "openingHoursSpecification": {
     "@type": "OpeningHoursSpecification",
@@ -65,22 +75,22 @@ const faqItems = [{
 
 // Tipos de Chapas - Grid de 8 chapas (foco da home)
 const tiposChapas = [
-  { nome: "Acrílico Transparente", imageUrl: CHAPAS_IMAGES.acrilicoCristal, href: "/chapas/acrilico" },
-  { nome: "Acrílico Colorido", imageUrl: CHAPAS_IMAGES.acrilicoColorido, href: "/chapas/acrilico" },
-  { nome: "PETG", imageUrl: CHAPAS_IMAGES.petg, href: "/chapas/petg" },
-  { nome: "PS Poliestireno", imageUrl: CHAPAS_IMAGES.acrilicoLeitoso, href: "/chapas/poliestireno" },
-  { nome: "Policarbonato Alveolar", imageUrl: CHAPAS_IMAGES.policarbonato, href: "/chapas/policarbonato-alveolar" },
-  { nome: "Policarbonato Compacto", imageUrl: CHAPAS_IMAGES.acrilicoEspelhado, href: "/chapas/policarbonato-compacto" },
-  { nome: "PVC Expandido", imageUrl: CHAPAS_IMAGES.pvcExpandido, href: "/chapas/pvc-expandido" },
-  { nome: "ACM", imageUrl: CHAPAS_IMAGES.pedacosRetalhos, href: "/chapas/acm" },
+  { nome: "Acrílico Transparente", imageUrl: imgAcrilicoTransparente, href: "/chapas/acrilico" },
+  { nome: "Acrílico Colorido", imageUrl: imgAcrilicoColorido, href: "/chapas/acrilico" },
+  { nome: "PETG", imageUrl: imgPetg, href: "/chapas/petg" },
+  { nome: "PS Poliestireno", imageUrl: imgPoliestireno, href: "/chapas/poliestireno" },
+  { nome: "Policarbonato Alveolar", imageUrl: imgPolicarbonatoAlveolar, href: "/chapas/policarbonato-alveolar" },
+  { nome: "Policarbonato Compacto", imageUrl: imgPolicarbonatoCompacto, href: "/chapas/policarbonato-compacto" },
+  { nome: "PVC Expandido", imageUrl: imgPvcExpandido, href: "/chapas/pvc-expandido" },
+  { nome: "ACM", imageUrl: imgAcm, href: "/chapas/acm" },
 ];
 
 // Depoimentos
 const depoimentos = [
-  { nome: "Carlos Silva", empresa: "Comunicação Visual", texto: "Excelente qualidade nas chapas e atendimento impecável. Sempre entregam no prazo!", avatarUrl: DEPOIMENTOS_IMAGES.avatar1 },
-  { nome: "Ana Paula", empresa: "Arquitetura Interior", texto: "As chapas de policarbonato ficaram perfeitas no projeto. Preço justo e qualidade top.", avatarUrl: DEPOIMENTOS_IMAGES.avatar2 },
-  { nome: "Roberto Santos", empresa: "Serralheria", texto: "Trabalho com a OK Plast há anos. Sempre entregam no prazo e com qualidade impecável.", avatarUrl: DEPOIMENTOS_IMAGES.avatar3 },
-  { nome: "Maria Fernanda", empresa: "Loja de Decoração", texto: "As chapas de acrílico são de primeira. Atendimento excepcional desde o primeiro contato!", avatarUrl: DEPOIMENTOS_IMAGES.avatar4 }
+  { nome: "Carlos Silva", empresa: "Comunicação Visual", texto: "Excelente qualidade nas chapas e atendimento impecável. Sempre entregam no prazo!", avatarUrl: "" },
+  { nome: "Ana Paula", empresa: "Arquitetura Interior", texto: "As chapas de policarbonato ficaram perfeitas no projeto. Preço justo e qualidade top.", avatarUrl: "" },
+  { nome: "Roberto Santos", empresa: "Serralheria", texto: "Trabalho com a OK Plast há anos. Sempre entregam no prazo e com qualidade impecável.", avatarUrl: "" },
+  { nome: "Maria Fernanda", empresa: "Loja de Decoração", texto: "As chapas de acrílico são de primeira. Atendimento excepcional desde o primeiro contato!", avatarUrl: "" }
 ];
 
 // Benefícios
@@ -116,7 +126,7 @@ export default function Index() {
               Chapas Inteiras e Cortadas
             </h2>
             <p className="text-muted-foreground mt-2">
-              Acrílico, Policarbonato, PS, PETG, PVC Expandido e ACM — corte sob medida
+              Acrílico, Policarbonato, PS, PETG, PVC Expandido e ACM — vendemos inteira ou cortamos sob medida
             </p>
           </div>
 
@@ -144,12 +154,6 @@ export default function Index() {
           </div>
 
           <div className="flex flex-col items-center gap-3 mt-8">
-            <Button size="lg" variant="outline" asChild className="gap-2">
-              <Link to="/chapas" onClick={() => window.scrollTo(0, 0)}>
-                Ver todas as chapas e materiais
-                <ArrowRight className="h-5 w-5" />
-              </Link>
-            </Button>
             <Button size="lg" className="btn-whatsapp gap-2" onClick={() => openWhatsAppModal("Chapa Inteira")}>
               <MessageCircle className="h-5 w-5" />
               Orçamento via WhatsApp
@@ -158,12 +162,12 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Banner Azul */}
+      {/* Banner */}
       <BlueBanner>
         {COMPANY.name} — sua distribuidora de chapas plásticas com o melhor preço do Rio de Janeiro.
       </BlueBanner>
 
-      {/* 6 Motivos - Carrossel */}
+      {/* 6 Motivos */}
       <section className="section-padding">
         <div className="container-custom">
           <div className="text-center mb-12">
@@ -178,10 +182,10 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Satisfação Garantida - Depoimentos */}
+      {/* Depoimentos */}
       <section className="section-padding bg-secondary">
+        <DecorativeDivider />
         <div className="container-custom">
-          <DecorativeDivider />
           <div className="text-center mb-12">
             <h2 className="font-bold text-2xl md:text-3xl text-foreground mb-4">Satisfação Garantida</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">Veja as opiniões de nossos clientes</p>

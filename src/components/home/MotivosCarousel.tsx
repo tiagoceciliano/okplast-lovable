@@ -5,32 +5,32 @@ const motivos = [
   { 
     icon: Headphones, 
     titulo: "1º Atendimento Ágil e Eficaz", 
-    desc: "Os orçamentos e cotações empresariais são respondidos em até 24 horas úteis em papel timbrado através de um Sistema Informatizado, e-mail ou atendimento nas lojas."
+    desc: "Orçamentos e cotações respondidos em até 24 horas úteis. Atendimento personalizado via WhatsApp, e-mail ou telefone."
   },
   { 
     icon: Truck, 
     titulo: "2º Frete Seguro", 
-    desc: "Os orçamentos e cotações empresariais são respondidos em até 24 horas úteis em papel timbrado através de um Sistema Informatizado, e-mail ou atendimento nas lojas."
+    desc: "Embalagem reforçada e envio seguro para todo o Brasil. Trabalhamos com transportadoras confiáveis para garantir que sua chapa chegue intacta."
   },
   { 
     icon: ClipboardEdit, 
-    titulo: "3º Produtos Sob Medida", 
-    desc: "Os orçamentos e cotações empresariais são respondidos em até 24 horas úteis em papel timbrado através de um Sistema Informatizado, e-mail ou atendimento nas lojas."
+    titulo: "3º Corte Sob Medida", 
+    desc: "Cortamos suas chapas nas dimensões exatas que você precisa. Precisão no corte para otimizar seu material e reduzir desperdício."
   },
   { 
     icon: Receipt, 
     titulo: "4º Emissão de NF-e", 
-    desc: "Os orçamentos e cotações empresariais são respondidos em até 24 horas úteis em papel timbrado através de um Sistema Informatizado, e-mail ou atendimento nas lojas."
+    desc: "Todas as vendas acompanham Nota Fiscal Eletrônica. Transparência e segurança para sua empresa em todas as transações."
   },
   { 
     icon: BadgeDollarSign, 
     titulo: "5º Faturamento e Linha de Crédito", 
-    desc: "Os orçamentos e cotações empresariais são respondidos em até 24 horas úteis em papel timbrado através de um Sistema Informatizado, e-mail ou atendimento nas lojas."
+    desc: "Condições especiais para empresas com cadastro aprovado. Faturamento com prazo e linha de crédito para clientes recorrentes."
   },
   { 
     icon: Building2, 
     titulo: "6º Empresa Sólida e Confiável", 
-    desc: "Os orçamentos e cotações empresariais são respondidos em até 24 horas úteis em papel timbrado através de um Sistema Informatizado, e-mail ou atendimento nas lojas."
+    desc: "Anos de experiência no mercado de chapas plásticas. Estoque próprio, preço competitivo e compromisso com a qualidade."
   },
 ];
 
