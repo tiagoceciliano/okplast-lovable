@@ -21,11 +21,8 @@ const PoliticaVenda = lazy(() => import("./pages/PoliticaVenda"));
 const TermoUso = lazy(() => import("./pages/TermoUso"));
 const PoliticaPrivacidade = lazy(() => import("./pages/PoliticaPrivacidade"));
 
-// Lazy loaded product hub pages
-const AcrilicoSobMedida = lazy(() => import("./pages/products/AcrilicoSobMedida"));
-const ChapasDeAcrilico = lazy(() => import("./pages/products/ChapasDeAcrilico"));
-
 // Lazy loaded chapas pages
+const ChapasDeAcrilico = lazy(() => import("./pages/products/ChapasDeAcrilico"));
 const Acrilico = lazy(() => import("./pages/chapas/Acrilico"));
 const Poliestireno = lazy(() => import("./pages/chapas/Poliestireno"));
 const Petg = lazy(() => import("./pages/chapas/Petg"));
@@ -33,27 +30,6 @@ const PolicarbonatoAlveolar = lazy(() => import("./pages/chapas/PolicarbonatoAlv
 const PolicarbonatoCompacto = lazy(() => import("./pages/chapas/PolicarbonatoCompacto"));
 const PvcExpandido = lazy(() => import("./pages/chapas/PvcExpandido"));
 const Acm = lazy(() => import("./pages/chapas/Acm"));
-
-// Lazy loaded product detail pages
-const CaixasSobMedida = lazy(() => import("./pages/products/CaixasSobMedida"));
-const CupulasRedomas = lazy(() => import("./pages/products/CupulasRedomas"));
-const PotesDoces = lazy(() => import("./pages/products/PotesDoces"));
-const PotesGraos = lazy(() => import("./pages/products/PotesGraos"));
-const UrnaAcrilico = lazy(() => import("./pages/products/UrnaAcrilico"));
-const CaixaSugestao = lazy(() => import("./pages/products/CaixaSugestao"));
-const MedalhasPersonalizadas = lazy(() => import("./pages/products/MedalhasPersonalizadas"));
-const TrofeusPersonalizados = lazy(() => import("./pages/products/TrofeusPersonalizados"));
-const PlacaCustomizada = lazy(() => import("./pages/products/PlacaCustomizada"));
-const PlacaSinalizacao = lazy(() => import("./pages/products/PlacaSinalizacao"));
-const ExpositoresBijuterias = lazy(() => import("./pages/products/ExpositoresBijuterias"));
-const ExpositoresCalcados = lazy(() => import("./pages/products/ExpositoresCalcados"));
-const ExpositoresOculos = lazy(() => import("./pages/products/ExpositoresOculos"));
-const DisplayAcrilico = lazy(() => import("./pages/products/DisplayAcrilico"));
-const PortaFolder = lazy(() => import("./pages/products/PortaFolder"));
-const QuadroAvisos = lazy(() => import("./pages/products/QuadroAvisos"));
-const Confeitaria = lazy(() => import("./pages/products/Confeitaria"));
-const PlacaGravada = lazy(() => import("./pages/products/PlacaGravada"));
-const PlacaPersonalizada = lazy(() => import("./pages/products/PlacaPersonalizada"));
 
 const queryClient = new QueryClient();
 
@@ -80,8 +56,7 @@ const MainSite = () => (
             <Route path="/home/termo-de-uso" element={<TermoUso />} />
             <Route path="/home/politica-de-privacidade" element={<PoliticaPrivacidade />} />
 
-            {/* Product Hub Pages */}
-            <Route path="/acrilico-sob-medida" element={<AcrilicoSobMedida />} />
+            {/* Chapas Hub */}
             <Route path="/chapas" element={<ChapasDeAcrilico />} />
             <Route path="/chapas-de-acrilico" element={<Navigate to="/chapas" replace />} />
 
@@ -94,26 +69,8 @@ const MainSite = () => (
             <Route path="/chapas/pvc-expandido" element={<PvcExpandido />} />
             <Route path="/chapas/acm" element={<Acm />} />
 
-            {/* Product Detail Pages - Acrílico Sob Medida */}
-            <Route path="/acrilico-sob-medida/caixas-sob-medida" element={<CaixasSobMedida />} />
-            <Route path="/acrilico-sob-medida/cupulas-e-redomas" element={<CupulasRedomas />} />
-            <Route path="/acrilico-sob-medida/potes-para-doces-e-guloseimas" element={<PotesDoces />} />
-            <Route path="/acrilico-sob-medida/potes-para-graos-e-cereais-a-granel" element={<PotesGraos />} />
-            <Route path="/acrilico-sob-medida/urna-de-acrilico" element={<UrnaAcrilico />} />
-            <Route path="/acrilico-sob-medida/caixa-de-sugestao" element={<CaixaSugestao />} />
-            <Route path="/acrilico-sob-medida/medalhas-personalizadas" element={<MedalhasPersonalizadas />} />
-            <Route path="/acrilico-sob-medida/trofeus-personalizados" element={<TrofeusPersonalizados />} />
-            <Route path="/acrilico-sob-medida/placa-de-acrilico-customizada" element={<PlacaCustomizada />} />
-            <Route path="/acrilico-sob-medida/placa-de-acrilico-sinalizacao" element={<PlacaSinalizacao />} />
-            <Route path="/acrilico-sob-medida/expositores-para-bijuterias" element={<ExpositoresBijuterias />} />
-            <Route path="/acrilico-sob-medida/expositores-para-calcados" element={<ExpositoresCalcados />} />
-            <Route path="/acrilico-sob-medida/expositores-para-oculos" element={<ExpositoresOculos />} />
-            <Route path="/acrilico-sob-medida/display-de-acrilico" element={<DisplayAcrilico />} />
-            <Route path="/acrilico-sob-medida/porta-folder" element={<PortaFolder />} />
-            <Route path="/acrilico-sob-medida/quadro-de-avisos" element={<QuadroAvisos />} />
-            <Route path="/acrilico-sob-medida/confeitaria" element={<Confeitaria />} />
-            <Route path="/acrilico-sob-medida/placa-gravada" element={<PlacaGravada />} />
-            <Route path="/acrilico-sob-medida/placa-personalizada" element={<PlacaPersonalizada />} />
+            {/* Redirect old product routes to home */}
+            <Route path="/acrilico-sob-medida/*" element={<Navigate to="/" replace />} />
 
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

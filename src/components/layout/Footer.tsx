@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { MapPin, Phone, Mail, Clock, MessageCircle } from "lucide-react";
 import { COMPANY } from "@/lib/constants";
-import logoImg from "@/assets/logo-lab-acrilicos.png";
+import logoImg from "@/assets/logo-okplast.png";
 import { GoogleMapEmbed } from "@/components/ui/GoogleMapEmbed";
 import { useEmailQuoteModal } from "@/contexts/EmailQuoteModalContext";
 import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
@@ -94,10 +94,10 @@ export function Footer() {
         {/* Copyright com Logo */}
         <div className="mt-8 pt-6 border-t border-primary-foreground/20 flex flex-col items-center gap-1">
           <div className="h-24 overflow-hidden">
-            <img src={logoImg} alt="Lab Acrílicos" className="h-40 w-auto brightness-0 invert opacity-90 -mt-8" />
+            <img src={logoImg} alt="OK Plast" className="h-40 w-auto brightness-0 invert opacity-90 -mt-8" />
           </div>
           <p className="text-sm text-primary-foreground/60">
-            © {currentYear} {COMPANY.name}. Todos os direitos reservados.
+            © {currentYear} {COMPANY.legalName}. Todos os direitos reservados.
           </p>
         </div>
       </div>

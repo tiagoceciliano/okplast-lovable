@@ -1,26 +1,24 @@
-// Homepage component
 import { Link } from "react-router-dom";
-import { ArrowRight, CheckCircle, Phone, Award, DollarSign, ShoppingCart, MessageCircle } from "lucide-react";
+import { ArrowRight, CheckCircle, Phone, Award, DollarSign, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { COMPANY } from "@/lib/constants";
 import { DecorativeDivider } from "@/components/ui/DecorativeDivider";
 import { BlueBanner } from "@/components/ui/BlueBanner";
 import { TestimonialCard } from "@/components/ui/TestimonialCard";
-import { ClientLogos } from "@/components/ui/ClientLogos";
 import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
 import { useEmailQuoteModal } from "@/contexts/EmailQuoteModalContext";
-import { MotivosCarousel } from "@/components/home/MotivosCarousel";
 import { HeroSection } from "@/components/home/HeroSection";
-import { PRODUTOS_IMAGES, CHAPAS_IMAGES, DEPOIMENTOS_IMAGES } from "@/lib/images";
+import { CHAPAS_IMAGES, DEPOIMENTOS_IMAGES } from "@/lib/images";
 import { SEOHead, createFAQSchema } from "@/components/SEOHead";
+import { MotivosCarousel } from "@/components/home/MotivosCarousel";
 
 // LocalBusiness Schema para SEO local
 const localBusinessSchema = {
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
-  "name": "Lab Acrílicos",
-  "description": "Fábrica de produtos em acrílico sob medida e distribuidora de chapas no Rio de Janeiro. Troféus, medalhas, displays, urnas e muito mais.",
-  "image": "https://labacrilicos.com.br/og-image.jpg",
+  "name": "OK Plast",
+  "description": "Distribuidora de chapas plásticas no Rio de Janeiro. Acrílico, Policarbonato, PETG, Poliestireno, PVC e ACM. Corte sob medida.",
+  "image": "https://okplast.com.br/og-image.jpg",
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "Rua Cordovil 259",
@@ -35,11 +33,11 @@ const localBusinessSchema = {
     "longitude": -43.2658
   },
   "telephone": "(21) 3372-3797",
-  "url": "https://labacrilicos.com.br",
+  "url": "https://okplast.com.br",
   "openingHoursSpecification": {
     "@type": "OpeningHoursSpecification",
     "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-    "opens": "08:00",
+    "opens": "09:00",
     "closes": "17:00"
   },
   "priceRange": "$$",
@@ -52,11 +50,11 @@ const localBusinessSchema = {
 
 // FAQ para Schema
 const faqItems = [{
-  question: "Qual o prazo de entrega dos produtos em acrílico?",
-  answer: "O prazo varia de acordo com o produto e complexidade. Produtos padrão de 3 a 7 dias úteis. Projetos sob medida de 7 a 15 dias úteis."
+  question: "Quais tipos de chapas a OK Plast trabalha?",
+  answer: "Trabalhamos com Acrílico (cristal, colorido, leitoso), Policarbonato alveolar e compacto, PETG, Poliestireno (PS), PVC Expandido e ACM."
 }, {
   question: "Vocês fazem corte de chapas sob medida?",
-  answer: "Sim! Cortamos chapas de acrílico, policarbonato, PS, PETG e PVC nas medidas que você precisar."
+  answer: "Sim! Cortamos chapas em qualquer medida que você precisar."
 }, {
   question: "Como solicitar um orçamento?",
   answer: "Você pode solicitar orçamento pelo WhatsApp, e-mail ou formulário do site. Resposta em até 24 horas úteis."
@@ -65,47 +63,31 @@ const faqItems = [{
   answer: "Sim, enviamos para todo o Brasil via transportadora."
 }];
 
-// Produtos Sob Medida - Grid de 12 produtos
-const produtosSobMedida = [
-  { nome: "Cúpulas e Redomas", imageUrl: PRODUTOS_IMAGES.cupulasRedomas },
-  { nome: "Troféus", imageUrl: PRODUTOS_IMAGES.trofeus },
-  { nome: "Medalhas e Premiações", imageUrl: PRODUTOS_IMAGES.medalhasPremiacoes },
-  { nome: "Expositores Sob medida", imageUrl: PRODUTOS_IMAGES.potesDoces },
-  { nome: "Display A4 Parede", imageUrl: PRODUTOS_IMAGES.displayA4Parede },
-  { nome: "Display A6 Mesa", imageUrl: PRODUTOS_IMAGES.displayA6Mesa },
-  { nome: "Urna Piramidal", imageUrl: PRODUTOS_IMAGES.urnaPiramidal },
-  { nome: "Púlpitos", imageUrl: PRODUTOS_IMAGES.caixasSobMedida },
-  { nome: "Caixa para Doces", imageUrl: PRODUTOS_IMAGES.caixaDoces },
-  { nome: "Pote a Granel", imageUrl: PRODUTOS_IMAGES.poteAGranel },
-  { nome: "Defletores", imageUrl: PRODUTOS_IMAGES.portaFolder },
-  { nome: "Placas Personalizadas", imageUrl: PRODUTOS_IMAGES.placasPersonalizadas }
-];
-
-// Tipos de Chapas - Grid de 8 chapas
+// Tipos de Chapas - Grid de 8 chapas (foco da home)
 const tiposChapas = [
-  { nome: "Acrílico Transparente", imageUrl: CHAPAS_IMAGES.acrilicoCristal },
-  { nome: "Acrílico Colorido", imageUrl: CHAPAS_IMAGES.acrilicoColorido },
-  { nome: "Pet G", imageUrl: CHAPAS_IMAGES.petg },
-  { nome: "PS Poliestireno", imageUrl: CHAPAS_IMAGES.acrilicoLeitoso },
-  { nome: "Policarbonato Alveolar", imageUrl: CHAPAS_IMAGES.policarbonato },
-  { nome: "Policarbonato Compacto", imageUrl: CHAPAS_IMAGES.acrilicoEspelhado },
-  { nome: "PVC Expandido", imageUrl: CHAPAS_IMAGES.pvcExpandido },
-  { nome: "ACM", imageUrl: CHAPAS_IMAGES.pedacosRetalhos }
+  { nome: "Acrílico Transparente", imageUrl: CHAPAS_IMAGES.acrilicoCristal, href: "/chapas/acrilico" },
+  { nome: "Acrílico Colorido", imageUrl: CHAPAS_IMAGES.acrilicoColorido, href: "/chapas/acrilico" },
+  { nome: "PETG", imageUrl: CHAPAS_IMAGES.petg, href: "/chapas/petg" },
+  { nome: "PS Poliestireno", imageUrl: CHAPAS_IMAGES.acrilicoLeitoso, href: "/chapas/poliestireno" },
+  { nome: "Policarbonato Alveolar", imageUrl: CHAPAS_IMAGES.policarbonato, href: "/chapas/policarbonato-alveolar" },
+  { nome: "Policarbonato Compacto", imageUrl: CHAPAS_IMAGES.acrilicoEspelhado, href: "/chapas/policarbonato-compacto" },
+  { nome: "PVC Expandido", imageUrl: CHAPAS_IMAGES.pvcExpandido, href: "/chapas/pvc-expandido" },
+  { nome: "ACM", imageUrl: CHAPAS_IMAGES.pedacosRetalhos, href: "/chapas/acm" },
 ];
 
 // Depoimentos
 const depoimentos = [
-  { nome: "Carlos Silva", empresa: "Loja de Bijuterias", texto: "Excelente qualidade nos expositores. Minha loja ficou muito mais organizada e bonita!", avatarUrl: DEPOIMENTOS_IMAGES.avatar1 },
-  { nome: "Ana Paula", empresa: "Confeitaria Doce Sabor", texto: "Os potes de acrílico são perfeitos para expor os doces. Clientes elogiam muito!", avatarUrl: DEPOIMENTOS_IMAGES.avatar2 },
-  { nome: "Roberto Santos", empresa: "Arquiteto", texto: "Trabalho com a Lab Acrílicos há anos. Sempre entregam no prazo e com qualidade impecável.", avatarUrl: DEPOIMENTOS_IMAGES.avatar3 },
-  { nome: "Maria Fernanda", empresa: "Joalheria Elegance", texto: "Os displays valorizaram muito nossas peças. Atendimento excepcional desde o primeiro contato!", avatarUrl: DEPOIMENTOS_IMAGES.avatar4 }
+  { nome: "Carlos Silva", empresa: "Comunicação Visual", texto: "Excelente qualidade nas chapas e atendimento impecável. Sempre entregam no prazo!", avatarUrl: DEPOIMENTOS_IMAGES.avatar1 },
+  { nome: "Ana Paula", empresa: "Arquitetura Interior", texto: "As chapas de policarbonato ficaram perfeitas no projeto. Preço justo e qualidade top.", avatarUrl: DEPOIMENTOS_IMAGES.avatar2 },
+  { nome: "Roberto Santos", empresa: "Serralheria", texto: "Trabalho com a OK Plast há anos. Sempre entregam no prazo e com qualidade impecável.", avatarUrl: DEPOIMENTOS_IMAGES.avatar3 },
+  { nome: "Maria Fernanda", empresa: "Loja de Decoração", texto: "As chapas de acrílico são de primeira. Atendimento excepcional desde o primeiro contato!", avatarUrl: DEPOIMENTOS_IMAGES.avatar4 }
 ];
 
 // Benefícios
 const beneficios = [
   { icon: Phone, titulo: "Contato Rápido", desc: "Resposta em até 24 horas" },
-  { icon: Award, titulo: "Produtos de Alta Qualidade", desc: "Acrílico 100% virgem" },
-  { icon: DollarSign, titulo: "Melhor Preço", desc: "Direto da fábrica" }
+  { icon: Award, titulo: "Chapas de Alta Qualidade", desc: "Materiais de primeira linha" },
+  { icon: DollarSign, titulo: "Melhor Preço", desc: "Direto da distribuidora" }
 ];
 
 export default function Index() {
@@ -115,8 +97,8 @@ export default function Index() {
   return (
     <>
       <SEOHead
-        title="Lab Acrílicos | Fábrica de Acrílico no Rio de Janeiro"
-        description="Fábrica de produtos em acrílico sob medida no RJ. Troféus, medalhas, displays, urnas, chapas de acrílico, policarbonato, PETG. Orçamento em 24h."
+        title="OK Plast | Distribuidora de Chapas Plásticas no RJ"
+        description="Distribuidora de chapas: Acrílico, Policarbonato, PETG, Poliestireno, PVC Expandido e ACM. Corte sob medida. Melhor preço do Rio de Janeiro. Orçamento em 24h."
         canonical="/"
         schema={{
           "@context": "https://schema.org",
@@ -126,59 +108,7 @@ export default function Index() {
 
       <HeroSection onWhatsAppClick={() => openWhatsAppModal()} onEmailClick={() => openEmailModal()} />
 
-      {/* LINHA 1: PRODUTOS SOB MEDIDA */}
-      <section className="section-padding bg-secondary">
-        <div className="container-custom">
-          <div className="text-center mb-10">
-            <h2 className="font-bold text-2xl md:text-3xl lg:text-4xl text-accent uppercase tracking-wide">
-              PRODUTOS SOB MEDIDA E PERSONALIZADOS
-            </h2>
-            <p className="text-muted-foreground mt-2">
-              Fabricamos produtos personalizados em acrílico de alta qualidade
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            {produtosSobMedida.map((produto, index) => {
-              const isAboveFold = index < 4;
-              return (
-                <div key={index} className="bg-background rounded-lg overflow-hidden shadow-sm">
-                  <div className="aspect-square bg-muted overflow-hidden">
-                    <img
-                      src={produto.imageUrl}
-                      alt={`${produto.nome} em acrílico - Lab Acrílicos RJ`}
-                      width={400}
-                      height={400}
-                      className="w-full h-full object-cover"
-                      loading={isAboveFold ? "eager" : "lazy"}
-                      fetchPriority={isAboveFold ? "high" : undefined}
-                      decoding={isAboveFold ? "sync" : "async"}
-                    />
-                  </div>
-                  <div className="p-3 text-center">
-                    <span className="text-sm font-medium text-foreground">{produto.nome}</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="flex flex-col items-center gap-3 mt-8">
-            <Button size="lg" asChild className="gap-2">
-              <Link to="/acrilico-sob-medida" onClick={() => window.scrollTo(0, 0)}>
-                Ver mais produtos
-                <ShoppingCart className="h-5 w-5" />
-              </Link>
-            </Button>
-            <Button size="lg" className="btn-whatsapp gap-2" onClick={() => openWhatsAppModal("Produto Personalizado")}>
-              <MessageCircle className="h-5 w-5" />
-              Orçamento via WhatsApp
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* LINHA 2: CHAPAS E PEDAÇOS DE PLACAS */}
+      {/* CHAPAS - Grid principal */}
       <section className="section-padding">
         <div className="container-custom">
           <div className="text-center mb-10">
@@ -186,39 +116,41 @@ export default function Index() {
               Chapas Inteiras e Cortadas
             </h2>
             <p className="text-muted-foreground mt-2">
-              Acrílico Transparente e Colorido, PS, Policarbonato, PETG, PVC e muito mais.
+              Acrílico, Policarbonato, PS, PETG, PVC Expandido e ACM — corte sob medida
             </p>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {tiposChapas.map((chapa, index) => (
-              <div key={index} className="bg-background rounded-lg overflow-hidden shadow-sm border">
-                <div className="aspect-square bg-muted overflow-hidden">
-                  <img
-                    src={chapa.imageUrl}
-                    alt={`Chapa de ${chapa.nome} - Distribuidora Lab Acrílicos`}
-                    width={400}
-                    height={400}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                    decoding="async"
-                  />
+              <Link key={index} to={chapa.href} className="group">
+                <div className="bg-background rounded-lg overflow-hidden shadow-sm border hover:shadow-md transition-shadow">
+                  <div className="aspect-square bg-muted overflow-hidden">
+                    <img
+                      src={chapa.imageUrl}
+                      alt={`Chapa de ${chapa.nome} - OK Plast`}
+                      width={400}
+                      height={400}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      loading={index < 4 ? "eager" : "lazy"}
+                      decoding={index < 4 ? "sync" : "async"}
+                    />
+                  </div>
+                  <div className="p-3 text-center">
+                    <span className="text-sm font-medium text-foreground">{chapa.nome}</span>
+                  </div>
                 </div>
-                <div className="p-3 text-center">
-                  <span className="text-sm font-medium text-foreground">{chapa.nome}</span>
-                </div>
-              </div>
+              </Link>
             ))}
           </div>
 
           <div className="flex flex-col items-center gap-3 mt-8">
             <Button size="lg" variant="outline" asChild className="gap-2">
               <Link to="/chapas" onClick={() => window.scrollTo(0, 0)}>
-                Ver mais chapas e materiais
+                Ver todas as chapas e materiais
                 <ArrowRight className="h-5 w-5" />
               </Link>
             </Button>
-            <Button size="lg" className="btn-whatsapp gap-2" onClick={() => openWhatsAppModal("Chapas de Acrílico")}>
+            <Button size="lg" className="btn-whatsapp gap-2" onClick={() => openWhatsAppModal("Chapa Inteira")}>
               <MessageCircle className="h-5 w-5" />
               Orçamento via WhatsApp
             </Button>
@@ -228,7 +160,7 @@ export default function Index() {
 
       {/* Banner Azul */}
       <BlueBanner>
-        {COMPANY.name} é sua casa do acrílico com o melhor preço da região entre todas as lojas de acrílicos.
+        {COMPANY.name} — sua distribuidora de chapas plásticas com o melhor preço do Rio de Janeiro.
       </BlueBanner>
 
       {/* 6 Motivos - Carrossel */}
@@ -239,7 +171,7 @@ export default function Index() {
               6 Motivos para Escolher a {COMPANY.name}
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Descubra por que somos a escolha certa para seu projeto em acrílico
+              Descubra por que somos a escolha certa para suas chapas plásticas
             </p>
           </div>
           <MotivosCarousel />
@@ -262,23 +194,10 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Grande Empresa, Grandes Clientes */}
-      <section className="section-padding">
-        <div className="container-custom">
-          <div className="text-center mb-12">
-            <h2 className="font-bold text-2xl md:text-3xl text-foreground mb-4">Grande Empresa, Grandes Clientes</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              A {COMPANY.name} atende desde pequenos empreendedores até grandes corporações
-            </p>
-          </div>
-          <ClientLogos />
-        </div>
-      </section>
-
       {/* CTA Final */}
       <section className="section-padding bg-primary text-primary-foreground">
         <div className="container-custom text-center">
-          <h2 className="font-bold text-2xl md:text-3xl mb-4">Pronto para Começar seu Projeto?</h2>
+          <h2 className="font-bold text-2xl md:text-3xl mb-4">Pronto para seu Orçamento?</h2>
           <p className="text-primary-foreground/90 mb-8 max-w-2xl mx-auto">
             Entre em contato conosco e solicite um orçamento personalizado. Nossa equipe está pronta para atender você!
           </p>
@@ -322,7 +241,7 @@ export default function Index() {
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle className="h-5 w-5 text-accent shrink-0" />
-                  <span className="text-sm">Projetos sob encomenda</span>
+                  <span className="text-sm">Corte sob medida</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle className="h-5 w-5 text-accent shrink-0" />
