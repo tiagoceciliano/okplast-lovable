@@ -1,44 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Lab Acrílicos Design System - Modern Blue Theme
-   Primary: #0F4C81 (azul petróleo) / Accent: #00B4D8 (turquesa moderno)
+/* OK Plast Design System
+   Primary: #1a3a5c (azul marinho escuro) / Accent: #3bb78f (verde OK Plast)
    All colors in HSL format */
 
 @layer base {
   :root {
-    /* Core Brand Colors - Modern Blue */
+    /* Core Brand Colors - OK Plast */
     --background: 0 0% 100%;
-    --foreground: 207 40% 15%;
+    --foreground: 210 30% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 207 40% 15%;
+    --card-foreground: 210 30% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 207 40% 15%;
+    --popover-foreground: 210 30% 15%;
 
-    /* Primary - Azul Petróleo Vibrante #0F4C81 */
-    --primary: 207 80% 28%;
+    /* Primary - Azul Marinho Escuro #1a3a5c */
+    --primary: 212 55% 23%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary - Light cyan-blue */
-    --secondary: 190 70% 96%;
-    --secondary-foreground: 207 40% 15%;
+    /* Secondary - Light mint */
+    --secondary: 156 40% 96%;
+    --secondary-foreground: 210 30% 15%;
 
-    /* Accent - Turquesa Moderno #00B4D8 */
-    --accent: 190 100% 42%;
+    /* Accent - Verde OK Plast #3bb78f */
+    --accent: 156 52% 47%;
     --accent-foreground: 0 0% 100%;
 
-    --muted: 210 20% 96%;
-    --muted-foreground: 207 25% 45%;
+    --muted: 210 15% 96%;
+    --muted-foreground: 210 15% 45%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 210 20% 90%;
-    --input: 210 20% 90%;
-    --ring: 190 100% 42%;
+    --border: 210 15% 90%;
+    --input: 210 15% 90%;
+    --ring: 156 52% 47%;
 
     --radius: 0.5rem;
 
@@ -47,7 +49,7 @@
     --whatsapp-foreground: 0 0% 100%;
 
     /* CTA Email Button */
-    --cta-email: 207 60% 50%;
+    --cta-email: 212 55% 40%;
     --cta-email-foreground: 0 0% 100%;
 
     /* Gold/Yellow for accent buttons */
@@ -55,53 +57,53 @@
     --gold-foreground: 0 0% 15%;
 
     /* Sidebar */
-    --sidebar-background: 207 80% 28%;
+    --sidebar-background: 212 55% 23%;
     --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 190 100% 42%;
+    --sidebar-primary: 156 52% 47%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 207 70% 35%;
+    --sidebar-accent: 212 50% 30%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 207 70% 35%;
-    --sidebar-ring: 190 100% 42%;
+    --sidebar-border: 212 50% 30%;
+    --sidebar-ring: 156 52% 47%;
   }
 
   .dark {
-    --background: 207 80% 8%;
+    --background: 212 55% 8%;
     --foreground: 0 0% 98%;
 
-    --card: 207 70% 12%;
+    --card: 212 50% 12%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 207 70% 12%;
+    --popover: 212 50% 12%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 190 100% 42%;
-    --primary-foreground: 207 80% 8%;
+    --primary: 156 52% 47%;
+    --primary-foreground: 212 55% 8%;
 
-    --secondary: 207 60% 18%;
+    --secondary: 212 40% 18%;
     --secondary-foreground: 0 0% 98%;
 
-    --accent: 190 100% 42%;
-    --accent-foreground: 207 80% 8%;
+    --accent: 156 52% 47%;
+    --accent-foreground: 212 55% 8%;
 
-    --muted: 207 50% 18%;
-    --muted-foreground: 210 20% 70%;
+    --muted: 212 40% 18%;
+    --muted-foreground: 210 15% 70%;
 
     --destructive: 0 62% 30%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 207 50% 22%;
-    --input: 207 50% 22%;
-    --ring: 190 100% 42%;
+    --border: 212 40% 22%;
+    --input: 212 40% 22%;
+    --ring: 156 52% 47%;
 
-    --sidebar-background: 207 80% 6%;
+    --sidebar-background: 212 55% 6%;
     --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 190 100% 42%;
+    --sidebar-primary: 156 52% 47%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 207 60% 15%;
+    --sidebar-accent: 212 40% 15%;
     --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 207 60% 15%;
-    --sidebar-ring: 190 100% 42%;
+    --sidebar-border: 212 40% 15%;
+    --sidebar-ring: 156 52% 47%;
   }
 }
 
@@ -112,11 +114,11 @@
 
   body {
      @apply bg-background text-foreground antialiased;
-     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+     font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
-     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+     font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
     font-weight: 700;
   }
 }
@@ -137,7 +139,7 @@
   }
 
   .btn-cta-email {
-    @apply bg-[hsl(var(--cta-email))] text-[hsl(var(--cta-email-foreground))] hover:bg-[hsl(207,60%,45%)] transition-all duration-200;
+    @apply bg-[hsl(var(--cta-email))] text-[hsl(var(--cta-email-foreground))] hover:bg-[hsl(212,55%,35%)] transition-all duration-200;
   }
 
   .btn-gold {
@@ -149,7 +151,7 @@
   }
 
   .gradient-primary {
-    background: linear-gradient(135deg, hsl(207 80% 28%) 0%, hsl(190 100% 42%) 100%);
+    background: linear-gradient(135deg, hsl(212 55% 23%) 0%, hsl(156 52% 47%) 100%);
   }
 
   .bg-primary-solid {

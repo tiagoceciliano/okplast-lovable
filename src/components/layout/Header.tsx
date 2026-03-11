@@ -3,6 +3,7 @@ import { MessageCircle, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
 import { useEmailQuoteModal } from "@/contexts/EmailQuoteModalContext";
+import logoImage from "@/assets/logo-okplast.png";
 
 export function Header() {
   const { openWhatsAppModal } = useWhatsAppModal();
@@ -11,15 +12,15 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full bg-primary">
       <div className="container-custom">
-        <div className="flex h-20 md:h-24 items-center justify-between">
+        <div className="flex h-16 md:h-20 items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center">
             <img
-              src="/logo-horizontal.png"
+              src={logoImage}
               alt="OK Plast"
-              className="h-32 md:h-40 lg:h-48 w-auto brightness-0 invert object-contain"
-              width={320}
-              height={120}
+              className="h-10 md:h-12 lg:h-14 w-auto object-contain brightness-0 invert"
+              width={180}
+              height={56}
               fetchPriority="high"
             />
           </Link>

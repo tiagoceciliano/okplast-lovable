@@ -109,7 +109,7 @@ interface ProductPageProps {
                <div className="aspect-[4/3] lg:aspect-square bg-muted rounded-lg overflow-hidden shadow-lg">
                  <img 
                    src={imageUrl} 
-                   alt={`${title} - Fabricação em acrílico sob medida - Lab Acrílicos`}
+                   alt={`${title} - OK Plast`}
                    width={600}
                    height={600}
                    className="w-full h-full object-cover"

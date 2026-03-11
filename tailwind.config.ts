@@ -14,8 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Open Sans', 'system-ui', 'sans-serif'],
-        display: ['Open Sans', 'system-ui', 'sans-serif'],
+        sans: ['Montserrat', 'system-ui', 'sans-serif'],
+        display: ['Montserrat', 'system-ui', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",

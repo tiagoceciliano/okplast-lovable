@@ -21,7 +21,7 @@ import { COMPANY, PRODUTOS_WHATSAPP } from "@/lib/constants";
 import { formatPhone, capitalizeName } from "./WhatsAppButton";
 import { supabase } from "@/integrations/supabase/client";
 import { getStoredUTM } from "@/hooks/useUTM";
-import logoImage from "@/assets/logo-lab-acrilicos.png";
+import logoImage from "@/assets/logo-okplast.png";
 
 // Schema de validação
 const whatsappFormSchema = z.object({
@@ -134,12 +134,12 @@ export function WhatsAppChatWidget({ open, onOpenChange }: WhatsAppChatWidgetPro
       {/* WhatsApp Header */}
       <div className="whatsapp-header flex items-center gap-3 px-4 py-3 rounded-t-2xl">
         <Avatar className="h-10 w-10 border-2 border-white/20">
-          <AvatarImage src={logoImage} alt="Lab Acrílicos" className="object-cover" />
-          <AvatarFallback className="bg-white/20 text-white text-sm font-semibold">LA</AvatarFallback>
+          <AvatarImage src={logoImage} alt="OK Plast" className="object-cover" />
+          <AvatarFallback className="bg-white/20 text-white text-sm font-semibold">OK</AvatarFallback>
         </Avatar>
         
         <div className="flex-1">
-          <h3 className="text-white font-semibold text-base leading-tight">Lab Acrílicos</h3>
+          <h3 className="text-white font-semibold text-base leading-tight">OK Plast</h3>
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
             <span className="text-white/80 text-xs">Online</span>
