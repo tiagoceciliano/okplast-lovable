@@ -3,11 +3,11 @@ export const COMPANY = {
   name: "OK Plast",
   legalName: "OK PLAST COMERCIO LTDA",
   slogan: "TUDO OK PARA SEU PROJETO",
-  address: "Rua Cordovil 259 – Cordovil – Rio de Janeiro – RJ",
+  address: "Rua Guatemala, 593 – Penha Circular – Rio de Janeiro – RJ, 21020-170",
   phone: "(21) 3372-3797",
   whatsapp: "5521923670633",
   whatsappFormatted: "(21) 92367-0633",
-  email: "comercial@okplast.com.br",
+  email: "vendas@okplast.com.br",
   domain: "https://okplast.com.br",
   businessHours: "Segunda a Sexta: 9h às 17h",
 } as const;
