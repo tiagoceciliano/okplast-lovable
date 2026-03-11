@@ -139,7 +139,7 @@ export function WhatsAppChatWidget({ open, onOpenChange }: WhatsAppChatWidgetPro
         </Avatar>
         
         <div className="flex-1">
-          <h3 className="text-white font-semibold text-base leading-tight">Lab Acrílicos</h3>
+          <h3 className="text-white font-semibold text-base leading-tight">OK Plast</h3>
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
             <span className="text-white/80 text-xs">Online</span>
