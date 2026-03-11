@@ -21,7 +21,7 @@ import { COMPANY, PRODUTOS_WHATSAPP } from "@/lib/constants";
 import { formatPhone, capitalizeName } from "./WhatsAppButton";
 import { supabase } from "@/integrations/supabase/client";
 import { getStoredUTM } from "@/hooks/useUTM";
-import logoImage from "@/assets/logo-lab-acrilicos.png";
+import logoImage from "@/assets/logo-okplast.png";
 
 // Schema de validação
 const whatsappFormSchema = z.object({
