@@ -32,7 +32,7 @@ export default function SobreNos() {
             </p>
 
             <p className="text-muted-foreground">
-              Contamos com corte sob medida, atendimento ágil e entrega para todo o Brasil. 
+              Contamos com corte sob medida, atendimento ágil e entrega rápida. 
               Nosso compromisso é fornecer materiais de alta qualidade com o melhor preço da região.
             </p>
 

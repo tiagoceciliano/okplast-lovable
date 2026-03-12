@@ -9,8 +9,8 @@ const motivos = [
   },
   { 
     icon: Truck, 
-    titulo: "2º Frete Seguro", 
-    desc: "Embalagem reforçada e envio seguro para todo o Brasil. Trabalhamos com transportadoras confiáveis para garantir que sua chapa chegue intacta."
+    titulo: "2º Frete e Transporte", 
+    desc: "Embalagem reforçada para proteção do material. Opções de transporte com segurança para garantir que sua chapa chegue intacta."
   },
   { 
     icon: ClipboardEdit, 

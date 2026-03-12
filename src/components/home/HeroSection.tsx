@@ -19,7 +19,7 @@ export function HeroSection({ onWhatsAppClick, onEmailClick }: HeroSectionProps)
             Acrílico, Policarbonato, PETG, Poliestireno (PS), PVC Expandido e ACM
           </h2>
           <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
-            <strong className="text-foreground">{COMPANY.name}</strong> — {COMPANY.slogan}. Distribuidora de chapas plásticas com corte sob medida e o melhor preço do Rio de Janeiro. Entrega para todo o Brasil.
+            <strong className="text-foreground">{COMPANY.name}</strong> — {COMPANY.slogan}. Distribuidora de chapas plásticas com corte sob medida e o melhor preço do Rio de Janeiro.
           </p>
           <div className="flex flex-col items-center gap-4">
             <Button size="lg" className="btn-whatsapp text-lg px-8 py-6" onClick={onWhatsAppClick}>

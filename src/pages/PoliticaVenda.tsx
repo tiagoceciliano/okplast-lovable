@@ -55,8 +55,7 @@ export default function PoliticaVenda() {
             <p className="text-muted-foreground">Disponibilizamos as seguintes opções de entrega:</p>
             <ul className="text-muted-foreground space-y-2">
               <li><strong className="text-foreground">Retirada no local:</strong> Sem custo, em nosso endereço no Rio de Janeiro</li>
-              <li><strong className="text-foreground">Correios:</strong> PAC ou SEDEX para todo o Brasil</li>
-              <li><strong className="text-foreground">Transportadora:</strong> Para pedidos maiores ou volumes pesados</li>
+              <li><strong className="text-foreground">Transportadora:</strong> Consulte-nos para saber as opções disponíveis</li>
             </ul>
             <p className="text-muted-foreground">
               O frete é calculado com base no peso, dimensões e CEP de destino.
