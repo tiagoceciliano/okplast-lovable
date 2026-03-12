@@ -69,8 +69,8 @@ const faqItems = [{
   question: "Como solicitar um orçamento?",
   answer: "Você pode solicitar orçamento pelo WhatsApp, e-mail ou formulário do site. Resposta em até 24 horas úteis."
 }, {
-  question: "Vocês entregam para todo o Brasil?",
-  answer: "Sim, enviamos para todo o Brasil via transportadora."
+  question: "Vocês fazem entrega?",
+  answer: "Sim, fazemos entrega no Rio de Janeiro. Consulte as opções disponíveis para sua região."
 }];
 
 // Tipos de Chapas - Grid de 8 chapas (foco da home)
