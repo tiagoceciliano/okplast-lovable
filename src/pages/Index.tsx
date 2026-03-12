@@ -249,7 +249,7 @@ export default function Index() {
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle className="h-5 w-5 text-accent shrink-0" />
-                  <span className="text-sm">Entrega nacional</span>
+                  <span className="text-sm">Entrega no RJ</span>
                 </div>
               </div>
             </div>
