@@ -43,7 +43,7 @@ const PageLoader = () => (
 // Main site content wrapped in Layout
 const MainSite = () => (
   <WhatsAppModalProvider>
-    <EmailQuoteModalProvider>
+    
       <Layout>
         <Suspense fallback={<PageLoader />}>
           <Routes>
