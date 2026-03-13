@@ -48,7 +48,7 @@ import { MessageCircle } from "lucide-react";
  
  export default function Acrilico() {
    const { openWhatsAppModal } = useWhatsAppModal();
-   const { openEmailModal } = useEmailQuoteModal();
+   
    const autoplayPlugin = useRef(
      Autoplay({ delay: 3000, stopOnInteraction: false })
    );
