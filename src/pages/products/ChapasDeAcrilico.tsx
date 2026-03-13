@@ -6,7 +6,7 @@ import { COMPANY } from "@/lib/constants";
 import { DecorativeDivider } from "@/components/ui/DecorativeDivider";
 import { BlueBanner } from "@/components/ui/BlueBanner";
 import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
- import { useEmailQuoteModal } from "@/contexts/EmailQuoteModalContext";
+ 
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { useRef } from "react";
