@@ -6,7 +6,6 @@ import { GoogleMapEmbed } from "@/components/ui/GoogleMapEmbed";
 import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
 
 export function Footer() {
-  const { openEmailModal } = useEmailQuoteModal();
   const { openWhatsAppModal } = useWhatsAppModal();
   const currentYear = new Date().getFullYear();
   return <footer className="bg-primary text-primary-foreground">
