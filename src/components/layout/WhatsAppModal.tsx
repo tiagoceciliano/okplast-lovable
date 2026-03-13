@@ -215,7 +215,6 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
                       name="produto"
                       render={({ field }) => (
                         <FormItem>
-                          <p className="text-xs text-gray-600 mb-1">O que você está procurando?</p>
                           <FormControl>
                             <RadioGroup
                               onValueChange={field.onChange}
