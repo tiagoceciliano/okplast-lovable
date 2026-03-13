@@ -6,7 +6,7 @@ import { DecorativeDivider } from "@/components/ui/DecorativeDivider";
 import { BlueBanner } from "@/components/ui/BlueBanner";
 import { TestimonialCard } from "@/components/ui/TestimonialCard";
 import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
-import { useEmailQuoteModal } from "@/contexts/EmailQuoteModalContext";
+
 import { HeroSection } from "@/components/home/HeroSection";
 import { SEOHead, createFAQSchema } from "@/components/SEOHead";
 import { MotivosCarousel } from "@/components/home/MotivosCarousel";
@@ -102,7 +102,7 @@ const beneficios = [
 
 export default function Index() {
   const { openWhatsAppModal } = useWhatsAppModal();
-  const { openEmailModal } = useEmailQuoteModal();
+  
 
   return (
     <>
@@ -116,7 +116,7 @@ export default function Index() {
         }}
       />
 
-      <HeroSection onWhatsAppClick={() => openWhatsAppModal()} onEmailClick={() => openEmailModal()} />
+      <HeroSection onWhatsAppClick={() => openWhatsAppModal()} />
 
       {/* CHAPAS - Grid principal */}
       <section className="section-padding">
@@ -210,9 +210,6 @@ export default function Index() {
               <MessageCircle className="h-5 w-5 mr-2" />
               Orçamento via WhatsApp
             </Button>
-            <button onClick={() => openEmailModal()} className="text-primary-foreground/70 hover:text-primary-foreground text-sm underline underline-offset-4">
-              Prefere orçamento via e-mail?
-            </button>
           </div>
         </div>
       </section>

@@ -4,7 +4,7 @@
 import { MessageCircle } from "lucide-react";
  import { DecorativeDivider } from "@/components/ui/DecorativeDivider";
  import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
- import { useEmailQuoteModal } from "@/contexts/EmailQuoteModalContext";
+ 
  
  import heroPvcExpandido from "@/assets/chapas-hero/pvc-expandido.jpg";
  
@@ -18,7 +18,7 @@ import { MessageCircle } from "lucide-react";
  
  export default function PvcExpandido() {
    const { openWhatsAppModal } = useWhatsAppModal();
-   const { openEmailModal } = useEmailQuoteModal();
+   
  
    return (
      <>
@@ -68,12 +68,6 @@ import { MessageCircle } from "lucide-react";
                    <MessageCircle className="h-5 w-5 mr-2" />
                    Orçamento via WhatsApp
                  </Button>
-                 <button 
-                   onClick={() => openEmailModal("Chapa PVC Expandido")}
-                   className="text-muted-foreground hover:text-foreground text-sm underline underline-offset-4"
-                 >
-                   Prefere orçamento via e-mail?
-                 </button>
                </div>
              </div>
  
@@ -195,12 +189,6 @@ import { MessageCircle } from "lucide-react";
                <MessageCircle className="h-5 w-5 mr-2" />
               Orçamento via WhatsApp
              </Button>
-            <button 
-               onClick={() => openEmailModal("Chapa PVC Expandido")}
-              className="text-muted-foreground hover:text-foreground text-sm underline underline-offset-4"
-             >
-              Prefere orçamento via e-mail?
-            </button>
            </div>
          </div>
        </section>

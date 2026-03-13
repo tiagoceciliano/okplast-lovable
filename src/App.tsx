@@ -8,7 +8,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Layout } from "@/components/layout";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppModalProvider } from "@/contexts/WhatsAppModalContext";
-import { EmailQuoteModalProvider } from "@/contexts/EmailQuoteModalContext";
+
 
 // Lazy loaded pages
 const Index = lazy(() => import("./pages/Index"));
@@ -43,7 +43,7 @@ const PageLoader = () => (
 // Main site content wrapped in Layout
 const MainSite = () => (
   <WhatsAppModalProvider>
-    <EmailQuoteModalProvider>
+    
       <Layout>
         <Suspense fallback={<PageLoader />}>
           <Routes>
@@ -77,7 +77,7 @@ const MainSite = () => (
           </Routes>
         </Suspense>
       </Layout>
-    </EmailQuoteModalProvider>
+    
   </WhatsAppModalProvider>
 );
 

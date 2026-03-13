@@ -3,11 +3,9 @@ import { MapPin, Phone, Mail, Clock, MessageCircle } from "lucide-react";
 import { COMPANY } from "@/lib/constants";
 import logoImg from "@/assets/logo-okplast.png";
 import { GoogleMapEmbed } from "@/components/ui/GoogleMapEmbed";
-import { useEmailQuoteModal } from "@/contexts/EmailQuoteModalContext";
 import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
 
 export function Footer() {
-  const { openEmailModal } = useEmailQuoteModal();
   const { openWhatsAppModal } = useWhatsAppModal();
   const currentYear = new Date().getFullYear();
   return <footer className="bg-primary text-primary-foreground">
@@ -23,12 +21,7 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="h-4 w-4 shrink-0" />
-                <button 
-                  onClick={() => openEmailModal()} 
-                  className="hover:text-primary-foreground transition-colors text-left"
-                >
-                  {COMPANY.email}
-                </button>
+                <span>{COMPANY.email}</span>
               </li>
             </ul>
           </div>

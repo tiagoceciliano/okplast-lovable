@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
  import { Badge } from "@/components/ui/badge";
 import { CheckCircle, MessageCircle } from "lucide-react";
 import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
- import { useEmailQuoteModal } from "@/contexts/EmailQuoteModalContext";
+ 
  import { SEOHead, createBreadcrumbSchema, createProductSchema } from "@/components/SEOHead";
 
 interface ProductPageProps {
@@ -31,7 +31,7 @@ interface ProductPageProps {
    canonical,
  }: ProductPageProps) {
   const { openWhatsAppModal } = useWhatsAppModal();
-   const { openEmailModal } = useEmailQuoteModal();
+   
  
    const schemas = useMemo(() => {
      const breadcrumb = createBreadcrumbSchema([
@@ -95,12 +95,6 @@ interface ProductPageProps {
                    <MessageCircle className="h-5 w-5 mr-2" />
                    Orçamento via WhatsApp
                  </Button>
-                 <button 
-                   onClick={() => openEmailModal(title)}
-                   className="text-muted-foreground hover:text-foreground text-sm underline underline-offset-4"
-                 >
-                   Prefere orçamento via e-mail?
-                 </button>
                </div>
              </div>
  
@@ -178,12 +172,6 @@ interface ProductPageProps {
                <MessageCircle className="h-5 w-5 mr-2" />
                Orçamento via WhatsApp
              </Button>
-             <button 
-               onClick={() => openEmailModal(title)}
-               className="text-muted-foreground hover:text-foreground text-sm underline underline-offset-4"
-             >
-               Prefere orçamento via e-mail?
-             </button>
            </div>
          </div>
        </section>

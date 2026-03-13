@@ -4,10 +4,9 @@ import { COMPANY } from "@/lib/constants";
 
 interface HeroSectionProps {
   onWhatsAppClick: () => void;
-  onEmailClick: () => void;
 }
 
-export function HeroSection({ onWhatsAppClick, onEmailClick }: HeroSectionProps) {
+export function HeroSection({ onWhatsAppClick }: HeroSectionProps) {
   return (
     <section className="bg-background py-12 md:py-16 lg:py-20">
       <div className="container-custom">
@@ -26,9 +25,6 @@ export function HeroSection({ onWhatsAppClick, onEmailClick }: HeroSectionProps)
               <MessageCircle className="h-5 w-5 mr-2" />
               Orçamento via WhatsApp
             </Button>
-            <button onClick={onEmailClick} className="text-muted-foreground hover:text-foreground text-sm underline underline-offset-4">
-              Prefere orçamento via e-mail?
-            </button>
           </div>
         </div>
       </div>
