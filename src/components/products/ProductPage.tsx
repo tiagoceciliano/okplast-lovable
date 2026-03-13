@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
  import { Badge } from "@/components/ui/badge";
 import { CheckCircle, MessageCircle } from "lucide-react";
 import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
- import { useEmailQuoteModal } from "@/contexts/EmailQuoteModalContext";
+ 
  import { SEOHead, createBreadcrumbSchema, createProductSchema } from "@/components/SEOHead";
 
 interface ProductPageProps {
