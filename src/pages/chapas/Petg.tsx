@@ -4,7 +4,7 @@
 import { MessageCircle } from "lucide-react";
  import { DecorativeDivider } from "@/components/ui/DecorativeDivider";
  import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
- import { useEmailQuoteModal } from "@/contexts/EmailQuoteModalContext";
+ 
  
  import heroPetg from "@/assets/chapas-hero/petg.jpg";
  
