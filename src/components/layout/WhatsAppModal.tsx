@@ -59,9 +59,6 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
   });
 
   const handleOpenChange = (isOpen: boolean) => {
-    if (isOpen && defaultProduto) {
-      form.setValue("produto", defaultProduto);
-    }
     onOpenChange(isOpen);
   };
 
