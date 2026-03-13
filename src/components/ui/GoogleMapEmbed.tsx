@@ -28,8 +28,8 @@ interface GoogleMapEmbedProps {
      return () => observer.disconnect();
    }, []);
  
-  // OK Plast address: Rua Cordovil 259 - Cordovil - Rio de Janeiro - RJ
-  const mapSrc = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3675.2!2d-43.3!3d-22.85!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sRua%20Cordovil%2C%20259%20-%20Cordovil%2C%20Rio%20de%20Janeiro%20-%20RJ!5e0!3m2!1spt-BR!2sbr!4v1700000000000!5m2!1spt-BR!2sbr";
+  // OK Plast address: Rua Guatemala, 593 - Penha Circular - Rio de Janeiro - RJ, 21020-170
+  const mapSrc = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3675.5!2d-43.28!3d-22.84!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sRua%20Guatemala%2C%20593%20-%20Penha%20Circular%2C%20Rio%20de%20Janeiro%20-%20RJ!5e0!3m2!1spt-BR!2sbr!4v1700000000000!5m2!1spt-BR!2sbr";
 
  
    return (
