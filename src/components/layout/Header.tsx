@@ -16,11 +16,10 @@ export function Header() {
           {/* Logo */}
           <Link to="/" className="flex items-center">
             <img
-
               alt="OK Plast"
-              className="h-10 md:h-12 lg:h-14 w-auto object-contain brightness-0 invert"
-              width={180}
-              height={56}
+              className="h-12 md:h-16 lg:h-20 w-auto object-contain brightness-0 invert"
+              width={200}
+              height={80}
               fetchPriority="high" src="/lovable-uploads/e3c63f33-82e6-4475-9fc6-b070d0134450.png" />
             
           </Link>
