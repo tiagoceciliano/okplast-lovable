@@ -3,7 +3,6 @@ import { MapPin, Phone, Mail, Clock, MessageCircle } from "lucide-react";
 import { COMPANY } from "@/lib/constants";
 import logoImg from "@/assets/logo-okplast.png";
 import { GoogleMapEmbed } from "@/components/ui/GoogleMapEmbed";
-import { useEmailQuoteModal } from "@/contexts/EmailQuoteModalContext";
 import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
 
 export function Footer() {
