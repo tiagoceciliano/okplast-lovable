@@ -95,12 +95,6 @@ interface ProductPageProps {
                    <MessageCircle className="h-5 w-5 mr-2" />
                    Orçamento via WhatsApp
                  </Button>
-                 <button 
-                   onClick={() => openEmailModal(title)}
-                   className="text-muted-foreground hover:text-foreground text-sm underline underline-offset-4"
-                 >
-                   Prefere orçamento via e-mail?
-                 </button>
                </div>
              </div>
  
