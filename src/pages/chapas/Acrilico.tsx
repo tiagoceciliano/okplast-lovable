@@ -324,12 +324,6 @@ import { MessageCircle } from "lucide-react";
                <MessageCircle className="h-5 w-5 mr-2" />
               Orçamento via WhatsApp
              </Button>
-            <button 
-               onClick={() => openEmailModal("Chapa de Acrílico")}
-              className="text-muted-foreground hover:text-foreground text-sm underline underline-offset-4"
-             >
-              Prefere orçamento via e-mail?
-            </button>
            </div>
          </div>
        </section>

@@ -21,12 +21,7 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="h-4 w-4 shrink-0" />
-                <button 
-                  onClick={() => openEmailModal()} 
-                  className="hover:text-primary-foreground transition-colors text-left"
-                >
-                  {COMPANY.email}
-                </button>
+                <span>{COMPANY.email}</span>
               </li>
             </ul>
           </div>

@@ -1,13 +1,10 @@
 import { Link } from "react-router-dom";
-import { MessageCircle, Mail } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
-import { useEmailQuoteModal } from "@/contexts/EmailQuoteModalContext";
-import logoImage from "@/assets/logo-okplast.png";
 
 export function Header() {
   const { openWhatsAppModal } = useWhatsAppModal();
-  const { openEmailModal } = useEmailQuoteModal();
 
   return (
     <header className="sticky top-0 z-50 w-full bg-primary">
@@ -32,15 +29,6 @@ export function Header() {
               
               <MessageCircle className="h-4 w-4 md:h-5 md:w-5 mr-2" />
               <span className="hidden sm:inline">Orçamento via </span>WhatsApp
-            </Button>
-
-            <Button
-              onClick={() => openEmailModal()}
-              variant="ghost"
-              className="text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10 rounded-full px-3 md:px-4 py-2 text-xs md:text-sm hidden sm:flex">
-              
-              <Mail className="h-4 w-4 mr-1" />
-              Orçamento via e-mail
             </Button>
           </div>
         </div>

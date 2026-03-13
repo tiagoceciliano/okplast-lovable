@@ -77,7 +77,7 @@ const MainSite = () => (
           </Routes>
         </Suspense>
       </Layout>
-    </EmailQuoteModalProvider>
+    
   </WhatsAppModalProvider>
 );
 
