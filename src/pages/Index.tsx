@@ -6,7 +6,7 @@ import { DecorativeDivider } from "@/components/ui/DecorativeDivider";
 import { BlueBanner } from "@/components/ui/BlueBanner";
 import { TestimonialCard } from "@/components/ui/TestimonialCard";
 import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
-import { useEmailQuoteModal } from "@/contexts/EmailQuoteModalContext";
+
 import { HeroSection } from "@/components/home/HeroSection";
 import { SEOHead, createFAQSchema } from "@/components/SEOHead";
 import { MotivosCarousel } from "@/components/home/MotivosCarousel";
