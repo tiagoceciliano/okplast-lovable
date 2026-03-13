@@ -116,7 +116,7 @@ export default function Index() {
         }}
       />
 
-      <HeroSection onWhatsAppClick={() => openWhatsAppModal()} onEmailClick={() => openEmailModal()} />
+      <HeroSection onWhatsAppClick={() => openWhatsAppModal()} />
 
       {/* CHAPAS - Grid principal */}
       <section className="section-padding">
