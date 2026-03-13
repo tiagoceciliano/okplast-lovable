@@ -102,7 +102,7 @@ const beneficios = [
 
 export default function Index() {
   const { openWhatsAppModal } = useWhatsAppModal();
-  const { openEmailModal } = useEmailQuoteModal();
+  
 
   return (
     <>
