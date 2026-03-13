@@ -54,7 +54,6 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
       nome: "",
       email: "",
       telefone: "",
-      produto: defaultProduto || "",
       mensagem: "",
     },
   });
