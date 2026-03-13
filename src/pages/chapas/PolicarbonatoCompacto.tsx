@@ -18,7 +18,7 @@ import { MessageCircle } from "lucide-react";
  
  export default function PolicarbonatoCompacto() {
    const { openWhatsAppModal } = useWhatsAppModal();
-   const { openEmailModal } = useEmailQuoteModal();
+   
  
    return (
      <>
