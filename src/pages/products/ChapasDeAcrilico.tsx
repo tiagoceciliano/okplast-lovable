@@ -129,7 +129,7 @@ export default function ChapasDeAcrilico() {
   const {
     openWhatsAppModal
   } = useWhatsAppModal();
-   const { openEmailModal } = useEmailQuoteModal();
+   
   const autoplayPlugin = useRef(Autoplay({
     delay: 1000,
     stopOnInteraction: false
