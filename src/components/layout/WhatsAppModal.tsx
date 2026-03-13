@@ -75,7 +75,6 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
         `Nome: ${nomeFormatado}`,
         `E-mail: ${data.email}`,
         `WhatsApp: ${telefoneFormatado}`,
-        `Produto: ${data.produto}`,
         `Mensagem: ${data.mensagem}`,
       ].join("\n");
 
