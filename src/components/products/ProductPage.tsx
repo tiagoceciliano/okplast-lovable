@@ -31,7 +31,7 @@ interface ProductPageProps {
    canonical,
  }: ProductPageProps) {
   const { openWhatsAppModal } = useWhatsAppModal();
-   const { openEmailModal } = useEmailQuoteModal();
+   
  
    const schemas = useMemo(() => {
      const breadcrumb = createBreadcrumbSchema([
