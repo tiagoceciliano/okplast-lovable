@@ -17,9 +17,9 @@ export function Header() {
           <Link to="/" className="flex items-center">
             <img
               alt="OK Plast"
-              className="h-12 md:h-16 lg:h-20 w-auto object-contain brightness-0 invert"
-              width={200}
-              height={80}
+              className="h-16 md:h-24 lg:h-32 w-auto object-contain brightness-0 invert"
+              width={280}
+              height={128}
               fetchPriority="high" src="/lovable-uploads/e3c63f33-82e6-4475-9fc6-b070d0134450.png" />
             
           </Link>
