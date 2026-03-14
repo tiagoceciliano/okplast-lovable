@@ -87,14 +87,22 @@ export const DEPOIMENTOS_IMAGES = {
 // ========================================
 // PÁGINA CHAPAS DE ACRÍLICO
 // ========================================
+import chapasCast from "@/assets/chapas-hero/acrilico-transparente.jpg";
+import chapasPoliestireno2 from "@/assets/chapas/ps-poliestireno-2.jpg";
+import chapasPetg2 from "@/assets/chapas/pet-g-2.jpg";
+import chapasPcAlveolar2 from "@/assets/chapas/policarbonato-alveolar-2.jpg";
+import chapasPcCompacto2 from "@/assets/chapas/policarbonato-compacto-2.jpg";
+import chapasPvc2 from "@/assets/chapas/pvc-expandido-2.jpg";
+import chapasAcm2 from "@/assets/chapas/acm-2.jpg";
+
 export const CHAPAS_PAGINA_IMAGES = {
-  cast: img("chapas-pagina/cast.jpg"),
-  poliestireno: img("chapas/ps-poliestireno-2.jpg"),
-  petg: img("chapas/pet-g-2.jpg"),
-  policarbonatoAlveolar: img("chapas/policarbonato-alveolar-2.jpg"),
-  policarbonatoCompacto: img("chapas/policarbonato-compacto-2.jpg"),
-  pvc: img("chapas/pvc-expandido-2.jpg"),
-  acm: img("chapas/acm-2.jpg"),
+  cast: chapasCast,
+  poliestireno: chapasPoliestireno2,
+  petg: chapasPetg2,
+  policarbonatoAlveolar: chapasPcAlveolar2,
+  policarbonatoCompacto: chapasPcCompacto2,
+  pvc: chapasPvc2,
+  acm: chapasAcm2,
 } as const;
 
 // ========================================
