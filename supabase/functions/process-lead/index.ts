@@ -11,7 +11,7 @@ interface LeadPayload {
   nome: string;
   email: string;
   telefone: string;
-  produto_interesse: string;
+  produto_interesse?: string;
   mensagem?: string;
   utm_source?: string | null;
   utm_medium?: string | null;
@@ -26,14 +26,6 @@ interface GeoData {
   region?: string;
   country_name?: string;
   ip?: string;
-}
-
-// Determina qual webhook usar baseado no produto
-function getWebhookType(produto: string): "chapas" | "peca" {
-  if (produto === "Chapa Inteira ou Cortada") {
-    return "chapas";
-  }
-  return "peca";
 }
 
 // Obtém data e hora separados no fuso de São Paulo
@@ -56,7 +48,6 @@ function cleanPhone(phone: string): string {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -64,10 +55,9 @@ serve(async (req) => {
   try {
     const payload: LeadPayload = await req.json();
 
-    // Validação básica
-    if (!payload.nome || !payload.email || !payload.telefone || !payload.produto_interesse) {
+    if (!payload.nome || !payload.email || !payload.telefone) {
       return new Response(
-        JSON.stringify({ error: "Campos obrigatórios: nome, email, telefone, produto_interesse" }),
+        JSON.stringify({ error: "Campos obrigatórios: nome, email, telefone" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -77,7 +67,7 @@ serve(async (req) => {
                      req.headers.get("cf-connecting-ip") || 
                      "unknown";
 
-    // Consulta geolocalização via ipapi.co
+    // Consulta geolocalização
     let geoData: GeoData = {};
     try {
       if (clientIp && clientIp !== "unknown") {
@@ -90,11 +80,8 @@ serve(async (req) => {
       console.error("Erro ao consultar geolocalização:", geoError);
     }
 
-    // Determina tipo de webhook (WhatsApp)
-    const webhookType = getWebhookType(payload.produto_interesse);
-    const webhookUrl = webhookType === "chapas" 
-      ? Deno.env.get("WEBHOOK_WHATSAPP_CHAPA") 
-      : Deno.env.get("WEBHOOK_WHATSAPP_PECA");
+    // Webhook único para WhatsApp chapas
+    const webhookUrl = Deno.env.get("WEBHOOK_WHATSAPP_CHAPA");
 
     // Cria cliente Supabase com service role
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -108,7 +95,7 @@ serve(async (req) => {
         nome: payload.nome,
         email: payload.email,
         telefone: payload.telefone,
-        produto_interesse: payload.produto_interesse,
+        produto_interesse: payload.produto_interesse || "Chapa Inteira",
         mensagem: payload.mensagem || null,
         utm_source: payload.utm_source || null,
         utm_medium: payload.utm_medium || null,
@@ -119,7 +106,7 @@ serve(async (req) => {
         estado: geoData.region || null,
         pais: geoData.country_name || null,
         ip_address: clientIp,
-        webhook_tipo: webhookType,
+        webhook_tipo: "whatsapp",
         webhook_enviado: false,
       })
       .select()
@@ -130,14 +117,14 @@ serve(async (req) => {
       throw new Error("Erro ao salvar lead no banco de dados");
     }
 
-    // Prepara payload para webhook Kinbox
+    // Prepara payload para webhook
     const { date, time } = getSaoPauloDateTime();
     
     const webhookPayload = {
       name: payload.nome,
       email: payload.email,
       phone: cleanPhone(payload.telefone),
-      product: payload.produto_interesse,
+      product: payload.produto_interesse || "Chapa Inteira",
       message: payload.mensagem || "",
       location: {
         city: geoData.city || "",
@@ -166,7 +153,6 @@ serve(async (req) => {
 
         if (webhookResponse.ok) {
           webhookEnviado = true;
-          // Atualiza status do webhook no banco
           await supabase
             .from("leads")
             .update({ webhook_enviado: true })
@@ -178,7 +164,7 @@ serve(async (req) => {
         console.error("Erro ao enviar webhook:", webhookError);
       }
     } else {
-      console.warn(`Webhook ${webhookType} não configurado`);
+      console.warn("WEBHOOK_WHATSAPP_CHAPA não configurado");
     }
 
     return new Response(
