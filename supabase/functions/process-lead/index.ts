@@ -81,7 +81,7 @@ serve(async (req) => {
     }
 
     // Webhook único para WhatsApp chapas
-    const webhookUrl = Deno.env.get("WEBHOOK_WHATSAPP_CHAPA");
+    const webhookUrl = Deno.env.get("WEBHOOK_KINBOX_CHAPA_WHATSAPP");
 
     // Cria cliente Supabase com service role
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -164,7 +164,7 @@ serve(async (req) => {
         console.error("Erro ao enviar webhook:", webhookError);
       }
     } else {
-      console.warn("WEBHOOK_WHATSAPP_CHAPA não configurado");
+      console.warn("WEBHOOK_KINBOX_CHAPA_WHATSAPP não configurado");
     }
 
     return new Response(
