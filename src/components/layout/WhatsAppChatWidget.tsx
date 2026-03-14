@@ -48,7 +48,6 @@ export function WhatsAppChatWidget({ open, onOpenChange }: WhatsAppChatWidgetPro
       nome: "",
       email: "",
       telefone: "",
-      produto: "",
       mensagem: "",
     },
   });
