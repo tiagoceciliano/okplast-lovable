@@ -15,27 +15,7 @@ export const COMPANY = {
 // Webhooks Kinbox
 export const WEBHOOKS = {
   chapas: "WEBHOOK_CHAPAS",
-  geral: "WEBHOOK_GERAL",
 } as const;
-
-// Produtos simplificados para modal WhatsApp (só chapas)
-export const PRODUTOS_WHATSAPP = [
-  "Chapa Inteira",
-  "Chapa Cortada sob Medida",
-] as const;
-
-// Produtos para formulário de orçamento (só chapas)
-export const PRODUTOS_INTERESSE = [
-  "Acrílico Transparente",
-  "Acrílico Colorido",
-  "Policarbonato Alveolar",
-  "Policarbonato Compacto",
-  "PETG",
-  "Poliestireno (PS)",
-  "PVC Expandido",
-  "ACM",
-  "Outro",
-] as const;
 
 // Navegação principal
 export const NAV_ITEMS = [
