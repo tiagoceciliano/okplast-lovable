@@ -133,7 +133,7 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-1 min-h-0">
-            <ScrollArea className="whatsapp-chat-area flex-1 min-h-0 max-h-[380px]">
+            <ScrollArea className="whatsapp-chat-area flex-1 min-h-0 max-h-[60vh]">
               <div className="p-3 space-y-2">
                 <div className="whatsapp-bubble-received animate-fade-in">
                   <p className="text-sm leading-relaxed">
