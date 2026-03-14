@@ -114,7 +114,7 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="p-0 gap-0 max-w-md overflow-hidden border-0 rounded-2xl">
+      <DialogContent className="p-0 gap-0 max-w-[360px] w-[90vw] overflow-hidden border-0 rounded-2xl max-h-[85vh] flex flex-col">
         {/* WhatsApp Header */}
         <DialogHeader className="whatsapp-header flex-row items-center gap-3 px-4 py-3 rounded-t-2xl space-y-0">
           <Avatar className="h-10 w-10 border-2 border-white/20">
@@ -133,7 +133,7 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-1 min-h-0">
-            <ScrollArea className="whatsapp-chat-area flex-1 min-h-0 max-h-[380px]">
+            <ScrollArea className="whatsapp-chat-area flex-1 min-h-0 max-h-[60vh]">
               <div className="p-3 space-y-2">
                 <div className="whatsapp-bubble-received animate-fade-in">
                   <p className="text-sm leading-relaxed">
@@ -210,7 +210,7 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
                           <FormControl>
                             <Textarea 
                               placeholder="Descreva o tipo de chapa, espessura, medidas..."
-                              className="whatsapp-input min-h-[50px] text-sm resize-none"
+                              className="whatsapp-input min-h-[80px] text-sm resize-none"
                               {...field} 
                             />
                           </FormControl>

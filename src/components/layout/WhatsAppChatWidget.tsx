@@ -154,7 +154,7 @@ export function WhatsAppChatWidget({ open, onOpenChange }: WhatsAppChatWidgetPro
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-1 min-h-0">
           {/* Chat Area */}
-          <ScrollArea className="whatsapp-chat-area flex-1 min-h-0 max-h-[340px]">
+          <ScrollArea className="whatsapp-chat-area flex-1 min-h-0 max-h-[50vh]">
             <div className="p-3 space-y-2">
               {/* Welcome Message Bubble */}
               <div className="whatsapp-bubble-received animate-fade-in">
@@ -233,7 +233,7 @@ export function WhatsAppChatWidget({ open, onOpenChange }: WhatsAppChatWidgetPro
                         <FormControl>
                           <Textarea 
                             placeholder="Descreva seu projeto..."
-                            className="whatsapp-input min-h-[50px] text-sm resize-none"
+                            className="whatsapp-input min-h-[80px] text-sm resize-none"
                             {...field} 
                           />
                         </FormControl>
