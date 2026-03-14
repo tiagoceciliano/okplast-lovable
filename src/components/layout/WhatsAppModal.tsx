@@ -210,7 +210,7 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
                           <FormControl>
                             <Textarea 
                               placeholder="Descreva o tipo de chapa, espessura, medidas..."
-                              className="whatsapp-input min-h-[50px] text-sm resize-none"
+                              className="whatsapp-input min-h-[80px] text-sm resize-none"
                               {...field} 
                             />
                           </FormControl>

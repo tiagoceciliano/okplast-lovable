@@ -233,7 +233,7 @@ export function WhatsAppChatWidget({ open, onOpenChange }: WhatsAppChatWidgetPro
                         <FormControl>
                           <Textarea 
                             placeholder="Descreva seu projeto..."
-                            className="whatsapp-input min-h-[50px] text-sm resize-none"
+                            className="whatsapp-input min-h-[80px] text-sm resize-none"
                             {...field} 
                           />
                         </FormControl>
