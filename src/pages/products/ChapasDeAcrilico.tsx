@@ -135,7 +135,7 @@ export default function ChapasDeAcrilico() {
     stopOnInteraction: false
   }));
   return <>
-      <SEOHead title="Chapas no RJ - Acrílico, Policarbonato, PS, PETG, ACM" description="Distribuidora de chapas plásticas: Acrílico, Policarbonato alveolar e compacto, PETG, Poliestireno, PVC Expandido e ACM. Corte sob medida. Melhor preço do Rio de Janeiro." canonical="/chapas" schema={createFAQSchema(faqItems)} />
+      <SEOHead title="Chapas Plásticas no Rio de Janeiro - Acrílico, Policarbonato, PETG, ACM | OK Plast" description="Distribuidora de chapas plásticas no RJ: Acrílico, Policarbonato alveolar e compacto, PETG, Poliestireno, PVC Expandido e ACM. Corte sob medida. Melhor preço do Rio de Janeiro." canonical="/chapas" schema={createFAQSchema(faqItems)} />
  
       {/* Hero - 2 Colunas */}
       <section className="bg-muted py-16 md:py-20">
