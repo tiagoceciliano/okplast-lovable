@@ -114,7 +114,7 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="p-0 gap-0 max-w-md overflow-hidden border-0 rounded-2xl">
+      <DialogContent className="p-0 gap-0 max-w-[360px] w-[90vw] overflow-hidden border-0 rounded-2xl max-h-[85vh] flex flex-col">
         {/* WhatsApp Header */}
         <DialogHeader className="whatsapp-header flex-row items-center gap-3 px-4 py-3 rounded-t-2xl space-y-0">
           <Avatar className="h-10 w-10 border-2 border-white/20">
