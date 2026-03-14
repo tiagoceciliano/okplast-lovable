@@ -147,7 +147,6 @@ export default function Dashboard() {
 
         <PagesList
           topPages={stats?.topPages || []}
-          leadsByProduct={stats?.leadsByProduct || []}
           isLoading={isLoading}
         />
 
