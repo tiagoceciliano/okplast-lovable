@@ -1,61 +1,34 @@
 
+## Plano de Atualização do Webhook
 
-# Fix: Dashboard não puxa todos os dados do banco
+### Situação Atual
 
-## Problema
-O banco tem 1237 leads e 10258 visitas, mas o dashboard mostra números menores. Mesmo com `.limit(50000)`, o PostgREST pode estar ignorando limites acima do padrão configurado (1000).
+**Edge Function (`process-lead/index.ts`)**:
+- Linha 84: Busca o secret `WEBHOOK_WHATSAPP_CHAPA` (que não existe mais)
+- Linha 167: Log de warning menciona `WEBHOOK_WHATSAPP_CHAPA`
 
-## Solução: Migrar para agregação SQL via RPC
+**Constants (`constants.ts`)**:
+- Linhas 16-18: Define `WEBHOOKS.chapas = "WEBHOOK_CHAPAS"` (não utilizado no código)
 
-Em vez de buscar todas as linhas e contar no JavaScript (sujeito ao limite do PostgREST), criar **funções SQL no banco** que fazem a contagem diretamente — sem limite de linhas.
+**Secrets Configurados**:
+- ✅ `WEBHOOK_KINBOX_CHAPA_WHATSAPP` (o correto, que será usado)
+- ❌ `RESEND_API_KEY` (não utilizado)
 
-### 1. Criar funções SQL no banco (migration)
+### Mudanças Necessárias
 
-**Função `get_leads_count_by_period`**: Conta leads agrupados por `produto_interesse` dentro de um intervalo de datas.
+**1. Atualizar Edge Function `process-lead/index.ts`**
+- Linha 84: Trocar `WEBHOOK_WHATSAPP_CHAPA` → `WEBHOOK_KINBOX_CHAPA_WHATSAPP`
+- Linha 167: Atualizar mensagem de warning para refletir o nome correto
 
-```sql
-CREATE FUNCTION get_leads_count_by_period(p_start timestamptz, p_end timestamptz)
-RETURNS TABLE(produtos bigint, chapas bigint, total bigint)
-AS $$
-  SELECT 
-    COUNT(*) FILTER (WHERE produto_interesse = 'Produto Personalizado') as produtos,
-    COUNT(*) FILTER (WHERE produto_interesse = 'Chapa Inteira ou Cortada') as chapas,
-    COUNT(*) as total
-  FROM leads
-  WHERE created_at >= p_start AND created_at <= p_end;
-$$
-```
+**2. Limpar `constants.ts`**
+- Remover o objeto `WEBHOOKS` (linhas 15-18), pois não é mais usado
 
-**Função `get_visits_count_by_period`**: Conta visitantes únicos por categoria (chapas vs produtos) baseado em `utm_campaign`.
+**3. Manutenção de Secrets**
+- Informar ao usuário que pode remover o `RESEND_API_KEY` manualmente se não for mais necessário (via Cloud → Secrets)
 
-**Função `get_top_pages`**: Retorna top páginas por contagem.
+### Resultado Esperado
 
-**Função `get_campaign_stats`**: Retorna visits/leads/conversão por campanha.
-
-### 2. Atualizar Edge Function (`get-dashboard-stats/index.ts`)
-
-Substituir os dois `SELECT *` gigantes por chamadas `supabase.rpc(...)`:
-
-```typescript
-// Antes (sujeito a limite de 1000):
-const { data: visits } = await supabase.from('page_visits').select('*').limit(50000)
-
-// Depois (sem limite, agregação no banco):
-const { data: todayLeads } = await supabase.rpc('get_leads_count_by_period', {
-  p_start: todayStart.toISOString(),
-  p_end: todayEnd.toISOString()
-})
-```
-
-### 3. Arquivos a modificar
-
-| Arquivo | Alteração |
-|---------|-----------|
-| Migration SQL | Criar 4-5 funções RPC de agregação |
-| `supabase/functions/get-dashboard-stats/index.ts` | Trocar SELECT * por chamadas RPC |
-
-### Benefícios
-- Dados 100% precisos (sem truncamento)
-- Muito mais rápido (banco agrega em vez de transferir 10k+ linhas)
-- Escala para qualquer volume de dados
-
+Após as mudanças:
+- O modal WhatsApp enviará leads para o webhook `WEBHOOK_KINBOX_CHAPA_WHATSAPP`
+- Código limpo, sem referências a webhooks antigos
+- Logs e mensagens de erro apontando para o secret correto
