@@ -1,16 +1,11 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 
-interface CategoryMetrics {
+interface PeriodMetrics {
   visits: number;
   leads: number;
   conversionRate: string;
-}
-
-interface PeriodMetrics {
-  produtos: CategoryMetrics;
-  chapas: CategoryMetrics;
 }
 
 interface PeriodStats {
@@ -43,42 +38,42 @@ export function PeriodStatsTable({ periodStats, isLoading }: PeriodStatsTablePro
       <TableCell className="text-center"><Skeleton className="h-4 w-12 mx-auto" /></TableCell>
       <TableCell className="text-center"><Skeleton className="h-4 w-10 mx-auto" /></TableCell>
       <TableCell className="text-center"><Skeleton className="h-4 w-14 mx-auto" /></TableCell>
-      <TableCell className="text-center"><Skeleton className="h-4 w-12 mx-auto" /></TableCell>
-      <TableCell className="text-center"><Skeleton className="h-4 w-10 mx-auto" /></TableCell>
-      <TableCell className="text-center"><Skeleton className="h-4 w-14 mx-auto" /></TableCell>
-      <TableCell className="text-center"><Skeleton className="h-4 w-12 mx-auto" /></TableCell>
-      <TableCell className="text-center"><Skeleton className="h-4 w-10 mx-auto" /></TableCell>
-      <TableCell className="text-center"><Skeleton className="h-4 w-14 mx-auto" /></TableCell>
     </TableRow>
   );
+
+  // Adapt data: if periodStats has nested produtos/chapas, flatten to totals
+  const getMetrics = (key: keyof PeriodStats): PeriodMetrics | null => {
+    if (!periodStats) return null;
+    const data = periodStats[key] as any;
+    // Handle both old format (with produtos/chapas) and new flat format
+    if (data && typeof data.visits === 'number') {
+      return data as PeriodMetrics;
+    }
+    if (data && data.produtos && data.chapas) {
+      const visits = data.produtos.visits + data.chapas.visits;
+      const leads = data.produtos.leads + data.chapas.leads;
+      const conversionRate = visits > 0 ? ((leads / visits) * 100).toFixed(2) : '0.00';
+      return { visits, leads, conversionRate };
+    }
+    return null;
+  };
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Métricas por Período</CardTitle>
         <CardDescription>
-          Desempenho separado entre Produtos Sob Medida e Chapas
+          Visitas, leads e taxa de conversão
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead rowSpan={2} className="align-bottom border-r">Período</TableHead>
-              <TableHead colSpan={3} className="text-center border-r bg-muted/30">PRODUTOS</TableHead>
-              <TableHead colSpan={3} className="text-center border-r bg-muted/30">CHAPAS</TableHead>
-              <TableHead colSpan={3} className="text-center bg-primary/10">TOTAL</TableHead>
-            </TableRow>
-            <TableRow>
-              <TableHead className="text-center text-xs">Visitas</TableHead>
-              <TableHead className="text-center text-xs">Leads</TableHead>
-              <TableHead className="text-center text-xs border-r">Tx Conversão</TableHead>
-              <TableHead className="text-center text-xs">Visitas</TableHead>
-              <TableHead className="text-center text-xs">Leads</TableHead>
-              <TableHead className="text-center text-xs border-r">Tx Conversão</TableHead>
-              <TableHead className="text-center text-xs">Visitas</TableHead>
-              <TableHead className="text-center text-xs">Leads</TableHead>
-              <TableHead className="text-center text-xs">Tx Conversão</TableHead>
+              <TableHead>Período</TableHead>
+              <TableHead className="text-center">Visitas</TableHead>
+              <TableHead className="text-center">Leads</TableHead>
+              <TableHead className="text-center">Tx Conversão</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -91,31 +86,21 @@ export function PeriodStatsTable({ periodStats, isLoading }: PeriodStatsTablePro
             ) : periodStats ? (
               <>
                 {periodOrder.map((periodKey) => {
-                  const data = periodStats[periodKey];
-                  const totalVisits = data.produtos.visits + data.chapas.visits;
-                  const totalLeads = data.produtos.leads + data.chapas.leads;
-                  const totalConversion = totalVisits > 0 
-                    ? ((totalLeads / totalVisits) * 100).toFixed(2) 
-                    : '0.00';
+                  const metrics = getMetrics(periodKey);
+                  if (!metrics) return null;
                   return (
                     <TableRow key={periodKey}>
-                      <TableCell className="font-medium border-r">{periodLabels[periodKey]}</TableCell>
-                      <TableCell className="text-center">{formatNumber(data.produtos.visits)}</TableCell>
-                      <TableCell className="text-center">{formatNumber(data.produtos.leads)}</TableCell>
-                      <TableCell className="text-center border-r">{data.produtos.conversionRate}%</TableCell>
-                      <TableCell className="text-center">{formatNumber(data.chapas.visits)}</TableCell>
-                      <TableCell className="text-center">{formatNumber(data.chapas.leads)}</TableCell>
-                      <TableCell className="text-center border-r">{data.chapas.conversionRate}%</TableCell>
-                      <TableCell className="text-center font-semibold">{formatNumber(totalVisits)}</TableCell>
-                      <TableCell className="text-center font-semibold">{formatNumber(totalLeads)}</TableCell>
-                      <TableCell className="text-center font-semibold">{totalConversion}%</TableCell>
+                      <TableCell className="font-medium">{periodLabels[periodKey]}</TableCell>
+                      <TableCell className="text-center">{formatNumber(metrics.visits)}</TableCell>
+                      <TableCell className="text-center">{formatNumber(metrics.leads)}</TableCell>
+                      <TableCell className="text-center">{metrics.conversionRate}%</TableCell>
                     </TableRow>
                   );
                 })}
               </>
             ) : (
               <TableRow>
-                <TableCell colSpan={10} className="text-center text-muted-foreground">
+                <TableCell colSpan={4} className="text-center text-muted-foreground">
                   Nenhum dado disponível
                 </TableCell>
               </TableRow>

@@ -3,15 +3,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Package, Layers, Calendar as CalendarIcon, CalendarDays, CalendarRange, CalendarClock } from "lucide-react";
+import { Calendar as CalendarIcon, CalendarDays, CalendarRange, CalendarClock } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { DateRange } from "react-day-picker";
 
 interface LeadsByPeriodItem {
-  produtos: number;
-  chapas: number;
   total: number;
 }
 
@@ -30,11 +28,11 @@ interface LeadsKPICardsProps {
 interface KPICardProps {
   title: string;
   icon: React.ElementType;
-  data: LeadsByPeriodItem | null;
+  total: number;
   isLoading: boolean;
 }
 
-function KPICard({ title, icon: Icon, data, isLoading }: KPICardProps) {
+function KPICard({ title, icon: Icon, total, isLoading }: KPICardProps) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -43,34 +41,9 @@ function KPICard({ title, icon: Icon, data, isLoading }: KPICardProps) {
       </CardHeader>
       <CardContent>
         {isLoading ? (
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-4 w-20" />
-            <Skeleton className="h-6 w-16 mt-2" />
-          </div>
+          <Skeleton className="h-8 w-16" />
         ) : (
-          <div className="space-y-1">
-            <div className="flex items-center justify-between text-sm">
-              <span className="flex items-center gap-1.5 text-muted-foreground">
-                <Package className="h-3.5 w-3.5" />
-                Produtos
-              </span>
-              <span className="font-medium">{data?.produtos ?? 0}</span>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="flex items-center gap-1.5 text-muted-foreground">
-                <Layers className="h-3.5 w-3.5" />
-                Chapas
-              </span>
-              <span className="font-medium">{data?.chapas ?? 0}</span>
-            </div>
-            <div className="border-t pt-2 mt-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Total</span>
-                <span className="text-2xl font-bold">{data?.total ?? 0}</span>
-              </div>
-            </div>
-          </div>
+          <div className="text-2xl font-bold">{total}</div>
         )}
       </CardContent>
     </Card>
@@ -78,13 +51,13 @@ function KPICard({ title, icon: Icon, data, isLoading }: KPICardProps) {
 }
 
 interface CustomKPICardProps {
-  data: LeadsByPeriodItem | null;
+  total: number;
   isLoading: boolean;
   dateRange: DateRange | undefined;
   onDateChange: (range: DateRange | undefined) => void;
 }
 
-function CustomKPICard({ data, isLoading, dateRange, onDateChange }: CustomKPICardProps) {
+function CustomKPICard({ total, isLoading, dateRange, onDateChange }: CustomKPICardProps) {
   const getDateLabel = () => {
     if (!dateRange?.from) return "Todo período";
     if (!dateRange.to) return format(dateRange.from, "dd/MM/yyyy", { locale: ptBR });
@@ -117,34 +90,9 @@ function CustomKPICard({ data, isLoading, dateRange, onDateChange }: CustomKPICa
       </CardHeader>
       <CardContent>
         {isLoading ? (
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-4 w-20" />
-            <Skeleton className="h-6 w-16 mt-2" />
-          </div>
+          <Skeleton className="h-8 w-16" />
         ) : (
-          <div className="space-y-1">
-            <div className="flex items-center justify-between text-sm">
-              <span className="flex items-center gap-1.5 text-muted-foreground">
-                <Package className="h-3.5 w-3.5" />
-                Produtos
-              </span>
-              <span className="font-medium">{data?.produtos ?? 0}</span>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="flex items-center gap-1.5 text-muted-foreground">
-                <Layers className="h-3.5 w-3.5" />
-                Chapas
-              </span>
-              <span className="font-medium">{data?.chapas ?? 0}</span>
-            </div>
-            <div className="border-t pt-2 mt-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Total</span>
-                <span className="text-2xl font-bold">{data?.total ?? 0}</span>
-              </div>
-            </div>
-          </div>
+          <div className="text-2xl font-bold">{total}</div>
         )}
       </CardContent>
     </Card>
@@ -157,23 +105,23 @@ export function LeadsKPICards({ leadsByPeriod, isLoading, customDateRange, onCus
       <KPICard
         title="Leads Hoje"
         icon={CalendarIcon}
-        data={leadsByPeriod?.today ?? null}
+        total={leadsByPeriod?.today?.total ?? 0}
         isLoading={isLoading}
       />
       <KPICard
         title="Leads Ontem"
         icon={CalendarDays}
-        data={leadsByPeriod?.yesterday ?? null}
+        total={leadsByPeriod?.yesterday?.total ?? 0}
         isLoading={isLoading}
       />
       <KPICard
         title="Últimos 7 Dias"
         icon={CalendarRange}
-        data={leadsByPeriod?.last7days ?? null}
+        total={leadsByPeriod?.last7days?.total ?? 0}
         isLoading={isLoading}
       />
       <CustomKPICard
-        data={leadsByPeriod?.custom ?? null}
+        total={leadsByPeriod?.custom?.total ?? 0}
         isLoading={isLoading}
         dateRange={customDateRange}
         onDateChange={onCustomDateChange}

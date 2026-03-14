@@ -9,15 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
 
-interface CategoryMetrics {
+interface PeriodMetrics {
   visits: number;
   leads: number;
   conversionRate: string;
-}
-
-interface PeriodMetrics {
-  produtos: CategoryMetrics;
-  chapas: CategoryMetrics;
 }
 
 interface PeriodStats {
@@ -27,8 +22,6 @@ interface PeriodStats {
 }
 
 interface LeadsByPeriodItem {
-  produtos: number;
-  chapas: number;
   total: number;
 }
 
@@ -48,9 +41,6 @@ interface DashboardStats {
   uniqueSessions: number;
   conversionRate: string;
   topPages: { path: string; count: number }[];
-  trafficSources: { source: string; count: number }[];
-  leadsByProduct: { product: string; count: number }[];
-  leadsByLocation: { location: string; count: number }[];
   chartData: { date: string; visits: number }[];
   campaignStats: Array<{
     campaign: string;
@@ -157,7 +147,6 @@ export default function Dashboard() {
 
         <PagesList
           topPages={stats?.topPages || []}
-          leadsByProduct={stats?.leadsByProduct || []}
           isLoading={isLoading}
         />
 
