@@ -6,8 +6,6 @@ import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
 import {
   Form,
   FormControl,
@@ -23,7 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { COMPANY, PRODUTOS_WHATSAPP } from "@/lib/constants";
+import { COMPANY } from "@/lib/constants";
 import { formatPhone, capitalizeName } from "./WhatsAppButton";
 import { supabase } from "@/integrations/supabase/client";
 import { getStoredUTM } from "@/hooks/useUTM";
@@ -34,7 +32,6 @@ const whatsappFormSchema = z.object({
   nome: z.string().trim().min(2, "Nome deve ter pelo menos 2 caracteres").max(100),
   email: z.string().trim().email("E-mail inválido").max(255),
   telefone: z.string().min(14, "WhatsApp inválido").max(15),
-  produto: z.string().min(1, "Selecione um produto"),
   mensagem: z.string().trim().min(5, "Mensagem deve ter pelo menos 5 caracteres").max(1000),
 });
 
@@ -55,15 +52,11 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
       nome: "",
       email: "",
       telefone: "",
-      produto: defaultProduto || "",
       mensagem: "",
     },
   });
 
   const handleOpenChange = (isOpen: boolean) => {
-    if (isOpen && defaultProduto) {
-      form.setValue("produto", defaultProduto);
-    }
     onOpenChange(isOpen);
   };
 
@@ -80,7 +73,6 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
         `Nome: ${nomeFormatado}`,
         `E-mail: ${data.email}`,
         `WhatsApp: ${telefoneFormatado}`,
-        `Produto: ${data.produto}`,
         `Mensagem: ${data.mensagem}`,
       ].join("\n");
 
@@ -94,7 +86,7 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
           nome: nomeFormatado,
           email: data.email,
           telefone: telefoneFormatado,
-          produto_interesse: data.produto,
+          produto_interesse: "Não especificado",
           mensagem: data.mensagem,
           current_url: window.location.href,
           ...utmData,
@@ -204,39 +196,6 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
                               onChange={(e) => handlePhoneChange(e, field.onChange)}
                               maxLength={15}
                             />
-                          </FormControl>
-                          <FormMessage className="text-xs text-red-600" />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="produto"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <RadioGroup
-                              onValueChange={field.onChange}
-                              value={field.value}
-                              className="flex flex-row gap-3"
-                            >
-                              {PRODUTOS_WHATSAPP.map((produto) => (
-                                <div key={produto} className="flex items-center space-x-1.5">
-                                  <RadioGroupItem 
-                                    value={produto} 
-                                    id={`modal-${produto}`}
-                                    className="h-3.5 w-3.5 border-gray-400"
-                                  />
-                                  <Label 
-                                    htmlFor={`modal-${produto}`}
-                                    className="text-xs text-gray-700 cursor-pointer leading-tight"
-                                  >
-                                    {produto}
-                                  </Label>
-                                </div>
-                              ))}
-                            </RadioGroup>
                           </FormControl>
                           <FormMessage className="text-xs text-red-600" />
                         </FormItem>
