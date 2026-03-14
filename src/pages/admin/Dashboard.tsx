@@ -41,9 +41,6 @@ interface DashboardStats {
   uniqueSessions: number;
   conversionRate: string;
   topPages: { path: string; count: number }[];
-  trafficSources: { source: string; count: number }[];
-  leadsByProduct: { product: string; count: number }[];
-  leadsByLocation: { location: string; count: number }[];
   chartData: { date: string; visits: number }[];
   campaignStats: Array<{
     campaign: string;
