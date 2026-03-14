@@ -1,61 +1,68 @@
 
 
-# Fix: Dashboard não puxa todos os dados do banco
+## Análise SEO Atual e Plano de Otimização
 
-## Problema
-O banco tem 1237 leads e 10258 visitas, mas o dashboard mostra números menores. Mesmo com `.limit(50000)`, o PostgREST pode estar ignorando limites acima do padrão configurado (1000).
+### Diagnóstico: Problemas Encontrados
 
-## Solução: Migrar para agregação SQL via RPC
+**1. Inconsistências entre domínios**
+- O `sitemap.xml` e `robots.txt` apontam para `labacrilicos.com.br` (domínio antigo), mas o site roda em `okplast.com.br`. O Google está indexando o sitemap errado.
+- O `index.html` tem dados estruturados com endereço "Rua Cordovil 259", mas o código usa "Rua Guatemala, 593". Informações conflitantes prejudicam SEO local.
 
-Em vez de buscar todas as linhas e contar no JavaScript (sujeito ao limite do PostgREST), criar **funções SQL no banco** que fazem a contagem diretamente — sem limite de linhas.
+**2. Falta de conteúdo textual rico em palavras-chave**
+- A Home tem pouco texto corrido. O Google prioriza conteúdo semântico extenso.
+- As páginas de chapas individuais (ex: `/chapas/acrilico`) têm bom conteúdo, mas faltam termos geográficos como "Rio de Janeiro", "RJ", "zona norte" no corpo do texto.
+- O H1 da Home ("DISTRIBUIDORA DE CHAPAS PLÁSTICAS") não contém "RJ" nem "Rio de Janeiro".
 
-### 1. Criar funções SQL no banco (migration)
+**3. Header sem navegação real**
+- O Header só tem logo + botão WhatsApp. Não há menu de navegação com links internos. O Google usa links internos para descobrir e rankear páginas. Os `NAV_ITEMS` definidos em `constants.ts` não estão sendo renderizados no Header.
 
-**Função `get_leads_count_by_period`**: Conta leads agrupados por `produto_interesse` dentro de um intervalo de datas.
+**4. Falta de tags alt otimizadas**
+- Os alts das imagens são genéricos ("Chapa de Acrílico Transparente"). Deveriam incluir localização ("Chapa de Acrílico Transparente no RJ - OK Plast").
 
-```sql
-CREATE FUNCTION get_leads_count_by_period(p_start timestamptz, p_end timestamptz)
-RETURNS TABLE(produtos bigint, chapas bigint, total bigint)
-AS $$
-  SELECT 
-    COUNT(*) FILTER (WHERE produto_interesse = 'Produto Personalizado') as produtos,
-    COUNT(*) FILTER (WHERE produto_interesse = 'Chapa Inteira ou Cortada') as chapas,
-    COUNT(*) as total
-  FROM leads
-  WHERE created_at >= p_start AND created_at <= p_end;
-$$
-```
+**5. SEO Head duplicado/conflitante**
+- O `index.html` define title, description e OG tags estaticamente, e o `SEOHead` via React Helmet sobrescreve parcialmente. Isso pode causar tags duplicadas.
 
-**Função `get_visits_count_by_period`**: Conta visitantes únicos por categoria (chapas vs produtos) baseado em `utm_campaign`.
+**6. Faltam páginas otimizadas para long-tail keywords**
+- Não existe conteúdo para termos como "chapa de acrílico preço RJ", "policarbonato alveolar Rio de Janeiro", "onde comprar acrílico RJ".
 
-**Função `get_top_pages`**: Retorna top páginas por contagem.
+**7. Sem internal linking estratégico**
+- As páginas de chapas não linkam entre si (ex: "Veja também Policarbonato Compacto").
+- Não há seção de FAQ renderizada visualmente (só schema invisível).
 
-**Função `get_campaign_stats`**: Retorna visits/leads/conversão por campanha.
+---
 
-### 2. Atualizar Edge Function (`get-dashboard-stats/index.ts`)
+### Plano de Implementação
 
-Substituir os dois `SELECT *` gigantes por chamadas `supabase.rpc(...)`:
+**Tarefa 1: Corrigir sitemap.xml e robots.txt**
+- Atualizar domínio de `labacrilicos.com.br` para `okplast.com.br` em ambos os arquivos.
+- Adicionar as rotas corretas atuais.
 
-```typescript
-// Antes (sujeito a limite de 1000):
-const { data: visits } = await supabase.from('page_visits').select('*').limit(50000)
+**Tarefa 2: Corrigir dados estruturados no index.html**
+- Remover o bloco de LocalBusiness duplicado do `index.html` (já existe no React via SEOHead).
+- Remover as meta tags estáticas de OG/Twitter do `index.html` que conflitam com o Helmet.
 
-// Depois (sem limite, agregação no banco):
-const { data: todayLeads } = await supabase.rpc('get_leads_count_by_period', {
-  p_start: todayStart.toISOString(),
-  p_end: todayEnd.toISOString()
-})
-```
+**Tarefa 3: Adicionar navegação real no Header**
+- Renderizar os `NAV_ITEMS` com dropdown para "Chapas" e "Institucional". Isso cria links internos crawláveis pelo Google.
 
-### 3. Arquivos a modificar
+**Tarefa 4: Otimizar H1s e meta tags com palavras-chave geográficas**
+- Home H1: "Distribuidora de Chapas Plásticas no Rio de Janeiro"
+- `/chapas` title: "Chapas de Acrílico, Policarbonato, PETG no RJ | OK Plast"
+- `/chapas/acrilico` title: "Chapa de Acrílico no Rio de Janeiro - Cristal, Colorido, Fumê | OK Plast"
+- Aplicar padrão similar para cada página de chapa individual.
 
-| Arquivo | Alteração |
-|---------|-----------|
-| Migration SQL | Criar 4-5 funções RPC de agregação |
-| `supabase/functions/get-dashboard-stats/index.ts` | Trocar SELECT * por chamadas RPC |
+**Tarefa 5: Enriquecer conteúdo textual com keywords + localização**
+- Adicionar parágrafos com texto natural em cada página mencionando "Rio de Janeiro", "RJ", "distribuidora", "melhor preço", "corte sob medida".
+- Adicionar seção de FAQ visível (não só schema) na Home e na página `/chapas`.
 
-### Benefícios
-- Dados 100% precisos (sem truncamento)
-- Muito mais rápido (banco agrega em vez de transferir 10k+ linhas)
-- Escala para qualquer volume de dados
+**Tarefa 6: Cross-linking entre páginas de chapas**
+- Adicionar seção "Veja também" no rodapé de cada página de chapa individual, linkando para as outras 6 chapas.
+
+**Tarefa 7: Otimizar alt texts das imagens**
+- Incluir keyword + localização nos alts: "Chapa de acrílico transparente RJ - OK Plast distribuidora".
+
+### Detalhes Técnicos
+
+- **Arquivos modificados**: `public/sitemap.xml`, `public/robots.txt`, `index.html`, `src/components/layout/Header.tsx`, `src/components/home/HeroSection.tsx`, `src/pages/Index.tsx`, `src/pages/products/ChapasDeAcrilico.tsx`, `src/pages/chapas/Acrilico.tsx` (e todas as outras 6 páginas de chapas), `src/components/SEOHead.tsx`.
+- **Novo componente**: `RelatedProducts` — grid de links para outras chapas, reutilizado em todas as páginas `/chapas/*`.
+- **Novo componente**: `FAQSection` — renderiza FAQ visível + schema, reutilizado na Home e `/chapas`.
 
