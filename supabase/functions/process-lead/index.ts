@@ -164,7 +164,7 @@ serve(async (req) => {
         console.error("Erro ao enviar webhook:", webhookError);
       }
     } else {
-      console.warn("WEBHOOK_WHATSAPP_CHAPA não configurado");
+      console.warn("WEBHOOK_KINBOX_CHAPA_WHATSAPP não configurado");
     }
 
     return new Response(

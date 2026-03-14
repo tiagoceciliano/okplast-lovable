@@ -12,11 +12,6 @@ export const COMPANY = {
   businessHours: "Segunda a Sexta: 9h às 17h",
 } as const;
 
-// Webhooks Kinbox
-export const WEBHOOKS = {
-  chapas: "WEBHOOK_CHAPAS",
-} as const;
-
 // Navegação principal
 export const NAV_ITEMS = [
   { label: "Home", href: "/" },
