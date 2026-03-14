@@ -92,10 +92,13 @@ const App = () => (
           <ScrollToTop />
           <Suspense fallback={<PageLoader />}>
             <Routes>
-              {/* Admin Dashboard - Outside main layout */}
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/admin/leads" element={<AdminLeads />} />
-              <Route path="/admin/utm-terms" element={<AdminUTMTerms />} />
+              {/* Admin Login - Public */}
+              <Route path="/admin/login" element={<AdminLogin />} />
+              
+              {/* Admin Dashboard - Protected */}
+              <Route path="/admin" element={<RequireAdmin><AdminDashboard /></RequireAdmin>} />
+              <Route path="/admin/leads" element={<RequireAdmin><AdminLeads /></RequireAdmin>} />
+              <Route path="/admin/utm-terms" element={<RequireAdmin><AdminUTMTerms /></RequireAdmin>} />
               
               {/* Main site routes */}
               <Route path="/*" element={<MainSite />} />
