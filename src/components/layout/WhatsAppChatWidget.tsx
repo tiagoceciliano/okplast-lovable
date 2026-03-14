@@ -79,8 +79,9 @@ export function WhatsAppChatWidget({ open, onOpenChange }: WhatsAppChatWidgetPro
           nome: nomeFormatado,
           email: data.email,
           telefone: telefoneFormatado,
-          produto_interesse: data.produto,
+          produto_interesse: "Não especificado",
           mensagem: data.mensagem,
+          current_url: window.location.href,
           ...utmData,
         },
       }).catch(console.error);
