@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { COMPANY, PRODUTOS_WHATSAPP } from "@/lib/constants";
+import { COMPANY } from "@/lib/constants";
 import { formatPhone, capitalizeName } from "./WhatsAppButton";
 import { supabase } from "@/integrations/supabase/client";
 import { getStoredUTM } from "@/hooks/useUTM";
