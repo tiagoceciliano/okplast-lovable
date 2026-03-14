@@ -22,8 +22,6 @@ interface PeriodStats {
 }
 
 interface LeadsByPeriodItem {
-  produtos: number;
-  chapas: number;
   total: number;
 }
 
