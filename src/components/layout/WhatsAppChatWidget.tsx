@@ -65,7 +65,6 @@ export function WhatsAppChatWidget({ open, onOpenChange }: WhatsAppChatWidgetPro
         `Nome: ${nomeFormatado}`,
         `E-mail: ${data.email}`,
         `WhatsApp: ${telefoneFormatado}`,
-        `Produto: ${data.produto}`,
         `Mensagem: ${data.mensagem}`,
       ].join("\n");
 
