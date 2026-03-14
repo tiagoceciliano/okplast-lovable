@@ -71,7 +71,7 @@ const MainSite = () => (
             <Route path="/chapas/acm" element={<Acm />} />
 
             {/* Redirect old product routes to home */}
-            <Route path="/acrilico-sob-medida/*" element={<Navigate to="/" replace />} />
+            
 
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
