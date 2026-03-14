@@ -4,6 +4,7 @@
 import { MessageCircle } from "lucide-react";
  import { DecorativeDivider } from "@/components/ui/DecorativeDivider";
  import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
+ import { RelatedProducts } from "@/components/seo/RelatedProducts";
  
  import {
    Carousel,
@@ -17,8 +18,8 @@ import { MessageCircle } from "lucide-react";
  import heroAcrilicoColorido from "@/assets/chapas-hero/acrilico-colorido.jpg";
  
  const heroImages = [
-   { src: heroAcrilicoTransparente, alt: "Chapa de Acrílico Cristal Transparente" },
-   { src: heroAcrilicoColorido, alt: "Chapas de Acrílico Colorido" },
+   { src: heroAcrilicoTransparente, alt: "Chapa de acrílico cristal transparente no RJ - OK Plast distribuidora" },
+   { src: heroAcrilicoColorido, alt: "Chapas de acrílico colorido no Rio de Janeiro - OK Plast" },
  ];
  
  // Cores disponíveis
@@ -56,8 +57,8 @@ import { MessageCircle } from "lucide-react";
    return (
      <>
        <SEOHead
-         title="Chapas de Acrílico RJ - Cristal, Colorido, Espelhado, Fumê"
-         description="Chapas de acrílico 100% virgem. Cristal transparente, colorido, leitoso, espelhado e fumê. Corte sob medida. Melhor preço do Rio de Janeiro."
+         title="Chapa de Acrílico no Rio de Janeiro - Cristal, Colorido, Fumê | OK Plast"
+         description="Compre chapas de acrílico no RJ: cristal transparente, colorido, leitoso, espelhado e fumê. CAST 100% virgem. Corte sob medida. Melhor preço do Rio de Janeiro. Distribuidora OK Plast."
          canonical="/chapas/acrilico"
          schema={breadcrumbSchema}
        />
@@ -82,15 +83,15 @@ import { MessageCircle } from "lucide-react";
              {/* Text */}
              <div>
                <h1 className="font-bold text-3xl md:text-4xl lg:text-5xl text-foreground mb-6">
-                 CHAPAS DE ACRÍLICO
+                 CHAPAS DE ACRÍLICO NO RIO DE JANEIRO
                </h1>
                <p className="text-lg text-accent font-medium mb-4">
-                 Cristal, colorido, leitoso, espelhado e fumê
+                 Cristal, colorido, leitoso, espelhado e fumê — distribuidora no RJ
                </p>
                <p className="text-muted-foreground mb-8">
                  Chapas de acrílico CAST 100% virgem com a mais alta qualidade. 
                  Transparência cristalina, diversas cores e espessuras de 1mm a 50mm. 
-                 Corte sob medida para qualquer projeto.
+                 Corte sob medida para qualquer projeto. A OK Plast é sua distribuidora de acrílico no Rio de Janeiro com o melhor preço do mercado carioca.
                </p>
                <div className="flex flex-col items-start gap-3">
                  <Button 
@@ -136,14 +137,14 @@ import { MessageCircle } from "lucide-react";
            
            <div className="text-center mb-12">
              <h2 className="font-bold text-2xl md:text-3xl text-foreground mb-4">
-               Chapas de acrílico cristal e diversas cores
+               Chapas de acrílico cristal e diversas cores no RJ
              </h2>
              <p className="text-muted-foreground max-w-3xl mx-auto">
-               Trabalhamos com uma ampla variedade de cores e acabamentos para atender qualquer projeto. 
+               Trabalhamos com uma ampla variedade de cores e acabamentos para atender qualquer projeto no Rio de Janeiro. 
                Todas as chapas passam por rigoroso controle de qualidade.
              </p>
            </div>
- 
+
            {/* Grid de cores */}
            <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-3 mb-12">
              {coresDisponiveis.map((cor, index) => (
@@ -169,11 +170,12 @@ import { MessageCircle } from "lucide-react";
            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
              <div>
                <h2 className="font-bold text-2xl md:text-3xl text-primary mb-4">
-                 Acrílico Cristal (Transparente)
+                 Acrílico Cristal (Transparente) no Rio de Janeiro
                </h2>
                <p className="text-muted-foreground mb-6">
                  O acrílico cristal é o tipo mais utilizado no mercado. Com 92% de transmissão de luz, 
-                 oferece transparência superior ao vidro e é 17 vezes mais resistente ao impacto.
+                 oferece transparência superior ao vidro e é 17 vezes mais resistente ao impacto. 
+                 Disponível para pronta entrega na nossa distribuidora no RJ.
                </p>
                
                <h3 className="font-semibold text-foreground mb-3">Principais Aplicações:</h3>
@@ -192,7 +194,7 @@ import { MessageCircle } from "lucide-react";
                    </li>
                  ))}
                </ul>
- 
+
                <h3 className="font-semibold text-foreground mb-3">Características:</h3>
                <ul className="space-y-2">
                  {[
@@ -209,11 +211,11 @@ import { MessageCircle } from "lucide-react";
                  ))}
                </ul>
              </div>
- 
+
              <div className="aspect-video bg-muted rounded-lg overflow-hidden">
                <img 
                  src={heroAcrilicoTransparente} 
-                 alt="Chapa de Acrílico Cristal Transparente"
+                 alt="Chapa de acrílico cristal transparente no RJ - OK Plast distribuidora"
                  className="w-full h-full object-cover"
                  loading="lazy"
                />
@@ -232,7 +234,7 @@ import { MessageCircle } from "lucide-react";
                </h2>
                <p className="text-muted-foreground mb-6">
                  Além do cristal, oferecemos uma ampla gama de cores e acabamentos especiais 
-                 para projetos diferenciados e personalizados.
+                 para projetos diferenciados e personalizados no Rio de Janeiro.
                </p>
                
                <h3 className="font-semibold text-foreground mb-3">Variedades Disponíveis:</h3>
@@ -250,7 +252,7 @@ import { MessageCircle } from "lucide-react";
                    </li>
                  ))}
                </ul>
- 
+
                <h3 className="font-semibold text-foreground mb-3">Aplicações Específicas:</h3>
                <ul className="space-y-2">
                  {[
@@ -267,11 +269,11 @@ import { MessageCircle } from "lucide-react";
                  ))}
                </ul>
              </div>
- 
+
              <div className="lg:order-1 aspect-video bg-muted rounded-lg overflow-hidden">
                <img 
                  src={heroAcrilicoColorido} 
-                 alt="Chapas de Acrílico Colorido"
+                 alt="Chapas de acrílico colorido no Rio de Janeiro - OK Plast distribuidora"
                  className="w-full h-full object-cover"
                  loading="lazy"
                />
@@ -289,7 +291,7 @@ import { MessageCircle } from "lucide-react";
              </h2>
              <p className="text-muted-foreground max-w-2xl mx-auto">
                Trabalhamos com uma ampla variedade de espessuras para atender diferentes necessidades, 
-               desde trabalhos delicados até projetos estruturais.
+               desde trabalhos delicados até projetos estruturais no Rio de Janeiro.
              </p>
            </div>
            
@@ -305,15 +307,18 @@ import { MessageCircle } from "lucide-react";
            </div>
          </div>
        </section>
+
+       {/* Related Products */}
+       <RelatedProducts currentSlug="acrilico" />
  
        {/* CTA Final */}
       <section className="section-padding bg-muted">
          <div className="container-custom text-center">
           <h2 className="font-bold text-2xl md:text-3xl text-foreground mb-4">
-            Solicite seu Orçamento
+            Solicite seu Orçamento de Acrílico no RJ
            </h2>
           <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
-            Informe o tipo de chapa, espessura e dimensões desejadas para receber um orçamento personalizado.
+            Informe o tipo de chapa, espessura e dimensões desejadas para receber um orçamento personalizado. Distribuidora de acrílico no Rio de Janeiro com entrega rápida.
            </p>
           <div className="flex flex-col items-center gap-4">
              <Button 
