@@ -9,15 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
 
-interface CategoryMetrics {
+interface PeriodMetrics {
   visits: number;
   leads: number;
   conversionRate: string;
-}
-
-interface PeriodMetrics {
-  produtos: CategoryMetrics;
-  chapas: CategoryMetrics;
 }
 
 interface PeriodStats {
