@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { 
   LayoutDashboard, 
   Home, 
@@ -8,8 +8,10 @@ import {
   ChevronRight,
   ExternalLink,
   Users,
-  Tag
+  Tag,
+  LogOut
 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { COMPANY } from "@/lib/constants";
 import {
