@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { 
   LayoutDashboard, 
   Home, 
@@ -8,8 +8,10 @@ import {
   ChevronRight,
   ExternalLink,
   Users,
-  Tag
+  Tag,
+  LogOut
 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { COMPANY } from "@/lib/constants";
 import {
@@ -171,6 +173,12 @@ export function AdminSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/admin/login");
+  };
 
   return (
     <Sidebar collapsible="icon">
@@ -274,6 +282,28 @@ export function AdminSidebar() {
               subPages={institucionalSubPages}
               collapsed={collapsed}
             />
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Logout */}
+        <SidebarGroup className="mt-auto">
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip="Sair">
+                  <button
+                    onClick={handleLogout}
+                    className={cn(
+                      "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-destructive/10 text-destructive w-full",
+                      collapsed && "justify-center px-0"
+                    )}
+                  >
+                    <LogOut className="h-4 w-4" />
+                    {!collapsed && <span>Sair</span>}
+                  </button>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>

@@ -8,11 +8,12 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Layout } from "@/components/layout";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppModalProvider } from "@/contexts/WhatsAppModalContext";
-
+import { RequireAdmin } from "@/components/admin/RequireAdmin";
 
 // Lazy loaded pages
 const Index = lazy(() => import("./pages/Index"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const AdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
 const AdminLeads = lazy(() => import("./pages/admin/Leads"));
 const AdminUTMTerms = lazy(() => import("./pages/admin/UTMTerms"));
@@ -91,10 +92,13 @@ const App = () => (
           <ScrollToTop />
           <Suspense fallback={<PageLoader />}>
             <Routes>
-              {/* Admin Dashboard - Outside main layout */}
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/admin/leads" element={<AdminLeads />} />
-              <Route path="/admin/utm-terms" element={<AdminUTMTerms />} />
+              {/* Admin Login - Public */}
+              <Route path="/admin/login" element={<AdminLogin />} />
+              
+              {/* Admin Dashboard - Protected */}
+              <Route path="/admin" element={<RequireAdmin><AdminDashboard /></RequireAdmin>} />
+              <Route path="/admin/leads" element={<RequireAdmin><AdminLeads /></RequireAdmin>} />
+              <Route path="/admin/utm-terms" element={<RequireAdmin><AdminUTMTerms /></RequireAdmin>} />
               
               {/* Main site routes */}
               <Route path="/*" element={<MainSite />} />
