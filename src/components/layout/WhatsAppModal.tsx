@@ -88,7 +88,7 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
           nome: nomeFormatado,
           email: data.email,
           telefone: telefoneFormatado,
-          produto_interesse: data.produto,
+          produto_interesse: "Não especificado",
           mensagem: data.mensagem,
           current_url: window.location.href,
           ...utmData,
