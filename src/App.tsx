@@ -8,11 +8,12 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Layout } from "@/components/layout";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppModalProvider } from "@/contexts/WhatsAppModalContext";
-
+import { RequireAdmin } from "@/components/admin/RequireAdmin";
 
 // Lazy loaded pages
 const Index = lazy(() => import("./pages/Index"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const AdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
 const AdminLeads = lazy(() => import("./pages/admin/Leads"));
 const AdminUTMTerms = lazy(() => import("./pages/admin/UTMTerms"));
