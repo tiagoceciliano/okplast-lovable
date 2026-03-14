@@ -232,8 +232,8 @@
     @apply fixed z-50 flex flex-col bg-white rounded-2xl overflow-hidden;
     bottom: 100px;
     right: 24px;
-    width: 360px;
-    max-height: 70vh;
+    width: 340px;
+    max-height: 80vh;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
   }
 
