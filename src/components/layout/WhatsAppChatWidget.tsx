@@ -28,7 +28,6 @@ const whatsappFormSchema = z.object({
   nome: z.string().trim().min(2, "Nome deve ter pelo menos 2 caracteres").max(100),
   email: z.string().trim().email("E-mail inválido").max(255),
   telefone: z.string().min(14, "WhatsApp inválido").max(15),
-  produto: z.string().min(1, "Selecione um produto"),
   mensagem: z.string().trim().min(5, "Mensagem deve ter pelo menos 5 caracteres").max(1000),
 });
 
