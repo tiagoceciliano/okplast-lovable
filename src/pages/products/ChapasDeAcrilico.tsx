@@ -36,28 +36,28 @@ import heroPoliestireno from "@/assets/chapas-hero/poliestireno.jpg";
 import heroPvcExpandido from "@/assets/chapas-hero/pvc-expandido.jpg";
 const heroCarouselImages = [{
   src: heroAcrilicoTransparente,
-  alt: "Chapas de Acrílico Transparente"
+  alt: "Chapas de acrílico transparente no RJ - OK Plast distribuidora"
 }, {
   src: heroAcrilicoColorido,
-  alt: "Chapas de Acrílico Colorido"
+  alt: "Chapas de acrílico colorido no Rio de Janeiro - OK Plast"
 }, {
   src: heroPetg,
-  alt: "Chapas PETG"
+  alt: "Chapas PETG no RJ - distribuidora OK Plast"
 }, {
   src: heroPolicarbonatoAlveolar,
-  alt: "Chapas Policarbonato Alveolar"
+  alt: "Chapas policarbonato alveolar no Rio de Janeiro - OK Plast"
 }, {
   src: heroPolicarbonatoCompacto,
-  alt: "Chapas Policarbonato Compacto"
+  alt: "Chapas policarbonato compacto no RJ - OK Plast"
 }, {
   src: heroPoliestireno,
-  alt: "Chapas Poliestireno"
+  alt: "Chapas poliestireno PS no Rio de Janeiro - OK Plast"
 }, {
   src: heroPvcExpandido,
-  alt: "Chapas PVC Expandido"
+  alt: "Chapas PVC expandido no RJ - OK Plast distribuidora"
 }, {
   src: heroAcm,
-  alt: "Chapas ACM"
+  alt: "Chapas ACM alumínio composto no Rio de Janeiro - OK Plast"
 }];
 
 // Tipos de chapas com detalhes
