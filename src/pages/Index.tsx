@@ -10,6 +10,7 @@ import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
 import { HeroSection } from "@/components/home/HeroSection";
 import { SEOHead, createFAQSchema } from "@/components/SEOHead";
 import { MotivosCarousel } from "@/components/home/MotivosCarousel";
+import { FAQSection } from "@/components/seo/FAQSection";
 
 // Imagens locais das chapas
 import imgAcrilicoTransparente from "@/assets/chapas-hero/acrilico-transparente.jpg";
@@ -53,36 +54,39 @@ const localBusinessSchema = {
   "priceRange": "$$",
   "paymentAccepted": "Dinheiro, Cartão de Crédito, Pix, Boleto",
   "areaServed": {
-    "@type": "Country",
-    "name": "Brasil"
+    "@type": "State",
+    "name": "Rio de Janeiro"
   }
 };
 
-// FAQ para Schema
+// FAQ para Schema + exibição visual
 const faqItems = [{
-  question: "Quais tipos de chapas a OK Plast trabalha?",
-  answer: "Trabalhamos com Acrílico (cristal, colorido, leitoso), Policarbonato alveolar e compacto, PETG, Poliestireno (PS), PVC Expandido e ACM."
+  question: "Onde comprar chapas de acrílico no Rio de Janeiro?",
+  answer: "A OK Plast é distribuidora de chapas de acrílico no RJ, localizada em Penha Circular. Trabalhamos com acrílico cristal, colorido, leitoso, espelhado e fumê, com corte sob medida e o melhor preço do Rio de Janeiro."
 }, {
-  question: "Vocês fazem corte de chapas sob medida?",
-  answer: "Sim! Cortamos chapas em qualquer medida que você precisar."
+  question: "Quais tipos de chapas plásticas a OK Plast trabalha?",
+  answer: "Trabalhamos com Acrílico (cristal, colorido, leitoso), Policarbonato alveolar e compacto, PETG, Poliestireno (PS), PVC Expandido e ACM. Todos disponíveis com corte sob medida no Rio de Janeiro."
 }, {
-  question: "Como solicitar um orçamento?",
-  answer: "Você pode solicitar orçamento pelo WhatsApp, e-mail ou formulário do site. Resposta em até 24 horas úteis."
+  question: "Vocês fazem corte de chapas sob medida no RJ?",
+  answer: "Sim! Cortamos chapas de acrílico, policarbonato, PETG, poliestireno, PVC e ACM em qualquer medida. Atendemos Rio de Janeiro e região metropolitana."
 }, {
-  question: "Vocês fazem entrega?",
-  answer: "Sim, fazemos entrega no Rio de Janeiro. Consulte as opções disponíveis para sua região."
+  question: "Como solicitar um orçamento de chapas plásticas?",
+  answer: "Você pode solicitar orçamento pelo WhatsApp, e-mail ou formulário do site. Resposta em até 24 horas úteis. Informe o tipo de chapa, espessura e dimensões desejadas."
+}, {
+  question: "Vocês fazem entrega de chapas no Rio de Janeiro?",
+  answer: "Sim, fazemos entrega de chapas plásticas em todo o Rio de Janeiro e região metropolitana. Consulte as opções de frete disponíveis para sua região."
 }];
 
 // Tipos de Chapas - Grid de 8 chapas (foco da home)
 const tiposChapas = [
-  { nome: "Acrílico Transparente", imageUrl: imgAcrilicoTransparente, href: "/chapas/acrilico" },
-  { nome: "Acrílico Colorido", imageUrl: imgAcrilicoColorido, href: "/chapas/acrilico" },
-  { nome: "PETG", imageUrl: imgPetg, href: "/chapas/petg" },
-  { nome: "PS Poliestireno", imageUrl: imgPoliestireno, href: "/chapas/poliestireno" },
-  { nome: "Policarbonato Alveolar", imageUrl: imgPolicarbonatoAlveolar, href: "/chapas/policarbonato-alveolar" },
-  { nome: "Policarbonato Compacto", imageUrl: imgPolicarbonatoCompacto, href: "/chapas/policarbonato-compacto" },
-  { nome: "PVC Expandido", imageUrl: imgPvcExpandido, href: "/chapas/pvc-expandido" },
-  { nome: "ACM", imageUrl: imgAcm, href: "/chapas/acm" },
+  { nome: "Acrílico Transparente", imageUrl: imgAcrilicoTransparente, href: "/chapas/acrilico", alt: "Chapa de acrílico transparente no RJ - OK Plast distribuidora" },
+  { nome: "Acrílico Colorido", imageUrl: imgAcrilicoColorido, href: "/chapas/acrilico", alt: "Chapas de acrílico colorido no Rio de Janeiro - OK Plast" },
+  { nome: "PETG", imageUrl: imgPetg, href: "/chapas/petg", alt: "Chapa PETG no RJ - distribuidora OK Plast" },
+  { nome: "PS Poliestireno", imageUrl: imgPoliestireno, href: "/chapas/poliestireno", alt: "Chapa de poliestireno PS no Rio de Janeiro - OK Plast" },
+  { nome: "Policarbonato Alveolar", imageUrl: imgPolicarbonatoAlveolar, href: "/chapas/policarbonato-alveolar", alt: "Chapa de policarbonato alveolar no RJ - OK Plast" },
+  { nome: "Policarbonato Compacto", imageUrl: imgPolicarbonatoCompacto, href: "/chapas/policarbonato-compacto", alt: "Chapa de policarbonato compacto no Rio de Janeiro - OK Plast" },
+  { nome: "PVC Expandido", imageUrl: imgPvcExpandido, href: "/chapas/pvc-expandido", alt: "Chapa de PVC expandido no RJ - OK Plast distribuidora" },
+  { nome: "ACM", imageUrl: imgAcm, href: "/chapas/acm", alt: "Chapa ACM alumínio composto no Rio de Janeiro - OK Plast" },
 ];
 
 // Depoimentos
@@ -97,7 +101,7 @@ const depoimentos = [
 const beneficios = [
   { icon: Phone, titulo: "Contato Rápido", desc: "Resposta em até 24 horas" },
   { icon: Award, titulo: "Chapas de Alta Qualidade", desc: "Materiais de primeira linha" },
-  { icon: DollarSign, titulo: "Melhor Preço", desc: "Direto da distribuidora" }
+  { icon: DollarSign, titulo: "Melhor Preço do RJ", desc: "Direto da distribuidora" }
 ];
 
 export default function Index() {
@@ -107,8 +111,8 @@ export default function Index() {
   return (
     <>
       <SEOHead
-        title="OK Plast | Distribuidora de Chapas Plásticas no RJ"
-        description="Distribuidora de chapas: Acrílico, Policarbonato, PETG, Poliestireno, PVC Expandido e ACM. Corte sob medida. Melhor preço do Rio de Janeiro. Orçamento em 24h."
+        title="OK Plast | Distribuidora de Chapas Plásticas no Rio de Janeiro - RJ"
+        description="Distribuidora de chapas plásticas no RJ: Acrílico, Policarbonato, PETG, Poliestireno, PVC Expandido e ACM. Corte sob medida. Melhor preço do Rio de Janeiro. Orçamento em 24h."
         canonical="/"
         schema={{
           "@context": "https://schema.org",
@@ -123,10 +127,10 @@ export default function Index() {
         <div className="container-custom">
           <div className="text-center mb-10">
             <h2 className="font-bold text-2xl md:text-3xl lg:text-4xl text-accent uppercase tracking-wide">
-              Chapas Inteiras e Cortadas
+              Chapas Plásticas no Rio de Janeiro
             </h2>
             <p className="text-muted-foreground mt-2">
-              Acrílico, Policarbonato, PS, PETG, PVC Expandido e ACM — vendemos inteira ou cortamos sob medida
+              Acrílico, Policarbonato, PS, PETG, PVC Expandido e ACM — vendemos inteira ou cortamos sob medida no RJ
             </p>
           </div>
 
@@ -137,7 +141,7 @@ export default function Index() {
                   <div className="aspect-square bg-muted overflow-hidden">
                     <img
                       src={chapa.imageUrl}
-                      alt={`Chapa de ${chapa.nome} - OK Plast`}
+                      alt={chapa.alt}
                       width={400}
                       height={400}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
@@ -175,7 +179,7 @@ export default function Index() {
               6 Motivos para Escolher a {COMPANY.name}
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Descubra por que somos a escolha certa para suas chapas plásticas
+              Descubra por que somos a distribuidora de chapas plásticas mais escolhida do Rio de Janeiro
             </p>
           </div>
           <MotivosCarousel />
@@ -188,7 +192,7 @@ export default function Index() {
         <div className="container-custom">
           <div className="text-center mb-12">
             <h2 className="font-bold text-2xl md:text-3xl text-foreground mb-4">Satisfação Garantida</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">Veja as opiniões de nossos clientes</p>
+            <p className="text-muted-foreground max-w-2xl mx-auto">Veja as opiniões de nossos clientes no Rio de Janeiro</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {depoimentos.map((dep, index) => (
@@ -198,12 +202,15 @@ export default function Index() {
         </div>
       </section>
 
+      {/* FAQ Visível */}
+      <FAQSection faqs={faqItems} title="Perguntas Frequentes sobre Chapas Plásticas no RJ" />
+
       {/* CTA Final */}
       <section className="section-padding bg-primary text-primary-foreground">
         <div className="container-custom text-center">
           <h2 className="font-bold text-2xl md:text-3xl mb-4">Pronto para seu Orçamento?</h2>
           <p className="text-primary-foreground/90 mb-8 max-w-2xl mx-auto">
-            Entre em contato conosco e solicite um orçamento personalizado. Nossa equipe está pronta para atender você!
+            Entre em contato conosco e solicite um orçamento personalizado. Distribuidora de chapas plásticas no Rio de Janeiro com entrega rápida e melhor preço do RJ.
           </p>
           <div className="flex flex-col items-center gap-4">
             <Button size="lg" className="btn-whatsapp text-lg px-8 py-6" onClick={() => openWhatsAppModal()}>
@@ -220,8 +227,13 @@ export default function Index() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
             <div>
               <h2 className="font-bold text-2xl md:text-3xl text-foreground mb-8">
-                Por que escolher a {COMPANY.name}?
+                Por que escolher a {COMPANY.name} no Rio de Janeiro?
               </h2>
+              <p className="text-muted-foreground mb-6">
+                Somos uma distribuidora de chapas plásticas localizada em Penha Circular, Rio de Janeiro. 
+                Com anos de experiência no mercado carioca, oferecemos os melhores preços em acrílico, 
+                policarbonato, PETG, poliestireno, PVC expandido e ACM para todo o RJ e região metropolitana.
+              </p>
               <div className="space-y-6 mb-8">
                 {beneficios.map((beneficio, index) => (
                   <div key={index} className="flex items-start gap-4">

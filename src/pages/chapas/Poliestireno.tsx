@@ -4,7 +4,7 @@
 import { MessageCircle } from "lucide-react";
  import { DecorativeDivider } from "@/components/ui/DecorativeDivider";
  import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
- 
+ import { RelatedProducts } from "@/components/seo/RelatedProducts";
  
  import heroPoliestireno from "@/assets/chapas-hero/poliestireno.jpg";
  
@@ -19,12 +19,11 @@ import { MessageCircle } from "lucide-react";
  export default function Poliestireno() {
    const { openWhatsAppModal } = useWhatsAppModal();
    
- 
    return (
      <>
        <SEOHead
-         title="Chapas de Poliestireno RJ - PS e PSAI"
-         description="Chapas de Poliestireno PS Cristal e PSAI (Alto Impacto). Custo-benefício excelente para displays, embalagens e molduras. Corte sob medida no Rio de Janeiro."
+         title="Chapa de Poliestireno no Rio de Janeiro - PS e PSAI | OK Plast"
+         description="Compre chapas de poliestireno PS e PSAI no RJ. Custo-benefício excelente para displays, embalagens e molduras. Corte sob medida. Distribuidora no Rio de Janeiro."
          canonical="/chapas/poliestireno"
          schema={breadcrumbSchema}
        />
@@ -46,18 +45,17 @@ import { MessageCircle } from "lucide-react";
        <section className="bg-muted py-16 md:py-20">
          <div className="container-custom">
            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-             {/* Text */}
              <div>
                <h1 className="font-bold text-3xl md:text-4xl lg:text-5xl text-foreground mb-6">
-                 CHAPAS DE POLIESTIRENO
+                 CHAPAS DE POLIESTIRENO NO RIO DE JANEIRO
                </h1>
                <p className="text-lg text-accent font-medium mb-4">
-                 PS Cristal e PSAI (Alto Impacto)
+                 PS Cristal e PSAI (Alto Impacto) — distribuidora no RJ
                </p>
                <p className="text-muted-foreground mb-8">
                  Chapas de poliestireno com excelente custo-benefício. 
                  Ideais para molduras, displays descartáveis, embalagens e projetos de curta duração. 
-                 Fácil corte e dobra com acabamento profissional.
+                 Fácil corte e dobra com acabamento profissional. Disponível com corte sob medida na OK Plast, sua distribuidora no Rio de Janeiro.
                </p>
                <div className="flex flex-col items-start gap-3">
                  <Button 
@@ -70,12 +68,11 @@ import { MessageCircle } from "lucide-react";
                  </Button>
                </div>
              </div>
- 
-             {/* Image */}
+
              <div className="aspect-video bg-muted rounded-lg overflow-hidden">
                <img 
                  src={heroPoliestireno} 
-                 alt="Chapa de Poliestireno PS"
+                 alt="Chapa de poliestireno PS no Rio de Janeiro - OK Plast distribuidora"
                  className="w-full h-full object-cover"
                  loading="eager"
                />
@@ -92,11 +89,12 @@ import { MessageCircle } from "lucide-react";
            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
              <div>
                <h2 className="font-bold text-2xl md:text-3xl text-primary mb-4">
-                 Poliestireno PS e PSAI
+                 Poliestireno PS e PSAI no RJ
                </h2>
                <p className="text-muted-foreground mb-6">
                  O poliestireno é um termoplástico versátil e econômico. Oferecemos duas variações: 
-                 PS Cristal (transparente e rígido) e PSAI Alto Impacto (mais resistente e opaco).
+                 PS Cristal (transparente e rígido) e PSAI Alto Impacto (mais resistente e opaco). 
+                 Disponível na nossa distribuidora no Rio de Janeiro com corte sob medida.
                </p>
                
                <h3 className="font-semibold text-foreground mb-3">Principais Aplicações:</h3>
@@ -114,7 +112,7 @@ import { MessageCircle } from "lucide-react";
                    </li>
                  ))}
                </ul>
- 
+
                <h3 className="font-semibold text-foreground mb-3">Características:</h3>
                <ul className="space-y-2">
                  {[
@@ -130,11 +128,11 @@ import { MessageCircle } from "lucide-react";
                  ))}
                </ul>
              </div>
- 
+
              <div className="aspect-video bg-muted rounded-lg overflow-hidden">
                <img 
                  src={heroPoliestireno} 
-                 alt="Aplicações do Poliestireno"
+                 alt="Aplicações do poliestireno PS no Rio de Janeiro - OK Plast"
                  className="w-full h-full object-cover"
                  loading="lazy"
                />
@@ -143,7 +141,7 @@ import { MessageCircle } from "lucide-react";
          </div>
        </section>
  
-       {/* Espessuras Disponíveis */}
+       {/* Espessuras */}
        <section className="section-padding bg-muted/30">
          <div className="container-custom">
            <div className="text-center mb-8">
@@ -152,7 +150,7 @@ import { MessageCircle } from "lucide-react";
              </h2>
              <p className="text-muted-foreground max-w-2xl mx-auto">
                Trabalhamos com as espessuras mais utilizadas no mercado para atender 
-               diferentes necessidades de projetos.
+               diferentes necessidades de projetos no Rio de Janeiro.
              </p>
            </div>
            
@@ -168,12 +166,14 @@ import { MessageCircle } from "lucide-react";
            </div>
          </div>
        </section>
+
+       <RelatedProducts currentSlug="poliestireno" />
  
        {/* CTA Final */}
       <section className="section-padding bg-muted">
          <div className="container-custom text-center">
           <h2 className="font-bold text-2xl md:text-3xl text-foreground mb-4">
-            Solicite seu Orçamento
+            Solicite seu Orçamento de Poliestireno no RJ
            </h2>
           <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
             Informe o tipo de chapa, espessura e dimensões desejadas para receber um orçamento personalizado.
