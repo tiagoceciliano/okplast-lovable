@@ -204,39 +204,6 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
 
                     <FormField
                       control={form.control}
-                      name="produto"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <RadioGroup
-                              onValueChange={field.onChange}
-                              value={field.value}
-                              className="flex flex-row gap-3"
-                            >
-                              {PRODUTOS_WHATSAPP.map((produto) => (
-                                <div key={produto} className="flex items-center space-x-1.5">
-                                  <RadioGroupItem 
-                                    value={produto} 
-                                    id={`modal-${produto}`}
-                                    className="h-3.5 w-3.5 border-gray-400"
-                                  />
-                                  <Label 
-                                    htmlFor={`modal-${produto}`}
-                                    className="text-xs text-gray-700 cursor-pointer leading-tight"
-                                  >
-                                    {produto}
-                                  </Label>
-                                </div>
-                              ))}
-                            </RadioGroup>
-                          </FormControl>
-                          <FormMessage className="text-xs text-red-600" />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
                       name="mensagem"
                       render={({ field }) => (
                         <FormItem>
