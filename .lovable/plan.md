@@ -1,72 +1,61 @@
 
 
-## Plano de Performance — Meta: Tempo Total < 2s (Produção)
+# Fix: Dashboard não puxa todos os dados do banco
 
-### Diagnóstico Real (dados do profiler)
+## Problema
+O banco tem 1237 leads e 10258 visitas, mas o dashboard mostra números menores. Mesmo com `.limit(50000)`, o PostgREST pode estar ignorando limites acima do padrão configurado (1000).
 
-| Métrica | Atual | Meta |
-|---------|-------|------|
-| FCP | 5.4s | < 1.5s |
-| Full Load | 6.4s | < 2s |
-| Scripts | 109 arquivos (dev) | ~5 chunks (prod) |
-| Imagens na home | 8 eager + 5 lazy | 0 eager above-fold (hero é texto puro) |
+## Solução: Migrar para agregação SQL via RPC
 
-### Causas Raiz Identificadas
+Em vez de buscar todas as linhas e contar no JavaScript (sujeito ao limite do PostgREST), criar **funções SQL no banco** que fazem a contagem diretamente — sem limite de linhas.
 
-1. **Google Fonts via `@import` no CSS** (`src/index.css` linha 1) — **RENDER-BLOCKING**. O CSS inteiro espera o download da fonte antes de pintar qualquer coisa. Este é o maior vilão.
+### 1. Criar funções SQL no banco (migration)
 
-2. **8 imagens de chapas carregando eager** na Home — as primeiras 4 imagens do grid têm `loading="eager"` e `decoding="sync"`, competindo com o CSS e JS pelo bandwidth.
+**Função `get_leads_count_by_period`**: Conta leads agrupados por `produto_interesse` dentro de um intervalo de datas.
 
-3. **console.log em produção** (`useUTM.ts`) — 5 `console.log` executando em cada page load, incluindo no carregamento do módulo (antes do React).
+```sql
+CREATE FUNCTION get_leads_count_by_period(p_start timestamptz, p_end timestamptz)
+RETURNS TABLE(produtos bigint, chapas bigint, total bigint)
+AS $$
+  SELECT 
+    COUNT(*) FILTER (WHERE produto_interesse = 'Produto Personalizado') as produtos,
+    COUNT(*) FILTER (WHERE produto_interesse = 'Chapa Inteira ou Cortada') as chapas,
+    COUNT(*) as total
+  FROM leads
+  WHERE created_at >= p_start AND created_at <= p_end;
+$$
+```
 
-4. **Notification audio pré-carregado** — `WhatsAppFloatingButton` agenda download de MP3 em 5 segundos.
+**Função `get_visits_count_by_period`**: Conta visitantes únicos por categoria (chapas vs produtos) baseado em `utm_campaign`.
 
-5. **Falta preconnect para Google Fonts** no `index.html`.
+**Função `get_top_pages`**: Retorna top páginas por contagem.
 
-6. **Home hero é texto puro** — não tem imagem, mas o LCP espera a fonte Montserrat carregar.
+**Função `get_campaign_stats`**: Retorna visits/leads/conversão por campanha.
 
----
+### 2. Atualizar Edge Function (`get-dashboard-stats/index.ts`)
 
-### Ações (ordenadas por impacto)
+Substituir os dois `SELECT *` gigantes por chamadas `supabase.rpc(...)`:
 
-**1. Mover Google Fonts do CSS para o HTML com preconnect + preload** (MAIOR IMPACTO)
-- Remover `@import url(...)` da linha 1 de `src/index.css`
-- Adicionar no `index.html`:
-  - `<link rel="preconnect" href="https://fonts.googleapis.com">`
-  - `<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>`
-  - `<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap">`
-  - `<link rel="stylesheet" href="..." media="print" onload="this.media='all'">`
-- Adicionar fallback font-display no CSS: `font-family: 'Montserrat', system-ui, sans-serif` (já existe)
-- **Resultado esperado**: FCP cai ~2-3 segundos
+```typescript
+// Antes (sujeito a limite de 1000):
+const { data: visits } = await supabase.from('page_visits').select('*').limit(50000)
 
-**2. Tornar todas as imagens do grid lazy** 
-- Em `src/pages/Index.tsx`, mudar as primeiras 4 imagens de `loading="eager"` para `loading="lazy"` e `decoding="async"`
-- O hero da Home é texto puro — não precisa de nenhuma imagem eager
+// Depois (sem limite, agregação no banco):
+const { data: todayLeads } = await supabase.rpc('get_leads_count_by_period', {
+  p_start: todayStart.toISOString(),
+  p_end: todayEnd.toISOString()
+})
+```
 
-**3. Remover console.logs de produção**
-- Em `src/hooks/useUTM.ts`, remover ou envolver em `if (import.meta.env.DEV)` os 5 `console.log`
+### 3. Arquivos a modificar
 
-**4. Adiar áudio de notificação**
-- Em `WhatsAppFloatingButton.tsx`, não pré-carregar o Audio object — criar apenas no momento do play
+| Arquivo | Alteração |
+|---------|-----------|
+| Migration SQL | Criar 4-5 funções RPC de agregação |
+| `supabase/functions/get-dashboard-stats/index.ts` | Trocar SELECT * por chamadas RPC |
 
-**5. Preconnect para Supabase já existe — OK**
-
-**6. Adicionar font-display: swap inline como fallback**
-- Garantir que mesmo se a fonte demorar, o texto aparece com system font primeiro
-
----
-
-### Arquivos Modificados
-
-| Arquivo | Mudança |
-|---------|---------|
-| `index.html` | Adicionar preconnect + preload Google Fonts |
-| `src/index.css` | Remover `@import url(...)` da linha 1 |
-| `src/pages/Index.tsx` | Imagens do grid → todas `loading="lazy"` |
-| `src/hooks/useUTM.ts` | Remover/condicionar console.logs |
-| `src/components/layout/WhatsAppFloatingButton.tsx` | Adiar criação do Audio |
-
-### Impacto Esperado
-
-Com a remoção do `@import` render-blocking do Google Fonts (a mudança #1), o FCP deve cair de ~5.4s para ~2s no ambiente de dev. Em produção (build otimizado com bundling), o tempo total deve ficar abaixo de 2s, pois os 109 scripts viram ~5 chunks otimizados.
+### Benefícios
+- Dados 100% precisos (sem truncamento)
+- Muito mais rápido (banco agrega em vez de transferir 10k+ linhas)
+- Escala para qualquer volume de dados
 

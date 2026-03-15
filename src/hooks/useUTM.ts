@@ -32,20 +32,14 @@ function captureUTMsFromUrl(): UTMParams {
   }
 }
 
-// Debug: Log URL no momento do carregamento
-console.log("[UTM] Módulo carregado. URL:", window.location.href);
-console.log("[UTM] Search params:", window.location.search);
-
 // Captura imediata no carregamento do módulo
 const initialUrlUtms = captureUTMsFromUrl();
-console.log("[UTM] Resultado da captura:", initialUrlUtms);
 const hasInitialUtms = Object.values(initialUrlUtms).some((v) => v !== null);
 
 // Salva imediatamente se tiver UTMs na URL
 if (hasInitialUtms && typeof localStorage !== "undefined") {
   try {
     localStorage.setItem(UTM_STORAGE_KEY, JSON.stringify(initialUrlUtms));
-    console.log("[UTM] Capturados da URL:", initialUrlUtms);
   } catch {
     // Ignora erro de localStorage
   }
@@ -82,14 +76,11 @@ export function getStoredUTM(): UTMParams {
   try {
     const stored = localStorage.getItem(UTM_STORAGE_KEY);
     if (stored) {
-      const parsed = JSON.parse(stored);
-      console.log("[UTM] Lido do localStorage:", parsed);
-      return parsed;
+      return JSON.parse(stored);
     }
   } catch {
     // Ignora erro
   }
-  console.log("[UTM] Nenhum UTM encontrado no localStorage");
   return {
     utm_source: null,
     utm_medium: null,

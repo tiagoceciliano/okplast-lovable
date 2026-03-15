@@ -145,8 +145,8 @@ export default function Index() {
                       width={400}
                       height={400}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      loading={index < 4 ? "eager" : "lazy"}
-                      decoding={index < 4 ? "sync" : "async"}
+                      loading="lazy"
+                      decoding="async"
                     />
                   </div>
                   <div className="p-3 text-center">

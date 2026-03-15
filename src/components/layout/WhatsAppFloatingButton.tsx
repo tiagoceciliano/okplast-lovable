@@ -12,17 +12,13 @@ export function WhatsAppFloatingButton() {
     const timer = setTimeout(() => {
       setShowProactiveMessage(true);
       
-      // Tocar som de notificação (defer para não bloquear render)
-      if (typeof window !== 'undefined') {
-        requestIdleCallback?.(() => {
-          const audio = new Audio('/sounds/notification.mp3');
-          audio.volume = 0.5;
-          audio.play().catch(() => {});
-        }) ?? setTimeout(() => {
-          const audio = new Audio('/sounds/notification.mp3');
-          audio.volume = 0.5;
-          audio.play().catch(() => {});
-        }, 100);
+      // Tocar som de notificação apenas no momento necessário
+      try {
+        const audio = new Audio('/sounds/notification.mp3');
+        audio.volume = 0.5;
+        audio.play().catch(() => {});
+      } catch {
+        // Ignora erro de áudio
       }
     }, 5000);
     
