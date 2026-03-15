@@ -76,9 +76,7 @@ export function getStoredUTM(): UTMParams {
   try {
     const stored = localStorage.getItem(UTM_STORAGE_KEY);
     if (stored) {
-      const parsed = JSON.parse(stored);
-      console.log("[UTM] Lido do localStorage:", parsed);
-      return parsed;
+      return JSON.parse(stored);
     }
   } catch {
     // Ignora erro
