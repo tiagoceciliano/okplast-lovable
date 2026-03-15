@@ -40,7 +40,6 @@ const hasInitialUtms = Object.values(initialUrlUtms).some((v) => v !== null);
 if (hasInitialUtms && typeof localStorage !== "undefined") {
   try {
     localStorage.setItem(UTM_STORAGE_KEY, JSON.stringify(initialUrlUtms));
-    console.log("[UTM] Capturados da URL:", initialUrlUtms);
   } catch {
     // Ignora erro de localStorage
   }
