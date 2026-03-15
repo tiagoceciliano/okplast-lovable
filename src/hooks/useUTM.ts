@@ -81,7 +81,6 @@ export function getStoredUTM(): UTMParams {
   } catch {
     // Ignora erro
   }
-  console.log("[UTM] Nenhum UTM encontrado no localStorage");
   return {
     utm_source: null,
     utm_medium: null,
