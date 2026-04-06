@@ -1,7 +1,7 @@
  {
-   "name": "Lab Acrílicos",
-   "short_name": "Lab Acrílicos",
-   "description": "Fábrica de produtos em acrílico sob medida e distribuidora de chapas no Rio de Janeiro",
+    "name": "OK Plast",
+    "short_name": "OK Plast",
+    "description": "Distribuidora de chapas plásticas no Rio de Janeiro — acrílico, policarbonato, ACM, PVC e mais",
    "start_url": "/",
    "display": "standalone",
    "background_color": "#ffffff",
