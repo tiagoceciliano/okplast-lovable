@@ -26,9 +26,15 @@ import imgAcm from "@/assets/chapas-hero/acm.jpg";
 const localBusinessSchema = {
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
+  "@id": "https://okplast.com.br/#organization",
   "name": "OK Plast",
-  "description": "Distribuidora de chapas plásticas no Rio de Janeiro. Acrílico, Policarbonato, PETG, Poliestireno, PVC e ACM. Corte sob medida.",
+  "alternateName": "OK Plast Distribuidora de Chapas Plásticas",
+  "description": "Distribuidora de chapas plásticas no Rio de Janeiro. Acrílico, Policarbonato, PETG, Poliestireno, PVC e ACM. Corte sob medida. Atendemos todo o RJ.",
   "image": "https://okplast.com.br/og-image.jpg",
+  "logo": "https://okplast.com.br/logo-horizontal.png",
+  "url": "https://okplast.com.br",
+  "telephone": "(21) 3372-3797",
+  "email": "vendas@okplast.com.br",
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "Rua Guatemala, 593 - Penha Circular",
@@ -42,21 +48,74 @@ const localBusinessSchema = {
     "latitude": -22.8380,
     "longitude": -43.2670
   },
-  "telephone": "(21) 3372-3797",
-  "email": "vendas@okplast.com.br",
-  "url": "https://okplast.com.br",
-  "openingHoursSpecification": {
-    "@type": "OpeningHoursSpecification",
-    "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-    "opens": "09:00",
-    "closes": "17:00"
-  },
+  "hasMap": "https://maps.google.com/?q=Rua+Guatemala+593+Penha+Circular+Rio+de+Janeiro+RJ",
+  "openingHoursSpecification": [
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      "opens": "09:00",
+      "closes": "17:00"
+    }
+  ],
   "priceRange": "$$",
-  "paymentAccepted": "Dinheiro, Cartão de Crédito, Pix, Boleto",
-  "areaServed": {
-    "@type": "State",
-    "name": "Rio de Janeiro"
-  }
+  "currenciesAccepted": "BRL",
+  "paymentAccepted": "Dinheiro, Cartão de Crédito, Cartão de Débito, Pix, Boleto, Transferência Bancária",
+  "areaServed": [
+    { "@type": "State", "name": "Rio de Janeiro" },
+    { "@type": "City", "name": "Rio de Janeiro" },
+    { "@type": "City", "name": "Niterói" },
+    { "@type": "City", "name": "São Gonçalo" },
+    { "@type": "City", "name": "Duque de Caxias" },
+    { "@type": "City", "name": "Nova Iguaçu" }
+  ],
+  "sameAs": [],
+  "knowsAbout": [
+    "Chapas de acrílico",
+    "Chapas de policarbonato",
+    "Chapas de PETG",
+    "Chapas de poliestireno",
+    "Chapas de PVC expandido",
+    "Chapas de ACM",
+    "Corte de chapas plásticas sob medida",
+    "Distribuidora de plásticos no Rio de Janeiro"
+  ],
+  "makesOffer": [
+    {
+      "@type": "Offer",
+      "itemOffered": { "@type": "Product", "name": "Chapa de Acrílico" },
+      "areaServed": { "@type": "State", "name": "Rio de Janeiro" }
+    },
+    {
+      "@type": "Offer",
+      "itemOffered": { "@type": "Product", "name": "Chapa de Policarbonato Alveolar" },
+      "areaServed": { "@type": "State", "name": "Rio de Janeiro" }
+    },
+    {
+      "@type": "Offer",
+      "itemOffered": { "@type": "Product", "name": "Chapa de Policarbonato Compacto" },
+      "areaServed": { "@type": "State", "name": "Rio de Janeiro" }
+    },
+    {
+      "@type": "Offer",
+      "itemOffered": { "@type": "Product", "name": "Chapa de PETG" },
+      "areaServed": { "@type": "State", "name": "Rio de Janeiro" }
+    },
+    {
+      "@type": "Offer",
+      "itemOffered": { "@type": "Product", "name": "Chapa de Poliestireno" },
+      "areaServed": { "@type": "State", "name": "Rio de Janeiro" }
+    },
+    {
+      "@type": "Offer",
+      "itemOffered": { "@type": "Product", "name": "Chapa de PVC Expandido" },
+      "areaServed": { "@type": "State", "name": "Rio de Janeiro" }
+    },
+    {
+      "@type": "Offer",
+      "itemOffered": { "@type": "Product", "name": "Chapa de ACM" },
+      "areaServed": { "@type": "State", "name": "Rio de Janeiro" }
+    }
+  ]
 };
 
 // FAQ para Schema + exibição visual
