@@ -14,6 +14,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -32,10 +39,22 @@ const whatsappFormSchema = z.object({
   nome: z.string().trim().min(2, "Nome deve ter pelo menos 2 caracteres").max(100),
   email: z.string().trim().email("E-mail inválido").max(255),
   telefone: z.string().min(14, "WhatsApp inválido").max(15),
+  tipo_material: z.string().min(1, "Selecione o tipo de material"),
   mensagem: z.string().trim().min(5, "Mensagem deve ter pelo menos 5 caracteres").max(1000),
 });
 
 type WhatsAppFormData = z.infer<typeof whatsappFormSchema>;
+
+const TIPOS_MATERIAL = [
+  "Policarbonato Alveolar",
+  "Policarbonato Compacto",
+  "Acrílico",
+  "Poliestireno (PS)",
+  "PVC Expandido",
+  "ACM",
+  "PETG",
+  "Outros",
+];
 
 interface WhatsAppModalProps {
   open: boolean;
@@ -52,6 +71,7 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
       nome: "",
       email: "",
       telefone: "",
+      tipo_material: "",
       mensagem: "",
     },
   });
@@ -73,6 +93,7 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
         `Nome: ${nomeFormatado}`,
         `E-mail: ${data.email}`,
         `WhatsApp: ${telefoneFormatado}`,
+        `Tipo de Material: ${data.tipo_material}`,
         `Mensagem: ${data.mensagem}`,
       ].join("\n");
 
@@ -86,7 +107,8 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
           nome: nomeFormatado,
           email: data.email,
           telefone: telefoneFormatado,
-          produto_interesse: "Chapa Inteira",
+          produto_interesse: data.tipo_material,
+          tipo_material: data.tipo_material,
           mensagem: data.mensagem,
           current_url: window.location.href,
           ...utmData,
@@ -197,6 +219,30 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
                               maxLength={15}
                             />
                           </FormControl>
+                          <FormMessage className="text-xs text-red-600" />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="tipo_material"
+                      render={({ field }) => (
+                        <FormItem>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="whatsapp-input h-8 text-sm">
+                                <SelectValue placeholder="Tipo de Material" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {TIPOS_MATERIAL.map((tipo) => (
+                                <SelectItem key={tipo} value={tipo}>
+                                  {tipo}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                           <FormMessage className="text-xs text-red-600" />
                         </FormItem>
                       )}
