@@ -5,7 +5,7 @@ export const COMPANY = {
   slogan: "TUDO OK PARA SEU PROJETO",
   address: "Rua Guatemala, 593 – Penha Circular – Rio de Janeiro – RJ, 21020-170",
   phone: "(21) 3372-3797",
-  whatsapp: "5521923670633",
+  whatsapp: "5521923679387",
   whatsappFormatted: "(21) 92367-0633",
   email: "vendas@okplast.com.br",
   domain: "https://okplast.com.br",
