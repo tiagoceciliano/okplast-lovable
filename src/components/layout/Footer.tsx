@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { MapPin, Phone, Mail, Clock, MessageCircle } from "lucide-react";
+import { MapPin, Mail, Clock, MessageCircle } from "lucide-react";
 import { COMPANY } from "@/lib/constants";
 import logoImg from "@/assets/logo-okplast.png";
 import { GoogleMapEmbed } from "@/components/ui/GoogleMapEmbed";
