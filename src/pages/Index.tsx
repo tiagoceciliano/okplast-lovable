@@ -33,7 +33,7 @@ const localBusinessSchema = {
   "image": "https://okplast.com.br/og-image.jpg",
   "logo": "https://okplast.com.br/logo-horizontal.png",
   "url": "https://okplast.com.br",
-  "telephone": "(21) 3372-3797",
+  "telephone": "+5521923679387",
   "email": "vendas@okplast.com.br",
   "address": {
     "@type": "PostalAddress",

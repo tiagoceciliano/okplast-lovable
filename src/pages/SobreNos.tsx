@@ -58,9 +58,6 @@ export default function SobreNos() {
                 <strong className="text-foreground">Endereço:</strong> {COMPANY.address}
               </p>
               <p className="text-muted-foreground mb-2">
-                <strong className="text-foreground">Telefone:</strong> {COMPANY.phone}
-              </p>
-              <p className="text-muted-foreground mb-2">
                 <strong className="text-foreground">WhatsApp:</strong> {COMPANY.whatsappFormatted}
               </p>
               <p className="text-muted-foreground">

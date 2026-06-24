@@ -101,7 +101,6 @@ export default function PoliticaVenda() {
               </p>
               <p className="text-muted-foreground">
                 <strong className="text-foreground">E-mail:</strong> {COMPANY.email}<br />
-                <strong className="text-foreground">Telefone:</strong> {COMPANY.phone}<br />
                 <strong className="text-foreground">WhatsApp:</strong> {COMPANY.whatsappFormatted}<br />
                 <strong className="text-foreground">Endereço:</strong> {COMPANY.address}
               </p>
