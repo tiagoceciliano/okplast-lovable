@@ -31,15 +31,6 @@ export function Footer() {
             <h3 className="font-bold text-lg uppercase tracking-wide">Atendimento</h3>
             <ul className="space-y-3 text-sm text-primary-foreground/80">
               <li className="flex items-center gap-2">
-                <Phone className="h-4 w-4 shrink-0" />
-                <button 
-                  onClick={() => openWhatsAppModal()} 
-                  className="hover:text-primary-foreground transition-colors text-left"
-                >
-                  {COMPANY.phone}
-                </button>
-              </li>
-              <li className="flex items-center gap-2">
                 <MessageCircle className="h-4 w-4 shrink-0" />
                 <button 
                   onClick={() => openWhatsAppModal()} 
