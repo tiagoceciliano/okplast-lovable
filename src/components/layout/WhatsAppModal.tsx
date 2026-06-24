@@ -226,6 +226,30 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
 
                     <FormField
                       control={form.control}
+                      name="tipo_material"
+                      render={({ field }) => (
+                        <FormItem>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="whatsapp-input h-8 text-sm">
+                                <SelectValue placeholder="Tipo de Material" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {TIPOS_MATERIAL.map((tipo) => (
+                                <SelectItem key={tipo} value={tipo}>
+                                  {tipo}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage className="text-xs text-red-600" />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
                       name="mensagem"
                       render={({ field }) => (
                         <FormItem>
