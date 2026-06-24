@@ -12,6 +12,7 @@ interface LeadPayload {
   email: string;
   telefone: string;
   produto_interesse?: string;
+  tipo_material?: string;
   mensagem?: string;
   utm_source?: string | null;
   utm_medium?: string | null;
@@ -125,6 +126,7 @@ serve(async (req) => {
       email: payload.email,
       phone: cleanPhone(payload.telefone),
       product: payload.produto_interesse || "Chapa Inteira",
+      tipo_material: payload.tipo_material || payload.produto_interesse || "",
       message: payload.mensagem || "",
       location: {
         city: geoData.city || "",
