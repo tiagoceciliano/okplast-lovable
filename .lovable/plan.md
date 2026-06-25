@@ -1,36 +1,50 @@
-## Plano para resolver o problema crônico de cache/publicação
+## Diagnóstico
 
-### Objetivo
-Garantir que, após publicar uma nova versão, o navegador carregue os arquivos atuais do site publicado e não continue preso em HTML/JS/CSS antigos.
+A estrutura atual da Edge Function `process-lead` já envia exatamente os mesmos campos do print (name, email, phone, product, tipo_material, message, location{}, utm_*, submitted_at, submitted_time, current_url).
 
-### O que vou ajustar neste projeto
-1. **Versionamento explícito da aplicação**
-   - Criar uma versão de build usada pelo frontend para identificar quando a publicação mudou.
-   - Essa versão será comparada no navegador para detectar app antigo em execução.
+O motivo de só `name`, `email` e `phone` terem dado match no Kinbox é provavelmente um dos dois:
 
-2. **Correção do carregamento de chunks antigos**
-   - Melhorar o tratamento atual de erro de importação dinâmica.
-   - Quando o navegador tentar carregar um arquivo JS antigo que não existe mais, a página fará reload forçado com cache-buster.
+1. **`location` é um objeto aninhado** — muitos sistemas de inbound (incluindo Kinbox) só mapeiam campos de **primeiro nível** (string/number). Objetos aninhados ficam invisíveis no mapeamento.
+2. Campos como `submitted_at` e `submitted_time` chegando vazios/sem valor consistente nos envios reais (quando o lead vem sem UTM, vários campos viram string vazia `""` — alguns sistemas ignoram strings vazias no auto-mapping da primeira amostra).
 
-3. **Cache-buster automático no reload**
-   - Em vez de apenas `window.location.reload()`, redirecionar para a mesma URL com um parâmetro tipo `?v=<timestamp>`.
-   - Isso força o navegador/CDN a buscar o HTML novo.
+## Mudança proposta
 
-4. **Limpeza controlada de storage do app**
-   - Remover apenas flags internas de reload para não travar em estado antigo.
-   - Não apagar dados importantes de usuário/UTM sem necessidade.
+Achatar `location` em três campos planos e garantir que todos os campos cheguem sempre preenchidos (com `"-"` ou `"N/A"` quando vazios, para o Kinbox detectar o campo na primeira amostra de payload).
 
-5. **Headers/meta defensivos para HTML**
-   - Adicionar metatags de no-cache no `index.html` para reduzir chance de HTML velho ficar preso em cache.
-   - Manter assets com hash funcionando normalmente, pois eles podem continuar cacheados com segurança.
+**Novo payload enviado ao webhook:**
 
-6. **Documentar o procedimento padrão para outros projetos**
-   - Ao final, te passo o padrão exato para replicar: onde alterar e qual lógica usar.
+```json
+{
+  "name": "...",
+  "email": "...",
+  "phone": "5521...",
+  "product": "...",
+  "tipo_material": "...",
+  "message": "...",
+  "city": "Rio de Janeiro",
+  "state": "RJ",
+  "country": "Brazil",
+  "utm_source": "...",
+  "utm_medium": "...",
+  "utm_campaign": "...",
+  "utm_term": "...",
+  "utm_content": "...",
+  "submitted_at": "25/06/2026",
+  "submitted_time": "14:00:00",
+  "current_url": "https://okplast.com.br/"
+}
+```
 
-### Resultado esperado
-- Publicou nova versão → usuários recebem HTML novo com os assets corretos.
-- Se alguém estiver com página antiga aberta → ao navegar ou disparar erro de chunk antigo, o site força atualização limpa.
-- Reduz bastante o erro de “publicou mas a versão publicada não muda”.
+Mesmos nomes do print, sem objeto aninhado.
 
-### Observação importante
-Essa correção atua no lado do app/navegador. Se houver atraso real na infraestrutura de publicação/CDN da plataforma, ainda pode existir uma janela curta de propagação, mas o usuário não deve ficar preso indefinidamente em build antiga.
+## Implementação
+
+Arquivo único: `supabase/functions/process-lead/index.ts`
+
+- Trocar o bloco `location: { city, state, country }` por três chaves planas: `city`, `state`, `country`.
+- Substituir `""` por `"-"` como fallback nos campos opcionais (utm_*, message, current_url, city, state) para garantir presença na primeira amostra de payload do Kinbox.
+- Não mexer em mais nada (validação, banco, geolocalização e `cleanPhone` permanecem).
+
+## Passo seguinte (lado Kinbox)
+
+Depois do deploy, vou enviar um payload de teste via `curl` para o webhook. Você precisa **reabrir o mapeamento de campos no Kinbox** e remapear, pois ele só "aprende" campos novos quando recebe um payload com a nova estrutura.
