@@ -236,8 +236,8 @@ export default function Index() {
   return (
     <>
       <SEOHead
-        title="OK Plast | Distribuidora de Chapas Plásticas no Rio de Janeiro - RJ"
-        description="Distribuidora de chapas plásticas no RJ: Acrílico, Policarbonato, PETG, Poliestireno, PVC Expandido e ACM. Corte sob medida. Melhor preço do Rio de Janeiro. Orçamento em 24h."
+        title="OK Plast | Distribuidora de Chapas Plásticas no RJ"
+        description="Distribuidora de chapas plásticas no RJ: acrílico, policarbonato, PETG, PS, PVC e ACM. Corte sob medida e entrega rápida. Orçamento via WhatsApp."
         canonical="/"
         schema={{
           "@context": "https://schema.org",

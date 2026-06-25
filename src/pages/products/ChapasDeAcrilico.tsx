@@ -141,8 +141,8 @@ export default function ChapasDeAcrilico() {
 
   return <>
       <SEOHead
-        title="Chapas Plásticas no Rio de Janeiro - Acrílico, Policarbonato, PETG, ACM | OK Plast"
-        description="Distribuidora de chapas plásticas no RJ: Acrílico, Policarbonato alveolar e compacto, PETG, Poliestireno, PVC Expandido e ACM. Corte sob medida. Melhor preço do Rio de Janeiro."
+        title="Chapas Plásticas no Rio de Janeiro | OK Plast"
+        description="Distribuidora de chapas plásticas no RJ: acrílico, policarbonato, PETG, PS, PVC e ACM. Corte sob medida e entrega rápida."
         canonical="/chapas"
         schema={createFAQSchema(faqItems)}
       />
@@ -203,9 +203,9 @@ export default function ChapasDeAcrilico() {
 
               <div className={`${chapa.imagePosition === "right" ? "lg:order-1" : "lg:order-2"}`}>
                 <Link to={`/chapas/${chapa.slug}`}>
-                  <h3 className="font-bold text-xl md:text-2xl text-primary mb-4 hover:underline cursor-pointer">
+                  <h2 className="font-bold text-xl md:text-2xl text-primary mb-4 hover:underline cursor-pointer">
                     {chapa.nome}
-                  </h3>
+                  </h2>
                 </Link>
                 <p className="text-muted-foreground mb-6">{chapa.desc}</p>
 
