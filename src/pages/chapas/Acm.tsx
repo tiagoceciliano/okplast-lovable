@@ -1,5 +1,5 @@
  import { Link } from "react-router-dom";
- import { SEOHead, createBreadcrumbSchema } from "@/components/SEOHead";
+  import { SEOHead, createBreadcrumbSchema, createProductSchema } from "@/components/SEOHead";
  import { Button } from "@/components/ui/button";
 import { MessageCircle } from "lucide-react";
  import { DecorativeDivider } from "@/components/ui/DecorativeDivider";
@@ -15,18 +15,31 @@ import { MessageCircle } from "lucide-react";
    { name: "Chapas", url: "/chapas" },
    { name: "ACM" },
  ]);
+
+  const productSchema = createProductSchema({
+    name: "Chapa ACM (Alumínio Composto)",
+    description:
+      "Chapas ACM no RJ para fachadas, letreiros e revestimentos externos. Alta durabilidade e diversas cores. Corte sob medida.",
+    image: "https://okplast.com.br/og-image.jpg",
+    brand: "OK Plast",
+  });
+
+  const acmSchema = {
+    "@context": "https://schema.org",
+    "@graph": [breadcrumbSchema, productSchema],
+  };
  
  export default function Acm() {
    const { openWhatsAppModal } = useWhatsAppModal();
    
    return (
      <>
-       <SEOHead
-         title="Chapa ACM no Rio de Janeiro - Fachadas e Letreiros | OK Plast"
-         description="Compre chapas ACM (alumínio composto) no RJ para fachadas, letreiros e revestimentos externos. Alta durabilidade e diversas cores. Corte sob medida. Distribuidora no Rio de Janeiro."
-         canonical="/chapas/acm"
-         schema={breadcrumbSchema}
-       />
+        <SEOHead
+          title="Chapa ACM no Rio de Janeiro | OK Plast"
+          description="Chapas ACM (alumínio composto) no RJ para fachadas, letreiros e revestimentos externos. Corte sob medida."
+          canonical="/chapas/acm"
+          schema={acmSchema}
+        />
  
        <div className="bg-muted/50 py-3">
          <div className="container-custom">

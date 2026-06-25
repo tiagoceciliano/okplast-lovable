@@ -1,0 +1,22 @@
+# OK Plast
+
+> Distribuidora de chapas plásticas no Rio de Janeiro (RJ). Acrílico, policarbonato (alveolar e compacto), PETG, poliestireno (PS), PVC expandido e ACM, com corte sob medida e entrega rápida.
+
+## Pages
+
+- [Home](/): Quem somos, diferenciais e atendimento via WhatsApp.
+- [Chapas Plásticas](/chapas): Hub com todos os tipos de chapas distribuídas.
+- [Chapa de Acrílico](/chapas/acrilico): Cristal, colorido, leitoso, espelhado e fumê. Espessuras de 1mm a 50mm.
+- [Chapa de Poliestireno (PS)](/chapas/poliestireno): PS cristal e PSAI para displays e projetos econômicos.
+- [Chapa PETG](/chapas/petg): Alta resistência ao impacto, atóxico, ideal para EPIs e proteções.
+- [Chapa Policarbonato Alveolar](/chapas/policarbonato-alveolar): Coberturas, pergolados e fechamentos translúcidos.
+- [Chapa Policarbonato Compacto](/chapas/policarbonato-compacto): Resistência ao impacto para vitrines e blindagem arquitetônica.
+- [Chapa PVC Expandido](/chapas/pvc-expandido): Comunicação visual, displays e revestimentos internos.
+- [Chapa ACM](/chapas/acm): Alumínio composto para fachadas, letreiros e revestimentos externos.
+
+## Optional
+
+- [Sobre Nós](/home/sobre-nos): História e atuação da OK Plast no RJ.
+- [Política de Venda](/home/politica-de-venda)
+- [Termo de Uso](/home/termo-de-uso)
+- [Política de Privacidade](/home/politica-de-privacidade)

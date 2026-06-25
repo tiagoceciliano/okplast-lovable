@@ -1,5 +1,5 @@
  import { Link } from "react-router-dom";
- import { SEOHead, createBreadcrumbSchema } from "@/components/SEOHead";
+  import { SEOHead, createBreadcrumbSchema, createProductSchema } from "@/components/SEOHead";
  import { Button } from "@/components/ui/button";
 import { MessageCircle } from "lucide-react";
  import { DecorativeDivider } from "@/components/ui/DecorativeDivider";
@@ -46,6 +46,19 @@ import { MessageCircle } from "lucide-react";
    { name: "Chapas", url: "/chapas" },
    { name: "Acrílico" },
  ]);
+
+  const productSchema = createProductSchema({
+    name: "Chapa de Acrílico",
+    description:
+      "Chapas de acrílico CAST 100% virgem: cristal, colorido, leitoso, espelhado e fumê. Espessuras de 1mm a 50mm com corte sob medida no Rio de Janeiro.",
+    image: "https://okplast.com.br/og-image.jpg",
+    brand: "OK Plast",
+  });
+
+  const acrilicoSchema = {
+    "@context": "https://schema.org",
+    "@graph": [breadcrumbSchema, productSchema],
+  };
  
  export default function Acrilico() {
    const { openWhatsAppModal } = useWhatsAppModal();
@@ -56,12 +69,12 @@ import { MessageCircle } from "lucide-react";
  
    return (
      <>
-       <SEOHead
-         title="Chapa de Acrílico no Rio de Janeiro - Cristal, Colorido, Fumê | OK Plast"
-         description="Compre chapas de acrílico no RJ: cristal transparente, colorido, leitoso, espelhado e fumê. CAST 100% virgem. Corte sob medida. Melhor preço do Rio de Janeiro. Distribuidora OK Plast."
-         canonical="/chapas/acrilico"
-         schema={breadcrumbSchema}
-       />
+        <SEOHead
+          title="Chapa de Acrílico no Rio de Janeiro | OK Plast"
+          description="Chapas de acrílico CAST no RJ: cristal, colorido, leitoso, espelhado e fumê. Espessuras de 1mm a 50mm com corte sob medida."
+          canonical="/chapas/acrilico"
+          schema={acrilicoSchema}
+        />
  
        {/* Breadcrumb */}
        <div className="bg-muted/50 py-3">
