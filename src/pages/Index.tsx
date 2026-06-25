@@ -252,7 +252,7 @@ export default function Index() {
         <div className="container-custom">
           <div className="text-center mb-10">
             <h2 className="font-bold text-2xl md:text-3xl lg:text-4xl text-accent uppercase tracking-wide">
-              Chapas Plásticas no Rio de Janeiro
+            Chapas no Rio de Janeiro
             </h2>
             <p className="text-muted-foreground mt-2">
               Acrílico, Policarbonato, PS, PETG, PVC Expandido e ACM — vendemos inteira ou cortamos sob medida no RJ

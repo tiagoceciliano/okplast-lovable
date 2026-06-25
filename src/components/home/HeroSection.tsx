@@ -12,7 +12,7 @@ export function HeroSection({ onWhatsAppClick }: HeroSectionProps) {
       <div className="container-custom">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="font-bold md:text-4xl lg:text-5xl text-foreground mb-4 leading-tight text-2xl">
-            DISTRIBUIDORA DE <span className="text-accent">CHAPAS PLÁSTICAS</span> NO RIO DE JANEIRO
+            DISTRIBUIDORA DE <span className="text-accent">CHAPAS</span> NO RIO DE JANEIRO
           </h1>
           <h2 className="text-lg md:text-xl text-accent font-medium mb-6">
             Acrílico, Policarbonato, PETG, Poliestireno (PS), PVC Expandido e ACM no RJ
