@@ -33,19 +33,24 @@ interface GeoData {
 function getSaoPauloDateTime(): { date: string; time: string } {
   const now = new Date();
   const options: Intl.DateTimeFormatOptions = { timeZone: "America/Sao_Paulo" };
-  
+
   const date = now.toLocaleDateString("pt-BR", options);
-  const time = now.toLocaleTimeString("pt-BR", { 
-    ...options, 
-    hour12: false 
+  const time = now.toLocaleTimeString("pt-BR", {
+    ...options,
+    hour12: false,
   });
-  
+
   return { date, time };
 }
 
-// Remove formatação do telefone (apenas números)
+// Remove formatação do telefone (apenas números) e garante DDI 55
 function cleanPhone(phone: string): string {
-  return phone.replace(/\D/g, "");
+  const digits = phone.replace(/\D/g, "");
+  // Se não começar com 55 e tiver 10 ou 11 dígitos (BR), adiciona DDI
+  if (!digits.startsWith("55") && digits.length >= 10 && digits.length <= 11) {
+    return `55${digits}`;
+  }
+  return digits;
 }
 
 serve(async (req) => {
@@ -59,14 +64,14 @@ serve(async (req) => {
     if (!payload.nome || !payload.email || !payload.telefone) {
       return new Response(
         JSON.stringify({ error: "Campos obrigatórios: nome, email, telefone" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
     // Captura IP do cliente
-    const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0] || 
-                     req.headers.get("cf-connecting-ip") || 
-                     "unknown";
+    const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0] ||
+      req.headers.get("cf-connecting-ip") ||
+      "unknown";
 
     // Consulta geolocalização
     let geoData: GeoData = {};
@@ -120,7 +125,7 @@ serve(async (req) => {
 
     // Prepara payload para webhook
     const { date, time } = getSaoPauloDateTime();
-    
+
     const webhookPayload = {
       name: payload.nome,
       email: payload.email,
@@ -170,20 +175,20 @@ serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ 
-        success: true, 
+      JSON.stringify({
+        success: true,
         lead_id: leadData.id,
         webhook_enviado: webhookEnviado,
-        message: "Lead processado com sucesso" 
+        message: "Lead processado com sucesso",
       }),
-      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
-
   } catch (error) {
     console.error("Erro no processamento:", error);
     return new Response(
       JSON.stringify({ error: "Erro interno ao processar lead" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }
 });
+
