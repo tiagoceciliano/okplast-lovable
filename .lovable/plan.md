@@ -1,17 +1,22 @@
-## Plano: Adicionar campo "Tipo de Material" no formulário WhatsApp
+## Plano para corrigir o webhook da Kinbox
 
-### 1. `src/components/layout/WhatsAppModal.tsx`
-- Adicionar campo `tipo_material` (Select shadcn) entre WhatsApp e Mensagem.
-- Opções: Policarbonato Alveolar, Policarbonato Compacto, Acrílico, Poliestireno (PS), PVC Expandido, ACM, PETG, Outros.
-- Estilizar o `SelectTrigger` para combinar com `whatsapp-input` (h-8, text-sm, fundo branco).
-- Schema zod: `tipo_material: z.string().min(1, "Selecione o tipo de material")`.
-- Incluir "Tipo de Material: X" na mensagem do WhatsApp.
-- Enviar `tipo_material` no `supabase.functions.invoke("process-lead", ...)` e usá-lo também como `produto_interesse`.
+1. **Atualizar o endereço do webhook no backend**
+   - Trocar o valor do secret `WEBHOOK_KINBOX_CHAPA_WHATSAPP` para:
+   - `https://webhook.kinbox.com.br/v3/inbound/mwVIr-FpU`
 
-### 2. Webhook
-- Não toco em nada do webhook (nem secret, nem URL). A edge function `process-lead` continua usando `WEBHOOK_KINBOX_CHAPA_WHATSAPP` exatamente como está.
-- Apenas adiciono `tipo_material` ao `LeadPayload` e ao `webhookPayload` no `supabase/functions/process-lead/index.ts` para que o novo campo seja propagado.
+2. **Confirmar que o código está usando o secret correto**
+   - A função `process-lead` já busca o webhook pelo secret `WEBHOOK_KINBOX_CHAPA_WHATSAPP`.
+   - Não precisa alterar a URL no frontend.
 
-### Arquivos
-- `src/components/layout/WhatsAppModal.tsx` (UI + envio)
-- `supabase/functions/process-lead/index.ts` (incluir campo no payload do webhook)
+3. **Testar o envio real pela função**
+   - Enviar um payload de teste pela função `process-lead`.
+   - Confirmar se a resposta retorna `webhook_enviado: true`.
+   - Isso valida que o formulário do site vai disparar para o webhook novo.
+
+4. **Depois você testa no site**
+   - Preenche o formulário normalmente.
+   - O envio deve cair no webhook novo da Kinbox, não no antigo `JqLvB0d7t`.
+
+## Detalhe técnico
+
+O webhook não deve ficar fixo no código. Ele fica salvo como secret do backend em `WEBHOOK_KINBOX_CHAPA_WHATSAPP`, e a função `process-lead` lê esse valor na hora de enviar o lead.
