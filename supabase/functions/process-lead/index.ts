@@ -43,15 +43,11 @@ function getSaoPauloDateTime(): { date: string; time: string } {
   return { date, time };
 }
 
-// Remove formatação do telefone (apenas números) e garante DDI 55
+// Remove formatação do telefone (apenas números), sem adicionar DDI
 function cleanPhone(phone: string): string {
-  const digits = phone.replace(/\D/g, "");
-  // Se não começar com 55 e tiver 10 ou 11 dígitos (BR), adiciona DDI
-  if (!digits.startsWith("55") && digits.length >= 10 && digits.length <= 11) {
-    return `55${digits}`;
-  }
-  return digits;
+  return phone.replace(/\D/g, "").replace(/^55/, "");
 }
+
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
