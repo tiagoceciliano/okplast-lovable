@@ -3,21 +3,7 @@
  <head>
    <meta charset="UTF-8" />
    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-   <!-- Evita que o HTML fique preso em cache do navegador/CDN entre deploys.
-        Assets com hash (JS/CSS) continuam cacheados normalmente. -->
-   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-   <meta http-equiv="Pragma" content="no-cache" />
-   <meta http-equiv="Expires" content="0" />
-   
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18068965569"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'AW-18068965569');
-    </script>
-    
+
    <!-- Favicon -->
    <link rel="apple-touch-icon" href="/favicon.png" />
    
@@ -27,14 +13,12 @@
     <link rel="preconnect" href="https://osfxdoxfiyyqcpahuwci.supabase.co" />
     <link rel="dns-prefetch" href="https://osfxdoxfiyyqcpahuwci.supabase.co" />
      
-    <!-- Google Fonts: non-render-blocking -->
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'" />
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" /></noscript>
+    <!-- Google Fonts: somente 2 pesos para encurtar a cadeia crítica -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap" />
 
     <!-- Preload recursos críticos (LCP) -->
     <link rel="preload" as="image" href="/lovable-uploads/e3c63f33-82e6-4475-9fc6-b070d0134450.webp" fetchpriority="high" />
-    <!-- Preload do peso 700 do Montserrat (usado pelo H1 da home) -->
+    <!-- Preload dos pesos usados na dobra -->
     <link rel="preload" as="font" type="font/woff2" crossorigin
           href="https://fonts.gstatic.com/s/montserrat/v31/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCuM73w5aXo.woff2" />
     
@@ -65,5 +49,13 @@
  <body>
    <div id="root"></div>
    <script type="module" src="/src/main.tsx"></script>
+    <!-- Google tag (gtag.js) — carregado depois do conteúdo crítico -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18068965569"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'AW-18068965569');
+    </script>
  </body>
 </html>
