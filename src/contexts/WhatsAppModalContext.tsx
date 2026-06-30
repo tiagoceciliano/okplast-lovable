@@ -1,5 +1,11 @@
-import { createContext, useContext, useState, ReactNode } from "react";
-import { WhatsAppModal } from "@/components/layout/WhatsAppModal";
+import { createContext, useContext, useState, lazy, Suspense, ReactNode } from "react";
+
+// Modal pesado (react-hook-form + zod + várias primitivas Radix) — só
+// carregamos quando o usuário realmente abre o WhatsApp. Reduz drasticamente
+// o JS executado na hidratação (TTI).
+const WhatsAppModal = lazy(() =>
+  import("@/components/layout/WhatsAppModal").then((m) => ({ default: m.WhatsAppModal }))
+);
 
 interface WhatsAppModalContextType {
   openWhatsAppModal: (defaultProduto?: string) => void;
@@ -25,11 +31,15 @@ export function WhatsAppModalProvider({ children }: { children: ReactNode }) {
   return (
     <WhatsAppModalContext.Provider value={{ openWhatsAppModal, closeWhatsAppModal, isOpen }}>
       {children}
-      <WhatsAppModal 
-        open={isOpen} 
-        onOpenChange={setIsOpen}
-        defaultProduto={defaultProduto}
-      />
+      {isOpen && (
+        <Suspense fallback={null}>
+          <WhatsAppModal
+            open={isOpen}
+            onOpenChange={setIsOpen}
+            defaultProduto={defaultProduto}
+          />
+        </Suspense>
+      )}
     </WhatsAppModalContext.Provider>
   );
 }
