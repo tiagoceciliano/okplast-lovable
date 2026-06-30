@@ -1,68 +1,73 @@
-## Diagnóstico técnico (LCP 5.8s → meta ≤ 2.5s)
+## Diagnóstico técnico — Speed Index 9.6 s
 
-A página `/` é praticamente texto na dobra (H1 "DISTRIBUIDORA DE CHAPAS NO RIO DE JANEIRO" + logo no header). O candidato a LCP é **o H1** (desktop) ou **o logo do header** (mobile, onde o H1 fica abaixo). Três gargalos confirmados ao ler o código:
+Speed Index mede a velocidade com que pixels da dobra "pintam". Hoje a home tem 3 gargalos que atrasam a pintura progressiva:
 
-### 1. Preload do logo está apontando para o arquivo errado
-- `index.html` faz `<link rel="preload" as="image" href="/logo-horizontal.png" fetchpriority="high">`
-- O `Header.tsx` renderiza outro arquivo: `/lovable-uploads/e3c63f33-82e6-4475-9fc6-b070d0134450.png`
-- Resultado: o navegador baixa **dois PNGs** (~60 KB cada) e o que realmente aparece na tela não tem prioridade. Preload é desperdiçado e dispara warning no Lighthouse.
+1. **Fontes Google bloqueando a primeira pintura útil**
+   - `index.html` carrega `Montserrat` em **5 pesos** (400/500/600/700/800) via CSS hospedado no Google Fonts.
+   - O CSS é injetado via truque `media="print" onload="this.media='all'"`, então o navegador só descobre os arquivos `.woff2` depois que o CSS chega → cadeia longa: HTML → fonts.googleapis.com (CSS) → fonts.gstatic.com (5 woff2).
+   - Apenas o peso 700 está com `<link rel=preload>`, os outros 4 entram tarde e atrasam a "consolidação visual" que o Speed Index mede.
 
-### 2. Fonte crítica (Montserrat 700/800) chega tarde
-- Hoje carregamos a folha de estilo do Google Fonts via truque `media="print" onload="this.media='all'"`, ou seja, **não-bloqueante** — bom para CLS, ruim para LCP de texto, porque o H1 pinta com fallback e depois "repinta" com Montserrat, e o Lighthouse mede o repaint final.
-- Não há preload do `.woff2` do peso 700/800 efetivamente usado pelo H1.
+2. **8 imagens JPG do grid de chapas (~339 KB total) competindo pela rede**
+   - Estão em `src/assets/chapas-hero/*.jpg` (até 92 KB cada). Mesmo com `loading="lazy"`, em desktop os primeiros 4 cards ficam dentro do viewport inicial e disputam banda com fontes/JS.
+   - Sem variantes WebP/AVIF e sem `sizes`/`srcset` — o navegador baixa o JPG em resolução cheia (400×400) mesmo em telas pequenas.
 
-### 3. Home está atrás de `React.lazy` + `Suspense`
-- Em `src/App.tsx` a rota `/` usa `lazy(() => import("./pages/Index"))`. Isso adiciona 1 round-trip extra (HTML → main.js → Index chunk → render) antes do H1 aparecer. Em conexão 4G simulada isso sozinho custa ~600–900 ms de LCP.
+3. **JS de terceiros e widgets sobem cedo demais**
+   - `gtag.js` é carregado `async` no topo do `<head>`, antes mesmo dos preloads críticos.
+   - `MotivosCarousel`, `TestimonialCard`, `FAQSection` e o bloco "Por que escolher" entram no bundle inicial da Home (eager) — empurram TBT/SI mesmo estando abaixo da dobra.
 
-### 4. Logo PNG de 60 KB e renderizado a 128 px de altura
-- O arquivo original tem resolução muito maior do que precisa. Servir em WebP otimizado e dimensão correta tipicamente derruba para ~6–10 KB.
+Também: `<meta http-equiv="Cache-Control" no-cache>` no HTML não impacta SI diretamente, mas impede que a CDN sirva o HTML cacheado e piora visitas repetidas (TTFB).
 
 ---
 
 ## Mudanças propostas
 
-### A. `index.html`
-1. Corrigir o `preload` para o caminho real do logo usado no header:
-   ```html
-   <link rel="preload" as="image" href="/lovable-uploads/e3c63f33-82e6-4475-9fc6-b070d0134450.webp" fetchpriority="high" />
-   ```
-2. **Preload do woff2 do Montserrat 700** (peso do H1) servido pela gstatic, com `crossorigin`:
-   ```html
-   <link rel="preload" as="font" type="font/woff2" crossorigin
-         href="https://fonts.gstatic.com/s/montserrat/v29/JTUSjIg1_i6t8kCHKm45_dJE3gnD_g.woff2" />
-   ```
-   (URL exata será extraída do CSS atual; truque print→all permanece para os demais pesos.)
-3. Remover o preload obsoleto `/logo-horizontal.png` (arquivo deixará de ser referenciado).
+### 1. `index.html` — encurtar a cadeia crítica de fontes
+- Reduzir Montserrat para **2 pesos**: 500 (corpo) e 700 (títulos). 400/600/800 não são realmente usados na dobra.
+- Trocar o CSS do Google Fonts por `<link rel=stylesheet>` direto (com `&display=swap`) — o navegador já trata `swap` corretamente; o truque `media=print` cria 1 round-trip extra que atrasa a pintura.
+- Manter o `preload` do woff2 do peso 700 (LCP do H1) e adicionar o do peso 500.
+- Mover `gtag.js` para o final do `<body>` (continua `async`, mas não compete com os preloads).
+- Remover as 3 metatags `Cache-Control/Pragma/Expires` — `Cache-Control` deve vir do servidor; o `<meta>` só funciona em alguns navegadores e atrapalha a CDN.
 
-### B. Logo
-1. Gerar versão WebP otimizada do logo (≈8–12 KB, ~560×256) e substituir o PNG em `/public/lovable-uploads/`.
-2. Em `src/components/layout/Header.tsx`:
-   - Trocar `src` para o `.webp`.
-   - Manter `width`, `height`, `fetchPriority="high"`, adicionar `decoding="async"` e remover o filtro `brightness-0 invert` (gerar o WebP já em branco para o navegador não pagar custo de composite).
+### 2. Imagens do grid de chapas — converter para WebP e dimensionar
+- Converter os 8 arquivos `src/assets/chapas-hero/*.jpg` para WebP via `vite-imagetools` (já recomendado pela infra Lovable) ou pré-compactando com `sharp/squoosh` e commitando `.webp` ao lado dos `.jpg`. Alvo: < 20 KB por imagem em 400×400.
+- Em `src/pages/Index.tsx`, importar a versão `.webp` e renderizar:
+  - Primeiros 4 cards (acima da dobra em desktop): `loading="eager"` + `fetchpriority="low"` (não competem com o LCP de texto mas pintam cedo).
+  - Cards 5–8: continuam `loading="lazy"`.
+  - Adicionar `sizes="(min-width: 768px) 25vw, 50vw"` para o navegador escolher o melhor tamanho.
 
-### C. `src/App.tsx`
-- Importar `Index` **eager** (não-lazy) para que a home pinte na primeira passada:
-  ```ts
-  import Index from "./pages/Index";
-  ```
-  As demais rotas (`/chapas/*`, `/admin/*`, etc.) continuam `lazy`.
+### 3. `src/App.tsx` — dividir a Home em chunks por dobra
+- Manter `Index` eager (acelera LCP), mas dentro de `src/pages/Index.tsx` envolver as seções abaixo da dobra em `React.lazy` + `Suspense`:
+  - `MotivosCarousel`, bloco de Depoimentos (`TestimonialCard`), `FAQSection` e o bloco "Por que escolher".
+- Reduz o JS executado nos primeiros segundos → SI cai porque o thread principal libera mais cedo para pintar.
 
-### D. (Opcional, baixo risco) `src/index.css`
-- Garantir que o H1 declare `font-display: swap` indiretamente já está coberto pelo Google Fonts (`&display=swap`). Sem mudanças necessárias.
+### 4. `src/components/home/HeroSection.tsx` — pintura instantânea
+- Remover o `py-12 md:py-16 lg:py-20` exagerado (deixa muito espaço em branco que conta como "não pintado" no SI). Reduzir para `py-8 md:py-12`.
+- Garantir que `text-foreground` e `text-accent` venham de tokens já presentes no CSS crítico (sem dependência de JS para aparecer).
+
+### 5. (Opcional, alto ganho) Self-host Montserrat
+- Baixar `Montserrat-500.woff2` e `Montserrat-700.woff2` para `public/fonts/` e declarar `@font-face` em `src/index.css` com `font-display: swap`.
+- Elimina a dependência de `fonts.googleapis.com` (1 host a menos no caminho crítico). Deixar como passo opcional caso queira simplicidade primeiro.
 
 ---
 
-## Como validar o ganho
+## Arquivos a tocar
 
-1. **Build local**: `bun run build` e checar que o chunk da Home agora vai para o bundle principal (some `Index-*.js` separado).
-2. **PageSpeed Insights**: https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fokplast.com.br após publicar — meta LCP ≤ 2.5s em mobile.
-3. **Chrome DevTools → Performance**:
-   - Aba *Network*: confirmar **uma única** request do logo, com prioridade `Highest`.
-   - Aba *Performance* → marcador "LCP": deve cair para < 2.5s em throttling "Slow 4G".
-4. **Lighthouse**: a auditoria "Largest Contentful Paint element" deve apontar o H1 (ou o logo) com `Render delay` próximo de 0 e sem warning "preload key request".
+- `index.html`
+- `src/pages/Index.tsx`
+- `src/components/home/HeroSection.tsx`
+- (gerados) `src/assets/chapas-hero/*.webp`
+- (opcional) `src/index.css` + `public/fonts/*.woff2`
 
-## Critério de sucesso
+---
 
-- LCP mobile (PSI field/lab) ≤ 2.5 s.
-- Sem warnings de "Preloaded resource not used" no Lighthouse.
-- Bundle principal não cresce mais que ~20 KB gzip (custo de eager-load da Home).
+## Validação após o deploy
+
+1. Hard reload + aba anônima em `https://okplast.com.br/?nocache=1`.
+2. Rodar `https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fokplast.com.br` (mobile e desktop).
+   - **Meta**: Speed Index ≤ 3,4 s; idealmente abaixo de 2,5 s no desktop.
+3. No Chrome DevTools → aba **Performance** com throttling "Slow 4G + 4× CPU":
+   - Verificar que o filmstrip mostra texto + grid de chapas pintados antes de 2,5 s.
+   - Confirmar na aba **Network** que `Montserrat` traz só 2 arquivos woff2 e que os JPGs do grid sumiram (substituídos por WebP).
+4. Conferir no Search Console → "Core Web Vitals" em ~28 dias se a página sai do balde "Precisa de melhorias".
+
+Sem regressão esperada em LCP/CLS — as mudanças reforçam a dobra principal.
