@@ -1,26 +1,36 @@
+import { lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, CheckCircle, Phone, Award, DollarSign, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { COMPANY } from "@/lib/constants";
 import { DecorativeDivider } from "@/components/ui/DecorativeDivider";
 import { BlueBanner } from "@/components/ui/BlueBanner";
-import { TestimonialCard } from "@/components/ui/TestimonialCard";
 import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
 
 import { HeroSection } from "@/components/home/HeroSection";
 import { SEOHead, createFAQSchema } from "@/components/SEOHead";
-import { MotivosCarousel } from "@/components/home/MotivosCarousel";
-import { FAQSection } from "@/components/seo/FAQSection";
 
-// Imagens locais das chapas
-import imgAcrilicoTransparente from "@/assets/chapas-hero/acrilico-transparente.jpg";
-import imgAcrilicoColorido from "@/assets/chapas-hero/acrilico-colorido.jpg";
-import imgPetg from "@/assets/chapas-hero/petg.jpg";
-import imgPoliestireno from "@/assets/chapas-hero/poliestireno.jpg";
-import imgPolicarbonatoAlveolar from "@/assets/chapas-hero/policarbonato-alveolar.jpg";
-import imgPolicarbonatoCompacto from "@/assets/chapas-hero/policarbonato-compacto.jpg";
-import imgPvcExpandido from "@/assets/chapas-hero/pvc-expandido.jpg";
-import imgAcm from "@/assets/chapas-hero/acm.jpg";
+// Seções abaixo da dobra — carregadas sob demanda para liberar o thread
+// principal e melhorar o Speed Index
+const MotivosCarousel = lazy(() =>
+  import("@/components/home/MotivosCarousel").then((m) => ({ default: m.MotivosCarousel }))
+);
+const TestimonialCard = lazy(() =>
+  import("@/components/ui/TestimonialCard").then((m) => ({ default: m.TestimonialCard }))
+);
+const FAQSection = lazy(() =>
+  import("@/components/seo/FAQSection").then((m) => ({ default: m.FAQSection }))
+);
+
+// Imagens locais das chapas (WebP otimizado)
+import imgAcrilicoTransparente from "@/assets/chapas-hero/acrilico-transparente.webp";
+import imgAcrilicoColorido from "@/assets/chapas-hero/acrilico-colorido.webp";
+import imgPetg from "@/assets/chapas-hero/petg.webp";
+import imgPoliestireno from "@/assets/chapas-hero/poliestireno.webp";
+import imgPolicarbonatoAlveolar from "@/assets/chapas-hero/policarbonato-alveolar.webp";
+import imgPolicarbonatoCompacto from "@/assets/chapas-hero/policarbonato-compacto.webp";
+import imgPvcExpandido from "@/assets/chapas-hero/pvc-expandido.webp";
+import imgAcm from "@/assets/chapas-hero/acm.webp";
 
 // LocalBusiness Schema para SEO local
 const localBusinessSchema = {
@@ -270,8 +280,10 @@ export default function Index() {
                       width={400}
                       height={400}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      loading="lazy"
+                      loading={index < 4 ? "eager" : "lazy"}
+                      fetchPriority={index < 4 ? "low" : undefined}
                       decoding="async"
+                      sizes="(min-width: 768px) 25vw, 50vw"
                     />
                   </div>
                   <div className="p-3 text-center">
@@ -307,7 +319,9 @@ export default function Index() {
               Descubra por que somos a distribuidora de chapas plásticas mais escolhida do Rio de Janeiro
             </p>
           </div>
-          <MotivosCarousel />
+          <Suspense fallback={<div className="min-h-[300px]" />}>
+            <MotivosCarousel />
+          </Suspense>
         </div>
       </section>
 
@@ -322,21 +336,25 @@ export default function Index() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {depoimentos.map((dep, index) => (
-              <TestimonialCard
-                key={index}
-                nome={dep.nome}
-                empresa={dep.empresa}
-                texto={dep.texto}
-                avatarUrl={dep.avatarUrl}
-              />
-            ))}
+            <Suspense fallback={<div className="min-h-[200px]" />}>
+              {depoimentos.map((dep, index) => (
+                <TestimonialCard
+                  key={index}
+                  nome={dep.nome}
+                  empresa={dep.empresa}
+                  texto={dep.texto}
+                  avatarUrl={dep.avatarUrl}
+                />
+              ))}
+            </Suspense>
           </div>
         </div>
       </section>
 
       {/* FAQ Visível */}
-      <FAQSection faqs={faqItems} title="Perguntas Frequentes sobre Chapas Plásticas no RJ" />
+      <Suspense fallback={<div className="min-h-[200px]" />}>
+        <FAQSection faqs={faqItems} title="Perguntas Frequentes sobre Chapas Plásticas no RJ" />
+      </Suspense>
 
       {/* CTA Final */}
       <section className="section-padding bg-primary text-primary-foreground">
