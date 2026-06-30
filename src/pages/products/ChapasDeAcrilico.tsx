@@ -30,14 +30,14 @@ const faqItems = [{
 }];
 
 // Imagens do carrossel hero
-import heroAcm from "@/assets/chapas-hero/acm.jpg";
-import heroAcrilicoColorido from "@/assets/chapas-hero/acrilico-colorido.jpg";
-import heroAcrilicoTransparente from "@/assets/chapas-hero/acrilico-transparente.jpg";
-import heroPetg from "@/assets/chapas-hero/petg.jpg";
-import heroPolicarbonatoAlveolar from "@/assets/chapas-hero/policarbonato-alveolar.jpg";
-import heroPolicarbonatoCompacto from "@/assets/chapas-hero/policarbonato-compacto.jpg";
-import heroPoliestireno from "@/assets/chapas-hero/poliestireno.jpg";
-import heroPvcExpandido from "@/assets/chapas-hero/pvc-expandido.jpg";
+import heroAcm from "@/assets/chapas-hero/acm.webp";
+import heroAcrilicoColorido from "@/assets/chapas-hero/acrilico-colorido.webp";
+import heroAcrilicoTransparente from "@/assets/chapas-hero/acrilico-transparente.webp";
+import heroPetg from "@/assets/chapas-hero/petg.webp";
+import heroPolicarbonatoAlveolar from "@/assets/chapas-hero/policarbonato-alveolar.webp";
+import heroPolicarbonatoCompacto from "@/assets/chapas-hero/policarbonato-compacto.webp";
+import heroPoliestireno from "@/assets/chapas-hero/poliestireno.webp";
+import heroPvcExpandido from "@/assets/chapas-hero/pvc-expandido.webp";
 
 const heroCarouselImages = [{
   src: heroAcrilicoTransparente,

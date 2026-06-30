@@ -14,8 +14,8 @@ import { MessageCircle } from "lucide-react";
  import Autoplay from "embla-carousel-autoplay";
  import { useRef } from "react";
  
- import heroAcrilicoTransparente from "@/assets/chapas-hero/acrilico-transparente.jpg";
- import heroAcrilicoColorido from "@/assets/chapas-hero/acrilico-colorido.jpg";
+ import heroAcrilicoTransparente from "@/assets/chapas-hero/acrilico-transparente.webp";
+ import heroAcrilicoColorido from "@/assets/chapas-hero/acrilico-colorido.webp";
  
  const heroImages = [
    { src: heroAcrilicoTransparente, alt: "Chapa de acrílico cristal transparente no RJ - OK Plast distribuidora" },

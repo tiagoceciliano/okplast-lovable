@@ -1,5 +1,16 @@
 /* Google Fonts loaded via index.html (non-render-blocking) */
 
+/* Fallback metric-matched para Montserrat — reduz reflow (CLS) no font-swap.
+   size-adjust e métricas calibradas para Arial. */
+@font-face {
+  font-family: "Montserrat Fallback";
+  src: local("Arial");
+  size-adjust: 107%;
+  ascent-override: 90%;
+  descent-override: 23%;
+  line-gap-override: 0%;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

@@ -6,7 +6,7 @@ import { MessageCircle } from "lucide-react";
  import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
  import { RelatedProducts } from "@/components/seo/RelatedProducts";
  
- import heroPetg from "@/assets/chapas-hero/petg.jpg";
+ import heroPetg from "@/assets/chapas-hero/petg.webp";
  
  const espessuras = ["0.5mm", "1mm", "2mm", "3mm", "4mm", "5mm", "6mm", "8mm"];
  
