@@ -10,8 +10,10 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppModalProvider } from "@/contexts/WhatsAppModalContext";
 import { RequireAdmin } from "@/components/admin/RequireAdmin";
 
+// Home carregada eager para acelerar o LCP da rota "/"
+import Index from "./pages/Index";
+
 // Lazy loaded pages
-const Index = lazy(() => import("./pages/Index"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const AdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
