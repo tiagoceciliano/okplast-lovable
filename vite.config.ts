@@ -18,4 +18,18 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    // Divide o vendor em chunks menores para a hidratação inicial baixar/parsear
+    // menos JS de uma vez, melhorando o TTI.
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          "react-vendor": ["react", "react-dom", "react-router-dom"],
+          "supabase-vendor": ["@supabase/supabase-js"],
+          "form-vendor": ["react-hook-form", "@hookform/resolvers", "zod"],
+          "query-vendor": ["@tanstack/react-query"],
+        },
+      },
+    },
+  },
 }));

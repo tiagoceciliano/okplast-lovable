@@ -62,7 +62,7 @@ const TRACKED_PAGES_KEY = "okplast_tracked_pages";
  
      isTracking.current = true;
  
-     const trackVisit = async () => {
+      const trackVisit = async () => {
        try {
          const visitorId = getVisitorId();
          const sessionId = getSessionId();
@@ -102,6 +102,17 @@ const TRACKED_PAGES_KEY = "okplast_tracked_pages";
        }
      };
  
-     trackVisit();
+      // Adia o tracking para não competir com a hidratação (TTI).
+      const ric: typeof window.requestIdleCallback | undefined =
+        (window as any).requestIdleCallback;
+      const handle = ric
+        ? ric(() => trackVisit(), { timeout: 2000 })
+        : window.setTimeout(() => trackVisit(), 1500);
+      return () => {
+        const cic: typeof window.cancelIdleCallback | undefined =
+          (window as any).cancelIdleCallback;
+        if (ric && cic) cic(handle as number);
+        else clearTimeout(handle as number);
+      };
    }, [location.pathname]);
  }
