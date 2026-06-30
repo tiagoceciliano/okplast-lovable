@@ -76,7 +76,15 @@ export function Footer() {
 
         {/* Copyright com Logo */}
         <div className="mt-8 pt-6 border-t border-primary-foreground/20 flex flex-col items-center gap-2">
-          <img src={logoImg} alt="OK Plast" className="h-12 w-auto brightness-0 invert opacity-90" />
+          <img
+            src={logoImg}
+            alt="OK Plast"
+            width={120}
+            height={48}
+            loading="lazy"
+            decoding="async"
+            className="h-12 w-auto brightness-0 invert opacity-90"
+          />
           <p className="text-sm text-primary-foreground/60">
             © {currentYear} {COMPANY.legalName}. Todos os direitos reservados.
           </p>
