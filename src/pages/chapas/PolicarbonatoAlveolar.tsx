@@ -6,7 +6,7 @@ import { MessageCircle } from "lucide-react";
  import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
  import { RelatedProducts } from "@/components/seo/RelatedProducts";
  
- import heroPolicarbonatoAlveolar from "@/assets/chapas-hero/policarbonato-alveolar.jpg";
+ import heroPolicarbonatoAlveolar from "@/assets/chapas-hero/policarbonato-alveolar.webp";
  
  const espessuras = ["4mm", "6mm", "10mm", "16mm", "20mm", "25mm"];
  

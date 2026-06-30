@@ -6,7 +6,7 @@ import { MessageCircle } from "lucide-react";
  import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
  import { RelatedProducts } from "@/components/seo/RelatedProducts";
  
- import heroPvcExpandido from "@/assets/chapas-hero/pvc-expandido.jpg";
+ import heroPvcExpandido from "@/assets/chapas-hero/pvc-expandido.webp";
  
  const espessuras = ["1mm", "2mm", "3mm", "5mm", "8mm", "10mm", "15mm", "20mm"];
  

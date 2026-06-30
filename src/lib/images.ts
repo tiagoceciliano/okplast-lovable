@@ -87,7 +87,7 @@ export const DEPOIMENTOS_IMAGES = {
 // ========================================
 // PÁGINA CHAPAS DE ACRÍLICO
 // ========================================
-import chapasCast from "@/assets/chapas-hero/acrilico-transparente.jpg";
+import chapasCast from "@/assets/chapas-hero/acrilico-transparente.webp";
 import chapasPoliestireno2 from "@/assets/chapas/ps-poliestireno-2.jpg";
 import chapasPetg2 from "@/assets/chapas/pet-g-2.jpg";
 import chapasPcAlveolar2 from "@/assets/chapas/policarbonato-alveolar-2.jpg";

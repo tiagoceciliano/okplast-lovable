@@ -6,7 +6,7 @@ import { MessageCircle } from "lucide-react";
  import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
  import { RelatedProducts } from "@/components/seo/RelatedProducts";
  
- import heroPoliestireno from "@/assets/chapas-hero/poliestireno.jpg";
+ import heroPoliestireno from "@/assets/chapas-hero/poliestireno.webp";
  
  const espessuras = ["1mm", "2mm", "3mm", "4mm", "5mm"];
  

@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom";
 
-import imgAcrilicoTransparente from "@/assets/chapas-hero/acrilico-transparente.jpg";
-import imgPetg from "@/assets/chapas-hero/petg.jpg";
-import imgPoliestireno from "@/assets/chapas-hero/poliestireno.jpg";
-import imgPolicarbonatoAlveolar from "@/assets/chapas-hero/policarbonato-alveolar.jpg";
-import imgPolicarbonatoCompacto from "@/assets/chapas-hero/policarbonato-compacto.jpg";
-import imgPvcExpandido from "@/assets/chapas-hero/pvc-expandido.jpg";
-import imgAcm from "@/assets/chapas-hero/acm.jpg";
+import imgAcrilicoTransparente from "@/assets/chapas-hero/acrilico-transparente.webp";
+import imgPetg from "@/assets/chapas-hero/petg.webp";
+import imgPoliestireno from "@/assets/chapas-hero/poliestireno.webp";
+import imgPolicarbonatoAlveolar from "@/assets/chapas-hero/policarbonato-alveolar.webp";
+import imgPolicarbonatoCompacto from "@/assets/chapas-hero/policarbonato-compacto.webp";
+import imgPvcExpandido from "@/assets/chapas-hero/pvc-expandido.webp";
+import imgAcm from "@/assets/chapas-hero/acm.webp";
 
 const allChapas = [
   { slug: "acrilico", nome: "Acrílico", image: imgAcrilicoTransparente },
