@@ -13,11 +13,16 @@
     <link rel="preconnect" href="https://osfxdoxfiyyqcpahuwci.supabase.co" />
     <link rel="dns-prefetch" href="https://osfxdoxfiyyqcpahuwci.supabase.co" />
      
-    <!-- Google Fonts: somente 2 pesos para encurtar a cadeia crítica -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap" />
-
-    <!-- Preload recursos críticos (LCP) -->
-    <link rel="preload" as="image" href="/lovable-uploads/e3c63f33-82e6-4475-9fc6-b070d0134450.webp" fetchpriority="high" />
+    <!-- Google Fonts: carregamento assíncrono (não bloqueia render) -->
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap" />
+    </noscript>
     <!-- Preload dos pesos usados na dobra -->
     <link rel="preload" as="font" type="font/woff2" crossorigin
           href="https://fonts.gstatic.com/s/montserrat/v31/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCuM73w5aXo.woff2" />
@@ -49,13 +54,27 @@
  <body>
    <div id="root"></div>
    <script type="module" src="/src/main.tsx"></script>
-    <!-- Google tag (gtag.js) — carregado depois do conteúdo crítico -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18068965569"></script>
+    <!-- Google tag (gtag.js) — injetado após load para não competir com hidratação -->
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'AW-18068965569');
+      function loadGtag(){
+        if (window.__gtagLoaded) return;
+        window.__gtagLoaded = true;
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://www.googletagmanager.com/gtag/js?id=AW-18068965569';
+        document.head.appendChild(s);
+        gtag('js', new Date());
+        gtag('config', 'AW-18068965569');
+      }
+      if (document.readyState === 'complete') {
+        (window.requestIdleCallback || setTimeout)(loadGtag, 1);
+      } else {
+        window.addEventListener('load', function(){
+          (window.requestIdleCallback || setTimeout)(loadGtag, 1);
+        });
+      }
     </script>
  </body>
 </html>

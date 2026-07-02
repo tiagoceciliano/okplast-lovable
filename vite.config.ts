@@ -23,11 +23,21 @@ export default defineConfig(({ mode }) => ({
     // menos JS de uma vez, melhorando o TTI.
     rollupOptions: {
       output: {
-        manualChunks: {
-          "react-vendor": ["react", "react-dom", "react-router-dom"],
-          "supabase-vendor": ["@supabase/supabase-js"],
-          "form-vendor": ["react-hook-form", "@hookform/resolvers", "zod"],
-          "query-vendor": ["@tanstack/react-query"],
+        manualChunks(id) {
+          if (!id.includes("node_modules")) return;
+          if (id.includes("@supabase/supabase-js")) return "supabase-vendor";
+          if (
+            id.includes("react-hook-form") ||
+            id.includes("@hookform/resolvers") ||
+            id.includes("/zod/")
+          ) return "form-vendor";
+          if (id.includes("@tanstack/react-query")) return "query-vendor";
+          if (id.includes("@radix-ui/")) return "radix-vendor";
+          if (
+            id.includes("/react/") ||
+            id.includes("/react-dom/") ||
+            id.includes("react-router")
+          ) return "react-vendor";
         },
       },
     },

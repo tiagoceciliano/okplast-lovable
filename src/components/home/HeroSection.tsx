@@ -8,7 +8,10 @@ interface HeroSectionProps {
 
 export function HeroSection({ onWhatsAppClick }: HeroSectionProps) {
   return (
-    <section className="bg-background py-8 md:py-12 min-h-[320px] md:min-h-[360px]">
+    <section
+      className="bg-background py-8 md:py-12 min-h-[420px] md:min-h-[440px]"
+      style={{ contain: "layout" }}
+    >
       <div className="container-custom">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="font-bold md:text-4xl lg:text-5xl text-foreground mb-4 leading-tight text-2xl">
