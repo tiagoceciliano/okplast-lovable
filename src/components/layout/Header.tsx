@@ -17,11 +17,12 @@ export function Header() {
           <Link to="/" className="flex items-center">
             <img
               alt="OK Plast - Distribuidora de Chapas Plásticas RJ"
-              className="h-16 md:h-24 lg:h-32 w-auto object-contain"
-              width={280}
-              height={128}
-              fetchPriority="high"
+              className="h-10 md:h-12 w-auto object-contain"
+              width={160}
+              height={48}
+              style={{ aspectRatio: "160 / 48" }}
               decoding="async"
+              loading="eager"
               src="/lovable-uploads/e3c63f33-82e6-4475-9fc6-b070d0134450.webp"
             />
           </Link>
