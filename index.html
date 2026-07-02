@@ -13,19 +13,25 @@
     <link rel="preconnect" href="https://osfxdoxfiyyqcpahuwci.supabase.co" />
     <link rel="dns-prefetch" href="https://osfxdoxfiyyqcpahuwci.supabase.co" />
      
-    <!-- Google Fonts: carregamento assíncrono (não bloqueia render) -->
+    <!-- Google Fonts: display=optional evita reflow/CLS após o font-swap -->
     <link
       rel="preload"
       as="style"
-      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=optional"
       onload="this.onload=null;this.rel='stylesheet'"
     />
     <noscript>
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap" />
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=optional" />
     </noscript>
-    <!-- Preload dos pesos usados na dobra -->
+    <!-- Preload dos pesos usados na dobra (500 e 700) -->
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+          href="https://fonts.gstatic.com/s/montserrat/v31/JTUSjIg1_i6t8kCHKm459WlhyyTh89Y.woff2" />
     <link rel="preload" as="font" type="font/woff2" crossorigin
           href="https://fonts.gstatic.com/s/montserrat/v31/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCuM73w5aXo.woff2" />
+
+    <!-- Preload do logo (candidato a LCP acima da dobra) -->
+    <link rel="preload" as="image" fetchpriority="high"
+          href="/lovable-uploads/e3c63f33-82e6-4475-9fc6-b070d0134450.webp" />
     
    <!-- PWA Manifest -->
    <link rel="manifest" href="/manifest.json" />
