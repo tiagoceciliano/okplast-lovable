@@ -68,12 +68,17 @@
         gtag('js', new Date());
         gtag('config', 'AW-18068965569');
       }
+      function scheduleGtag(){
+        if (window.requestIdleCallback) {
+          window.requestIdleCallback(loadGtag, { timeout: 2000 });
+        } else {
+          setTimeout(loadGtag, 1);
+        }
+      }
       if (document.readyState === 'complete') {
-        (window.requestIdleCallback || setTimeout)(loadGtag, 1);
+        scheduleGtag();
       } else {
-        window.addEventListener('load', function(){
-          (window.requestIdleCallback || setTimeout)(loadGtag, 1);
-        });
+        window.addEventListener('load', scheduleGtag);
       }
     </script>
  </body>
