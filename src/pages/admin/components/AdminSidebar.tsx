@@ -9,7 +9,8 @@ import {
   ExternalLink,
   Users,
   Tag,
-  LogOut
+  LogOut,
+  MessageCircle
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
@@ -242,6 +243,21 @@ export function AdminSidebar() {
                   >
                     <Tag className="h-4 w-4" />
                     {!collapsed && <span>UTM Termos</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip="WhatsApp">
+                  <NavLink
+                    to="/admin/whatsapp"
+                    className={({ isActive }) => cn(
+                      "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-muted",
+                      isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
+                      collapsed && "justify-center px-0"
+                    )}
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                    {!collapsed && <span>WhatsApp</span>}
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
