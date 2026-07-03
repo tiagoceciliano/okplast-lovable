@@ -4,6 +4,7 @@ import { MessageCircle, Menu, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
 import { NAV_ITEMS } from "@/lib/constants";
+import logoUrl from "@/assets/brand/okplast-logo.webp";
 
 export function Header() {
   const { openWhatsAppModal } = useWhatsAppModal();
@@ -18,12 +19,13 @@ export function Header() {
             <img
               alt="OK Plast - Distribuidora de Chapas Plásticas RJ"
               className="h-10 md:h-12 w-auto object-contain"
-              width={160}
-              height={48}
-              style={{ aspectRatio: "160 / 48" }}
+              width={290}
+              height={140}
+              style={{ aspectRatio: "290 / 140" }}
               decoding="async"
               loading="eager"
-              src="/lovable-uploads/e3c63f33-82e6-4475-9fc6-b070d0134450.webp"
+              src={logoUrl}
+              fetchPriority="high"
             />
           </Link>
 
