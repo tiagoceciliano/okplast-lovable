@@ -12,26 +12,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://osfxdoxfiyyqcpahuwci.supabase.co" />
     <link rel="dns-prefetch" href="https://osfxdoxfiyyqcpahuwci.supabase.co" />
-     
-    <!-- Google Fonts: display=optional evita reflow/CLS após o font-swap -->
-    <link
-      rel="preload"
-      as="style"
-      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=optional"
-      onload="this.onload=null;this.rel='stylesheet'"
-    />
+
+    <!-- Google Fonts injetado após o primeiro paint (não bloqueia render).
+         display=optional garante que, se não vier a tempo, usa o fallback sem CLS. -->
     <noscript>
       <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=optional" />
     </noscript>
-    <!-- Preload dos pesos usados na dobra (500 e 700) -->
-    <link rel="preload" as="font" type="font/woff2" crossorigin
-          href="https://fonts.gstatic.com/s/montserrat/v31/JTUSjIg1_i6t8kCHKm459WlhyyTh89Y.woff2" />
-    <link rel="preload" as="font" type="font/woff2" crossorigin
-          href="https://fonts.gstatic.com/s/montserrat/v31/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCuM73w5aXo.woff2" />
-
-    <!-- Preload do logo (candidato a LCP acima da dobra) -->
-    <link rel="preload" as="image" fetchpriority="high"
-          href="/lovable-uploads/e3c63f33-82e6-4475-9fc6-b070d0134450.webp" />
     
    <!-- PWA Manifest -->
    <link rel="manifest" href="/manifest.json" />
@@ -60,12 +46,32 @@
  <body>
    <div id="root"></div>
    <script type="module" src="/src/main.tsx"></script>
-    <!-- Google tag (gtag.js) — injetado após load para não competir com hidratação -->
+    <!-- Google Fonts (Montserrat) carregado após o load para não bloquear render. -->
+    <script>
+      (function () {
+        function loadFonts() {
+          var l = document.createElement('link');
+          l.rel = 'stylesheet';
+          l.href = 'https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=optional';
+          document.head.appendChild(l);
+        }
+        if (document.readyState === 'complete') {
+          loadFonts();
+        } else {
+          window.addEventListener('load', loadFonts);
+        }
+      })();
+    </script>
+    <!-- Google Tag (gtag.js AW-18068965569): injeção única, após load, com guarda
+         para evitar duplicata caso a plataforma também injete. -->
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       function loadGtag(){
         if (window.__gtagLoaded) return;
+        // Se algum script (ex: plataforma) já injetou o mesmo ID, não duplica.
+        var existing = document.querySelector('script[src*="googletagmanager.com/gtag/js"]');
+        if (existing) { window.__gtagLoaded = true; return; }
         window.__gtagLoaded = true;
         var s = document.createElement('script');
         s.async = true;
@@ -76,9 +82,9 @@
       }
       function scheduleGtag(){
         if (window.requestIdleCallback) {
-          window.requestIdleCallback(loadGtag, { timeout: 2000 });
+          window.requestIdleCallback(loadGtag, { timeout: 3000 });
         } else {
-          setTimeout(loadGtag, 1);
+          setTimeout(loadGtag, 2000);
         }
       }
       if (document.readyState === 'complete') {
