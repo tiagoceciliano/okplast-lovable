@@ -20,6 +20,8 @@ interface LeadPayload {
   utm_term?: string | null;
   utm_content?: string | null;
   current_url?: string | null;
+  destino_whatsapp?: string | null;
+  destino_whatsapp_formatado?: string | null;
 }
 
 interface GeoData {
@@ -140,6 +142,9 @@ serve(async (req) => {
       submitted_at: date,
       submitted_time: time,
       current_url: payload.current_url || "-",
+      // Rateio 50/50 — número do atendente destino escolhido no client.
+      destination_phone: payload.destino_whatsapp || "-",
+      destination_phone_formatted: payload.destino_whatsapp_formatado || "-",
     };
 
     // Envia para webhook se configurado
