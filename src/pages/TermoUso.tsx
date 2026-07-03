@@ -85,7 +85,7 @@ export default function TermoUso() {
               <p className="text-muted-foreground mb-4">Entre em contato:</p>
               <p className="text-muted-foreground">
                 <strong className="text-foreground">E-mail:</strong> {COMPANY.email}<br />
-                <strong className="text-foreground">WhatsApp:</strong> {COMPANY.whatsappFormatted}<br />
+                <strong className="text-foreground">WhatsApp:</strong> {COMPANY.phone}<br />
                 <strong className="text-foreground">Endereço:</strong> {COMPANY.address}
               </p>
               <p className="text-muted-foreground mt-4 text-sm">Última atualização: Março de 2026</p>
