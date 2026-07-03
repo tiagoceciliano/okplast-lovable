@@ -4,9 +4,11 @@ export const COMPANY = {
   legalName: "OK PLAST COMERCIO LTDA",
   slogan: "TUDO OK PARA SEU PROJETO",
   address: "Rua Guatemala, 593 – Penha Circular – Rio de Janeiro – RJ, 21020-170",
-  phone: "(21) 92367-9387",
-  whatsapp: "5521923679387",
-  whatsappFormatted: "(21) 92367-9387",
+  // O número exibido/usado nos botões é decidido em runtime pelo rateio 50/50
+  // — ver src/lib/whatsapp-rotation.ts e src/hooks/useWhatsAppNumber.ts.
+  // As constantes abaixo continuam existindo apenas como fallback estático
+  // (ex.: SSR de metadados). Nunca use para links wa.me diretamente.
+  phone: "(21) 93505-8539",
   email: "vendas@okplast.com.br",
   domain: "https://okplast.com.br",
   businessHours: "Segunda a Sexta: 9h às 17h",

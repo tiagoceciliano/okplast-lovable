@@ -1,14 +1,16 @@
 import { MessageCircle } from "lucide-react";
 import { COMPANY } from "@/lib/constants";
+import { useWhatsAppNumber } from "@/hooks/useWhatsAppNumber";
 
 interface WhatsAppButtonProps {
   message?: string;
 }
 
 export function WhatsAppButton({ message }: WhatsAppButtonProps) {
+  const whatsapp = useWhatsAppNumber();
   const defaultMessage = `Olá! Gostaria de mais informações sobre os produtos da ${COMPANY.name}.`;
   const encodedMessage = encodeURIComponent(message || defaultMessage);
-  const whatsappUrl = `https://wa.me/${COMPANY.whatsapp}?text=${encodedMessage}`;
+  const whatsappUrl = `https://wa.me/${whatsapp.raw}?text=${encodedMessage}`;
 
   return (
     <a
