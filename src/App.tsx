@@ -21,6 +21,7 @@ const AdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
 const AdminLeads = lazy(() => import("./pages/admin/Leads"));
 const AdminUTMTerms = lazy(() => import("./pages/admin/UTMTerms"));
+const AdminWhatsAppConfig = lazy(() => import("./pages/admin/WhatsAppConfig"));
 const SobreNos = lazy(() => import("./pages/SobreNos"));
 const PoliticaVenda = lazy(() => import("./pages/PoliticaVenda"));
 const TermoUso = lazy(() => import("./pages/TermoUso"));
@@ -105,6 +106,7 @@ const App = () => (
               <Route path="/admin" element={<RequireAdmin><AdminDashboard /></RequireAdmin>} />
               <Route path="/admin/leads" element={<RequireAdmin><AdminLeads /></RequireAdmin>} />
               <Route path="/admin/utm-terms" element={<RequireAdmin><AdminUTMTerms /></RequireAdmin>} />
+              <Route path="/admin/whatsapp" element={<RequireAdmin><AdminWhatsAppConfig /></RequireAdmin>} />
               
               {/* Main site routes */}
               <Route path="/*" element={<MainSite />} />
