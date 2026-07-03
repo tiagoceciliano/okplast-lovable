@@ -1,4 +1,4 @@
-import { lazy, Suspense, ComponentType, ReactNode } from "react";
+import { lazy, Suspense } from "react";
 import { HelmetProvider } from "react-helmet-async";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
