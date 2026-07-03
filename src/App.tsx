@@ -3,10 +3,15 @@ import { HelmetProvider } from "react-helmet-async";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { Layout } from "@/components/layout";
+import { Layout } from "@/components/layout/Layout";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppModalProvider } from "@/contexts/WhatsAppModalContext";
-import { RequireAdmin } from "@/components/admin/RequireAdmin";
+
+// RequireAdmin importa o cliente do Supabase — mantemos lazy para que ele
+// não entre no bundle inicial (só carrega ao acessar /admin/*).
+const RequireAdmin = lazy(() =>
+  import("@/components/admin/RequireAdmin").then((m) => ({ default: m.RequireAdmin })),
+);
 
 // Home carregada eager para acelerar o LCP da rota "/"
 import Index from "./pages/Index";
