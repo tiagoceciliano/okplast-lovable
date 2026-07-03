@@ -1,41 +1,49 @@
+## Situação atual (PageSpeed mobile)
 
-## Objetivo
-Atacar exatamente os itens que o PageSpeed elencou para subir de **65 → 85+** no mobile, focando em CLS (0.289), LCP (4,1s) e JS não usado (287KB).
+- **Performance: 79** (subiu de 65 → 79)
+- FCP 2,4s ✅ | **LCP 4,1s ❌** | TBT 10ms ✅ | **CLS 0 ✅** | SI 5,4s ⚠️
 
-## Correções
+O CLS já foi resolvido (0). Agora o gargalo é **LCP** e **JS não usado**.
 
-### 1. Eliminar o CLS 0.289 da hero (maior ganho)
-Causa: fonte Montserrat carrega depois do primeiro paint e o texto da hero "salta" quando ela troca.
-- Adicionar no `<head>` do `index.html`:
-  - `<link rel="preload" as="font" type="font/woff2" href="https://fonts.gstatic.com/s/montserrat/v31/JTUSjIg1_i6t8kCHKm459WlhyyTh89Y.woff2" crossorigin>` (peso 500)
-  - Mesmo `preload` para o woff2 do peso 700 já detectado.
-- Trocar `display=swap` por `display=optional` no `<link>` do Google Fonts (elimina reflow: se a fonte não vier em ~100ms usa fallback sem trocar depois).
-- Definir `font-family` fallback com métrica próxima no CSS global (`system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`) para minimizar diferença visual.
+## Correções propostas
 
-### 2. Corrigir gtag carregando 2×
-O relatório mostra `/gtag/js?id=AW-18068965569` listado duas vezes (288KB, ~160KB economizáveis).
-- Auditar `index.html` e componentes React (`useEffect` que injeta script) — remover a duplicata. Manter apenas o carregamento diferido (`requestIdleCallback`) já presente no `index.html`.
+### 1. LCP 4,1s → alvo ~2,5s (maior ganho, ~1,5s)
+O relatório mostra **3.010ms de "Element render delay"** no `<p>` da hero. Isso significa: o HTML chega em 0ms mas o texto só pinta depois que o JS do React hidrata. Causas e correções:
 
-### 3. Reduzir peso das imagens acima da dobra
-- **Logo**: gerar versão em 320×96 (2× para retina) em vez de 560×270. Substituir arquivo em `src/assets/` e atualizar `Header.tsx`. Economia: ~9,5KB.
-- **Card policarbonato-alveolar**: reduzir para 630×630 (2× do display 315×315) ou adicionar `srcset` com variantes menores. Economia: ~10KB.
+- **Render-blocking do Google Fonts (750ms)**: hoje o `<link rel="preload" as="style">` com `onload` ainda vira stylesheet e bloqueia. Trocar por injeção via JS após `DOMContentLoaded` (fonts entram em `display:optional`, então nunca causam CLS mesmo carregando tarde).
+- **Render-blocking do CSS principal (160ms)**: inline do CSS crítico da hero (título, botão, container) direto no `<head>` do `index.html` para o primeiro paint não depender do arquivo `.css` externo.
+- **JS grande no caminho crítico**: hoje o `index-*.js` tem 203KB e o React só renderiza depois de baixar tudo. Vamos garantir que `HelmetProvider`, `TooltipProvider`, `QueryClient`, `BrowserRouter` e `WhatsAppModalProvider` não estão puxando dependências pesadas no bundle inicial (auditar imports do `App.tsx`).
 
-### 4. Reduzir LCP (render delay 320ms)
-- Adicionar `<link rel="preload" as="image" href="/lovable-uploads/e3c63f33-...webp" fetchpriority="high">` para o logo (que é elemento LCP candidato junto com o texto da hero).
-- Confirmar que o texto da hero (`<p>` LCP) não depende de nenhum estado async — renderizar direto sem `Suspense`.
+### 2. Duplicar gtag (economia 160KB) — ainda acontecendo
+O relatório mostra `/gtag/js?id=AW-18068965569` **listado 2×** na tabela de 3rd party (288KB total). O código do `index.html` tem guarda `window.__gtagLoaded`, então a 2ª carga vem de outro lugar — provavelmente de dentro do `flock.js` (`~flock.js` da hospedagem Lovable injeta gtag automaticamente quando detecta o AW-ID).
 
-### 5. Reduzir JS não usado (127KB no bundle)
-- Fazer code-split das rotas administrativas (`/admin/*`) via `React.lazy` — elas não deveriam entrar no bundle da home.
-- Verificar se `Toaster` (`toaster-E8i22Fyf.js`, 6KB) pode ser lazy também.
+**Solução**: remover o gtag manual do `index.html` e deixar apenas o injetado pela plataforma Lovable (que já é assíncrono). Testar publicando e verificar se o `AW-18068965569` continua disparando conversões.
 
-### 6. Cache lifetime
-- Hospedagem Lovable já serve `/assets/*` com hash e cache longo, mas `/lovable-uploads/*.webp` está sem TTL. Como não temos controle direto sobre headers do host, mover a logo para `src/assets/` (entra no pipeline do Vite com hash + cache-control longo automático).
+### 3. Reduzir 127KB de JS não usado no bundle principal
+Fazer code-split mais agressivo do `Index.tsx` (home). Componentes abaixo da dobra viram `React.lazy`:
+- `MotivosCarousel` (carousel de embla — pesa ~15KB)
+- `ProductCategoryGrid` (grid de cards abaixo da dobra)
+- `Footer` (fora da dobra)
+- `WhatsAppFloatingButton` / `WhatsAppChatWidget` (podem ser lazy após interação/idle)
+
+### 4. Redimensionar logo (economia 4,4KB)
+Logo hoje está 320×154 mas exibido em 145×70. Reduzir para **290×140** (2× do display real).
+
+### 5. Cache lifetime `/lovable-uploads/*.webp` — sem TTL
+Mover o logo `/lovable-uploads/e3c63f33-...webp` para `src/assets/` (Vite adiciona hash + cache longo automático). Atualizar `Header.tsx` e o `preload` do `index.html`.
+
+### 6. Reduzir CSS não usado (11KB)
+Boa parte vem de classes shadcn/tailwind não usadas. Deixar para o final — o `content` do `tailwind.config.ts` já faz purge, então o ganho real é limitado. Baixa prioridade.
+
+### 7. Animação `pulse-glow` no botão WhatsApp
+Trocar `box-shadow` pulse por `transform: scale()` + `opacity` (compositáveis pela GPU). Ganho pequeno de suavidade, sem impactar métrica.
 
 ## Fora de escopo
-- Migrar analytics (gtag continua como único tracking, conforme regra do projeto).
-- Alterar layout/design da hero.
+- Tocar em layout/design da home
+- Trocar hospedagem ou CDN (não temos controle de headers do `/lovable-uploads/*`)
+- Alterar tracking (AW-18068965569 continua único ID)
 
-## Métricas alvo esperadas após o deploy
-- CLS: 0.289 → < 0.05
-- LCP: 4,1s → ~2,5s
-- Score Performance mobile: 65 → 85+
+## Métricas alvo pós-deploy
+- LCP: 4,1s → **~2,5s**
+- Performance mobile: 79 → **90+**
+- Transfer size total: −160KB (gtag) −127KB (JS split) −4KB (imagem) = **~290KB a menos**

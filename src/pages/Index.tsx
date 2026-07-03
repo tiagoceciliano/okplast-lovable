@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, CheckCircle, Phone, Award, DollarSign, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,9 +9,16 @@ import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
 
 import { HeroSection } from "@/components/home/HeroSection";
 import { SEOHead, createFAQSchema } from "@/components/SEOHead";
-import { MotivosCarousel } from "@/components/home/MotivosCarousel";
-import { TestimonialCard } from "@/components/ui/TestimonialCard";
-import { FAQSection } from "@/components/seo/FAQSection";
+// Abaixo da dobra — lazy para reduzir JS inicial (embla + accordion pesados).
+const MotivosCarousel = lazy(() =>
+  import("@/components/home/MotivosCarousel").then((m) => ({ default: m.MotivosCarousel })),
+);
+const TestimonialCard = lazy(() =>
+  import("@/components/ui/TestimonialCard").then((m) => ({ default: m.TestimonialCard })),
+);
+const FAQSection = lazy(() =>
+  import("@/components/seo/FAQSection").then((m) => ({ default: m.FAQSection })),
+);
 
 // Imagens locais das chapas (WebP otimizado)
 import imgAcrilicoTransparente from "@/assets/chapas-hero/acrilico-transparente.webp";
@@ -309,7 +317,9 @@ export default function Index() {
               Descubra por que somos a distribuidora de chapas plásticas mais escolhida do Rio de Janeiro
             </p>
           </div>
-          <MotivosCarousel />
+          <Suspense fallback={<div className="min-h-[280px]" />}>
+            <MotivosCarousel />
+          </Suspense>
         </div>
       </section>
 
@@ -324,21 +334,25 @@ export default function Index() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {depoimentos.map((dep, index) => (
-              <TestimonialCard
-                key={index}
-                nome={dep.nome}
-                empresa={dep.empresa}
-                texto={dep.texto}
-                avatarUrl={dep.avatarUrl}
-              />
-            ))}
+            <Suspense fallback={<div className="min-h-[200px]" />}>
+              {depoimentos.map((dep, index) => (
+                <TestimonialCard
+                  key={index}
+                  nome={dep.nome}
+                  empresa={dep.empresa}
+                  texto={dep.texto}
+                  avatarUrl={dep.avatarUrl}
+                />
+              ))}
+            </Suspense>
           </div>
         </div>
       </section>
 
       {/* FAQ Visível */}
-      <FAQSection faqs={faqItems} title="Perguntas Frequentes sobre Chapas Plásticas no RJ" />
+      <Suspense fallback={<div className="min-h-[400px]" />}>
+        <FAQSection faqs={faqItems} title="Perguntas Frequentes sobre Chapas Plásticas no RJ" />
+      </Suspense>
 
       {/* CTA Final */}
       <section className="section-padding bg-primary text-primary-foreground">
