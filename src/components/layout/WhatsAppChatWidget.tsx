@@ -19,6 +19,7 @@ import { COMPANY } from "@/lib/constants";
 import { formatPhone, capitalizeName } from "./WhatsAppButton";
 import { supabase } from "@/integrations/supabase/client";
 import { getStoredUTM } from "@/hooks/useUTM";
+import { useWhatsAppNumber } from "@/hooks/useWhatsAppNumber";
 import logoImage from "@/assets/logo-okplast.png";
 
 // Schema de validação
@@ -38,6 +39,7 @@ interface WhatsAppChatWidgetProps {
 
 export function WhatsAppChatWidget({ open, onOpenChange }: WhatsAppChatWidgetProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const whatsapp = useWhatsAppNumber();
   const widgetRef = useRef<HTMLDivElement>(null);
 
   const form = useForm<WhatsAppFormData>({
@@ -66,7 +68,7 @@ export function WhatsAppChatWidget({ open, onOpenChange }: WhatsAppChatWidgetPro
         `Mensagem: ${data.mensagem}`,
       ].join("\n");
 
-      const whatsappUrl = `https://api.whatsapp.com/send?phone=${COMPANY.whatsapp}&text=${encodeURIComponent(mensagemWhatsApp)}`;
+      const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsapp.raw}&text=${encodeURIComponent(mensagemWhatsApp)}`;
       window.open(whatsappUrl, "_blank");
 
       // Dispara webhook de forma assíncrona com UTMs corretos
@@ -80,6 +82,8 @@ export function WhatsAppChatWidget({ open, onOpenChange }: WhatsAppChatWidgetPro
           produto_interesse: "Chapa Inteira",
           mensagem: data.mensagem,
           current_url: window.location.href,
+          destino_whatsapp: whatsapp.raw,
+          destino_whatsapp_formatado: whatsapp.formatted,
           ...utmData,
         },
       }).catch(console.error);

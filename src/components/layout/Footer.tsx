@@ -4,9 +4,11 @@ import { COMPANY } from "@/lib/constants";
 import logoImg from "@/assets/logo-okplast.png";
 import { GoogleMapEmbed } from "@/components/ui/GoogleMapEmbed";
 import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
+import { useWhatsAppNumber } from "@/hooks/useWhatsAppNumber";
 
 export function Footer() {
   const { openWhatsAppModal } = useWhatsAppModal();
+  const whatsapp = useWhatsAppNumber();
   const currentYear = new Date().getFullYear();
   return <footer className="bg-primary text-primary-foreground">
       <div className="container-custom section-padding">
@@ -36,7 +38,7 @@ export function Footer() {
                   onClick={() => openWhatsAppModal()} 
                   className="hover:text-primary-foreground transition-colors text-left"
                 >
-                  {COMPANY.whatsappFormatted}
+                  {whatsapp.formatted}
                 </button>
               </li>
             </ul>
