@@ -155,6 +155,39 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_numbers: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          id: string
+          nome_vendedor: string
+          numero_formatado: string
+          numero_raw: string
+          peso: number
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          id?: string
+          nome_vendedor: string
+          numero_formatado: string
+          numero_raw: string
+          peso?: number
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          id?: string
+          nome_vendedor?: string
+          numero_formatado?: string
+          numero_raw?: string
+          peso?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
