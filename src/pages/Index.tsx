@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, CheckCircle, Phone, Award, DollarSign, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,9 +9,16 @@ import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
 
 import { HeroSection } from "@/components/home/HeroSection";
 import { SEOHead, createFAQSchema } from "@/components/SEOHead";
-import { MotivosCarousel } from "@/components/home/MotivosCarousel";
-import { TestimonialCard } from "@/components/ui/TestimonialCard";
-import { FAQSection } from "@/components/seo/FAQSection";
+// Abaixo da dobra — lazy para reduzir JS inicial (embla + accordion pesados).
+const MotivosCarousel = lazy(() =>
+  import("@/components/home/MotivosCarousel").then((m) => ({ default: m.MotivosCarousel })),
+);
+const TestimonialCard = lazy(() =>
+  import("@/components/ui/TestimonialCard").then((m) => ({ default: m.TestimonialCard })),
+);
+const FAQSection = lazy(() =>
+  import("@/components/seo/FAQSection").then((m) => ({ default: m.FAQSection })),
+);
 
 // Imagens locais das chapas (WebP otimizado)
 import imgAcrilicoTransparente from "@/assets/chapas-hero/acrilico-transparente.webp";
