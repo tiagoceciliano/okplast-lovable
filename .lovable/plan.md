@@ -1,49 +1,59 @@
-## Situação atual (PageSpeed mobile)
+## Diagnóstico do relatório atual (mobile, Perf 72)
 
-- **Performance: 79** (subiu de 65 → 79)
-- FCP 2,4s ✅ | **LCP 4,1s ❌** | TBT 10ms ✅ | **CLS 0 ✅** | SI 5,4s ⚠️
+- **LCP 3,9s** — o elemento LCP é o `<p>` da hero, com **5.770 ms de "Element render delay"**. Como é uma SPA, o `<div id="root">` fica vazio até o React montar; nada visível pinta até baixar HTML + CSS + JS (`index-*.js` 103 KiB + `client-*.js` 54 KiB).
+- **Speed Index 9,5s** — mesma causa: o primeiro paint só acontece quando a árvore React aparece.
+- **Render-blocking (350 ms)**: `index-*.css` (180 ms) + Google Fonts (750 ms).
+- **JS não usado (167 KiB)**: `gtag.js` 145 KiB (85 KiB unused) + `index-*.js` (38 KiB unused) + `client-*.js` (43 KiB unused, React vendor).
+- **Cadeia crítica**: `whatsapp_numbers` e `track-visit` ao Supabase entram no caminho crítico da LCP (disparados no mount do `Layout`/`Header`).
+- **Não composto**: animação `pulse-glow` no botão WhatsApp usa `box-shadow` (roda no main thread).
 
-O CLS já foi resolvido (0). Agora o gargalo é **LCP** e **JS não usado**.
+## Correções (em ordem de impacto)
 
-## Correções propostas
+### 1. Pintar a hero antes do React (maior ganho — deve levar LCP de 3,9s para ~1,5s)
+Injetar o HTML estático da hero (título, subtítulo, parágrafo LCP, CTA) direto dentro do `<div id="root">` no `index.html`, com o CSS crítico inline no `<head>` (tokens de cor da hero, tipografia, layout do container e do botão). Assim o texto LCP pinta no primeiro parse de HTML, sem esperar JS. Quando o React montar via `createRoot`, ele substitui o conteúdo pela versão real (mesmo visual → sem "flash").
 
-### 1. LCP 4,1s → alvo ~2,5s (maior ganho, ~1,5s)
-O relatório mostra **3.010ms de "Element render delay"** no `<p>` da hero. Isso significa: o HTML chega em 0ms mas o texto só pinta depois que o JS do React hidrata. Causas e correções:
+O CSS crítico inline (~1,5 KiB) traz: reset mínimo, `.container-custom`, tipografia da hero, cores primary/accent/muted-foreground, botão `.btn-whatsapp`, e a variável de fonte fallback (`Montserrat Fallback` já configurada) para não haver reflow quando a Montserrat carregar.
 
-- **Render-blocking do Google Fonts (750ms)**: hoje o `<link rel="preload" as="style">` com `onload` ainda vira stylesheet e bloqueia. Trocar por injeção via JS após `DOMContentLoaded` (fonts entram em `display:optional`, então nunca causam CLS mesmo carregando tarde).
-- **Render-blocking do CSS principal (160ms)**: inline do CSS crítico da hero (título, botão, container) direto no `<head>` do `index.html` para o primeiro paint não depender do arquivo `.css` externo.
-- **JS grande no caminho crítico**: hoje o `index-*.js` tem 203KB e o React só renderiza depois de baixar tudo. Vamos garantir que `HelmetProvider`, `TooltipProvider`, `QueryClient`, `BrowserRouter` e `WhatsAppModalProvider` não estão puxando dependências pesadas no bundle inicial (auditar imports do `App.tsx`).
+### 2. Eliminar o CSS render-blocking (economia 180 ms)
+Além do CSS crítico inline (#1), adicionar `media="print" onload="this.media='all'"` no `<link>` do `index-*.css` — o browser baixa sem bloquear render. Fallback `<noscript>` para SEO.
 
-### 2. Duplicar gtag (economia 160KB) — ainda acontecendo
-O relatório mostra `/gtag/js?id=AW-18068965569` **listado 2×** na tabela de 3rd party (288KB total). O código do `index.html` tem guarda `window.__gtagLoaded`, então a 2ª carga vem de outro lugar — provavelmente de dentro do `flock.js` (`~flock.js` da hospedagem Lovable injeta gtag automaticamente quando detecta o AW-ID).
+Como o Vite emite o `<link>` do CSS automaticamente, aplicar via plugin simples no `vite.config.ts` (transformIndexHtml) que reescreve o link do CSS gerado.
 
-**Solução**: remover o gtag manual do `index.html` e deixar apenas o injetado pela plataforma Lovable (que já é assíncrono). Testar publicando e verificar se o `AW-18068965569` continua disparando conversões.
+### 3. Remover o gtag manual do `index.html` (economia ~145 KiB no caminho crítico)
+O relatório mostra apenas 1 gtag agora — o injetado pelo `~flock.js` da plataforma Lovable. Manter só ele. Remover todo o bloco `<script>...gtag...</script>` do `index.html`.
 
-### 3. Reduzir 127KB de JS não usado no bundle principal
-Fazer code-split mais agressivo do `Index.tsx` (home). Componentes abaixo da dobra viram `React.lazy`:
-- `MotivosCarousel` (carousel de embla — pesa ~15KB)
-- `ProductCategoryGrid` (grid de cards abaixo da dobra)
-- `Footer` (fora da dobra)
-- `WhatsAppFloatingButton` / `WhatsAppChatWidget` (podem ser lazy após interação/idle)
+### 4. Adiar Supabase (whatsapp_numbers + track-visit) para fora do caminho crítico da LCP
+- `usePageVisit` (chama `track-visit`): trocar disparo imediato por `requestIdleCallback` com `timeout: 3000` (ou `setTimeout(..., 2500)` como fallback). Não muda nada de UX, tira 2 requests da cadeia crítica.
+- `useWhatsAppNumber`: o número inicial já vem do `localStorage` (sync). Adiar a revalidação em rede via `requestIdleCallback`. O botão WhatsApp já aparece com o número certo desde o primeiro paint.
 
-### 4. Redimensionar logo (economia 4,4KB)
-Logo hoje está 320×154 mas exibido em 145×70. Reduzir para **290×140** (2× do display real).
+### 5. Adiar Google Fonts para depois da LCP
+Trocar o loader atual (que dispara no `load`) por `requestIdleCallback` com `timeout: 4000`. Como o CSS crítico já usa `Montserrat Fallback` (métricas casadas com Arial), o swap não causa CLS nem "flash" perceptível. Também remove `preconnect fonts.googleapis.com` para não gastar handshake antes da LCP.
 
-### 5. Cache lifetime `/lovable-uploads/*.webp` — sem TTL
-Mover o logo `/lovable-uploads/e3c63f33-...webp` para `src/assets/` (Vite adiciona hash + cache longo automático). Atualizar `Header.tsx` e o `preload` do `index.html`.
+### 6. Animação composta no botão WhatsApp (elimina o aviso "non-composited")
+Substituir a animação `pulse-glow` (que anima `box-shadow`) por uma variação com `::after` pseudo-elemento animando `transform: scale()` + `opacity` — mesmo efeito visual (halo pulsante verde), 100% GPU-composta.
 
-### 6. Reduzir CSS não usado (11KB)
-Boa parte vem de classes shadcn/tailwind não usadas. Deixar para o final — o `content` do `tailwind.config.ts` já faz purge, então o ganho real é limitado. Baixa prioridade.
+### 7. Code-split extra da home (economia ~38 KiB no `index-*.js`)
+No `Index.tsx`, mover para `lazy`:
+- `BlueBanner`, `DecorativeDivider` (não estão na dobra).
+- Seções "CTA Final" e "Por que escolher" (abaixo da dobra) em um único chunk `HomeBelowFold`.
+Manter na dobra apenas: `HeroSection`, grid de 8 chapas, título e botão WhatsApp.
 
-### 7. Animação `pulse-glow` no botão WhatsApp
-Trocar `box-shadow` pulse por `transform: scale()` + `opacity` (compositáveis pela GPU). Ganho pequeno de suavidade, sem impactar métrica.
+## Arquivos afetados
+- `index.html` — CSS crítico inline, HTML estático da hero em `#root`, remoção do gtag, loader de fontes com `requestIdleCallback`.
+- `vite.config.ts` — plugin `transformIndexHtml` para transformar o `<link rel="stylesheet">` em non-blocking.
+- `src/hooks/usePageVisit.ts` — envolver o `track-visit` em `requestIdleCallback`.
+- `src/hooks/useWhatsAppNumber.ts` — revalidação diferida.
+- `src/index.css` — nova animação `pulse-glow` composta (transform/opacity via `::after`).
+- `src/components/layout/WhatsAppFloatingButton.tsx` — ajuste no elemento (adicionar wrapper para o `::after` se necessário).
+- `src/pages/Index.tsx` — `lazy()` extra para `BlueBanner`, `DecorativeDivider` e um `HomeBelowFold` (extraído para novo arquivo).
+- `src/components/home/HomeBelowFold.tsx` — novo (contém CTA final + "Por que escolher").
+
+## Alvo pós-deploy
+- **LCP: 3,9s → ~1,5s** (paint imediato da hero)
+- **Speed Index: 9,5s → ~4s**
+- **Performance mobile: 72 → 90+**
 
 ## Fora de escopo
-- Tocar em layout/design da home
-- Trocar hospedagem ou CDN (não temos controle de headers do `/lovable-uploads/*`)
-- Alterar tracking (AW-18068965569 continua único ID)
-
-## Métricas alvo pós-deploy
-- LCP: 4,1s → **~2,5s**
-- Performance mobile: 79 → **90+**
-- Transfer size total: −160KB (gtag) −127KB (JS split) −4KB (imagem) = **~290KB a menos**
+- Layout/design da home (visual idêntico ao atual).
+- Trocar tracking (segue `AW-18068965569` via `~flock.js`).
+- Tocar em admin/backend.
