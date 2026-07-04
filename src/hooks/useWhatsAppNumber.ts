@@ -17,10 +17,19 @@ export function useWhatsAppNumber(): WhatsAppNumber {
     // Primeiro, define imediatamente com base no cache/localStorage
     // para evitar delay nos botões.
     setNumber(getRotatedWhatsAppSync());
-    // Em seguida, revalida contra o banco (atualiza pesos/números novos).
-    getRotatedWhatsApp()
-      .then((n) => setNumber(n))
-      .catch(() => {});
+    // Revalida contra o banco em idle para não competir com a LCP.
+    const run = () => {
+      getRotatedWhatsApp()
+        .then((n) => setNumber(n))
+        .catch(() => {});
+    };
+    const ric: any = (window as any).requestIdleCallback;
+    const handle = ric ? ric(run, { timeout: 4000 }) : window.setTimeout(run, 2500);
+    return () => {
+      const cic: any = (window as any).cancelIdleCallback;
+      if (ric && cic) cic(handle);
+      else clearTimeout(handle as number);
+    };
   }, []);
 
   return number;
