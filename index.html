@@ -7,17 +7,35 @@
    <!-- Favicon -->
    <link rel="apple-touch-icon" href="/favicon.png" />
    
-    <!-- Performance: Preconnects -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://osfxdoxfiyyqcpahuwci.supabase.co" />
+    <!-- Performance: preconnects mínimos. Fonts.googleapis é adiado
+         para depois da LCP, então não pré-conectamos e economizamos handshake. -->
     <link rel="dns-prefetch" href="https://osfxdoxfiyyqcpahuwci.supabase.co" />
 
-    <!-- Google Fonts injetado após o primeiro paint (não bloqueia render).
-         display=optional garante que, se não vier a tempo, usa o fallback sem CLS. -->
     <noscript>
       <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=optional" />
     </noscript>
+
+    <!-- CSS crítico inline: pinta a hero antes do CSS externo baixar.
+         Tokens de cor OK Plast + tipografia + layout do container e do botão.
+         Mantido pequeno (<2KB) para não inflar o HTML. -->
+    <style>
+      @font-face{font-family:"Montserrat Fallback";src:local("Arial");size-adjust:107%;ascent-override:90%;descent-override:23%;line-gap-override:0%}
+      *,*::before,*::after{box-sizing:border-box}
+      html,body{margin:0;padding:0}
+      body{font-family:'Montserrat','Montserrat Fallback',system-ui,-apple-system,sans-serif;color:hsl(210 30% 15%);background:#fff;-webkit-font-smoothing:antialiased}
+      h1,h2{font-family:'Montserrat','Montserrat Fallback',system-ui,-apple-system,sans-serif;font-weight:700;margin:0}
+      p{margin:0}
+      .okp-hero{padding:2rem 1rem;min-height:420px;background:#fff}
+      .okp-hero-inner{max-width:56rem;margin:0 auto;text-align:center}
+      .okp-hero h1{font-size:1.5rem;line-height:1.2;margin-bottom:1rem;color:hsl(210 30% 15%)}
+      .okp-hero h1 .accent{color:hsl(156 52% 47%)}
+      .okp-hero h2{font-size:1.125rem;color:hsl(156 52% 47%);font-weight:500;margin-bottom:1.5rem}
+      .okp-hero p{color:hsl(210 20% 35%);margin:0 auto 2rem;max-width:42rem}
+      .okp-hero p strong{color:hsl(210 30% 15%);font-weight:700}
+      .okp-hero .cta{display:inline-flex;align-items:center;gap:.5rem;background:hsl(142 70% 45%);color:#fff;font-weight:600;font-size:1.125rem;padding:1rem 2rem;border-radius:.5rem;border:0;box-shadow:0 4px 14px rgba(0,0,0,.08);cursor:pointer}
+      @media(min-width:768px){.okp-hero{padding:3rem 1.5rem;min-height:440px}.okp-hero h1{font-size:2.25rem}.okp-hero h2{font-size:1.25rem}}
+      @media(min-width:1024px){.okp-hero h1{font-size:3rem}}
+    </style>
     
    <!-- PWA Manifest -->
    <link rel="manifest" href="/manifest.json" />
@@ -44,9 +62,20 @@
 </head>
 
  <body>
-   <div id="root"></div>
+   <div id="root">
+     <!-- Hero estática: pinta o LCP no primeiro parse de HTML,
+          antes do React montar. React a substitui na hidratação. -->
+     <section class="okp-hero">
+       <div class="okp-hero-inner">
+         <h1>DISTRIBUIDORA DE <span class="accent">CHAPAS</span> NO RIO DE JANEIRO</h1>
+         <h2>Acrílico, Policarbonato, PETG, Poliestireno (PS), PVC Expandido e ACM no RJ</h2>
+         <p><strong>OK Plast</strong> — TUDO OK PARA SEU PROJETO. Sua distribuidora de chapas plásticas no Rio de Janeiro com corte sob medida e o melhor preço do RJ. Atendemos toda a região metropolitana com entrega rápida.</p>
+         <button class="cta" type="button" aria-label="Orçamento via WhatsApp">Orçamento via WhatsApp</button>
+       </div>
+     </section>
+   </div>
    <script type="module" src="/src/main.tsx"></script>
-    <!-- Google Fonts (Montserrat) carregado após o load para não bloquear render. -->
+    <!-- Google Fonts (Montserrat) carregado em idle após a LCP -->
     <script>
       (function () {
         function loadFonts() {
@@ -55,43 +84,15 @@
           l.href = 'https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=optional';
           document.head.appendChild(l);
         }
-        if (document.readyState === 'complete') {
-          loadFonts();
-        } else {
-          window.addEventListener('load', loadFonts);
+        function schedule(){
+          if (window.requestIdleCallback) window.requestIdleCallback(loadFonts, { timeout: 4000 });
+          else setTimeout(loadFonts, 3000);
         }
+        if (document.readyState === 'complete') schedule();
+        else window.addEventListener('load', schedule);
       })();
     </script>
-    <!-- Google Tag (gtag.js AW-18068965569): injeção única, após load, com guarda
-         para evitar duplicata caso a plataforma também injete. -->
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      function loadGtag(){
-        if (window.__gtagLoaded) return;
-        // Se algum script (ex: plataforma) já injetou o mesmo ID, não duplica.
-        var existing = document.querySelector('script[src*="googletagmanager.com/gtag/js"]');
-        if (existing) { window.__gtagLoaded = true; return; }
-        window.__gtagLoaded = true;
-        var s = document.createElement('script');
-        s.async = true;
-        s.src = 'https://www.googletagmanager.com/gtag/js?id=AW-18068965569';
-        document.head.appendChild(s);
-        gtag('js', new Date());
-        gtag('config', 'AW-18068965569');
-      }
-      function scheduleGtag(){
-        if (window.requestIdleCallback) {
-          window.requestIdleCallback(loadGtag, { timeout: 3000 });
-        } else {
-          setTimeout(loadGtag, 2000);
-        }
-      }
-      if (document.readyState === 'complete') {
-        scheduleGtag();
-      } else {
-        window.addEventListener('load', scheduleGtag);
-      }
-    </script>
+    <!-- Google Ads/gtag é injetado automaticamente pela plataforma Lovable
+         via ~flock.js (AW-18068965569). Não duplicar aqui. -->
  </body>
 </html>
