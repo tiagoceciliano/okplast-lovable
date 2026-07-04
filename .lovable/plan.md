@@ -1,59 +1,59 @@
-## Diagnóstico do relatório atual (mobile, Perf 72)
+## Diagnóstico do relatório atual (mobile, Perf 89)
 
-- **LCP 3,9s** — o elemento LCP é o `<p>` da hero, com **5.770 ms de "Element render delay"**. Como é uma SPA, o `<div id="root">` fica vazio até o React montar; nada visível pinta até baixar HTML + CSS + JS (`index-*.js` 103 KiB + `client-*.js` 54 KiB).
-- **Speed Index 9,5s** — mesma causa: o primeiro paint só acontece quando a árvore React aparece.
-- **Render-blocking (350 ms)**: `index-*.css` (180 ms) + Google Fonts (750 ms).
-- **JS não usado (167 KiB)**: `gtag.js` 145 KiB (85 KiB unused) + `index-*.js` (38 KiB unused) + `client-*.js` (43 KiB unused, React vendor).
-- **Cadeia crítica**: `whatsapp_numbers` e `track-visit` ao Supabase entram no caminho crítico da LCP (disparados no mount do `Layout`/`Header`).
-- **Não composto**: animação `pulse-glow` no botão WhatsApp usa `box-shadow` (roda no main thread).
+- **LCP 3,0s** — "Element render delay" ainda em 990 ms. O parágrafo LCP existe no HTML, mas só é considerado "pintado" depois do CSS externo aplicar (font-family, cor).
+- **Render-blocking (330 ms)**: `index-*.css` (170 ms) + Google Fonts CSS (750 ms) ainda estão bloqueando.
+- **Google Fonts ainda no caminho crítico** — mesmo com `requestIdleCallback`, o browser dispara em ~489 ms porque a página fica ociosa muito cedo (a hero estática já pintou).
+- **JS não usado (83 KiB)** — `client-*.js` (React vendor, 43 KiB unused) + `index-*.js` (39 KiB unused).
+- **CSS não usado (11 KiB)** no bundle Tailwind.
+- **Cadeia crítica de 1.914 ms** puxada pelo `track-visit` (Supabase).
 
-## Correções (em ordem de impacto)
+## Correções
 
-### 1. Pintar a hero antes do React (maior ganho — deve levar LCP de 3,9s para ~1,5s)
-Injetar o HTML estático da hero (título, subtítulo, parágrafo LCP, CTA) direto dentro do `<div id="root">` no `index.html`, com o CSS crítico inline no `<head>` (tokens de cor da hero, tipografia, layout do container e do botão). Assim o texto LCP pinta no primeiro parse de HTML, sem esperar JS. Quando o React montar via `createRoot`, ele substitui o conteúdo pela versão real (mesmo visual → sem "flash").
+### 1. CSS principal non-blocking (economia 170 ms na LCP)
+Adicionar plugin `transformIndexHtml` no `vite.config.ts` que reescreve, **apenas no build de produção**, o `<link rel="stylesheet" href="/assets/index-*.css">` gerado pelo Vite para:
+```html
+<link rel="preload" as="style" href="/assets/index-*.css" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="/assets/index-*.css"></noscript>
+```
+O CSS crítico inline no `<head>` (já implementado) continua garantindo a hero.
 
-O CSS crítico inline (~1,5 KiB) traz: reset mínimo, `.container-custom`, tipografia da hero, cores primary/accent/muted-foreground, botão `.btn-whatsapp`, e a variável de fonte fallback (`Montserrat Fallback` já configurada) para não haver reflow quando a Montserrat carregar.
+### 2. Adiar Google Fonts para depois da LCP real (economia 750 ms de render-blocking + tira da chain crítica)
+Trocar o gatilho atual (`requestIdleCallback` após `load`) por um mais tardio — carregar só depois de qualquer um destes:
+- `PerformanceObserver` disparar `largest-contentful-paint` (ou seja, LCP já foi medida), ou
+- primeira interação do usuário (`pointerdown`, `keydown`, `scroll`, `touchstart`), ou
+- fallback `setTimeout` de 6 s.
 
-### 2. Eliminar o CSS render-blocking (economia 180 ms)
-Além do CSS crítico inline (#1), adicionar `media="print" onload="this.media='all'"` no `<link>` do `index-*.css` — o browser baixa sem bloquear render. Fallback `<noscript>` para SEO.
+Como o CSS crítico já usa `Montserrat Fallback` com métricas casadas (sem CLS), o swap tardio não é perceptível.
 
-Como o Vite emite o `<link>` do CSS automaticamente, aplicar via plugin simples no `vite.config.ts` (transformIndexHtml) que reescreve o link do CSS gerado.
+### 3. Purge de CSS não usado (economia 11 KiB)
+Já temos Tailwind purge ativo, mas 11 KiB são de classes shadcn/tailwind não usadas na home (`accordion-*`, `sonner`, etc. injetadas via `@tailwind components/utilities`). Ganho pequeno; deixar como bônus se sobrar tempo — sem tocar em componentes.
 
-### 3. Remover o gtag manual do `index.html` (economia ~145 KiB no caminho crítico)
-O relatório mostra apenas 1 gtag agora — o injetado pelo `~flock.js` da plataforma Lovable. Manter só ele. Remover todo o bloco `<script>...gtag...</script>` do `index.html`.
+**Ação prática**: revisar `tailwind.config.ts` → remover animações e keyframes não usados (`accordion-*` fica se o FAQ usa; `float` provavelmente não é usado — auditar). Ganho estimado 2-3 KiB.
 
-### 4. Adiar Supabase (whatsapp_numbers + track-visit) para fora do caminho crítico da LCP
-- `usePageVisit` (chama `track-visit`): trocar disparo imediato por `requestIdleCallback` com `timeout: 3000` (ou `setTimeout(..., 2500)` como fallback). Não muda nada de UX, tira 2 requests da cadeia crítica.
-- `useWhatsAppNumber`: o número inicial já vem do `localStorage` (sync). Adiar a revalidação em rede via `requestIdleCallback`. O botão WhatsApp já aparece com o número certo desde o primeiro paint.
+### 4. Reduzir 39 KiB não usados do `index-*.js`
+Dois candidatos identificáveis:
+- `SEOHead` importa `react-helmet-async` (~9 KiB gzip) — mover para dentro de `useEffect` via `import()` dinâmico não é viável (Helmet precisa render). Alternativa: substituir por manipulação direta do `document.title` + `document.querySelector('meta[name=description]')` em `useEffect`. Simples, mesmo resultado para SEO (Google renderiza JS).
+- `WhatsAppModalProvider` importa `useState`/context — ok. Mas o `MainSite` importa `Layout` que importa `useUTM` + `usePageVisit` eager. Já ok.
 
-### 5. Adiar Google Fonts para depois da LCP
-Trocar o loader atual (que dispara no `load`) por `requestIdleCallback` com `timeout: 4000`. Como o CSS crítico já usa `Montserrat Fallback` (métricas casadas com Arial), o swap não causa CLS nem "flash" perceptível. Também remove `preconnect fonts.googleapis.com` para não gastar handshake antes da LCP.
+**Ação**: substituir `react-helmet-async` por hook próprio `useDocumentHead` que escreve title/description/canonical/schema no `document` via `useEffect`. Remove a dependência do `HelmetProvider` do `App.tsx`.
 
-### 6. Animação composta no botão WhatsApp (elimina o aviso "non-composited")
-Substituir a animação `pulse-glow` (que anima `box-shadow`) por uma variação com `::after` pseudo-elemento animando `transform: scale()` + `opacity` — mesmo efeito visual (halo pulsante verde), 100% GPU-composta.
-
-### 7. Code-split extra da home (economia ~38 KiB no `index-*.js`)
-No `Index.tsx`, mover para `lazy`:
-- `BlueBanner`, `DecorativeDivider` (não estão na dobra).
-- Seções "CTA Final" e "Por que escolher" (abaixo da dobra) em um único chunk `HomeBelowFold`.
-Manter na dobra apenas: `HeroSection`, grid de 8 chapas, título e botão WhatsApp.
+### 5. Tirar `track-visit` da chain crítica de 1.914 ms
+Ele já roda em `requestIdleCallback` (timeout 2000 ms) — mas o Lighthouse enxerga como crítico porque o timeout dispara antes da LCP quando a página fica ociosa rápido. Aumentar `timeout` para **5000 ms** e disparar só após o evento `load` + 1 s extra (via `setTimeout` aninhado). Como é analytics, atrasar 2-3 s é irrelevante.
 
 ## Arquivos afetados
-- `index.html` — CSS crítico inline, HTML estático da hero em `#root`, remoção do gtag, loader de fontes com `requestIdleCallback`.
-- `vite.config.ts` — plugin `transformIndexHtml` para transformar o `<link rel="stylesheet">` em non-blocking.
-- `src/hooks/usePageVisit.ts` — envolver o `track-visit` em `requestIdleCallback`.
-- `src/hooks/useWhatsAppNumber.ts` — revalidação diferida.
-- `src/index.css` — nova animação `pulse-glow` composta (transform/opacity via `::after`).
-- `src/components/layout/WhatsAppFloatingButton.tsx` — ajuste no elemento (adicionar wrapper para o `::after` se necessário).
-- `src/pages/Index.tsx` — `lazy()` extra para `BlueBanner`, `DecorativeDivider` e um `HomeBelowFold` (extraído para novo arquivo).
-- `src/components/home/HomeBelowFold.tsx` — novo (contém CTA final + "Por que escolher").
+- `vite.config.ts` — plugin para CSS non-blocking em produção.
+- `index.html` — trocar loader de fontes por gatilho pós-LCP.
+- `src/hooks/usePageVisit.ts` — atrasar mais o `track-visit`.
+- `src/components/SEOHead.tsx` — reescrever como hook DOM direto (sem Helmet).
+- `src/App.tsx` — remover `HelmetProvider`.
+- `package.json` — remover dep `react-helmet-async`.
+- `tailwind.config.ts` — remover keyframes/animações não usadas.
 
-## Alvo pós-deploy
-- **LCP: 3,9s → ~1,5s** (paint imediato da hero)
-- **Speed Index: 9,5s → ~4s**
-- **Performance mobile: 72 → 90+**
+## Alvo
+- **LCP: 3,0s → ~1,8s**
+- **FCP: 2,9s → ~1,8s** (com CSS non-blocking)
+- **Performance mobile: 89 → 95+**
 
 ## Fora de escopo
-- Layout/design da home (visual idêntico ao atual).
-- Trocar tracking (segue `AW-18068965569` via `~flock.js`).
-- Tocar em admin/backend.
+- Redesenhar a home ou alterar layout.
+- Reduzir o React vendor (`client-*.js` 213 KiB) — exigiria trocar React por Preact, algo muito invasivo.
