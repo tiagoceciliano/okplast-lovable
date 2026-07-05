@@ -303,6 +303,8 @@ export function AdminSidebar() {
               hubPath="/acrilico-sob-medida"
               subPages={acrilicoSubPages}
               collapsed={collapsed}
+              open={!!openSections["Acrílico Sob Medida"]}
+              onToggle={() => toggleSection("Acrílico Sob Medida")}
             />
 
             <SubPagesSection
@@ -311,6 +313,8 @@ export function AdminSidebar() {
               hubPath="/chapas"
               subPages={chapasSubPages}
               collapsed={collapsed}
+              open={!!openSections["Chapas"]}
+              onToggle={() => toggleSection("Chapas")}
             />
 
             <SubPagesSection
@@ -319,6 +323,8 @@ export function AdminSidebar() {
               hubPath="/home"
               subPages={institucionalSubPages}
               collapsed={collapsed}
+              open={!!openSections["Institucional"]}
+              onToggle={() => toggleSection("Institucional")}
             />
           </SidebarGroupContent>
         </SidebarGroup>
