@@ -28,7 +28,6 @@ const AdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
 const AdminLeads = lazy(() => import("./pages/admin/Leads"));
 const AdminUTMTerms = lazy(() => import("./pages/admin/UTMTerms"));
-const AdminWhatsAppConfig = lazy(() => import("./pages/admin/WhatsAppConfig"));
 const AdminVendedores = lazy(() => import("./pages/admin/Vendedores"));
 const AdminNegociacoes = lazy(() => import("./pages/admin/Negociacoes"));
 const SobreNos = lazy(() => import("./pages/SobreNos"));
