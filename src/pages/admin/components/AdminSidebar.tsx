@@ -120,9 +120,11 @@ interface SubPagesSectionProps {
   hubPath: string;
   subPages: { title: string; path: string }[];
   collapsed: boolean;
+  open: boolean;
+  onToggle: () => void;
 }
 
-const SubPagesSection = ({ title, icon: Icon, hubPath, subPages, collapsed }: SubPagesSectionProps) => {
+const SubPagesSection = ({ title, icon: Icon, hubPath, subPages, collapsed, open, onToggle }: SubPagesSectionProps) => {
   if (collapsed) {
     return (
       <Tooltip>
@@ -143,30 +145,43 @@ const SubPagesSection = ({ title, icon: Icon, hubPath, subPages, collapsed }: Su
 
   return (
     <div className="space-y-1">
-      <a
-        href={COMPANY.domain + hubPath}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-muted"
-      >
-        <Icon className="h-4 w-4" />
-        <span>{title}</span>
-        <ExternalLink className="h-3 w-3 ml-auto" />
-      </a>
-      <div className="pl-6 space-y-1">
-        {subPages.map((page) => (
-          <a
-            key={page.path}
-            href={COMPANY.domain + page.path}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md"
-          >
-            <ExternalLink className="h-3 w-3" />
-            <span>{page.title}</span>
-          </a>
-        ))}
+      <div className="flex items-center gap-1">
+        <a
+          href={COMPANY.domain + hubPath}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-muted flex-1 min-w-0"
+        >
+          <Icon className="h-4 w-4 shrink-0" />
+          <span className="truncate">{title}</span>
+          <ExternalLink className="h-3 w-3 ml-auto shrink-0" />
+        </a>
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-expanded={open}
+          aria-label={open ? `Recolher ${title}` : `Expandir ${title}`}
+          className="flex items-center justify-center h-8 w-8 rounded-md text-sm font-medium transition-colors hover:bg-muted shrink-0"
+        >
+          <ChevronDown className={cn("h-4 w-4 transition-transform", !open && "-rotate-90")} />
+        </button>
       </div>
+      {open && (
+        <div className="pl-6 space-y-1">
+          {subPages.map((page) => (
+            <a
+              key={page.path}
+              href={COMPANY.domain + page.path}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md"
+            >
+              <ExternalLink className="h-3 w-3" />
+              <span>{page.title}</span>
+            </a>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
