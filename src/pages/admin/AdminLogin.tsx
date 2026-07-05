@@ -41,17 +41,22 @@ export default function AdminLogin() {
     const { data: roles } = await supabase
       .from("user_roles")
       .select("role")
-      .eq("user_id", user.id)
-      .eq("role", "admin");
+      .eq("user_id", user.id);
 
-    if (!roles || roles.length === 0) {
+    const rolesList = (roles ?? []).map((r) => r.role);
+    if (!rolesList.some((r) => ["admin", "gestor", "vendedor"].includes(r))) {
       await supabase.auth.signOut();
       setError("Acesso não autorizado.");
       setLoading(false);
       return;
     }
 
-    navigate("/admin");
+    // Vendedor vai direto para o Kanban; admin/gestor para o Dashboard
+    if (rolesList.includes("vendedor") && !rolesList.includes("admin") && !rolesList.includes("gestor")) {
+      navigate("/admin/negociacoes");
+    } else {
+      navigate("/admin");
+    }
   };
 
   return (
