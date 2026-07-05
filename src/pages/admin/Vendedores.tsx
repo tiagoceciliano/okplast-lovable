@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Plus, Trash2, Save, Loader2, Users } from "lucide-react";
+import { Plus, Trash2, Save, Loader2, Users, KeyRound } from "lucide-react";
 import { toast } from "sonner";
 import { PermissionsMatrix } from "./components/PermissionsMatrix";
 
@@ -43,6 +43,7 @@ export default function Vendedores() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
+  const [editCred, setEditCred] = useState<Member | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -65,10 +66,17 @@ export default function Vendedores() {
       });
     }
 
+    // busca emails via edge function (admin API)
+    let emailsMap: Record<string, string> = {};
+    try {
+      const { data: em } = await supabase.functions.invoke("list-team-members");
+      emailsMap = (em as { emails?: Record<string, string> })?.emails ?? {};
+    } catch { /* silencioso */ }
+
     const members: Member[] = (wa || []).map((w) => ({
       id: w.id,
       user_id: w.user_id,
-      email: null,
+      email: w.user_id ? emailsMap[w.user_id] ?? null : null,
       role: (w.user_id ? rolesMap[w.user_id] : "vendedor") || "vendedor",
       nome_vendedor: w.nome_vendedor,
       numero_formatado: w.numero_formatado,
