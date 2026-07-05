@@ -176,7 +176,8 @@ export default function Vendedores() {
                 {loading ? <div className="flex justify-center py-8"><Loader2 className="animate-spin"/></div> :
                  rows.length === 0 ? <p className="text-center text-muted-foreground py-6">Nenhum membro. Adicione um vendedor ou gestor.</p> :
                  rows.map((row) => (
-                  <div key={row.id} className="grid grid-cols-1 md:grid-cols-[1fr,1fr,140px,100px,auto,auto,auto] gap-2 items-end p-3 border rounded-lg bg-card">
+                  <div key={row.id} className="p-3 border rounded-lg bg-card space-y-2">
+                   <div className="grid grid-cols-1 md:grid-cols-[1fr,1fr,140px,100px,auto,auto,auto,auto] gap-2 items-end">
                     <div>
                       <Label className="text-xs">Nome</Label>
                       <Input value={row.nome_vendedor} onChange={(e) => updateRow(row.id!, { nome_vendedor: e.target.value })} />
@@ -209,9 +210,16 @@ export default function Vendedores() {
                       <Label className="text-xs">Ativo</Label>
                       <Switch checked={row.ativo} onCheckedChange={(v) => updateRow(row.id!, { ativo: v })} />
                     </div>
+                    <Button variant="ghost" size="icon" onClick={() => setEditCred(row)} disabled={!row.user_id} title="Editar email/senha">
+                      <KeyRound className="h-4 w-4"/>
+                    </Button>
                     <Button variant="ghost" size="icon" onClick={() => removeRow(row)} className="text-destructive">
                       <Trash2 className="h-4 w-4"/>
                     </Button>
+                  </div>
+                   <div className="text-xs text-muted-foreground pl-1">
+                     {row.user_id ? (row.email ? <>Login: <strong className="text-foreground">{row.email}</strong></> : "Sem email vinculado") : "Sem usuário de login"}
+                   </div>
                   </div>
                  ))}
                 <div className="flex justify-end pt-4 border-t">
