@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Plus, Trash2, Save, Loader2, Users } from "lucide-react";
+import { Plus, Trash2, Save, Loader2, Users, KeyRound } from "lucide-react";
 import { toast } from "sonner";
 import { PermissionsMatrix } from "./components/PermissionsMatrix";
 
@@ -43,6 +43,7 @@ export default function Vendedores() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
+  const [editCred, setEditCred] = useState<Member | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -65,10 +66,17 @@ export default function Vendedores() {
       });
     }
 
+    // busca emails via edge function (admin API)
+    let emailsMap: Record<string, string> = {};
+    try {
+      const { data: em } = await supabase.functions.invoke("list-team-members");
+      emailsMap = (em as { emails?: Record<string, string> })?.emails ?? {};
+    } catch { /* silencioso */ }
+
     const members: Member[] = (wa || []).map((w) => ({
       id: w.id,
       user_id: w.user_id,
-      email: null,
+      email: w.user_id ? emailsMap[w.user_id] ?? null : null,
       role: (w.user_id ? rolesMap[w.user_id] : "vendedor") || "vendedor",
       nome_vendedor: w.nome_vendedor,
       numero_formatado: w.numero_formatado,
@@ -168,7 +176,8 @@ export default function Vendedores() {
                 {loading ? <div className="flex justify-center py-8"><Loader2 className="animate-spin"/></div> :
                  rows.length === 0 ? <p className="text-center text-muted-foreground py-6">Nenhum membro. Adicione um vendedor ou gestor.</p> :
                  rows.map((row) => (
-                  <div key={row.id} className="grid grid-cols-1 md:grid-cols-[1fr,1fr,140px,100px,auto,auto,auto] gap-2 items-end p-3 border rounded-lg bg-card">
+                  <div key={row.id} className="p-3 border rounded-lg bg-card space-y-2">
+                   <div className="grid grid-cols-1 md:grid-cols-[1fr,1fr,140px,100px,auto,auto,auto,auto] gap-2 items-end">
                     <div>
                       <Label className="text-xs">Nome</Label>
                       <Input value={row.nome_vendedor} onChange={(e) => updateRow(row.id!, { nome_vendedor: e.target.value })} />
@@ -201,9 +210,16 @@ export default function Vendedores() {
                       <Label className="text-xs">Ativo</Label>
                       <Switch checked={row.ativo} onCheckedChange={(v) => updateRow(row.id!, { ativo: v })} />
                     </div>
+                    <Button variant="ghost" size="icon" onClick={() => setEditCred(row)} disabled={!row.user_id} title="Editar email/senha">
+                      <KeyRound className="h-4 w-4"/>
+                    </Button>
                     <Button variant="ghost" size="icon" onClick={() => removeRow(row)} className="text-destructive">
                       <Trash2 className="h-4 w-4"/>
                     </Button>
+                  </div>
+                   <div className="text-xs text-muted-foreground pl-1">
+                     {row.user_id ? (row.email ? <>Login: <strong className="text-foreground">{row.email}</strong></> : "Sem email vinculado") : "Sem usuário de login"}
+                   </div>
                   </div>
                  ))}
                 <div className="flex justify-end pt-4 border-t">
@@ -242,7 +258,58 @@ export default function Vendedores() {
       </div>
 
       <AddMemberDialog open={addOpen} onOpenChange={setAddOpen} onCreated={load} />
+      <EditCredentialsDialog member={editCred} onClose={() => setEditCred(null)} onSaved={load} />
     </AdminLayout>
+  );
+}
+
+function EditCredentialsDialog({ member, onClose, onSaved }: { member: Member | null; onClose: () => void; onSaved: () => void }) {
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    setEmail(member?.email ?? "");
+    setSenha("");
+  }, [member?.user_id]);
+
+  const submit = async () => {
+    if (!member?.user_id) return;
+    if (!email && !senha) return toast.error("Informe email ou nova senha");
+    if (senha && senha.length < 6) return toast.error("Senha precisa ter no mínimo 6 caracteres");
+    setSaving(true);
+    try {
+      const body: { user_id: string; email?: string; password?: string } = { user_id: member.user_id };
+      if (email && email !== member.email) body.email = email;
+      if (senha) body.password = senha;
+      const { data, error } = await supabase.functions.invoke("update-team-member", { body });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      toast.success("Credenciais atualizadas");
+      onClose();
+      onSaved();
+    } catch (e) { toast.error((e as Error).message); }
+    finally { setSaving(false); }
+  };
+
+  return (
+    <Dialog open={!!member} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent>
+        <DialogHeader><DialogTitle>Editar credenciais — {member?.nome_vendedor}</DialogTitle></DialogHeader>
+        <div className="space-y-3">
+          <div><Label>E-mail de login</Label><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
+          <div>
+            <Label>Nova senha</Label>
+            <Input type="text" value={senha} onChange={(e) => setSenha(e.target.value)} placeholder="Deixe em branco para manter" />
+            <p className="text-xs text-muted-foreground mt-1">Mínimo 6 caracteres. Somente admin pode alterar.</p>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>Cancelar</Button>
+          <Button onClick={submit} disabled={saving}>{saving ? <Loader2 className="h-4 w-4 animate-spin"/> : "Salvar"}</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
