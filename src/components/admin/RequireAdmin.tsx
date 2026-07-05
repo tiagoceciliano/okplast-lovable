@@ -1,51 +1,55 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
 
-interface RequireAdminProps {
+type AppRole = Database["public"]["Enums"]["app_role"];
+
+interface RequireAuthProps {
   children: React.ReactNode;
+  roles?: AppRole[];
 }
 
-export function RequireAdmin({ children }: RequireAdminProps) {
+/**
+ * Gate para rotas do admin. Se `roles` não for passado, aceita qualquer
+ * usuário logado com pelo menos um papel (admin/gestor/vendedor).
+ */
+export function RequireAuth({ children, roles }: RequireAuthProps) {
   const [loading, setLoading] = useState(true);
   const [authorized, setAuthorized] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
+    const allowed: AppRole[] = roles ?? ["admin", "gestor", "vendedor"];
+
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      
       if (!session) {
         navigate("/admin/login", { replace: true });
         return;
       }
-
-      const { data: roles } = await supabase
+      const { data: userRoles } = await supabase
         .from("user_roles")
         .select("role")
-        .eq("user_id", session.user.id)
-        .eq("role", "admin");
+        .eq("user_id", session.user.id);
 
-      if (!roles || roles.length === 0) {
+      const has = (userRoles ?? []).some((r) => allowed.includes(r.role as AppRole));
+      if (!has) {
         await supabase.auth.signOut();
         navigate("/admin/login", { replace: true });
         return;
       }
-
       setAuthorized(true);
       setLoading(false);
     };
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_OUT") {
-        navigate("/admin/login", { replace: true });
-      }
+      if (event === "SIGNED_OUT") navigate("/admin/login", { replace: true });
     });
 
     checkAuth();
-
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, roles]);
 
   if (loading && !authorized) {
     return (
@@ -54,8 +58,11 @@ export function RequireAdmin({ children }: RequireAdminProps) {
       </div>
     );
   }
-
   if (!authorized) return null;
-
   return <>{children}</>;
 }
+
+// Alias para compat retroativa.
+export const RequireAdmin = ({ children }: { children: React.ReactNode }) => (
+  <RequireAuth roles={["admin"]}>{children}</RequireAuth>
+);

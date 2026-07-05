@@ -1,0 +1,314 @@
+import { useEffect, useState } from "react";
+import { AdminLayout } from "./AdminLayout";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Plus, Trash2, Save, Loader2, Users } from "lucide-react";
+import { toast } from "sonner";
+import { PermissionsMatrix } from "./components/PermissionsMatrix";
+
+type Role = "admin" | "gestor" | "vendedor";
+
+interface Member {
+  id?: string; // whatsapp_numbers.id
+  user_id: string | null;
+  email: string | null;
+  role: Role;
+  nome_vendedor: string;
+  numero_formatado: string;
+  numero_raw: string;
+  peso: number;
+  ativo: boolean;
+  recebe_lead: boolean;
+  _dirty?: boolean;
+}
+
+function formatDisplay(digits: string): string {
+  const d = digits.replace(/\D/g, "").replace(/^55/, "");
+  if (d.length <= 2) return d;
+  if (d.length <= 7) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
+  if (d.length <= 11) return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
+  return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7, 11)}`;
+}
+const toRaw = (f: string) => { const d = f.replace(/\D/g, ""); return d.startsWith("55") ? d : `55${d}`; };
+
+export default function Vendedores() {
+  const [rows, setRows] = useState<Member[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
+
+  const load = async () => {
+    setLoading(true);
+    // whatsapp_numbers com user vinculado
+    const { data: wa } = await supabase
+      .from("whatsapp_numbers")
+      .select("*")
+      .order("created_at");
+
+    // pega roles para cada user_id conhecido
+    const userIds = (wa || []).map((w) => w.user_id).filter(Boolean) as string[];
+    let rolesMap: Record<string, Role> = {};
+    if (userIds.length > 0) {
+      const { data: rs } = await supabase.from("user_roles").select("user_id,role").in("user_id", userIds);
+      (rs || []).forEach((r: { user_id: string; role: string }) => {
+        // prioridade admin > gestor > vendedor
+        const cur = rolesMap[r.user_id];
+        const prio = (x: string) => (x === "admin" ? 3 : x === "gestor" ? 2 : 1);
+        if (!cur || prio(r.role) > prio(cur)) rolesMap[r.user_id] = r.role as Role;
+      });
+    }
+
+    const members: Member[] = (wa || []).map((w) => ({
+      id: w.id,
+      user_id: w.user_id,
+      email: null,
+      role: (w.user_id ? rolesMap[w.user_id] : "vendedor") || "vendedor",
+      nome_vendedor: w.nome_vendedor,
+      numero_formatado: w.numero_formatado,
+      numero_raw: w.numero_raw,
+      peso: w.peso,
+      ativo: w.ativo,
+      recebe_lead: (w as any).recebe_lead ?? true,
+    }));
+    setRows(members);
+    setLoading(false);
+  };
+  useEffect(() => { load(); }, []);
+
+  const updateRow = (id: string, patch: Partial<Member>) => {
+    setRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch, _dirty: true } : r)));
+  };
+
+  const removeRow = async (row: Member) => {
+    if (!confirm(`Remover ${row.nome_vendedor}?`)) return;
+    if (row.id) {
+      const { error } = await supabase.from("whatsapp_numbers").delete().eq("id", row.id);
+      if (error) return toast.error(error.message);
+    }
+    toast.success("Removido");
+    setRows((p) => p.filter((r) => r.id !== row.id));
+  };
+
+  const activeReceivers = rows.filter((r) => r.ativo && r.recebe_lead);
+  const totalPeso = activeReceivers.reduce((s, r) => s + (r.peso || 0), 0);
+
+  const saveAll = async () => {
+    if (activeReceivers.length > 0 && totalPeso !== 100) {
+      toast.error(`Soma dos pesos dos que recebem lead deve ser 100% (atual: ${totalPeso}%)`);
+      return;
+    }
+    setSaving(true);
+    try {
+      for (const r of rows) {
+        if (!r._dirty || !r.id) continue;
+        const raw = toRaw(r.numero_formatado);
+        const { error } = await supabase.from("whatsapp_numbers").update({
+          nome_vendedor: r.nome_vendedor,
+          numero_raw: raw,
+          numero_formatado: formatDisplay(raw),
+          peso: r.peso,
+          ativo: r.ativo,
+          recebe_lead: r.recebe_lead,
+        }).eq("id", r.id);
+        if (error) throw error;
+
+        // Atualiza role se mudou
+        if (r.user_id) {
+          await supabase.from("user_roles").delete().eq("user_id", r.user_id);
+          await supabase.from("user_roles").insert({ user_id: r.user_id, role: r.role });
+        }
+      }
+      toast.success("Salvo");
+      try { window.localStorage.removeItem("okp-wa-cache"); } catch {}
+      load();
+    } catch (e) { toast.error((e as Error).message); }
+    finally { setSaving(false); }
+  };
+
+  return (
+    <AdminLayout>
+      <div className="max-w-6xl mx-auto space-y-6">
+        <div className="flex items-center gap-3">
+          <Users className="h-6 w-6 text-primary" />
+          <div>
+            <h1 className="text-2xl font-bold">Vendedores & WhatsApp</h1>
+            <p className="text-sm text-muted-foreground">Gerencie a equipe, o rateio de WhatsApp e as permissões.</p>
+          </div>
+        </div>
+
+        <Tabs defaultValue="equipe">
+          <TabsList>
+            <TabsTrigger value="equipe">Equipe</TabsTrigger>
+            <TabsTrigger value="permissoes">Permissões</TabsTrigger>
+            <TabsTrigger value="rateio">Como funciona o rateio</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="equipe" className="space-y-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>Membros da equipe</CardTitle>
+                  <CardDescription>
+                    Total de peso dos ativos que recebem lead:{" "}
+                    <strong className={totalPeso === 100 ? "text-emerald-600" : "text-destructive"}>{totalPeso}%</strong>
+                  </CardDescription>
+                </div>
+                <Button size="sm" onClick={() => setAddOpen(true)}>
+                  <Plus className="h-4 w-4 mr-2" /> Adicionar membro
+                </Button>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {loading ? <div className="flex justify-center py-8"><Loader2 className="animate-spin"/></div> :
+                 rows.length === 0 ? <p className="text-center text-muted-foreground py-6">Nenhum membro. Adicione um vendedor ou gestor.</p> :
+                 rows.map((row) => (
+                  <div key={row.id} className="grid grid-cols-1 md:grid-cols-[1fr,1fr,140px,100px,auto,auto,auto] gap-2 items-end p-3 border rounded-lg bg-card">
+                    <div>
+                      <Label className="text-xs">Nome</Label>
+                      <Input value={row.nome_vendedor} onChange={(e) => updateRow(row.id!, { nome_vendedor: e.target.value })} />
+                    </div>
+                    <div>
+                      <Label className="text-xs">WhatsApp</Label>
+                      <Input value={row.numero_formatado} onChange={(e) => updateRow(row.id!, { numero_formatado: formatDisplay(e.target.value) })} maxLength={15} />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Papel</Label>
+                      <Select value={row.role} onValueChange={(v) => updateRow(row.id!, { role: v as Role, recebe_lead: v !== "gestor", peso: v === "gestor" ? 0 : row.peso })}>
+                        <SelectTrigger><SelectValue/></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="admin">Admin</SelectItem>
+                          <SelectItem value="gestor">Gestor</SelectItem>
+                          <SelectItem value="vendedor">Vendedor</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="text-xs">Peso (%)</Label>
+                      <Input type="number" min={0} max={100} value={row.peso} disabled={!row.recebe_lead}
+                        onChange={(e) => updateRow(row.id!, { peso: Math.max(0, Math.min(100, Number(e.target.value) || 0)) })} />
+                    </div>
+                    <div className="flex flex-col items-center gap-1">
+                      <Label className="text-xs">Recebe</Label>
+                      <Switch checked={row.recebe_lead} onCheckedChange={(v) => updateRow(row.id!, { recebe_lead: v, peso: v ? row.peso : 0 })} />
+                    </div>
+                    <div className="flex flex-col items-center gap-1">
+                      <Label className="text-xs">Ativo</Label>
+                      <Switch checked={row.ativo} onCheckedChange={(v) => updateRow(row.id!, { ativo: v })} />
+                    </div>
+                    <Button variant="ghost" size="icon" onClick={() => removeRow(row)} className="text-destructive">
+                      <Trash2 className="h-4 w-4"/>
+                    </Button>
+                  </div>
+                 ))}
+                <div className="flex justify-end pt-4 border-t">
+                  <Button onClick={saveAll} disabled={saving || loading}>
+                    {saving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin"/>Salvando…</> : <><Save className="h-4 w-4 mr-2"/>Salvar alterações</>}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="permissoes">
+            <Card>
+              <CardHeader>
+                <CardTitle>Permissões por papel</CardTitle>
+                <CardDescription>Defina o que cada papel pode ver, editar e excluir. "Só o meu" restringe às negociações onde o usuário é responsável.</CardDescription>
+              </CardHeader>
+              <CardContent><PermissionsMatrix /></CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="rateio">
+            <Card>
+              <CardHeader>
+                <CardTitle>Como funciona o rateio</CardTitle>
+                <CardDescription>
+                  O sorteio é <strong>sticky por visitante</strong>: na primeira interação o cliente é atribuído a um vendedor
+                  (respeitando a % de rateio) e a partir daí sempre fala com o mesmo. Para testar diferentes números use aba anônima.<br/><br/>
+                  A soma dos pesos <strong>ativos que recebem lead</strong> deve totalizar <strong>100%</strong>.<br/>
+                  Gestores podem ter número cadastrado apenas para referência (chave "Recebe" desligada) — eles não entram no rateio.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+
+      <AddMemberDialog open={addOpen} onOpenChange={setAddOpen} onCreated={load} />
+    </AdminLayout>
+  );
+}
+
+function AddMemberDialog({ open, onOpenChange, onCreated }: { open: boolean; onOpenChange: (o: boolean) => void; onCreated: () => void }) {
+  const [nome, setNome] = useState("");
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [role, setRole] = useState<Role>("vendedor");
+  const [numero, setNumero] = useState("");
+  const [peso, setPeso] = useState(0);
+  const [saving, setSaving] = useState(false);
+
+  const submit = async () => {
+    if (!nome || !email || !senha) return toast.error("Preencha nome, email e senha");
+    setSaving(true);
+    try {
+      const raw = numero ? toRaw(numero) : null;
+      const { data, error } = await supabase.functions.invoke("create-team-member", {
+        body: {
+          nome, email, password: senha, role,
+          numero_raw: raw,
+          numero_formatado: raw ? formatDisplay(raw) : null,
+          peso: role === "gestor" ? 0 : peso,
+          recebe_lead: role !== "gestor",
+          ativo: true,
+        },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      toast.success("Membro criado");
+      onOpenChange(false);
+      setNome(""); setEmail(""); setSenha(""); setNumero(""); setPeso(0); setRole("vendedor");
+      onCreated();
+    } catch (e) { toast.error((e as Error).message); }
+    finally { setSaving(false); }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader><DialogTitle>Adicionar membro</DialogTitle></DialogHeader>
+        <div className="space-y-3">
+          <div><Label>Nome</Label><Input value={nome} onChange={(e) => setNome(e.target.value)} /></div>
+          <div><Label>E-mail</Label><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
+          <div><Label>Senha inicial</Label><Input type="text" value={senha} onChange={(e) => setSenha(e.target.value)} placeholder="Mínimo 6 caracteres" /></div>
+          <div>
+            <Label>Papel</Label>
+            <Select value={role} onValueChange={(v) => setRole(v as Role)}>
+              <SelectTrigger><SelectValue/></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="admin">Admin</SelectItem>
+                <SelectItem value="gestor">Gestor</SelectItem>
+                <SelectItem value="vendedor">Vendedor</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div><Label>WhatsApp (opcional)</Label><Input value={numero} onChange={(e) => setNumero(formatDisplay(e.target.value))} placeholder="(21) 99999-9999" maxLength={15} /></div>
+          {role !== "gestor" && (
+            <div><Label>Peso do rateio (%)</Label><Input type="number" min={0} max={100} value={peso} onChange={(e) => setPeso(Number(e.target.value) || 0)} /></div>
+          )}
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
+          <Button onClick={submit} disabled={saving}>{saving ? <Loader2 className="h-4 w-4 animate-spin"/> : "Criar"}</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}

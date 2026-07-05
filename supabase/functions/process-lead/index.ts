@@ -121,6 +121,51 @@ serve(async (req) => {
       throw new Error("Erro ao salvar lead no banco de dados");
     }
 
+    // === Cria negociação automática ligada ao vendedor do rateio ===
+    try {
+      let responsavelId: string | null = null;
+      const destino = payload.destino_whatsapp || null;
+      if (destino) {
+        const { data: wa } = await supabase
+          .from("whatsapp_numbers")
+          .select("user_id")
+          .eq("numero_raw", destino)
+          .maybeSingle();
+        responsavelId = wa?.user_id ?? null;
+      }
+
+      // Próxima posição na coluna 'entrada'
+      const { data: last } = await supabase
+        .from("negociacoes")
+        .select("posicao")
+        .eq("etapa", "entrada")
+        .order("posicao", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      const nextPos = (last?.posicao ?? 0) + 1;
+
+      await supabase.from("negociacoes").insert({
+        lead_id: leadData.id,
+        nome_cliente: payload.nome,
+        telefone: payload.telefone,
+        email: payload.email,
+        etapa: "entrada",
+        responsavel_id: responsavelId,
+        produto: payload.produto_interesse || "Chapa Inteira",
+        material: payload.tipo_material || null,
+        mensagem: payload.mensagem || null,
+        utm_source: payload.utm_source || null,
+        utm_medium: payload.utm_medium || null,
+        utm_campaign: payload.utm_campaign || null,
+        utm_term: payload.utm_term || null,
+        utm_content: payload.utm_content || null,
+        posicao: nextPos,
+      });
+    } catch (negErr) {
+      console.error("Erro ao criar negociação:", negErr);
+      // não bloqueia o webhook
+    }
+
     // Prepara payload para webhook
     const { date, time } = getSaoPauloDateTime();
 

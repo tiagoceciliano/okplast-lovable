@@ -77,6 +77,191 @@ export type Database = {
         }
         Relationships: []
       }
+      negociacao_comentarios: {
+        Row: {
+          autor_id: string | null
+          created_at: string
+          id: string
+          negociacao_id: string
+          texto: string
+        }
+        Insert: {
+          autor_id?: string | null
+          created_at?: string
+          id?: string
+          negociacao_id: string
+          texto: string
+        }
+        Update: {
+          autor_id?: string | null
+          created_at?: string
+          id?: string
+          negociacao_id?: string
+          texto?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "negociacao_comentarios_negociacao_id_fkey"
+            columns: ["negociacao_id"]
+            isOneToOne: false
+            referencedRelation: "negociacoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      negociacao_historico: {
+        Row: {
+          autor_id: string | null
+          created_at: string
+          descricao: string | null
+          id: string
+          negociacao_id: string
+          tipo: string
+        }
+        Insert: {
+          autor_id?: string | null
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          negociacao_id: string
+          tipo: string
+        }
+        Update: {
+          autor_id?: string | null
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          negociacao_id?: string
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "negociacao_historico_negociacao_id_fkey"
+            columns: ["negociacao_id"]
+            isOneToOne: false
+            referencedRelation: "negociacoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      negociacao_tarefas: {
+        Row: {
+          concluida: boolean
+          created_at: string
+          created_by: string | null
+          data_vencimento: string | null
+          id: string
+          negociacao_id: string
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          concluida?: boolean
+          created_at?: string
+          created_by?: string | null
+          data_vencimento?: string | null
+          id?: string
+          negociacao_id: string
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          concluida?: boolean
+          created_at?: string
+          created_by?: string | null
+          data_vencimento?: string | null
+          id?: string
+          negociacao_id?: string
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "negociacao_tarefas_negociacao_id_fkey"
+            columns: ["negociacao_id"]
+            isOneToOne: false
+            referencedRelation: "negociacoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      negociacoes: {
+        Row: {
+          created_at: string
+          email: string | null
+          etapa: Database["public"]["Enums"]["negociacao_etapa"]
+          id: string
+          lead_id: string | null
+          material: string | null
+          mensagem: string | null
+          nome_cliente: string
+          posicao: number
+          produto: string | null
+          responsavel_id: string | null
+          tags: string[]
+          telefone: string | null
+          updated_at: string
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          utm_term: string | null
+          valor: number | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          etapa?: Database["public"]["Enums"]["negociacao_etapa"]
+          id?: string
+          lead_id?: string | null
+          material?: string | null
+          mensagem?: string | null
+          nome_cliente: string
+          posicao?: number
+          produto?: string | null
+          responsavel_id?: string | null
+          tags?: string[]
+          telefone?: string | null
+          updated_at?: string
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+          valor?: number | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          etapa?: Database["public"]["Enums"]["negociacao_etapa"]
+          id?: string
+          lead_id?: string | null
+          material?: string | null
+          mensagem?: string | null
+          nome_cliente?: string
+          posicao?: number
+          produto?: string | null
+          responsavel_id?: string | null
+          tags?: string[]
+          telefone?: string | null
+          updated_at?: string
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+          valor?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "negociacoes_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       page_visits: {
         Row: {
           cidade: string | null
@@ -137,6 +322,36 @@ export type Database = {
         }
         Relationships: []
       }
+      role_permissions: {
+        Row: {
+          can_delete: boolean
+          can_edit: boolean
+          can_view: boolean
+          resource: string
+          role: Database["public"]["Enums"]["app_role"]
+          scope: string
+          updated_at: string
+        }
+        Insert: {
+          can_delete?: boolean
+          can_edit?: boolean
+          can_view?: boolean
+          resource: string
+          role: Database["public"]["Enums"]["app_role"]
+          scope?: string
+          updated_at?: string
+        }
+        Update: {
+          can_delete?: boolean
+          can_edit?: boolean
+          can_view?: boolean
+          resource?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          scope?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -164,7 +379,9 @@ export type Database = {
           numero_formatado: string
           numero_raw: string
           peso: number
+          recebe_lead: boolean
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           ativo?: boolean
@@ -174,7 +391,9 @@ export type Database = {
           numero_formatado: string
           numero_raw: string
           peso?: number
+          recebe_lead?: boolean
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           ativo?: boolean
@@ -184,7 +403,9 @@ export type Database = {
           numero_formatado?: string
           numero_raw?: string
           peso?: number
+          recebe_lead?: boolean
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -193,6 +414,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_access_negociacao: {
+        Args: { _neg_id: string; _user_id: string }
+        Returns: boolean
+      }
       get_campaign_stats: {
         Args: { p_end: string; p_start: string }
         Returns: {
@@ -280,9 +505,17 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_admin_or_gestor: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "admin" | "user"
+      app_role: "admin" | "user" | "gestor" | "vendedor"
+      negociacao_etapa:
+        | "entrada"
+        | "em_contato"
+        | "orcamento"
+        | "negociacao"
+        | "ganho"
+        | "perdido"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -410,7 +643,15 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user"],
+      app_role: ["admin", "user", "gestor", "vendedor"],
+      negociacao_etapa: [
+        "entrada",
+        "em_contato",
+        "orcamento",
+        "negociacao",
+        "ganho",
+        "perdido",
+      ],
     },
   },
 } as const

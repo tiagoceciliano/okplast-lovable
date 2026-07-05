@@ -11,6 +11,7 @@ import {
   ExternalLink,
   Users,
   Tag,
+  KanbanSquare,
   LogOut,
   MessageCircle
 } from "lucide-react";
@@ -269,9 +270,24 @@ export function AdminSidebar() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="WhatsApp">
+                <SidebarMenuButton asChild tooltip="Negociações">
                   <NavLink
-                    to="/admin/whatsapp"
+                    to="/admin/negociacoes"
+                    className={({ isActive }) => cn(
+                      "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-muted",
+                      isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
+                      collapsed && "justify-center px-0"
+                    )}
+                  >
+                    <KanbanSquare className="h-4 w-4" />
+                    {!collapsed && <span>Negociações</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip="Vendedores">
+                  <NavLink
+                    to="/admin/vendedores"
                     className={({ isActive }) => cn(
                       "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-muted",
                       isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
@@ -279,7 +295,7 @@ export function AdminSidebar() {
                     )}
                   >
                     <MessageCircle className="h-4 w-4" />
-                    {!collapsed && <span>WhatsApp</span>}
+                    {!collapsed && <span>Vendedores</span>}
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
