@@ -258,7 +258,58 @@ export default function Vendedores() {
       </div>
 
       <AddMemberDialog open={addOpen} onOpenChange={setAddOpen} onCreated={load} />
+      <EditCredentialsDialog member={editCred} onClose={() => setEditCred(null)} onSaved={load} />
     </AdminLayout>
+  );
+}
+
+function EditCredentialsDialog({ member, onClose, onSaved }: { member: Member | null; onClose: () => void; onSaved: () => void }) {
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    setEmail(member?.email ?? "");
+    setSenha("");
+  }, [member?.user_id]);
+
+  const submit = async () => {
+    if (!member?.user_id) return;
+    if (!email && !senha) return toast.error("Informe email ou nova senha");
+    if (senha && senha.length < 6) return toast.error("Senha precisa ter no mínimo 6 caracteres");
+    setSaving(true);
+    try {
+      const body: { user_id: string; email?: string; password?: string } = { user_id: member.user_id };
+      if (email && email !== member.email) body.email = email;
+      if (senha) body.password = senha;
+      const { data, error } = await supabase.functions.invoke("update-team-member", { body });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      toast.success("Credenciais atualizadas");
+      onClose();
+      onSaved();
+    } catch (e) { toast.error((e as Error).message); }
+    finally { setSaving(false); }
+  };
+
+  return (
+    <Dialog open={!!member} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent>
+        <DialogHeader><DialogTitle>Editar credenciais — {member?.nome_vendedor}</DialogTitle></DialogHeader>
+        <div className="space-y-3">
+          <div><Label>E-mail de login</Label><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
+          <div>
+            <Label>Nova senha</Label>
+            <Input type="text" value={senha} onChange={(e) => setSenha(e.target.value)} placeholder="Deixe em branco para manter" />
+            <p className="text-xs text-muted-foreground mt-1">Mínimo 6 caracteres. Somente admin pode alterar.</p>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>Cancelar</Button>
+          <Button onClick={submit} disabled={saving}>{saving ? <Loader2 className="h-4 w-4 animate-spin"/> : "Salvar"}</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
