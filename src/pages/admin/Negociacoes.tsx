@@ -18,6 +18,7 @@ export default function Negociacoes() {
   const { can, loading: permLoading } = usePermissions();
   const [items, setItems] = useState<Negociacao[]>([]);
   const [vendedores, setVendedores] = useState<VendedorLite[]>([]);
+  const [numeroMap, setNumeroMap] = useState<Record<string, { user_id: string | null; nome: string; formatado: string }>>({});
   const [busca, setBusca] = useState("");
   const [filtroResp, setFiltroResp] = useState<string>("all");
   const [ativo, setAtivo] = useState<Negociacao | null>(null);
@@ -31,14 +32,19 @@ export default function Negociacoes() {
   const load = async () => {
     const [neg, wa, tar] = await Promise.all([
       supabase.from("negociacoes").select("*").order("posicao"),
-      supabase.from("whatsapp_numbers").select("user_id,nome_vendedor").not("user_id", "is", null),
+      supabase.from("whatsapp_numbers").select("user_id,nome_vendedor,numero_raw,numero_formatado"),
       supabase.from("negociacao_tarefas").select("negociacao_id,concluida,data_vencimento"),
     ]);
     if (neg.error) { toast.error(neg.error.message); return; }
     setItems((neg.data as Negociacao[]) || []);
-    const vs = ((wa.data || []) as { user_id: string; nome_vendedor: string }[])
+    const waRows = (wa.data || []) as { user_id: string | null; nome_vendedor: string; numero_raw: string; numero_formatado: string }[];
+    const vs = waRows
+      .filter((v) => v.user_id)
       .map((v) => ({ user_id: v.user_id!, nome: v.nome_vendedor }));
     setVendedores(vs);
+    const nmap: Record<string, { user_id: string | null; nome: string; formatado: string }> = {};
+    waRows.forEach((v) => { nmap[v.numero_raw] = { user_id: v.user_id, nome: v.nome_vendedor, formatado: v.numero_formatado }; });
+    setNumeroMap(nmap);
 
     const cT: Record<string, number> = {};
     const vV: Record<string, boolean> = {};
@@ -165,6 +171,7 @@ export default function Negociacoes() {
       <NegociacaoModal
         negociacao={ativo}
         vendedores={vendedores}
+        numeroMap={numeroMap}
         onClose={() => setAtivo(null)}
         onChanged={load}
       />

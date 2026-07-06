@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Check, X, Trash2, Plus } from "lucide-react";
+import { Check, X, Trash2, Plus, UserCheck } from "lucide-react";
 import { toast } from "sonner";
 import { ETAPAS, brl, type EtapaId, type Negociacao, type VendedorLite } from "./types";
 import { usePermissions } from "@/hooks/usePermissions";
@@ -15,6 +15,7 @@ import { usePermissions } from "@/hooks/usePermissions";
 interface Props {
   negociacao: Negociacao | null;
   vendedores: VendedorLite[];
+  numeroMap?: Record<string, { user_id: string | null; nome: string; formatado: string }>;
   onClose: () => void;
   onChanged: () => void;
 }
@@ -23,7 +24,7 @@ interface Tarefa { id: string; titulo: string; data_vencimento: string | null; c
 interface Comentario { id: string; texto: string; autor_id: string | null; created_at: string; }
 interface Hist { id: string; tipo: string; descricao: string | null; created_at: string; }
 
-export function NegociacaoModal({ negociacao, vendedores, onClose, onChanged }: Props) {
+export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClose, onChanged }: Props) {
   const { can } = usePermissions();
   const [n, setN] = useState<Negociacao | null>(negociacao);
   const [tarefas, setTarefas] = useState<Tarefa[]>([]);
@@ -100,6 +101,13 @@ export function NegociacaoModal({ negociacao, vendedores, onClose, onChanged }: 
   };
 
   const vendedoresElegiveis = vendedores;
+
+  const destinoInfo = n.destino_whatsapp ? numeroMap[n.destino_whatsapp] : null;
+  const atribuirDoDestino = async () => {
+    if (!destinoInfo?.user_id) return;
+    await patchN({ responsavel_id: destinoInfo.user_id });
+    toast.success(`Atribuído a ${destinoInfo.nome}`);
+  };
 
   return (
     <Dialog open={!!negociacao} onOpenChange={(o) => !o && onClose()}>
@@ -225,6 +233,27 @@ export function NegociacaoModal({ negociacao, vendedores, onClose, onChanged }: 
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div className="rounded-md border bg-muted/30 p-2 text-xs space-y-1">
+              <div className="text-muted-foreground">Mensagem recebida no WhatsApp</div>
+              {n.destino_whatsapp ? (
+                <>
+                  <div className="font-medium text-foreground">
+                    {destinoInfo?.formatado || n.destino_whatsapp}
+                    {destinoInfo?.nome && <span className="text-muted-foreground"> — {destinoInfo.nome}</span>}
+                  </div>
+                  {canEdit && destinoInfo?.user_id && destinoInfo.user_id !== n.responsavel_id && (
+                    <Button size="sm" variant="outline" className="h-7 text-xs" onClick={atribuirDoDestino}>
+                      <UserCheck className="h-3 w-3 mr-1" /> Atribuir a {destinoInfo.nome}
+                    </Button>
+                  )}
+                  {destinoInfo && !destinoInfo.user_id && (
+                    <div className="text-muted-foreground">Este número não tem vendedor vinculado.</div>
+                  )}
+                </>
+              ) : (
+                <div className="text-muted-foreground">Não identificado (lead antigo ou entrada manual).</div>
+              )}
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
