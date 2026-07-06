@@ -32,6 +32,7 @@ const AdminVendedores = lazy(() => import("./pages/admin/Vendedores"));
 const AdminNegociacoes = lazy(() => import("./pages/admin/Negociacoes"));
 const AdminProdutos = lazy(() => import("./pages/admin/Produtos"));
 const AdminMeta = lazy(() => import("./pages/admin/Meta"));
+const AdminRadar = lazy(() => import("./pages/admin/Radar"));
 const SobreNos = lazy(() => import("./pages/SobreNos"));
 const PoliticaVenda = lazy(() => import("./pages/PoliticaVenda"));
 const TermoUso = lazy(() => import("./pages/TermoUso"));
@@ -120,6 +121,7 @@ const App = () => (
               <Route path="/admin/negociacoes" element={<RequireAuth roles={["admin","gestor","vendedor"]}><AdminNegociacoes /></RequireAuth>} />
               <Route path="/admin/produtos" element={<RequireAdmin><AdminProdutos /></RequireAdmin>} />
               <Route path="/admin/meta" element={<RequireAuth roles={["admin","gestor","vendedor"]}><AdminMeta /></RequireAuth>} />
+              <Route path="/admin/radar" element={<RequireAuth roles={["admin","gestor","vendedor"]}><AdminRadar /></RequireAuth>} />
               
               {/* Main site routes */}
               <Route path="/*" element={<MainSite />} />
