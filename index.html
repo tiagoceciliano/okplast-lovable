@@ -11,14 +11,16 @@
          para depois da LCP, então não pré-conectamos e economizamos handshake. -->
     <link rel="dns-prefetch" href="https://osfxdoxfiyyqcpahuwci.supabase.co" />
 
-    <noscript>
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=optional" />
-    </noscript>
+    <!-- Fonte self-hosted: elimina render-block e latência do Google Fonts.
+         Preload da woff2 latin (contém 500 e 700) e @font-face inline. -->
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/montserrat-latin.woff2" crossorigin />
 
     <!-- CSS crítico inline: pinta a hero antes do CSS externo baixar.
          Tokens de cor OK Plast + tipografia + layout do container e do botão.
          Mantido pequeno (<2KB) para não inflar o HTML. -->
     <style>
+      @font-face{font-family:'Montserrat';font-style:normal;font-weight:500;font-display:optional;src:url(/fonts/montserrat-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+      @font-face{font-family:'Montserrat';font-style:normal;font-weight:700;font-display:optional;src:url(/fonts/montserrat-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
       @font-face{font-family:"Montserrat Fallback";src:local("Arial");size-adjust:107%;ascent-override:90%;descent-override:23%;line-gap-override:0%}
       *,*::before,*::after{box-sizing:border-box}
       html,body{margin:0;padding:0}
@@ -75,35 +77,6 @@
      </section>
    </div>
    <script type="module" src="/src/main.tsx"></script>
-    <!-- Google Fonts (Montserrat) — carregado só depois que a LCP for medida,
-         ou na primeira interação, ou após 6s (o que vier antes). Como o CSS
-         crítico usa Montserrat Fallback com métricas casadas, o swap tardio
-         não causa CLS nem "flash" perceptível. -->
-    <script>
-      (function () {
-        var loaded = false;
-        function loadFonts() {
-          if (loaded) return; loaded = true;
-          var l = document.createElement('link');
-          l.rel = 'stylesheet';
-          l.href = 'https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=optional';
-          document.head.appendChild(l);
-        }
-        // Após a LCP ser reportada
-        try {
-          if ('PerformanceObserver' in window) {
-            var po = new PerformanceObserver(function(){ loadFonts(); try{po.disconnect();}catch(e){} });
-            po.observe({ type: 'largest-contentful-paint', buffered: true });
-          }
-        } catch(e) {}
-        // Ou na primeira interação
-        var evs = ['pointerdown','keydown','scroll','touchstart'];
-        function onInter(){ loadFonts(); evs.forEach(function(e){ window.removeEventListener(e, onInter, { passive: true }); }); }
-        evs.forEach(function(e){ window.addEventListener(e, onInter, { passive: true }); });
-        // Fallback duro
-        setTimeout(loadFonts, 6000);
-      })();
-    </script>
     <!-- Google Ads/gtag é injetado automaticamente pela plataforma Lovable
          via ~flock.js (AW-18068965569). Não duplicar aqui. -->
  </body>
