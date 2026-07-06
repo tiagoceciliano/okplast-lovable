@@ -16,7 +16,12 @@ function nonBlockingCssPlugin() {
       return html.replace(
         /<link rel="stylesheet"([^>]*?)href="([^"]+\.css)"([^>]*)>/g,
         (_m, a, href, b) =>
+          // Duas estratégias combinadas:
+          //  1) preload+onload='swap' (rápido em Chromium moderno)
+          //  2) media="print" onload="this.media='all'" (fallback universal
+          //     mesmo quando o CDN reserializa o HTML e perde o preload)
           `<link rel="preload" as="style"${a}href="${href}"${b} onload="this.onload=null;this.rel='stylesheet'">` +
+          `<link rel="stylesheet"${a}href="${href}"${b} media="print" onload="this.media='all'">` +
           `<noscript><link rel="stylesheet"${a}href="${href}"${b}></noscript>`,
       );
     },
