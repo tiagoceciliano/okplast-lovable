@@ -17,6 +17,7 @@ interface Payload {
   peso?: number;                // 0 para gestor
   recebe_lead?: boolean;
   ativo?: boolean;
+  link_whatsapp_id?: string | null; // se presente, vincula ao whatsapp_numbers existente
 }
 
 serve(async (req) => {
@@ -75,8 +76,18 @@ serve(async (req) => {
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    // Cria whatsapp_number se veio número
-    if (payload.numero_raw && payload.numero_formatado) {
+    // Se veio link_whatsapp_id, apenas vincula o novo user ao registro existente
+    if (payload.link_whatsapp_id) {
+      const { error: linkErr } = await admin
+        .from("whatsapp_numbers")
+        .update({ user_id: newUserId, nome_vendedor: payload.nome })
+        .eq("id", payload.link_whatsapp_id);
+      if (linkErr) {
+        return new Response(JSON.stringify({ error: "Usuário criado mas erro ao vincular: " + linkErr.message }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+    } else if (payload.numero_raw && payload.numero_formatado) {
+      // Cria whatsapp_number se veio número
       await admin.from("whatsapp_numbers").insert({
         user_id: newUserId,
         nome_vendedor: payload.nome,
