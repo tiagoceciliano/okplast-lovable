@@ -27,7 +27,7 @@ export function MountOnVisible({
     if (visible) return;
     const el = ref.current;
     if (!el) return;
-    let timer: number | null = null;
+    let timer: ReturnType<typeof setTimeout> | null = null;
 
     if ("IntersectionObserver" in window) {
       const io = new IntersectionObserver(
@@ -41,7 +41,7 @@ export function MountOnVisible({
         { rootMargin },
       );
       io.observe(el);
-      timer = window.setTimeout(() => {
+      timer = setTimeout(() => {
         setVisible(true);
         io.disconnect();
       }, idleTimeoutMs);
@@ -52,7 +52,7 @@ export function MountOnVisible({
     }
 
     // Sem IO: monta após timeout curto
-    timer = window.setTimeout(() => setVisible(true), 1500);
+    timer = setTimeout(() => setVisible(true), 1500);
     return () => {
       if (timer) clearTimeout(timer);
     };
