@@ -1,13 +1,11 @@
 import { ReactNode, lazy, Suspense } from "react";
 import { Header } from "./Header";
+import { WhatsAppFloatingButton } from "./WhatsAppFloatingButton";
 import { useUTM } from "@/hooks/useUTM";
 import { usePageVisit } from "@/hooks/usePageVisit";
 
 // Abaixo da dobra — carregar depois para não bloquear LCP.
 const Footer = lazy(() => import("./Footer").then((m) => ({ default: m.Footer })));
-const WhatsAppFloatingButton = lazy(() =>
-  import("./WhatsAppFloatingButton").then((m) => ({ default: m.WhatsAppFloatingButton })),
-);
 
 interface LayoutProps {
   children: ReactNode;
@@ -26,8 +24,10 @@ export function Layout({ children }: LayoutProps) {
       <main className="flex-1">{children}</main>
       <Suspense fallback={null}>
         <Footer />
-        <WhatsAppFloatingButton />
       </Suspense>
+      {/* Renderizado imediatamente (não-lazy) para reservar espaço
+          e eliminar o CLS causado pela montagem tardia do container fixo. */}
+      <WhatsAppFloatingButton />
     </div>
   );
 }
