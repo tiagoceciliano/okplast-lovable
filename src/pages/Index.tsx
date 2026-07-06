@@ -7,6 +7,7 @@ import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
 
 import { HeroSection } from "@/components/home/HeroSection";
 import { SEOHead, createFAQSchema } from "@/components/SEOHead";
+import { MountOnVisible } from "@/components/util/MountOnVisible";
 // Abaixo da dobra — lazy para reduzir JS inicial (embla + accordion pesados).
 const BlueBanner = lazy(() =>
   import("@/components/ui/BlueBanner").then((m) => ({ default: m.BlueBanner })),
@@ -302,11 +303,13 @@ export default function Index() {
       </section>
 
       {/* Banner */}
-      <Suspense fallback={<div className="min-h-[80px]" />}>
-        <BlueBanner>
-          {COMPANY.name} — sua distribuidora de chapas plásticas com o melhor preço do Rio de Janeiro.
-        </BlueBanner>
-      </Suspense>
+      <MountOnVisible fallback={<div className="min-h-[80px]" />}>
+        <Suspense fallback={<div className="min-h-[80px]" />}>
+          <BlueBanner>
+            {COMPANY.name} — sua distribuidora de chapas plásticas com o melhor preço do Rio de Janeiro.
+          </BlueBanner>
+        </Suspense>
+      </MountOnVisible>
 
       {/* 6 Motivos */}
       <section className="section-padding">
@@ -319,17 +322,21 @@ export default function Index() {
               Descubra por que somos a distribuidora de chapas plásticas mais escolhida do Rio de Janeiro
             </p>
           </div>
-          <Suspense fallback={<div className="min-h-[280px]" />}>
-            <MotivosCarousel />
-          </Suspense>
+          <MountOnVisible fallback={<div className="min-h-[280px]" />}>
+            <Suspense fallback={<div className="min-h-[280px]" />}>
+              <MotivosCarousel />
+            </Suspense>
+          </MountOnVisible>
         </div>
       </section>
 
       {/* Depoimentos */}
       <section className="section-padding bg-secondary">
-        <Suspense fallback={null}>
-          <DecorativeDivider />
-        </Suspense>
+        <MountOnVisible fallback={null}>
+          <Suspense fallback={null}>
+            <DecorativeDivider />
+          </Suspense>
+        </MountOnVisible>
         <div className="container-custom">
           <div className="text-center mb-12">
             <h2 className="font-bold text-2xl md:text-3xl text-foreground mb-4">Satisfação Garantida</h2>
@@ -338,29 +345,35 @@ export default function Index() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Suspense fallback={<div className="min-h-[200px]" />}>
-              {depoimentos.map((dep, index) => (
-                <TestimonialCard
-                  key={index}
-                  nome={dep.nome}
-                  empresa={dep.empresa}
-                  texto={dep.texto}
-                  avatarUrl={dep.avatarUrl}
-                />
-              ))}
-            </Suspense>
+            <MountOnVisible fallback={<div className="min-h-[200px]" />}>
+              <Suspense fallback={<div className="min-h-[200px]" />}>
+                {depoimentos.map((dep, index) => (
+                  <TestimonialCard
+                    key={index}
+                    nome={dep.nome}
+                    empresa={dep.empresa}
+                    texto={dep.texto}
+                    avatarUrl={dep.avatarUrl}
+                  />
+                ))}
+              </Suspense>
+            </MountOnVisible>
           </div>
         </div>
       </section>
 
       {/* FAQ Visível */}
-      <Suspense fallback={<div className="min-h-[400px]" />}>
-        <FAQSection faqs={faqItems} title="Perguntas Frequentes sobre Chapas Plásticas no RJ" />
-      </Suspense>
+      <MountOnVisible fallback={<div className="min-h-[400px]" />}>
+        <Suspense fallback={<div className="min-h-[400px]" />}>
+          <FAQSection faqs={faqItems} title="Perguntas Frequentes sobre Chapas Plásticas no RJ" />
+        </Suspense>
+      </MountOnVisible>
 
-      <Suspense fallback={<div className="min-h-[400px]" />}>
-        <HomeBelowFold onWhatsAppClick={() => openWhatsAppModal()} />
-      </Suspense>
+      <MountOnVisible fallback={<div className="min-h-[400px]" />}>
+        <Suspense fallback={<div className="min-h-[400px]" />}>
+          <HomeBelowFold onWhatsAppClick={() => openWhatsAppModal()} />
+        </Suspense>
+      </MountOnVisible>
     </>
   );
 }
