@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { AdminLayout } from "./AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -162,7 +163,7 @@ export default function Vendedores() {
           </div>
         </div>
 
-        <Tabs defaultValue="equipe">
+        <Tabs value={tab} onValueChange={setTab}>
           <TabsList>
             <TabsTrigger value="equipe">Equipe</TabsTrigger>
             <TabsTrigger value="permissoes">Permissões</TabsTrigger>
