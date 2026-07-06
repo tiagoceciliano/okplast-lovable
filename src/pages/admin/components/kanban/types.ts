@@ -28,6 +28,7 @@ export interface Negociacao {
   utm_content: string | null;
   posicao: number;
   tags: string[];
+  destino_whatsapp: string | null;
   created_at: string;
   updated_at: string;
 }
