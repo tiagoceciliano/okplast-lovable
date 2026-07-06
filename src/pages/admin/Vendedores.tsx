@@ -46,6 +46,13 @@ function formatDisplay(digits: string): string {
 const toRaw = (f: string) => { const d = f.replace(/\D/g, ""); return d.startsWith("55") ? d : `55${d}`; };
 
 export default function Vendedores() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tab = searchParams.get("tab") || "equipe";
+  const setTab = (v: string) => {
+    const next = new URLSearchParams(searchParams);
+    if (v === "equipe") next.delete("tab"); else next.set("tab", v);
+    setSearchParams(next, { replace: true });
+  };
   const [rows, setRows] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
