@@ -293,7 +293,7 @@ function EditMemberDialog({ member, users, onClose, onSaved }: { member: Member 
   useEffect(() => {
     if (!member) return;
     setNome(member.nome_vendedor);
-    setUserId(member.user_id ?? "none");
+    setUserId(member.user_id ?? "new");
     setNumero(member.numero_formatado);
     setRole(member.role);
     setPeso(member.peso);
@@ -308,6 +308,35 @@ function EditMemberDialog({ member, users, onClose, onSaved }: { member: Member 
     if (senha && senha.length < 6) return toast.error("Senha precisa ter no mínimo 6 caracteres");
     setSaving(true);
     try {
+      // Caso 1: criar novo login
+      if (userId === "new") {
+        if (!email || !senha) {
+          setSaving(false);
+          return toast.error("Informe e-mail e senha para criar o login");
+        }
+        const raw = numero ? toRaw(numero) : member.numero_raw;
+        // Atualiza whatsapp_numbers primeiro (dados do form) — sem tocar user_id
+        const { error: upErr } = await supabase.from("whatsapp_numbers").update({
+          nome_vendedor: nome,
+          numero_raw: raw,
+          numero_formatado: formatDisplay(raw),
+          peso: role === "gestor" ? 0 : peso,
+          ativo,
+          recebe_lead: role === "gestor" ? false : recebe,
+        }).eq("id", member.id);
+        if (upErr) throw upErr;
+        const { data, error: fnErr } = await supabase.functions.invoke("create-team-member", {
+          body: { nome, email, password: senha, role, link_whatsapp_id: member.id },
+        });
+        if (fnErr) throw fnErr;
+        if ((data as any)?.error) throw new Error((data as any).error);
+        toast.success("Login criado e vinculado");
+        try { window.localStorage.removeItem("okp-wa-cache"); } catch {}
+        onClose();
+        onSaved();
+        return;
+      }
+
       const nextUserId = userId === "none" ? null : userId;
       const selectedUser = users.find((u) => u.id === nextUserId);
       const raw = numero ? toRaw(numero) : member.numero_raw;
@@ -353,11 +382,14 @@ function EditMemberDialog({ member, users, onClose, onSaved }: { member: Member 
             <Label>Usuário de login vinculado</Label>
             <Select value={userId} onValueChange={(v) => {
               setUserId(v);
+              if (v === "new") { setEmail(""); setSenha(""); return; }
+              if (v === "none") { setEmail(""); setSenha(""); return; }
               const selected = users.find((u) => u.id === v);
               if (selected?.email) setEmail(selected.email);
             }}>
               <SelectTrigger><SelectValue placeholder="Selecione o login" /></SelectTrigger>
               <SelectContent>
+                <SelectItem value="new">Criar novo login</SelectItem>
                 <SelectItem value="none">Sem usuário de login</SelectItem>
                 {users.map((u) => (
                   <SelectItem key={u.id} value={u.id}>
@@ -392,8 +424,14 @@ function EditMemberDialog({ member, users, onClose, onSaved }: { member: Member 
             <p className="text-xs text-muted-foreground mb-2">Credenciais de login (somente admin)</p>
             <div className="space-y-3">
               <div><Label>E-mail</Label><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} disabled={userId === "none"} /></div>
-              <div><Label>Nova senha</Label><Input type="text" value={senha} onChange={(e) => setSenha(e.target.value)} placeholder="Deixe em branco para manter" disabled={userId === "none"} /></div>
-              {userId === "none" && <p className="text-xs text-muted-foreground">Selecione um usuário de login para vincular e editar credenciais.</p>}
+              <div>
+                <Label>{userId === "new" ? "Senha" : "Nova senha"}</Label>
+                <Input type="text" value={senha} onChange={(e) => setSenha(e.target.value)}
+                  placeholder={userId === "new" ? "Mínimo 6 caracteres" : "Deixe em branco para manter"}
+                  disabled={userId === "none"} />
+              </div>
+              {userId === "none" && <p className="text-xs text-muted-foreground">Este membro ficará sem acesso ao admin. Escolha "Criar novo login" ou um usuário existente para dar acesso.</p>}
+              {userId === "new" && <p className="text-xs text-muted-foreground">Um novo usuário será criado com este e-mail e senha, e vinculado a este membro.</p>}
             </div>
           </div>
         </div>
