@@ -112,6 +112,7 @@ serve(async (req) => {
         ip_address: clientIp,
         webhook_tipo: "whatsapp",
         webhook_enviado: false,
+        destino_whatsapp: payload.destino_whatsapp || null,
       })
       .select()
       .single();
@@ -160,6 +161,7 @@ serve(async (req) => {
         utm_term: payload.utm_term || null,
         utm_content: payload.utm_content || null,
         posicao: nextPos,
+        destino_whatsapp: destino,
       });
     } catch (negErr) {
       console.error("Erro ao criar negociação:", negErr);
