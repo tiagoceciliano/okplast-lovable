@@ -18,13 +18,16 @@ interface Props {
   numeroMap?: Record<string, { user_id: string | null; nome: string; formatado: string }>;
   onClose: () => void;
   onChanged: () => void;
+  onRequestGanho?: (n: Negociacao) => void;
 }
 
 interface Tarefa { id: string; titulo: string; data_vencimento: string | null; concluida: boolean; }
 interface Comentario { id: string; texto: string; autor_id: string | null; created_at: string; }
 interface Hist { id: string; tipo: string; descricao: string | null; created_at: string; }
 
-export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClose, onChanged }: Props) {
+interface ProdutoLite { id: string; nome: string; material: string | null; }
+
+export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClose, onChanged, onRequestGanho }: Props) {
   const { can } = usePermissions();
   const [n, setN] = useState<Negociacao | null>(negociacao);
   const [tarefas, setTarefas] = useState<Tarefa[]>([]);
@@ -33,6 +36,7 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
   const [novoComent, setNovoComent] = useState("");
   const [novaTarefa, setNovaTarefa] = useState("");
   const [novaData, setNovaData] = useState("");
+  const [produtos, setProdutos] = useState<ProdutoLite[]>([]);
 
   useEffect(() => setN(negociacao), [negociacao]);
   useEffect(() => {
@@ -48,6 +52,10 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
       setHist((h.data as Hist[]) || []);
     })();
   }, [negociacao?.id]);
+  useEffect(() => {
+    supabase.from("produtos").select("id,nome,material").eq("ativo", true).order("nome")
+      .then(({ data }) => setProdutos((data as ProdutoLite[]) || []));
+  }, []);
 
   if (!n) return null;
   const canEdit = can("negociacoes", "edit", n.responsavel_id);
@@ -55,7 +63,7 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
 
   const patchN = async (patch: Partial<Negociacao>) => {
     setN((prev) => (prev ? { ...prev, ...patch } as Negociacao : prev));
-    const { error } = await supabase.from("negociacoes").update(patch).eq("id", n.id);
+    const { error } = await supabase.from("negociacoes").update(patch as any).eq("id", n.id);
     if (error) toast.error(error.message);
     else onChanged();
   };
@@ -109,6 +117,15 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
     toast.success(`Atribuído a ${destinoInfo.nome}`);
   };
 
+  // Produtos filtrados pelo material atual (não pode editar material aqui)
+  const produtosDoMaterial = n.material
+    ? produtos.filter((p) => (p.material || "").toLowerCase() === (n.material || "").toLowerCase())
+    : produtos;
+
+  const irParaVenda = () => {
+    if (onRequestGanho) onRequestGanho(n);
+  };
+
   return (
     <Dialog open={!!negociacao} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -117,7 +134,7 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
             <DialogTitle className="text-xl flex-1">{n.nome_cliente}</DialogTitle>
             {canEdit && (
               <>
-                <Button size="sm" variant="outline" className="text-emerald-600" onClick={() => patchN({ etapa: "ganho" })}>
+                <Button size="sm" variant="outline" className="text-emerald-600" onClick={irParaVenda}>
                   <Check className="h-4 w-4 mr-1" /> Ganho
                 </Button>
                 <Button size="sm" variant="outline" className="text-destructive" onClick={() => patchN({ etapa: "perdido" })}>
@@ -131,7 +148,14 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
               </Button>
             )}
           </div>
-          {n.telefone && <p className="text-sm text-muted-foreground">{n.telefone}</p>}
+          <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+            {n.telefone && <span>{n.telefone}</span>}
+            <span className={`px-2 py-0.5 rounded-full text-xs border ${
+              n.status === "ganho" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30" :
+              n.status === "perdido" ? "bg-destructive/10 text-destructive border-destructive/30" :
+              "bg-muted text-foreground"
+            }`}>Status: {n.status}</span>
+          </div>
         </DialogHeader>
 
         {/* Barra de etapas */}
@@ -140,7 +164,13 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
             <button
               key={e.id}
               disabled={!canEdit}
-              onClick={() => patchN({ etapa: e.id as EtapaId })}
+              onClick={() => {
+                if (e.id === "venda_realizada" && n.etapa !== "venda_realizada") {
+                  irParaVenda();
+                  return;
+                }
+                patchN({ etapa: e.id as EtapaId });
+              }}
               className={`text-xs px-3 py-1.5 rounded-full border transition ${
                 n.etapa === e.id ? "bg-primary text-primary-foreground border-primary" : "bg-background hover:bg-muted"
               } disabled:opacity-60`}
@@ -267,18 +297,40 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
                 <div className="text-[11px] text-muted-foreground">{brl(n.valor)}</div>
               </div>
               <div>
-                <Label className="text-xs">Material</Label>
-                <Input value={n.material ?? ""} disabled={!canEdit}
-                  onChange={(e) => setN({ ...n, material: e.target.value })}
-                  onBlur={() => patchN({ material: n.material })} />
+                <Label className="text-xs">Material (não editável)</Label>
+                <Input value={n.material ?? ""} disabled readOnly />
               </div>
             </div>
             <div>
               <Label className="text-xs">Produto</Label>
-              <Input value={n.produto ?? ""} disabled={!canEdit}
-                onChange={(e) => setN({ ...n, produto: e.target.value })}
-                onBlur={() => patchN({ produto: n.produto })} />
+              <Select
+                value={n.produto ?? ""}
+                onValueChange={(v) => patchN({ produto: v })}
+                disabled={!canEdit}
+              >
+                <SelectTrigger><SelectValue placeholder="Selecione um produto…" /></SelectTrigger>
+                <SelectContent>
+                  {produtosDoMaterial.map((p) => (
+                    <SelectItem key={p.id} value={p.nome}>{p.nome}</SelectItem>
+                  ))}
+                  {produtosDoMaterial.length === 0 && (
+                    <div className="px-2 py-1.5 text-xs text-muted-foreground">Nenhum produto cadastrado para este material.</div>
+                  )}
+                </SelectContent>
+              </Select>
             </div>
+            {n.status === "ganho" && (
+              <div>
+                <Label className="text-xs">Link PV do Bling</Label>
+                <Input value={n.link_pv_bling ?? ""} disabled={!canEdit}
+                  onChange={(e) => setN({ ...n, link_pv_bling: e.target.value })}
+                  onBlur={() => patchN({ link_pv_bling: n.link_pv_bling })} />
+                {n.link_pv_bling && (
+                  <a href={n.link_pv_bling} target="_blank" rel="noopener noreferrer"
+                    className="text-[11px] text-primary underline">Abrir pedido no Bling</a>
+                )}
+              </div>
+            )}
             <div>
               <Label className="text-xs">Tags (separadas por vírgula)</Label>
               <Input value={n.tags.join(", ")} disabled={!canEdit}
@@ -307,9 +359,13 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
             </div>
             <div className="text-[11px] text-muted-foreground pt-2 border-t space-y-0.5">
               <div>Criado: {new Date(n.created_at).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })}</div>
-              {(n.utm_source || n.utm_campaign) && (
-                <div>UTM: {[n.utm_source, n.utm_medium, n.utm_campaign, n.utm_term].filter(Boolean).join(" / ")}</div>
-              )}
+              <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-0.5">
+                <div><span className="font-medium text-foreground">utm_source:</span> {n.utm_source || "—"}</div>
+                <div><span className="font-medium text-foreground">utm_medium:</span> {n.utm_medium || "—"}</div>
+                <div><span className="font-medium text-foreground">utm_campaign:</span> {n.utm_campaign || "—"}</div>
+                <div><span className="font-medium text-foreground">utm_term:</span> {n.utm_term || "—"}</div>
+                <div className="col-span-2"><span className="font-medium text-foreground">utm_content:</span> {n.utm_content || "—"}</div>
+              </div>
             </div>
           </div>
         </div>

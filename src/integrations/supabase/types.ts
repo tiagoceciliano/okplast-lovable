@@ -80,6 +80,68 @@ export type Database = {
         }
         Relationships: []
       }
+      metas: {
+        Row: {
+          created_at: string
+          id: string
+          mes: string
+          observacao: string | null
+          updated_at: string
+          valor_total: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          mes: string
+          observacao?: string | null
+          updated_at?: string
+          valor_total?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          mes?: string
+          observacao?: string | null
+          updated_at?: string
+          valor_total?: number
+        }
+        Relationships: []
+      }
+      metas_vendedores: {
+        Row: {
+          created_at: string
+          id: string
+          meta_id: string
+          updated_at: string
+          user_id: string
+          valor: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          meta_id: string
+          updated_at?: string
+          user_id: string
+          valor?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          meta_id?: string
+          updated_at?: string
+          user_id?: string
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "metas_vendedores_meta_id_fkey"
+            columns: ["meta_id"]
+            isOneToOne: false
+            referencedRelation: "metas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       negociacao_comentarios: {
         Row: {
           autor_id: string | null
@@ -196,12 +258,15 @@ export type Database = {
           etapa: Database["public"]["Enums"]["negociacao_etapa"]
           id: string
           lead_id: string | null
+          link_pv_bling: string | null
           material: string | null
           mensagem: string | null
           nome_cliente: string
+          nome_produto: string | null
           posicao: number
           produto: string | null
           responsavel_id: string | null
+          status: string
           tags: string[]
           telefone: string | null
           updated_at: string
@@ -219,12 +284,15 @@ export type Database = {
           etapa?: Database["public"]["Enums"]["negociacao_etapa"]
           id?: string
           lead_id?: string | null
+          link_pv_bling?: string | null
           material?: string | null
           mensagem?: string | null
           nome_cliente: string
+          nome_produto?: string | null
           posicao?: number
           produto?: string | null
           responsavel_id?: string | null
+          status?: string
           tags?: string[]
           telefone?: string | null
           updated_at?: string
@@ -242,12 +310,15 @@ export type Database = {
           etapa?: Database["public"]["Enums"]["negociacao_etapa"]
           id?: string
           lead_id?: string | null
+          link_pv_bling?: string | null
           material?: string | null
           mensagem?: string | null
           nome_cliente?: string
+          nome_produto?: string | null
           posicao?: number
           produto?: string | null
           responsavel_id?: string | null
+          status?: string
           tags?: string[]
           telefone?: string | null
           updated_at?: string
@@ -325,6 +396,36 @@ export type Database = {
           utm_source?: string | null
           utm_term?: string | null
           visitor_id?: string
+        }
+        Relationships: []
+      }
+      produtos: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          id: string
+          material: string | null
+          nome: string
+          preco: number
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          id?: string
+          material?: string | null
+          nome: string
+          preco?: number
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          id?: string
+          material?: string | null
+          nome?: string
+          preco?: number
+          updated_at?: string
         }
         Relationships: []
       }
@@ -471,6 +572,14 @@ export type Database = {
           total: number
         }[]
       }
+      get_realizado_mensal: {
+        Args: { p_mes: string }
+        Returns: {
+          qtd: number
+          total: number
+          user_id: string
+        }[]
+      }
       get_term_stats: {
         Args: { p_end: string; p_start: string }
         Returns: {
@@ -520,7 +629,7 @@ export type Database = {
         | "em_contato"
         | "orcamento"
         | "negociacao"
-        | "ganho"
+        | "venda_realizada"
         | "perdido"
     }
     CompositeTypes: {
@@ -655,7 +764,7 @@ export const Constants = {
         "em_contato",
         "orcamento",
         "negociacao",
-        "ganho",
+        "venda_realizada",
         "perdido",
       ],
     },

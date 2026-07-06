@@ -1,9 +1,8 @@
 export const ETAPAS = [
   { id: "entrada", label: "Entrada" },
   { id: "em_contato", label: "Em Contato" },
-  { id: "orcamento", label: "Orçamento Enviado" },
   { id: "negociacao", label: "Negociação" },
-  { id: "ganho", label: "Venda Realizada" },
+  { id: "venda_realizada", label: "Venda Realizada" },
   { id: "perdido", label: "Perdido" },
 ] as const;
 
@@ -16,9 +15,12 @@ export interface Negociacao {
   telefone: string | null;
   email: string | null;
   etapa: EtapaId;
+  status: "aberto" | "ganho" | "perdido";
   responsavel_id: string | null;
   valor: number | null;
   produto: string | null;
+  nome_produto: string | null;
+  link_pv_bling: string | null;
   material: string | null;
   mensagem: string | null;
   utm_source: string | null;

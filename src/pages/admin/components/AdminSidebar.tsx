@@ -13,7 +13,9 @@ import {
   Tag,
   KanbanSquare,
   LogOut,
-  MessageCircle
+  MessageCircle,
+  Target,
+  Boxes
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
@@ -281,6 +283,36 @@ export function AdminSidebar() {
                   >
                     <KanbanSquare className="h-4 w-4" />
                     {!collapsed && <span>Negociações</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip="Meta">
+                  <NavLink
+                    to="/admin/meta"
+                    className={({ isActive }) => cn(
+                      "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-muted",
+                      isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
+                      collapsed && "justify-center px-0"
+                    )}
+                  >
+                    <Target className="h-4 w-4" />
+                    {!collapsed && <span>Meta</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip="Produtos">
+                  <NavLink
+                    to="/admin/produtos"
+                    className={({ isActive }) => cn(
+                      "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-muted",
+                      isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
+                      collapsed && "justify-center px-0"
+                    )}
+                  >
+                    <Boxes className="h-4 w-4" />
+                    {!collapsed && <span>Produtos</span>}
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>

@@ -8,9 +8,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 import { KanbanColumn } from "./components/kanban/KanbanColumn";
 import { KanbanCard } from "./components/kanban/KanbanCard";
 import { NegociacaoModal } from "./components/kanban/NegociacaoModal";
+import { NovaNegociacaoDialog } from "./components/kanban/NovaNegociacaoDialog";
+import { GanhoDialog } from "./components/kanban/GanhoDialog";
 import { ETAPAS, type EtapaId, type Negociacao, type VendedorLite } from "./components/kanban/types";
 import { usePermissions } from "@/hooks/usePermissions";
 
@@ -26,6 +30,8 @@ export default function Negociacoes() {
   const [countsT, setCountsT] = useState<Record<string, number>>({});
   const [countsC, setCountsC] = useState<Record<string, number>>({});
   const [venc, setVenc] = useState<Record<string, boolean>>({});
+  const [novaOpen, setNovaOpen] = useState(false);
+  const [ganhoPending, setGanhoPending] = useState<Negociacao | null>(null);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
@@ -75,9 +81,9 @@ export default function Negociacoes() {
 
   const byEtapa = useMemo(() => {
     const map: Record<EtapaId, Negociacao[]> = {
-      entrada: [], em_contato: [], orcamento: [], negociacao: [], ganho: [], perdido: [],
+      entrada: [], em_contato: [], negociacao: [], venda_realizada: [], perdido: [],
     };
-    filtered.forEach((n) => map[n.etapa]?.push(n));
+    filtered.forEach((n) => { if (map[n.etapa]) map[n.etapa].push(n); });
     return map;
   }, [filtered]);
 
@@ -99,6 +105,12 @@ export default function Negociacoes() {
 
     if (newEtapa === activeItem.etapa && over.id === active.id) return;
 
+    // Se vai para "venda_realizada" precisa dos campos obrigatórios
+    if (newEtapa === "venda_realizada" && activeItem.etapa !== "venda_realizada") {
+      setGanhoPending(activeItem);
+      return;
+    }
+
     // otimista
     setItems((prev) => prev.map((i) => (i.id === activeItem.id ? { ...i, etapa: newEtapa } : i)));
     const { error } = await supabase.from("negociacoes").update({ etapa: newEtapa }).eq("id", activeItem.id);
@@ -108,17 +120,6 @@ export default function Negociacoes() {
     }
   };
 
-  const criarManual = async (etapa: EtapaId) => {
-    const nome = prompt("Nome do cliente:");
-    if (!nome) return;
-    const { data, error } = await supabase.from("negociacoes").insert({
-      nome_cliente: nome, etapa, posicao: 999999,
-    }).select().single();
-    if (error) { toast.error(error.message); return; }
-    setItems((p) => [...p, data as Negociacao]);
-    setAtivo(data as Negociacao);
-  };
-
   const podeCriar = can("negociacoes", "edit");
 
   if (permLoading) return <AdminLayout><div className="p-8">Carregando…</div></AdminLayout>;
@@ -126,9 +127,16 @@ export default function Negociacoes() {
   return (
     <AdminLayout>
       <div className="space-y-4 h-full flex flex-col">
-        <div>
-          <h1 className="text-2xl font-bold">Negociações</h1>
-          <p className="text-sm text-muted-foreground">Pipeline de vendas</p>
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <h1 className="text-2xl font-bold">Negociações</h1>
+            <p className="text-sm text-muted-foreground">Pipeline de vendas</p>
+          </div>
+          {podeCriar && (
+            <Button onClick={() => setNovaOpen(true)}>
+              <Plus className="h-4 w-4 mr-2" /> Nova negociação
+            </Button>
+          )}
         </div>
         <div className="flex gap-2 items-center">
           <Input placeholder="Buscar…" value={busca} onChange={(e) => setBusca(e.target.value)} className="max-w-xs" />
@@ -156,7 +164,7 @@ export default function Negociacoes() {
                   countsComentarios={countsC}
                   vencidas={venc}
                   onCardClick={(n) => setAtivo(n)}
-                  onAdd={() => criarManual(e.id as EtapaId)}
+                  onAdd={() => setNovaOpen(true)}
                   canAdd={podeCriar}
                 />
               ))}
@@ -174,6 +182,20 @@ export default function Negociacoes() {
         numeroMap={numeroMap}
         onClose={() => setAtivo(null)}
         onChanged={load}
+        onRequestGanho={(n) => setGanhoPending(n)}
+      />
+
+      <NovaNegociacaoDialog
+        open={novaOpen}
+        onOpenChange={setNovaOpen}
+        vendedores={vendedores}
+        onCreated={(n) => { load(); setAtivo(n); }}
+      />
+
+      <GanhoDialog
+        negociacao={ganhoPending}
+        onClose={() => setGanhoPending(null)}
+        onDone={() => { setGanhoPending(null); load(); }}
       />
     </AdminLayout>
   );

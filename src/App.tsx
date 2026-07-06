@@ -30,6 +30,8 @@ const AdminLeads = lazy(() => import("./pages/admin/Leads"));
 const AdminUTMTerms = lazy(() => import("./pages/admin/UTMTerms"));
 const AdminVendedores = lazy(() => import("./pages/admin/Vendedores"));
 const AdminNegociacoes = lazy(() => import("./pages/admin/Negociacoes"));
+const AdminProdutos = lazy(() => import("./pages/admin/Produtos"));
+const AdminMeta = lazy(() => import("./pages/admin/Meta"));
 const SobreNos = lazy(() => import("./pages/SobreNos"));
 const PoliticaVenda = lazy(() => import("./pages/PoliticaVenda"));
 const TermoUso = lazy(() => import("./pages/TermoUso"));
@@ -116,6 +118,8 @@ const App = () => (
               <Route path="/admin/whatsapp" element={<RequireAdmin><AdminVendedores /></RequireAdmin>} />
               <Route path="/admin/vendedores" element={<RequireAdmin><AdminVendedores /></RequireAdmin>} />
               <Route path="/admin/negociacoes" element={<RequireAuth roles={["admin","gestor","vendedor"]}><AdminNegociacoes /></RequireAuth>} />
+              <Route path="/admin/produtos" element={<RequireAdmin><AdminProdutos /></RequireAdmin>} />
+              <Route path="/admin/meta" element={<RequireAuth roles={["admin","gestor","vendedor"]}><AdminMeta /></RequireAuth>} />
               
               {/* Main site routes */}
               <Route path="/*" element={<MainSite />} />
