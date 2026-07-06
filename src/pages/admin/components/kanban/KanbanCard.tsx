@@ -1,6 +1,6 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { CalendarClock, MessageSquare, Phone, User } from "lucide-react";
+import { CalendarClock, Clock, MessageSquare, Phone, User } from "lucide-react";
 import { brl, type Negociacao, type VendedorLite } from "./types";
 
 interface Props {
@@ -19,6 +19,16 @@ export function KanbanCard({ negociacao, vendedores, tarefasCount, comentariosCo
   });
   const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.4 : 1 };
   const responsavel = vendedores.find((v) => v.user_id === negociacao.responsavel_id);
+  const dataRef = negociacao.updated_at || negociacao.created_at;
+  const dataFmt = dataRef
+    ? new Intl.DateTimeFormat("pt-BR", {
+        timeZone: "America/Sao_Paulo",
+        day: "2-digit",
+        month: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(new Date(dataRef))
+    : "";
 
   return (
     <div
@@ -42,6 +52,11 @@ export function KanbanCard({ negociacao, vendedores, tarefasCount, comentariosCo
       )}
       {negociacao.produto && (
         <div className="text-xs text-muted-foreground truncate">{negociacao.produto}</div>
+      )}
+      {dataFmt && (
+        <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
+          <Clock className="h-3 w-3" /> {dataFmt}
+        </div>
       )}
       {negociacao.tags.length > 0 && (
         <div className="flex flex-wrap gap-1">
