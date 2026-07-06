@@ -83,17 +83,30 @@ const TRACKED_PAGES_KEY = "okplast_tracked_pages";
          };
  
          const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
- 
-         // Chamada assíncrona sem await - não bloqueia a UI
-         fetch(`${supabaseUrl}/functions/v1/track-visit`, {
-           method: "POST",
-           headers: { "Content-Type": "application/json" },
-           body: JSON.stringify(payload),
-         }).then(() => {
+         const url = `${supabaseUrl}/functions/v1/track-visit`;
+         const body = JSON.stringify(payload);
+
+         // sendBeacon roda fora do main thread e não entra na cadeia crítica.
+         // Fallback fetch com keepalive só quando não disponível.
+         let sent = false;
+         try {
+           if ("sendBeacon" in navigator) {
+             const blob = new Blob([body], { type: "application/json" });
+             sent = navigator.sendBeacon(url, blob);
+           }
+         } catch {}
+         if (sent) {
            markPageAsTracked(currentPath);
-         }).catch((error) => {
-           console.error("[PageVisit] Erro ao rastrear visita:", error);
-         });
+         } else {
+           fetch(url, {
+             method: "POST",
+             headers: { "Content-Type": "application/json" },
+             body,
+             keepalive: true,
+           })
+             .then(() => markPageAsTracked(currentPath))
+             .catch((error) => console.error("[PageVisit] Erro ao rastrear visita:", error));
+         }
  
        } catch (error) {
          console.error("[PageVisit] Erro ao preparar rastreamento:", error);
@@ -102,7 +115,7 @@ const TRACKED_PAGES_KEY = "okplast_tracked_pages";
        }
      };
  
-       // Adia o tracking para depois de load + 2s (tira da cadeia crítica da LCP)
+       // Adia o tracking para depois de load + 6s (tira totalmente da cadeia crítica).
        let handle: number | null = null;
        const kick = () => {
          const ric: any = (window as any).requestIdleCallback;
@@ -112,9 +125,9 @@ const TRACKED_PAGES_KEY = "okplast_tracked_pages";
        };
        let loadTimer: number | null = null;
        if (document.readyState === "complete") {
-         loadTimer = window.setTimeout(kick, 2000);
+         loadTimer = window.setTimeout(kick, 6000);
        } else {
-         const onLoad = () => { loadTimer = window.setTimeout(kick, 2000); };
+         const onLoad = () => { loadTimer = window.setTimeout(kick, 6000); };
          window.addEventListener("load", onLoad, { once: true });
        }
        return () => {
