@@ -15,7 +15,10 @@ import {
   LogOut,
   MessageCircle,
   Target,
-  Boxes
+  Boxes,
+  Settings,
+  Radar,
+  ShieldCheck
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
@@ -242,6 +245,21 @@ export function AdminSidebar() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip="Radar">
+                  <NavLink
+                    to="/admin/radar"
+                    className={({ isActive }) => cn(
+                      "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-muted",
+                      isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
+                      collapsed && "justify-center px-0"
+                    )}
+                  >
+                    <Radar className="h-4 w-4" />
+                    {!collapsed && <span>Radar</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip="Leads">
                   <NavLink
                     to="/admin/leads"
@@ -286,52 +304,76 @@ export function AdminSidebar() {
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Meta">
-                  <NavLink
-                    to="/admin/meta"
-                    className={({ isActive }) => cn(
-                      "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-muted",
-                      isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
-                      collapsed && "justify-center px-0"
-                    )}
-                  >
-                    <Target className="h-4 w-4" />
-                    {!collapsed && <span>Meta</span>}
-                  </NavLink>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Produtos">
-                  <NavLink
-                    to="/admin/produtos"
-                    className={({ isActive }) => cn(
-                      "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-muted",
-                      isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
-                      collapsed && "justify-center px-0"
-                    )}
-                  >
-                    <Boxes className="h-4 w-4" />
-                    {!collapsed && <span>Produtos</span>}
-                  </NavLink>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Vendedores">
-                  <NavLink
-                    to="/admin/vendedores"
-                    className={({ isActive }) => cn(
-                      "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-muted",
-                      isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
-                      collapsed && "justify-center px-0"
-                    )}
-                  >
-                    <MessageCircle className="h-4 w-4" />
-                    {!collapsed && <span>Vendedores</span>}
-                  </NavLink>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
             </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Configurações — agrupa páginas administrativas */}
+        <SidebarGroup>
+          <SidebarGroupLabel className={cn(collapsed && "sr-only")}>Configurações</SidebarGroupLabel>
+          <SidebarGroupContent>
+            {collapsed ? (
+              <SidebarMenu>
+                {[
+                  { to: "/admin/vendedores", label: "Vendedores", icon: MessageCircle },
+                  { to: "/admin/vendedores?tab=permissoes", label: "Permissões", icon: ShieldCheck },
+                  { to: "/admin/produtos", label: "Produtos", icon: Boxes },
+                  { to: "/admin/meta", label: "Meta", icon: Target },
+                ].map((it) => (
+                  <SidebarMenuItem key={it.to}>
+                    <SidebarMenuButton asChild tooltip={it.label}>
+                      <NavLink to={it.to} className={({ isActive }) => cn(
+                        "flex items-center justify-center h-8 w-8 mx-auto rounded-md hover:bg-muted",
+                        isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
+                      )}>
+                        <it.icon className="h-4 w-4" />
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            ) : (
+              <div className="space-y-1">
+                <button
+                  type="button"
+                  onClick={() => toggleSection("Configurações")}
+                  aria-expanded={!!openSections["Configurações"]}
+                  className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-muted w-full"
+                >
+                  <Settings className="h-4 w-4 shrink-0" />
+                  <span className="flex-1 text-left">Configurações</span>
+                  <ChevronDown className={cn("h-4 w-4 transition-transform", !openSections["Configurações"] && "-rotate-90")} />
+                </button>
+                {openSections["Configurações"] && (
+                  <div className="pl-6 space-y-1">
+                    <NavLink to="/admin/vendedores" end className={({ isActive }) => cn(
+                      "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm hover:bg-muted",
+                      isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
+                    )}>
+                      <MessageCircle className="h-3.5 w-3.5" /> Vendedores
+                    </NavLink>
+                    <NavLink to="/admin/vendedores?tab=permissoes" className={({ isActive }) => cn(
+                      "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm hover:bg-muted",
+                      isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
+                    )}>
+                      <ShieldCheck className="h-3.5 w-3.5" /> Permissões
+                    </NavLink>
+                    <NavLink to="/admin/produtos" className={({ isActive }) => cn(
+                      "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm hover:bg-muted",
+                      isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
+                    )}>
+                      <Boxes className="h-3.5 w-3.5" /> Produtos
+                    </NavLink>
+                    <NavLink to="/admin/meta" className={({ isActive }) => cn(
+                      "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm hover:bg-muted",
+                      isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
+                    )}>
+                      <Target className="h-3.5 w-3.5" /> Meta
+                    </NavLink>
+                  </div>
+                )}
+              </div>
+            )}
           </SidebarGroupContent>
         </SidebarGroup>
 
