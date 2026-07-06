@@ -1,45 +1,75 @@
-## Problema
+## Diagnóstico PageSpeed (mobile, score 87)
 
-Na tela de edição do Lucas (e outros membros) os campos **E-mail** e **Nova senha** estão desabilitados porque o membro está com **"Sem usuário de login"** vinculado. Hoje o dialog só permite editar credenciais quando já existe um usuário Auth vinculado — o que trava você quando o vendedor ainda não tem login criado (caso do Lucas, Amanda, etc.).
+Métricas: FCP 2.6s · **LCP 2.6s** (delay de render de 3.66s) · TBT 0ms · **CLS 0.02** · **SI 6.4s**. TBT já está zerado, então o ganho vem de LCP + Speed Index + CLS.
 
-## Solução
+Principais achados do relatório:
+1. **Render-blocking (~530ms):** `/assets/index-*.css` (13.6KB) e Google Fonts CSS (750ms) ainda bloqueiam.
+2. **LCP element render delay 3.66s:** o elemento LCP é o `<p>` da hero. A hero inline no `index.html` é substituída pela versão React na hidratação, o que reinicia a métrica.
+3. **CLS 0.02:** vem do `WhatsAppFloatingButton` (montado tardio via `Suspense`, empurra layout).
+4. **Unused JS 82KB:** `client-*.js` (53.8KB) e `index-*.js` (96.6KB).
+5. **Unused CSS 11KB** no bundle Tailwind.
+6. **Cache curto:** `/sounds/notification.mp3` sem cache, `~flock.js` só 25min.
+7. **Legacy JS / Minify JS 2KB:** relativo ao `/__l5e/events.js`.
 
-Permitir **criar um novo login direto do dialog "Editar membro"** quando não há usuário vinculado, além de continuar suportando vincular a um usuário já existente.
+---
 
-### Comportamento novo do dropdown "Usuário de login vinculado"
+## O que posso corrigir
 
-Três opções:
-1. **"Criar novo login"** (padrão quando o membro não tem `user_id`) → habilita E-mail + Senha, exige ambos, cria o usuário Auth e vincula.
-2. **"Sem usuário de login"** → mantém desvinculado (só login por WhatsApp/número, sem acesso ao admin).
-3. **Lista dos usuários Auth existentes** → vincula a um já criado; permite trocar e-mail/senha desse usuário.
+### 1. Eliminar render-block do CSS de verdade
+O `vite.config.ts` já tem `nonBlockingCssPlugin` que troca `<link rel="stylesheet">` por `preload+onload`, mas o HTML servido ainda aparece bloqueando. Vou:
+- Verificar/ajustar o plugin para que o transform rode no build final servido.
+- Adicionar `media="print" onload="this.media='all'"` como fallback além do preload.
 
-### Fluxo ao salvar
+### 2. Remover render-block e latência do Google Fonts
+Hoje o `index.html` tem `<noscript><link stylesheet ... fonts.googleapis.com></noscript>` e um loader tardio. Vou:
+- Self-hostar o `Montserrat 500/700 woff2` em `/public/fonts/` com `@font-face { font-display: optional }` no CSS crítico inline.
+- Remover totalmente as chamadas a `fonts.googleapis.com` e `fonts.gstatic.com` (elimina 2 requests third-party e 750ms de latência).
 
-- Se "Criar novo login": chama `create-team-member` (edge function já existente) com `nome`, `email`, `password`, `role`, mas **sem criar novo whatsapp_numbers** — precisa ajustar a função para aceitar um `link_whatsapp_id` opcional; quando presente, cria o auth user + role e faz `UPDATE whatsapp_numbers SET user_id=<novo> WHERE id=<link_whatsapp_id>` em vez de inserir uma nova linha.
-- Se usuário existente: fluxo atual (update whatsapp_numbers.user_id, user_roles, e chama `update-team-member` para email/senha se mudou).
-- Se "Sem usuário": limpa `user_id` da linha.
+### 3. Zerar CLS do botão flutuante do WhatsApp
+- Reservar o espaço fixo (`bottom-6 right-6`) via placeholder ou renderizar o container vazio imediatamente, hidratando o conteúdo depois.
+- Alternativa: remover o `Suspense` lazy do `WhatsAppFloatingButton` (peso é minúsculo, ~2KB) e montar direto.
 
-### Mudanças de código
+### 4. Estabilizar o elemento LCP (reduzir "render delay" de 3.6s)
+- Fazer o `HeroSection` React renderizar exatamente o mesmo DOM da hero inline (mesmas classes, mesmo texto) para que a hidratação não re-crie o `<p>` LCP.
+- Manter apenas um `<h1>` renderizado (evitar duplicidade entre static + React).
 
-**`supabase/functions/create-team-member/index.ts`**
-- Aceitar campo opcional `link_whatsapp_id: string`.
-- Quando presente: pular o `insert` em `whatsapp_numbers` e fazer `update` na linha existente ligando o novo `user_id`; ignorar `numero_raw`/`peso`/etc. do body (a linha já existe).
+### 5. Reduzir JS não usado (~40KB)
+- Lazy-load do `react-helmet-async` só em rotas que setam SEO custom (a home já tem tudo no `index.html`).
+- Mover `WhatsAppModal`, `WhatsAppChatWidget` e `useUTM/usePageVisit` para carregar após `requestIdleCallback` / primeira interação (hoje `useUTM` e `usePageVisit` rodam no `Layout` no mount).
+- Rodar `track-visit` (Supabase edge function) via `navigator.sendBeacon` diferido (hoje aparece na cadeia crítica de 6.8s).
 
-**`src/pages/admin/Vendedores.tsx` — `EditMemberDialog`**
-- Adicionar opção `"new"` no `Select` de usuário vinculado, e torná-la o valor padrão quando `member.user_id` for null.
-- Habilitar campos E-mail e Senha quando `userId === "new"` (obrigatórios) ou quando um usuário existente estiver selecionado (opcionais).
-- Ajustar `submit`:
-  - `userId === "new"`: valida email+senha, chama `create-team-member` com `link_whatsapp_id: member.id` e os outros campos do formulário.
-  - `userId === "none"`: apenas UPDATE em `whatsapp_numbers` limpando `user_id`.
-  - `userId === "<uuid>"`: fluxo atual.
-- Atualizar o texto de ajuda ("Selecione um usuário…") para refletir as 3 opções.
+### 6. Reduzir CSS não usado (~11KB)
+- Ativar `content` mais restrito no Tailwind e habilitar `safelist` só do necessário.
+- Remover utilitários não usados de componentes shadcn não importados.
 
-### O que NÃO muda
+### 7. Cache do `/sounds/notification.mp3`
+- O arquivo é usado apenas no admin. Remover do bundle público (mover para import dinâmico dentro de `/admin`) para não aparecer no home.
 
-- Botão "Adicionar membro" continua igual (cria membro+login de uma vez).
-- Botão da chave (KeyRound) continua igual (só aparece para membros já com user_id).
-- Tabelas, RLS, permissões, edge function `update-team-member` — nenhuma alteração.
+---
 
-## Resultado
+## O que NÃO posso corrigir
 
-Você abre "Editar" no Lucas → dropdown já vem em **"Criar novo login"** → preenche e-mail + senha → Salvar → login do Lucas fica criado e vinculado, sem precisar do fluxo "Adicionar membro".
+Estes itens são da plataforma de hospedagem/tracking Lovable e não são editáveis pelo código do projeto:
+
+- **`/__l5e/events.js`** (9.3KB, 2KB de minify possível) — script de tracking injetado pela plataforma.
+- **`/~flock.js`** (Google Ads gtag, cache 25min) — injetado automaticamente; não posso alterar headers de cache.
+- **`client-DVofI4QP.js` (53.8KB, ~43KB unused)** — runtime da plataforma. Não é do bundle da app.
+- **Headers HTTP de cache** (`Cache-Control`, TTL de assets estáticos, mp3) — controlados pelo CDN da Lovable.
+- **CrUX / dados reais de usuários** — depende de volume de tráfego real do site.
+- **CPU throttling 1.2x + Slow 4G** do teste simulado — parâmetros do Lighthouse.
+
+---
+
+## Ganho esperado
+
+Aplicando 1–4 (as maiores alavancas): FCP cai para ~1.4s, LCP para ~1.6s, SI para ~3.5s, CLS para 0.00. Isso deve levar o score para **92–96**. Itens 5–7 são reforço para manter margem.
+
+## Ordem de execução
+
+1. Self-host da Montserrat + remoção do Google Fonts.
+2. Ajuste do `nonBlockingCssPlugin` + fallback `media=print`.
+3. Igualar DOM da hero React ao inline (fim do render delay).
+4. Reservar espaço do WhatsAppFloatingButton.
+5. Diferir `useUTM`, `usePageVisit` e `track-visit`.
+6. Mover `notification.mp3` para dentro do bundle admin.
+7. Rebuild e reteste no PageSpeed.
