@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Plus, Trash2, Save, Loader2, Users, KeyRound } from "lucide-react";
+import { Plus, Trash2, Save, Loader2, Users, KeyRound, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { PermissionsMatrix } from "./components/PermissionsMatrix";
 
@@ -44,6 +44,7 @@ export default function Vendedores() {
   const [saving, setSaving] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [editCred, setEditCred] = useState<Member | null>(null);
+  const [editFull, setEditFull] = useState<Member | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -213,6 +214,9 @@ export default function Vendedores() {
                     <Button variant="ghost" size="icon" onClick={() => setEditCred(row)} disabled={!row.user_id} title="Editar email/senha">
                       <KeyRound className="h-4 w-4"/>
                     </Button>
+                    <Button variant="ghost" size="icon" onClick={() => setEditFull(row)} title="Editar tudo">
+                      <Pencil className="h-4 w-4"/>
+                    </Button>
                     <Button variant="ghost" size="icon" onClick={() => removeRow(row)} className="text-destructive">
                       <Trash2 className="h-4 w-4"/>
                     </Button>
@@ -259,7 +263,115 @@ export default function Vendedores() {
 
       <AddMemberDialog open={addOpen} onOpenChange={setAddOpen} onCreated={load} />
       <EditCredentialsDialog member={editCred} onClose={() => setEditCred(null)} onSaved={load} />
+      <EditMemberDialog member={editFull} onClose={() => setEditFull(null)} onSaved={load} />
     </AdminLayout>
+  );
+}
+
+function EditMemberDialog({ member, onClose, onSaved }: { member: Member | null; onClose: () => void; onSaved: () => void }) {
+  const [nome, setNome] = useState("");
+  const [numero, setNumero] = useState("");
+  const [role, setRole] = useState<Role>("vendedor");
+  const [peso, setPeso] = useState(0);
+  const [ativo, setAtivo] = useState(true);
+  const [recebe, setRecebe] = useState(true);
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!member) return;
+    setNome(member.nome_vendedor);
+    setNumero(member.numero_formatado);
+    setRole(member.role);
+    setPeso(member.peso);
+    setAtivo(member.ativo);
+    setRecebe(member.recebe_lead);
+    setEmail(member.email ?? "");
+    setSenha("");
+  }, [member?.id]);
+
+  const submit = async () => {
+    if (!member?.id) return;
+    if (senha && senha.length < 6) return toast.error("Senha precisa ter no mínimo 6 caracteres");
+    setSaving(true);
+    try {
+      const raw = numero ? toRaw(numero) : member.numero_raw;
+      const { error } = await supabase.from("whatsapp_numbers").update({
+        nome_vendedor: nome,
+        numero_raw: raw,
+        numero_formatado: formatDisplay(raw),
+        peso: role === "gestor" ? 0 : peso,
+        ativo,
+        recebe_lead: role === "gestor" ? false : recebe,
+      }).eq("id", member.id);
+      if (error) throw error;
+
+      if (member.user_id) {
+        if (role !== member.role) {
+          await supabase.from("user_roles").delete().eq("user_id", member.user_id);
+          await supabase.from("user_roles").insert({ user_id: member.user_id, role });
+        }
+        const credChanges: { user_id: string; email?: string; password?: string } = { user_id: member.user_id };
+        if (email && email !== member.email) credChanges.email = email;
+        if (senha) credChanges.password = senha;
+        if (credChanges.email || credChanges.password) {
+          const { data, error: fnErr } = await supabase.functions.invoke("update-team-member", { body: credChanges });
+          if (fnErr) throw fnErr;
+          if ((data as any)?.error) throw new Error((data as any).error);
+        }
+      }
+
+      toast.success("Salvo");
+      try { window.localStorage.removeItem("okp-wa-cache"); } catch {}
+      onClose();
+      onSaved();
+    } catch (e) { toast.error((e as Error).message); }
+    finally { setSaving(false); }
+  };
+
+  return (
+    <Dialog open={!!member} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader><DialogTitle>Editar membro — {member?.nome_vendedor}</DialogTitle></DialogHeader>
+        <div className="space-y-3 max-h-[70vh] overflow-y-auto pr-1">
+          <div><Label>Nome</Label><Input value={nome} onChange={(e) => setNome(e.target.value)} /></div>
+          <div><Label>WhatsApp</Label><Input value={numero} onChange={(e) => setNumero(formatDisplay(e.target.value))} maxLength={15} /></div>
+          <div>
+            <Label>Papel</Label>
+            <Select value={role} onValueChange={(v) => setRole(v as Role)}>
+              <SelectTrigger><SelectValue/></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="admin">Admin</SelectItem>
+                <SelectItem value="gestor">Gestor</SelectItem>
+                <SelectItem value="vendedor">Vendedor</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          {role !== "gestor" && (
+            <div><Label>Peso do rateio (%)</Label><Input type="number" min={0} max={100} value={peso} onChange={(e) => setPeso(Math.max(0, Math.min(100, Number(e.target.value) || 0)))} /></div>
+          )}
+          <div className="flex gap-6">
+            <label className="flex items-center gap-2 text-sm"><Switch checked={ativo} onCheckedChange={setAtivo}/> Ativo</label>
+            {role !== "gestor" && (
+              <label className="flex items-center gap-2 text-sm"><Switch checked={recebe} onCheckedChange={setRecebe}/> Recebe lead</label>
+            )}
+          </div>
+          <div className="pt-3 border-t">
+            <p className="text-xs text-muted-foreground mb-2">Credenciais de login (somente admin)</p>
+            <div className="space-y-3">
+              <div><Label>E-mail</Label><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} disabled={!member?.user_id} /></div>
+              <div><Label>Nova senha</Label><Input type="text" value={senha} onChange={(e) => setSenha(e.target.value)} placeholder="Deixe em branco para manter" disabled={!member?.user_id} /></div>
+              {!member?.user_id && <p className="text-xs text-muted-foreground">Este membro não tem usuário de login vinculado.</p>}
+            </div>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>Cancelar</Button>
+          <Button onClick={submit} disabled={saving}>{saving ? <Loader2 className="h-4 w-4 animate-spin"/> : "Salvar"}</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
