@@ -25,18 +25,26 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "Sem permissão" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    // Lista todos os users (paginado até 1000)
+    // Lista todos os usuários (paginado até 1000)
     const emails: Record<string, string> = {};
+    const users: Array<{ id: string; email: string | null; nome: string | null }> = [];
     let page = 1;
     while (true) {
       const { data, error } = await admin.auth.admin.listUsers({ page, perPage: 200 });
       if (error) throw error;
-      for (const u of data.users) if (u.email) emails[u.id] = u.email;
+      for (const u of data.users) {
+        if (u.email) emails[u.id] = u.email;
+        users.push({
+          id: u.id,
+          email: u.email ?? null,
+          nome: (u.user_metadata?.nome as string | undefined) ?? null,
+        });
+      }
       if (data.users.length < 200) break;
       page++;
       if (page > 20) break;
     }
-    return new Response(JSON.stringify({ emails }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return new Response(JSON.stringify({ emails, users }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (err) {
     return new Response(JSON.stringify({ error: (err as Error).message }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }

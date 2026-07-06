@@ -29,6 +29,12 @@ interface Member {
   _dirty?: boolean;
 }
 
+interface TeamUser {
+  id: string;
+  email: string | null;
+  nome: string | null;
+}
+
 function formatDisplay(digits: string): string {
   const d = digits.replace(/\D/g, "").replace(/^55/, "");
   if (d.length <= 2) return d;
@@ -45,6 +51,7 @@ export default function Vendedores() {
   const [addOpen, setAddOpen] = useState(false);
   const [editCred, setEditCred] = useState<Member | null>(null);
   const [editFull, setEditFull] = useState<Member | null>(null);
+  const [teamUsers, setTeamUsers] = useState<TeamUser[]>([]);
 
   const load = async () => {
     setLoading(true);
@@ -69,10 +76,13 @@ export default function Vendedores() {
 
     // busca emails via edge function (admin API)
     let emailsMap: Record<string, string> = {};
+    let usersList: TeamUser[] = [];
     try {
       const { data: em } = await supabase.functions.invoke("list-team-members");
       emailsMap = (em as { emails?: Record<string, string> })?.emails ?? {};
+      usersList = (em as { users?: TeamUser[] })?.users ?? [];
     } catch { /* silencioso */ }
+    setTeamUsers(usersList);
 
     const members: Member[] = (wa || []).map((w) => ({
       id: w.id,
@@ -263,13 +273,14 @@ export default function Vendedores() {
 
       <AddMemberDialog open={addOpen} onOpenChange={setAddOpen} onCreated={load} />
       <EditCredentialsDialog member={editCred} onClose={() => setEditCred(null)} onSaved={load} />
-      <EditMemberDialog member={editFull} onClose={() => setEditFull(null)} onSaved={load} />
+      <EditMemberDialog member={editFull} users={teamUsers} onClose={() => setEditFull(null)} onSaved={load} />
     </AdminLayout>
   );
 }
 
-function EditMemberDialog({ member, onClose, onSaved }: { member: Member | null; onClose: () => void; onSaved: () => void }) {
+function EditMemberDialog({ member, users, onClose, onSaved }: { member: Member | null; users: TeamUser[]; onClose: () => void; onSaved: () => void }) {
   const [nome, setNome] = useState("");
+  const [userId, setUserId] = useState<string>("none");
   const [numero, setNumero] = useState("");
   const [role, setRole] = useState<Role>("vendedor");
   const [peso, setPeso] = useState(0);
@@ -282,6 +293,7 @@ function EditMemberDialog({ member, onClose, onSaved }: { member: Member | null;
   useEffect(() => {
     if (!member) return;
     setNome(member.nome_vendedor);
+    setUserId(member.user_id ?? "none");
     setNumero(member.numero_formatado);
     setRole(member.role);
     setPeso(member.peso);
@@ -296,8 +308,11 @@ function EditMemberDialog({ member, onClose, onSaved }: { member: Member | null;
     if (senha && senha.length < 6) return toast.error("Senha precisa ter no mínimo 6 caracteres");
     setSaving(true);
     try {
+      const nextUserId = userId === "none" ? null : userId;
+      const selectedUser = users.find((u) => u.id === nextUserId);
       const raw = numero ? toRaw(numero) : member.numero_raw;
       const { error } = await supabase.from("whatsapp_numbers").update({
+        user_id: nextUserId,
         nome_vendedor: nome,
         numero_raw: raw,
         numero_formatado: formatDisplay(raw),
@@ -307,13 +322,11 @@ function EditMemberDialog({ member, onClose, onSaved }: { member: Member | null;
       }).eq("id", member.id);
       if (error) throw error;
 
-      if (member.user_id) {
-        if (role !== member.role) {
-          await supabase.from("user_roles").delete().eq("user_id", member.user_id);
-          await supabase.from("user_roles").insert({ user_id: member.user_id, role });
-        }
-        const credChanges: { user_id: string; email?: string; password?: string } = { user_id: member.user_id };
-        if (email && email !== member.email) credChanges.email = email;
+      if (nextUserId) {
+        await supabase.from("user_roles").delete().eq("user_id", nextUserId);
+        await supabase.from("user_roles").insert({ user_id: nextUserId, role });
+        const credChanges: { user_id: string; email?: string; password?: string } = { user_id: nextUserId };
+        if (email && email !== (selectedUser?.email ?? member.email)) credChanges.email = email;
         if (senha) credChanges.password = senha;
         if (credChanges.email || credChanges.password) {
           const { data, error: fnErr } = await supabase.functions.invoke("update-team-member", { body: credChanges });
@@ -336,6 +349,24 @@ function EditMemberDialog({ member, onClose, onSaved }: { member: Member | null;
         <DialogHeader><DialogTitle>Editar membro — {member?.nome_vendedor}</DialogTitle></DialogHeader>
         <div className="space-y-3 max-h-[70vh] overflow-y-auto pr-1">
           <div><Label>Nome</Label><Input value={nome} onChange={(e) => setNome(e.target.value)} /></div>
+          <div>
+            <Label>Usuário de login vinculado</Label>
+            <Select value={userId} onValueChange={(v) => {
+              setUserId(v);
+              const selected = users.find((u) => u.id === v);
+              if (selected?.email) setEmail(selected.email);
+            }}>
+              <SelectTrigger><SelectValue placeholder="Selecione o login" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Sem usuário de login</SelectItem>
+                {users.map((u) => (
+                  <SelectItem key={u.id} value={u.id}>
+                    {u.nome ? `${u.nome} — ` : ""}{u.email ?? u.id}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <div><Label>WhatsApp</Label><Input value={numero} onChange={(e) => setNumero(formatDisplay(e.target.value))} maxLength={15} /></div>
           <div>
             <Label>Papel</Label>
@@ -360,9 +391,9 @@ function EditMemberDialog({ member, onClose, onSaved }: { member: Member | null;
           <div className="pt-3 border-t">
             <p className="text-xs text-muted-foreground mb-2">Credenciais de login (somente admin)</p>
             <div className="space-y-3">
-              <div><Label>E-mail</Label><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} disabled={!member?.user_id} /></div>
-              <div><Label>Nova senha</Label><Input type="text" value={senha} onChange={(e) => setSenha(e.target.value)} placeholder="Deixe em branco para manter" disabled={!member?.user_id} /></div>
-              {!member?.user_id && <p className="text-xs text-muted-foreground">Este membro não tem usuário de login vinculado.</p>}
+              <div><Label>E-mail</Label><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} disabled={userId === "none"} /></div>
+              <div><Label>Nova senha</Label><Input type="text" value={senha} onChange={(e) => setSenha(e.target.value)} placeholder="Deixe em branco para manter" disabled={userId === "none"} /></div>
+              {userId === "none" && <p className="text-xs text-muted-foreground">Selecione um usuário de login para vincular e editar credenciais.</p>}
             </div>
           </div>
         </div>
