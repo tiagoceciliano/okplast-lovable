@@ -125,8 +125,33 @@ serve(async (req) => {
     // === Cria negociação automática ligada ao vendedor do rateio ===
     try {
       let responsavelId: string | null = null;
-      const destino = payload.destino_whatsapp || null;
-      if (destino) {
+      let destino = payload.destino_whatsapp || null;
+
+      // Fallback: se o cliente não enviou destino, sorteia um número ativo
+      // ponderado por 'peso' no próprio servidor para nunca ficar sem responsável.
+      if (!destino) {
+        const { data: ativos } = await supabase
+          .from("whatsapp_numbers")
+          .select("numero_raw, user_id, peso")
+          .eq("ativo", true);
+        if (ativos && ativos.length > 0) {
+          const total = ativos.reduce((s, n: any) => s + Math.max(0, n.peso ?? 0), 0);
+          let pick = ativos[0] as any;
+          if (total > 0) {
+            let r = Math.random() * total;
+            for (const n of ativos as any[]) {
+              r -= Math.max(0, n.peso ?? 0);
+              if (r <= 0) { pick = n; break; }
+            }
+          }
+          destino = pick.numero_raw;
+          responsavelId = pick.user_id ?? null;
+          // grava também no lead para rastreabilidade
+          await supabase.from("leads").update({ destino_whatsapp: destino }).eq("id", leadData.id);
+        }
+      }
+
+      if (destino && !responsavelId) {
         const { data: wa } = await supabase
           .from("whatsapp_numbers")
           .select("user_id")
