@@ -328,8 +328,9 @@ function EditMemberDialog({ member, users, onClose, onSaved }: { member: Member 
         const { data, error: fnErr } = await supabase.functions.invoke("create-team-member", {
           body: { nome, email, password: senha, role, link_whatsapp_id: member.id },
         });
-        if (fnErr) throw fnErr;
-        if ((data as any)?.error) throw new Error((data as any).error);
+        const errMsg = (data as any)?.error;
+        if (errMsg) throw new Error(errMsg);
+        if (fnErr) throw new Error((fnErr as any)?.message || "Erro ao criar login");
         toast.success("Login criado e vinculado");
         try { window.localStorage.removeItem("okp-wa-cache"); } catch {}
         onClose();
