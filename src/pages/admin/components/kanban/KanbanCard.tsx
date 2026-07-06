@@ -19,7 +19,7 @@ export function KanbanCard({ negociacao, vendedores, tarefasCount, comentariosCo
   });
   const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.4 : 1 };
   const responsavel = vendedores.find((v) => v.user_id === negociacao.responsavel_id);
-  const dataRef = negociacao.updated_at || negociacao.created_at;
+  const dataRef = negociacao.created_at;
   const dataFmt = dataRef
     ? new Intl.DateTimeFormat("pt-BR", {
         timeZone: "America/Sao_Paulo",
