@@ -328,8 +328,9 @@ function EditMemberDialog({ member, users, onClose, onSaved }: { member: Member 
         const { data, error: fnErr } = await supabase.functions.invoke("create-team-member", {
           body: { nome, email, password: senha, role, link_whatsapp_id: member.id },
         });
-        if (fnErr) throw fnErr;
-        if ((data as any)?.error) throw new Error((data as any).error);
+        const errMsg = (data as any)?.error;
+        if (errMsg) throw new Error(errMsg);
+        if (fnErr) throw new Error((fnErr as any)?.message || "Erro ao criar login");
         toast.success("Login criado e vinculado");
         try { window.localStorage.removeItem("okp-wa-cache"); } catch {}
         onClose();
@@ -359,8 +360,9 @@ function EditMemberDialog({ member, users, onClose, onSaved }: { member: Member 
         if (senha) credChanges.password = senha;
         if (credChanges.email || credChanges.password) {
           const { data, error: fnErr } = await supabase.functions.invoke("update-team-member", { body: credChanges });
-          if (fnErr) throw fnErr;
-          if ((data as any)?.error) throw new Error((data as any).error);
+          const em = (data as any)?.error;
+          if (em) throw new Error(em);
+          if (fnErr) throw new Error((fnErr as any)?.message || "Erro ao atualizar credenciais");
         }
       }
 
@@ -464,8 +466,9 @@ function EditCredentialsDialog({ member, onClose, onSaved }: { member: Member | 
       if (email && email !== member.email) body.email = email;
       if (senha) body.password = senha;
       const { data, error } = await supabase.functions.invoke("update-team-member", { body });
-      if (error) throw error;
-      if ((data as any)?.error) throw new Error((data as any).error);
+      const em = (data as any)?.error;
+      if (em) throw new Error(em);
+      if (error) throw new Error((error as any)?.message || "Erro ao atualizar credenciais");
       toast.success("Credenciais atualizadas");
       onClose();
       onSaved();
@@ -518,8 +521,9 @@ function AddMemberDialog({ open, onOpenChange, onCreated }: { open: boolean; onO
           ativo: true,
         },
       });
-      if (error) throw error;
-      if ((data as any)?.error) throw new Error((data as any).error);
+      const em = (data as any)?.error;
+      if (em) throw new Error(em);
+      if (error) throw new Error((error as any)?.message || "Erro ao criar membro");
       toast.success("Membro criado");
       onOpenChange(false);
       setNome(""); setEmail(""); setSenha(""); setNumero(""); setPeso(0); setRole("vendedor");
