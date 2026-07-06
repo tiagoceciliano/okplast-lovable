@@ -8,12 +8,17 @@ import { toast } from "sonner";
 type AppRole = "admin" | "gestor" | "vendedor";
 const ROLES: AppRole[] = ["admin", "gestor", "vendedor"];
 const RESOURCES: { id: string; label: string; scopable: boolean }[] = [
+  { id: "dashboard", label: "Dashboard", scopable: false },
+  { id: "radar", label: "Radar", scopable: false },
   { id: "leads", label: "Leads", scopable: true },
   { id: "negociacoes", label: "Negociações", scopable: true },
   { id: "tarefas", label: "Tarefas", scopable: true },
   { id: "comentarios", label: "Comentários", scopable: true },
   { id: "vendedores", label: "Vendedores/WhatsApp", scopable: false },
-  { id: "dashboard", label: "Dashboard", scopable: false },
+  { id: "produtos", label: "Produtos", scopable: false },
+  { id: "meta", label: "Meta", scopable: false },
+  { id: "utm_terms", label: "Termos UTM", scopable: false },
+  { id: "permissoes", label: "Permissões", scopable: false },
 ];
 
 interface Row {
