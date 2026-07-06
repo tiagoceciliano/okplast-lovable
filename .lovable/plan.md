@@ -1,119 +1,45 @@
-## Objetivo
-Página interna `/admin/negociacoes` (Kanban) substituindo o Kinbox. Simples. Lead que entra pelo site cria automaticamente uma **negociação em ENTRADA** já com o vendedor do rateio como responsável.
+## Problema
 
-## Regras importantes de posse
-- **Vendedor é dono da NEGOCIAÇÃO, não do LEAD.** Se o mesmo cliente voltar meses depois, o rateio de WhatsApp roda normal e uma nova negociação nasce com quem recebeu — sem vínculo com o vendedor anterior.
-- Nada de guardar `responsavel_id` na tabela `leads`.
+Na tela de edição do Lucas (e outros membros) os campos **E-mail** e **Nova senha** estão desabilitados porque o membro está com **"Sem usuário de login"** vinculado. Hoje o dialog só permite editar credenciais quando já existe um usuário Auth vinculado — o que trava você quando o vendedor ainda não tem login criado (caso do Lucas, Amanda, etc.).
 
-## Etapas do pipeline
-ENTRADA → EM CONTATO → ORÇAMENTO ENVIADO → NEGOCIAÇÃO → VENDA REALIZADA → PERDIDO
+## Solução
 
-## Papéis
-Enum `app_role` passa a ter: `admin`, `gestor`, `vendedor`.
-- **admin**: tudo.
-- **gestor**: tudo em negociações/leads, pode ter número de WhatsApp cadastrado (só de referência, peso=0, não entra no rateio).
-- **vendedor**: por padrão só visualiza; edita apenas negociações onde é responsável; nunca exclui.
+Permitir **criar um novo login direto do dialog "Editar membro"** quando não há usuário vinculado, além de continuar suportando vincular a um usuário já existente.
 
-## Página unificada "Vendedores & WhatsApp" (`/admin/vendedores`)
-Substitui a atual `/admin/whatsapp`. Uma única tela com abas:
+### Comportamento novo do dropdown "Usuário de login vinculado"
 
-**Aba 1 — Equipe**
-Lista todos os usuários (admin, gestor, vendedor). Cada linha:
-- Nome, email, papel (dropdown admin/gestor/vendedor)
-- WhatsApp (opcional; gestor pode ter só de referência)
-- Peso do rateio (%) — para vendedor obrigatório; gestor fica travado em 0
-- Switch "Recebe lead" (para gestor sempre desligado)
-- Switch "Ativo"
-- Botão remover
-Botão "Adicionar membro" → cria usuário no Supabase Auth (edge function `create-team-member` com service role), envia senha inicial, vincula role e (se aplicável) linha em `whatsapp_numbers` com o `user_id`.
-Regras: soma dos pesos ativos (só quem "Recebe lead") = 100%. Igual à página atual.
+Três opções:
+1. **"Criar novo login"** (padrão quando o membro não tem `user_id`) → habilita E-mail + Senha, exige ambos, cria o usuário Auth e vincula.
+2. **"Sem usuário de login"** → mantém desvinculado (só login por WhatsApp/número, sem acesso ao admin).
+3. **Lista dos usuários Auth existentes** → vincula a um já criado; permite trocar e-mail/senha desse usuário.
 
-**Aba 2 — Permissões**
-Matriz por papel (não por usuário — mais simples e coerente com pedido de pré-configurar o vendedor):
-```
-                    | Ver | Editar | Excluir
-Leads               |     |        |
-Negociações         |     |        |
-Tarefas             |     |        |
-Comentários         |     |        |
-WhatsApp/Vendedores |     |        |
-Dashboard           |     |        |
-```
-Para vendedor há dois modos por linha: "Tudo" ou "Só o meu" (aplicável a Leads e Negociações; Negociação usa `responsavel_id = auth.uid()`).
-Padrões vendedor: Ver=Só o meu, Editar=Só o meu, Excluir=não. Padrões gestor: tudo liberado.
-Salvo em nova tabela `role_permissions` (role, resource, can_view, can_edit, can_delete, scope: 'all'|'own').
+### Fluxo ao salvar
 
-**Aba 3 — Como funciona o rateio** (info card atual)
+- Se "Criar novo login": chama `create-team-member` (edge function já existente) com `nome`, `email`, `password`, `role`, mas **sem criar novo whatsapp_numbers** — precisa ajustar a função para aceitar um `link_whatsapp_id` opcional; quando presente, cria o auth user + role e faz `UPDATE whatsapp_numbers SET user_id=<novo> WHERE id=<link_whatsapp_id>` em vez de inserir uma nova linha.
+- Se usuário existente: fluxo atual (update whatsapp_numbers.user_id, user_roles, e chama `update-team-member` para email/senha se mudou).
+- Se "Sem usuário": limpa `user_id` da linha.
 
-## Página `/admin/negociacoes` (Kanban)
-- 6 colunas com título, contagem e "R$ total".
-- Cards: nome + telefone, valor, avatar do responsável, tags/produto, contadores (tarefas, comentários), badge vermelho se tarefa vencida.
-- Drag & drop entre colunas (`@dnd-kit/core`) atualiza `etapa` e `posicao`.
-- Filtros no topo: por responsável, tag, busca.
-- Botão "+" no rodapé de cada coluna cria negociação manual.
-- Sidebar admin ganha item "Negociações".
+### Mudanças de código
 
-## Modal de detalhe (estilo Kinbox)
-- Header: nome + telefone, ✓ (mover p/ ganho) e ✗ (perdido), atribuir responsável (dropdown com quem "Recebe lead"), tags.
-- Barra de etapas clicável.
-- Esquerda: campo de comentário, botão "Tarefa", lista de tarefas com checkbox, histórico cronológico automático.
-- Direita: Add valor, Add produto (texto livre), material, data/hora do lead, UTMs, msg do formulário, bloco Contato.
+**`supabase/functions/create-team-member/index.ts`**
+- Aceitar campo opcional `link_whatsapp_id: string`.
+- Quando presente: pular o `insert` em `whatsapp_numbers` e fazer `update` na linha existente ligando o novo `user_id`; ignorar `numero_raw`/`peso`/etc. do body (a linha já existe).
 
-## Banco de dados (nova migração)
+**`src/pages/admin/Vendedores.tsx` — `EditMemberDialog`**
+- Adicionar opção `"new"` no `Select` de usuário vinculado, e torná-la o valor padrão quando `member.user_id` for null.
+- Habilitar campos E-mail e Senha quando `userId === "new"` (obrigatórios) ou quando um usuário existente estiver selecionado (opcionais).
+- Ajustar `submit`:
+  - `userId === "new"`: valida email+senha, chama `create-team-member` com `link_whatsapp_id: member.id` e os outros campos do formulário.
+  - `userId === "none"`: apenas UPDATE em `whatsapp_numbers` limpando `user_id`.
+  - `userId === "<uuid>"`: fluxo atual.
+- Atualizar o texto de ajuda ("Selecione um usuário…") para refletir as 3 opções.
 
-**Alterar enum** `app_role`: adicionar `gestor` e `vendedor`.
+### O que NÃO muda
 
-**Alterar `whatsapp_numbers`**:
-- adicionar `user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL` (nullable — pode existir número sem usuário, mas o normal é vinculado)
-- adicionar `recebe_lead boolean NOT NULL DEFAULT true` (gestor = false)
+- Botão "Adicionar membro" continua igual (cria membro+login de uma vez).
+- Botão da chave (KeyRound) continua igual (só aparece para membros já com user_id).
+- Tabelas, RLS, permissões, edge function `update-team-member` — nenhuma alteração.
 
-**Nova `role_permissions`**
-Colunas: `role app_role`, `resource text`, `can_view boolean`, `can_edit boolean`, `can_delete boolean`, `scope text` ('all'|'own'). PK (role, resource). Seed com defaults acima.
+## Resultado
 
-**Nova `negociacoes`**
-`id, lead_id (FK nullable), nome_cliente, telefone, email, etapa (enum), responsavel_id (FK auth.users), valor numeric, produto text, material, mensagem, utm_*, posicao int, tags text[], created_at, updated_at`. Trigger `updated_at`.
-
-**Nova `negociacao_tarefas`**: `negociacao_id, titulo, data_vencimento, concluida, created_by`.
-
-**Nova `negociacao_comentarios`**: `negociacao_id, autor_id, texto`.
-
-**Nova `negociacao_historico`**: `negociacao_id, autor_id, tipo, descricao` (log automático via trigger em mudança de etapa/responsável).
-
-**RLS** (usando `has_role` já existente):
-- Admin e gestor: full access em tudo.
-- Vendedor em `negociacoes`: SELECT/UPDATE apenas se `responsavel_id = auth.uid()`. Sem DELETE.
-- Vendedor em `leads`: SELECT apenas se existir negociação sua ligada a esse lead. Sem edit/delete.
-- `role_permissions`: SELECT authenticated (frontend usa pra esconder botões); INSERT/UPDATE/DELETE só admin.
-- `whatsapp_numbers`: admin edita; leitura mantém como está (anon lê ativos com `recebe_lead=true`).
-
-**GRANTs**: authenticated para leitura das tabelas relevantes; service_role total (necessário para `process-lead`).
-
-## Fluxo automático de entrada (rateio → responsável)
-Alterar `supabase/functions/process-lead/index.ts`:
-1. Após inserir o lead, buscar em `whatsapp_numbers` o registro cujo `numero_raw = destino_whatsapp` recebido do client, pegar `user_id`.
-2. Inserir `negociacoes` com etapa=`entrada`, `responsavel_id=user_id`, dados do lead + UTMs, `posicao = max+1 na coluna`.
-3. Se `user_id` for null (número sem vínculo), grava negociação sem responsável — admin atribui depois.
-
-## Login vendedor/gestor
-- `/admin/login` continua igual.
-- Renomear `RequireAdmin` → `RequireAuth` com prop `roles`. Rotas de config e dashboard exigem admin ou gestor; `/admin/negociacoes` aceita os três; `/admin/leads` fica admin+gestor+vendedor (com RLS filtrando).
-- Após login: admin/gestor → `/admin`; vendedor → `/admin/negociacoes`.
-- Frontend consulta `role_permissions` e esconde botões conforme scope/permissão. RLS continua sendo a barreira real.
-
-## Arquivos afetados
-- Migration (enum, alter whatsapp_numbers, novas tabelas, seed permissions, RLS, grants, triggers).
-- `supabase/functions/process-lead/index.ts` — cria negociação automática.
-- Nova edge function `create-team-member` (service role — cria user + role + linha em whatsapp_numbers).
-- `src/App.tsx` — rota `/admin/negociacoes`, remover `/admin/whatsapp`, adicionar `/admin/vendedores`.
-- `src/components/admin/RequireAdmin.tsx` → `RequireAuth` com `roles`.
-- `src/pages/admin/components/AdminSidebar.tsx` — novo item "Negociações", renomear "WhatsApp" para "Vendedores & WhatsApp".
-- Novos: `src/pages/admin/Negociacoes.tsx`, `src/pages/admin/Vendedores.tsx` (com 3 abas), `src/pages/admin/components/kanban/*` (Board, Column, Card, DetailModal, TarefasList, ComentariosList, PermissionsMatrix).
-- Novo hook `src/hooks/usePermissions.ts` (retorna `{ can(resource, action, ownerId?) }`).
-- `bun add @dnd-kit/core @dnd-kit/sortable`.
-
-## Fora de escopo
-- Notificações email/WhatsApp de tarefa (só lembrete visual).
-- Catálogo de produtos com preço (valor e produto livres).
-- Metas/Campanhas/Contatos do Kinbox.
-- Importar histórico do Kinbox.
-- Permissões por usuário individual (só por papel).
+Você abre "Editar" no Lucas → dropdown já vem em **"Criar novo login"** → preenche e-mail + senha → Salvar → login do Lucas fica criado e vinculado, sem precisar do fluxo "Adicionar membro".
