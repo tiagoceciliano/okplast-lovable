@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           cidade: string | null
           created_at: string
+          destino_whatsapp: string | null
           email: string
           estado: string | null
           id: string
@@ -38,6 +39,7 @@ export type Database = {
         Insert: {
           cidade?: string | null
           created_at?: string
+          destino_whatsapp?: string | null
           email: string
           estado?: string | null
           id?: string
@@ -58,6 +60,7 @@ export type Database = {
         Update: {
           cidade?: string | null
           created_at?: string
+          destino_whatsapp?: string | null
           email?: string
           estado?: string | null
           id?: string
@@ -188,6 +191,7 @@ export type Database = {
       negociacoes: {
         Row: {
           created_at: string
+          destino_whatsapp: string | null
           email: string | null
           etapa: Database["public"]["Enums"]["negociacao_etapa"]
           id: string
@@ -210,6 +214,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          destino_whatsapp?: string | null
           email?: string | null
           etapa?: Database["public"]["Enums"]["negociacao_etapa"]
           id?: string
@@ -232,6 +237,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          destino_whatsapp?: string | null
           email?: string | null
           etapa?: Database["public"]["Enums"]["negociacao_etapa"]
           id?: string
