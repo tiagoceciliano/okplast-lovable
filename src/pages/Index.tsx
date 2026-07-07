@@ -344,9 +344,9 @@ export default function Index() {
               Veja as opiniões de nossos clientes no Rio de Janeiro
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <MountOnVisible fallback={<div className="min-h-[200px]" />}>
-              <Suspense fallback={<div className="min-h-[200px]" />}>
+          <MountOnVisible fallback={<div className="min-h-[200px]" />}>
+            <Suspense fallback={<div className="min-h-[200px]" />}>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {depoimentos.map((dep, index) => (
                   <TestimonialCard
                     key={index}
@@ -356,9 +356,9 @@ export default function Index() {
                     avatarUrl={dep.avatarUrl}
                   />
                 ))}
-              </Suspense>
-            </MountOnVisible>
-          </div>
+              </div>
+            </Suspense>
+          </MountOnVisible>
         </div>
       </section>
 
