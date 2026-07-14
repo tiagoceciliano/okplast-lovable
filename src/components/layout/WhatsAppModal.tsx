@@ -14,13 +14,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -233,20 +226,21 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
                       name="tipo_material"
                       render={({ field }) => (
                         <FormItem>
-                          <Select onValueChange={field.onChange} value={field.value}>
-                            <FormControl>
-                              <SelectTrigger className="whatsapp-input h-8 text-sm">
-                                <SelectValue placeholder="Tipo de Material" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
+                          <FormControl>
+                            <select
+                              {...field}
+                              className="whatsapp-input h-8 text-sm w-full rounded-md border border-input bg-background px-2 focus:outline-none focus:ring-2 focus:ring-ring"
+                            >
+                              <option value="" disabled>
+                                Tipo de Material
+                              </option>
                               {TIPOS_MATERIAL.map((tipo) => (
-                                <SelectItem key={tipo} value={tipo}>
+                                <option key={tipo} value={tipo}>
                                   {tipo}
-                                </SelectItem>
+                                </option>
                               ))}
-                            </SelectContent>
-                          </Select>
+                            </select>
+                          </FormControl>
                           <FormMessage className="text-xs text-red-600" />
                         </FormItem>
                       )}
