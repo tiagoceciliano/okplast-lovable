@@ -7,7 +7,7 @@ export default function PoliticaVenda() {
       <SEOHead
         title="Política de Venda - OK Plast"
         description="Condições comerciais, formas de pagamento, prazos e garantia. Política de venda da OK Plast Comércio LTDA."
-        canonical="/politica-venda"
+        canonical="/home/politica-de-venda"
         noindex={true}
       />
 

@@ -7,7 +7,7 @@ export default function TermoUso() {
       <SEOHead
         title="Termo de Uso - OK Plast"
         description="Termos e condições de uso do site da OK Plast Comércio LTDA."
-        canonical="/termo-uso"
+        canonical="/home/termo-de-uso"
         noindex={true}
       />
 
