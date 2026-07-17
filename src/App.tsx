@@ -72,6 +72,10 @@ const MainSite = () => (
             <Route path="/home/politica-de-venda" element={<PoliticaVenda />} />
             <Route path="/home/termo-de-uso" element={<TermoUso />} />
             <Route path="/home/politica-de-privacidade" element={<PoliticaPrivacidade />} />
+            <Route path="/sobre-nos" element={<Navigate to="/home/sobre-nos" replace />} />
+            <Route path="/politica-venda" element={<Navigate to="/home/politica-de-venda" replace />} />
+            <Route path="/termo-uso" element={<Navigate to="/home/termo-de-uso" replace />} />
+            <Route path="/politica-privacidade" element={<Navigate to="/home/politica-de-privacidade" replace />} />
 
             {/* Chapas Hub */}
             <Route path="/chapas" element={<ChapasDeAcrilico />} />

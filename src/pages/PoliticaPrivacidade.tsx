@@ -7,7 +7,7 @@ export default function PoliticaPrivacidade() {
       <SEOHead
         title="Política de Privacidade - OK Plast"
         description="Como protegemos seus dados pessoais conforme a LGPD. Política de privacidade da OK Plast Comércio LTDA."
-        canonical="/politica-privacidade"
+        canonical="/home/politica-de-privacidade"
         noindex={true}
       />
 

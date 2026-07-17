@@ -7,7 +7,7 @@ export default function SobreNos() {
       <SEOHead
         title="Sobre Nós - OK Plast"
         description="Conheça a OK Plast: distribuidora de chapas plásticas no Rio de Janeiro. Acrílico, Policarbonato, PETG, PS, PVC e ACM."
-        canonical="/sobre-nos"
+        canonical="/home/sobre-nos"
       />
 
       <section className="gradient-primary text-primary-foreground py-16 md:py-24">
