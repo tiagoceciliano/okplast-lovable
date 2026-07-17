@@ -45,7 +45,8 @@
    <link rel="manifest" href="/manifest.json" />
    <meta name="theme-color" content="#1a3a5c" />
 
-   <!-- Default SEO (overridden per-route via react-helmet-async) -->
+   <!-- Default SEO (overridden per-route via SEOHead) -->
+   <link rel="canonical" href="https://okplast.com.br/" />
    <title>OK Plast | Distribuidora de Chapas Plásticas no RJ</title>
    <meta name="description" content="Distribuidora de chapas plásticas no RJ: acrílico, policarbonato, PETG, PS, PVC e ACM. Corte sob medida e entrega rápida." />
 
@@ -63,6 +64,30 @@
    <meta name="twitter:title" content="OK Plast | Distribuidora de Chapas Plásticas no RJ" />
    <meta name="twitter:description" content="Distribuidora de chapas plásticas no RJ: acrílico, policarbonato, PETG, PS, PVC e ACM. Corte sob medida." />
    <meta name="twitter:image" content="https://okplast.com.br/og-image.jpg" />
+   <script>
+     (function () {
+       var allowed = [
+         "/",
+         "/chapas",
+         "/chapas/acrilico",
+         "/chapas/poliestireno",
+         "/chapas/petg",
+         "/chapas/policarbonato-alveolar",
+         "/chapas/policarbonato-compacto",
+         "/chapas/pvc-expandido",
+         "/chapas/acm",
+         "/home/sobre-nos",
+         "/home/politica-de-venda",
+         "/home/termo-de-uso",
+         "/home/politica-de-privacidade"
+       ];
+       var path = window.location.pathname.replace(/\/+$/, "") || "/";
+       var canonicalPath = allowed.indexOf(path) >= 0 ? path : "/";
+       var url = "https://okplast.com.br" + (canonicalPath === "/" ? "/" : canonicalPath);
+       document.querySelector('link[rel="canonical"]').setAttribute("href", url);
+       document.querySelector('meta[property="og:url"]').setAttribute("content", url);
+     })();
+   </script>
 </head>
 
  <body>
