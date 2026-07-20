@@ -87,7 +87,7 @@ serve(async (req) => {
     // Webhook único para WhatsApp chapas (Kinbox v3 inbound)
     const webhookUrl =
       Deno.env.get("WEBHOOK_KINBOX_CHAPA_WHATSAPP") ||
-      "https://webhook.kinbox.com.br/v3/inbound/JqLvB0d7t";
+      "https://webhook.kinbox.com.br/v3/inbound/mwVIr-FpU";
 
     // Cria cliente Supabase com service role
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -203,12 +203,11 @@ serve(async (req) => {
       email: payload.email,
       phone: cleanPhone(payload.telefone),
       product: payload.produto_interesse || "Chapa Inteira",
+      tipo_material: payload.tipo_material || "-",
       message: payload.mensagem || "-",
-      location: {
-        city: geoData.city || "",
-        state: geoData.region || "",
-        country: geoData.country_name || "Brazil",
-      },
+      city: geoData.city || "",
+      state: geoData.region || "",
+      country: geoData.country_name || "Brazil",
       utm_source: payload.utm_source || "-",
       utm_medium: payload.utm_medium || "-",
       utm_campaign: payload.utm_campaign || "-",
@@ -217,8 +216,6 @@ serve(async (req) => {
       submitted_at: date,
       submitted_time: time,
       current_url: payload.current_url || "-",
-      destination_phone: payload.destino_whatsapp || "-",
-      destination_phone_formatted: payload.destino_whatsapp_formatado || "-",
     };
 
     // Envia para webhook se configurado
