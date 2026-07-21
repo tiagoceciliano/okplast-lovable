@@ -26,6 +26,7 @@ import { formatPhone, capitalizeName } from "./WhatsAppButton";
 import { supabase } from "@/integrations/supabase/client";
 import { getStoredUTM } from "@/hooks/useUTM";
 import { useWhatsAppNumber } from "@/hooks/useWhatsAppNumber";
+import { reportConversion } from "@/lib/conversion";
 import logoImage from "@/assets/logo-okplast.png";
 
 // Schema de validação
