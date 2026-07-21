@@ -81,10 +81,19 @@
             window.location = url;
           }
         };
-        gtag('event', 'conversion', {
-          'send_to': 'AW-875161011/GenoCIznmtQcELPLp6ED',
-          'event_callback': callback
-        });
+        if (typeof gtag === 'function') {
+          gtag('event', 'conversion', {
+            'send_to': 'AW-875161011/GenoCIznmtQcELPLp6ED',
+            'transport_type': 'beacon',
+            'event_callback': callback
+          });
+        } else {
+          // Fallback: pixel síncrono caso gtag.js ainda não tenha carregado
+          try {
+            var img = new Image();
+            img.src = 'https://www.googleadservices.com/pagead/conversion/875161011/?label=GenoCIznmtQcELPLp6ED&guid=ON&script=0';
+          } catch (e) {}
+        }
         return false;
       }
     </script>

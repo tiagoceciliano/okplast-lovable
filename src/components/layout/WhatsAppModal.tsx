@@ -93,11 +93,12 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
         `Mensagem: ${data.mensagem}`,
       ].join("\n");
 
+      // Dispara conversão do Google Ads ANTES de abrir o WhatsApp
+      // (garante que o beacon saia antes da nova aba/foco mudar)
+      reportConversion();
+
       const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsapp.raw}&text=${encodeURIComponent(mensagemWhatsApp)}`;
       window.open(whatsappUrl, "_blank");
-
-      // Dispara conversão do Google Ads no envio do formulário
-      reportConversion();
 
       const utmData = getStoredUTM();
 
