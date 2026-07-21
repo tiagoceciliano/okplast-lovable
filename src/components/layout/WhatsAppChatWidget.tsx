@@ -72,6 +72,9 @@ export function WhatsAppChatWidget({ open, onOpenChange }: WhatsAppChatWidgetPro
       const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsapp.raw}&text=${encodeURIComponent(mensagemWhatsApp)}`;
       window.open(whatsappUrl, "_blank");
 
+      // Dispara conversão do Google Ads no envio do formulário
+      reportConversion();
+
       // Dispara webhook de forma assíncrona com UTMs corretos
       const utmData = getStoredUTM();
 
