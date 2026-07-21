@@ -69,8 +69,15 @@ export function WhatsAppChatWidget({ open, onOpenChange }: WhatsAppChatWidgetPro
         `Mensagem: ${data.mensagem}`,
       ].join("\n");
 
-      // Dispara conversão do Google Ads ANTES de abrir o WhatsApp
-      reportConversion();
+      // Dispara conversão do Google Ads (Enhanced Conversions) ANTES de abrir o WhatsApp.
+      // gtag.js normaliza e faz hash SHA-256 do e-mail/telefone antes de enviar.
+      const [firstName, ...rest] = nomeFormatado.split(" ");
+      reportConversion({
+        email: data.email,
+        phone: telefoneFormatado,
+        firstName,
+        lastName: rest.join(" ") || undefined,
+      });
 
       const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsapp.raw}&text=${encodeURIComponent(mensagemWhatsApp)}`;
       window.open(whatsappUrl, "_blank");
