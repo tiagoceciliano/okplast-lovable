@@ -73,6 +73,22 @@
       gtag('config', 'AW-875161011');
     </script>
 
+    <!-- Event snippet for Form OKPLAST conversion page -->
+    <script>
+      function gtag_report_conversion(url) {
+        var callback = function () {
+          if (typeof(url) != 'undefined') {
+            window.location = url;
+          }
+        };
+        gtag('event', 'conversion', {
+          'send_to': 'AW-875161011/GenoCIznmtQcELPLp6ED',
+          'event_callback': callback
+        });
+        return false;
+      }
+    </script>
+
     <script>
       (function () {
         var allowed = [

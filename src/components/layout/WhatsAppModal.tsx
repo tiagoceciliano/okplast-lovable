@@ -26,6 +26,7 @@ import { formatPhone, capitalizeName } from "./WhatsAppButton";
 import { supabase } from "@/integrations/supabase/client";
 import { getStoredUTM } from "@/hooks/useUTM";
 import { useWhatsAppNumber } from "@/hooks/useWhatsAppNumber";
+import { reportConversion } from "@/lib/conversion";
 import logoImage from "@/assets/logo-okplast.png";
 
 // Schema de validação
@@ -94,6 +95,9 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
 
       const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsapp.raw}&text=${encodeURIComponent(mensagemWhatsApp)}`;
       window.open(whatsappUrl, "_blank");
+
+      // Dispara conversão do Google Ads no envio do formulário
+      reportConversion();
 
       const utmData = getStoredUTM();
 
