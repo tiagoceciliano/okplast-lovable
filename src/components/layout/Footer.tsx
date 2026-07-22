@@ -88,7 +88,10 @@ export function Footer() {
             className="h-12 w-auto brightness-0 invert opacity-90"
           />
           <p className="text-sm text-primary-foreground/60">
-            © {currentYear} {COMPANY.legalName}. Todos os direitos reservados.
+            © {currentYear} {COMPANY.legalName}. CNPJ: {COMPANY.cnpj}
+          </p>
+          <p className="text-xs text-primary-foreground/50">
+            Todos os direitos reservados.
           </p>
         </div>
       </div>
