@@ -7,6 +7,7 @@
 - [Home](/): Quem somos, diferenciais e atendimento via WhatsApp.
 - [Chapas Plásticas](/chapas): Hub com todos os tipos de chapas distribuídas.
 - [Chapa de Acrílico](/chapas/acrilico): Cristal, colorido, leitoso, espelhado e fumê. Espessuras de 1mm a 50mm.
+- [Chapa de Policarbonato](/chapas/policarbonato): Página hub com as linhas alveolar e compacto para campanhas e orçamentos.
 - [Chapa de Poliestireno (PS)](/chapas/poliestireno): PS cristal e PSAI para displays e projetos econômicos.
 - [Chapa PETG](/chapas/petg): Alta resistência ao impacto, atóxico, ideal para EPIs e proteções.
 - [Chapa Policarbonato Alveolar](/chapas/policarbonato-alveolar): Coberturas, pergolados e fechamentos translúcidos.
