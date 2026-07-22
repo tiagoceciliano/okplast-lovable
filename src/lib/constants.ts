@@ -2,6 +2,7 @@
 export const COMPANY = {
   name: "OK Plast",
   legalName: "OK PLAST COMERCIO LTDA",
+  cnpj: "64.972.002/0001-25",
   slogan: "TUDO OK PARA SEU PROJETO",
   address: "Rua Guatemala, 593 – Penha Circular – Rio de Janeiro – RJ, 21020-170",
   // O número exibido/usado nos botões é decidido em runtime pelo rateio 50/50
