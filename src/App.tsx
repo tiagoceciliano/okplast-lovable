@@ -41,6 +41,7 @@ const PoliticaPrivacidade = lazy(() => import("./pages/PoliticaPrivacidade"));
 // Lazy loaded chapas pages
 const ChapasDeAcrilico = lazy(() => import("./pages/products/ChapasDeAcrilico"));
 const Acrilico = lazy(() => import("./pages/chapas/Acrilico"));
+const Policarbonato = lazy(() => import("./pages/chapas/Policarbonato"));
 const Poliestireno = lazy(() => import("./pages/chapas/Poliestireno"));
 const Petg = lazy(() => import("./pages/chapas/Petg"));
 const PolicarbonatoAlveolar = lazy(() => import("./pages/chapas/PolicarbonatoAlveolar"));
@@ -83,6 +84,7 @@ const MainSite = () => (
 
             {/* Chapas Detail Pages */}
             <Route path="/chapas/acrilico" element={<Acrilico />} />
+            <Route path="/chapas/policarbonato" element={<Policarbonato />} />
             <Route path="/chapas/poliestireno" element={<Poliestireno />} />
             <Route path="/chapas/petg" element={<Petg />} />
             <Route path="/chapas/policarbonato-alveolar" element={<PolicarbonatoAlveolar />} />

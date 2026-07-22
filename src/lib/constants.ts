@@ -21,6 +21,7 @@ export const NAV_ITEMS = [
     label: "Chapas",
     children: [
       { label: "Acrílico", href: "/chapas/acrilico" },
+      { label: "Policarbonato", href: "/chapas/policarbonato" },
       { label: "Policarbonato Alveolar", href: "/chapas/policarbonato-alveolar" },
       { label: "Policarbonato Compacto", href: "/chapas/policarbonato-compacto" },
       { label: "PETG", href: "/chapas/petg" },
