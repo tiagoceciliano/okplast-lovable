@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { MessageCircle, ArrowRight } from "lucide-react";
 import { DecorativeDivider } from "@/components/ui/DecorativeDivider";
 import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
-import { RelatedProducts } from "@/components/seo/RelatedProducts";
 
 import heroPolicarbonatoAlveolar from "@/assets/chapas-hero/policarbonato-alveolar.webp";
 import heroPolicarbonatoCompacto from "@/assets/chapas-hero/policarbonato-compacto.webp";
@@ -233,8 +232,6 @@ export default function Policarbonato() {
           </div>
         </div>
       </section>
-
-      <RelatedProducts currentSlug="policarbonato" />
 
       {/* CTA Final */}
       <section className="section-padding bg-muted">
