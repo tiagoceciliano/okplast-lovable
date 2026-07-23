@@ -82,31 +82,22 @@ const TRACKED_PAGES_KEY = "okplast_tracked_pages";
            user_agent: navigator.userAgent,
          };
  
-         const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-         const url = `${supabaseUrl}/functions/v1/track-visit`;
-         const body = JSON.stringify(payload);
+          const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+          const url = `${supabaseUrl}/functions/v1/track-visit`;
+          const body = JSON.stringify(payload);
 
-         // sendBeacon roda fora do main thread e não entra na cadeia crítica.
-         // Fallback fetch com keepalive só quando não disponível.
-         let sent = false;
-         try {
-           if ("sendBeacon" in navigator) {
-             const blob = new Blob([body], { type: "application/json" });
-             sent = navigator.sendBeacon(url, blob);
-           }
-         } catch {}
-         if (sent) {
-           markPageAsTracked(currentPath);
-         } else {
-           fetch(url, {
-             method: "POST",
-             headers: { "Content-Type": "application/json" },
-             body,
-             keepalive: true,
-           })
-             .then(() => markPageAsTracked(currentPath))
-             .catch((error) => console.error("[PageVisit] Erro ao rastrear visita:", error));
-         }
+          // Nota: sendBeacon com Blob type=application/json é bloqueado pelo
+          // CORS do navegador (não emite preflight). Usamos fetch keepalive,
+          // que suporta Content-Type application/json e permanece ativo mesmo
+          // se o usuário sair da página.
+          fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body,
+            keepalive: true,
+          })
+            .then(() => markPageAsTracked(currentPath))
+            .catch((error) => console.error("[PageVisit] Erro ao rastrear visita:", error));
  
        } catch (error) {
          console.error("[PageVisit] Erro ao preparar rastreamento:", error);
@@ -115,19 +106,19 @@ const TRACKED_PAGES_KEY = "okplast_tracked_pages";
        }
      };
  
-       // Adia o tracking para depois de load + 6s (tira totalmente da cadeia crítica).
+        // Adia o tracking para depois de load + 1.5s (tira da cadeia crítica sem perder visitas curtas).
        let handle: number | null = null;
        const kick = () => {
          const ric: any = (window as any).requestIdleCallback;
          handle = ric
-           ? ric(() => trackVisit(), { timeout: 5000 })
-           : window.setTimeout(() => trackVisit(), 3000);
+            ? ric(() => trackVisit(), { timeout: 2000 })
+            : window.setTimeout(() => trackVisit(), 800);
        };
        let loadTimer: number | null = null;
        if (document.readyState === "complete") {
-         loadTimer = window.setTimeout(kick, 6000);
+          loadTimer = window.setTimeout(kick, 1500);
        } else {
-         const onLoad = () => { loadTimer = window.setTimeout(kick, 6000); };
+          const onLoad = () => { loadTimer = window.setTimeout(kick, 1500); };
          window.addEventListener("load", onLoad, { once: true });
        }
        return () => {
