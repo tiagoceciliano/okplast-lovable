@@ -27,7 +27,6 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const AdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
 const AdminLeads = lazy(() => import("./pages/admin/Leads"));
-const AdminUTMTerms = lazy(() => import("./pages/admin/UTMTerms"));
 const AdminVendedores = lazy(() => import("./pages/admin/Vendedores"));
 const AdminNegociacoes = lazy(() => import("./pages/admin/Negociacoes"));
 const AdminProdutos = lazy(() => import("./pages/admin/Produtos"));
@@ -121,7 +120,6 @@ const App = () => (
               {/* Admin Dashboard - Protected */}
               <Route path="/admin" element={<RequireAdmin><AdminDashboard /></RequireAdmin>} />
               <Route path="/admin/leads" element={<RequireAdmin><AdminLeads /></RequireAdmin>} />
-              <Route path="/admin/utm-terms" element={<RequireAdmin><AdminUTMTerms /></RequireAdmin>} />
               <Route path="/admin/whatsapp" element={<RequireAdmin><AdminVendedores /></RequireAdmin>} />
               <Route path="/admin/vendedores" element={<RequireAdmin><AdminVendedores /></RequireAdmin>} />
               <Route path="/admin/negociacoes" element={<RequireAuth roles={["admin","gestor","vendedor"]}><AdminNegociacoes /></RequireAuth>} />
