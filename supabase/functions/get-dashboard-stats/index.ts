@@ -76,21 +76,66 @@ Deno.serve(async (req) => {
       return count || 0
     }
 
-    const leadsByCategoryGoogleAds = async (start: Date, end: Date) => {
-      const { data } = await supabase
-        .from('leads')
-        .select('produto_interesse')
-        .eq('utm_source', 'googleads')
-        .gte('created_at', start.toISOString())
-        .lte('created_at', end.toISOString())
-      const map: Record<string, number> = {}
-      ;(data || []).forEach((r: any) => {
-        const k = r.produto_interesse || '(Sem categoria)'
-        map[k] = (map[k] || 0) + 1
+    const normalizeCategory = (raw: string | null | undefined): string => {
+      if (!raw) return '(Sem categoria)'
+      const s = raw.toLowerCase()
+      if (s.includes('acm')) return 'ACM'
+      if (s.includes('acril')) return 'Acrílico'
+      if (s.includes('policarbonato')) return 'Policarbonato'
+      if (s.includes('petg')) return 'PETG'
+      if (s.includes('poliestireno') || s.includes('ps)')) return 'Poliestireno'
+      if (s.includes('pvc')) return 'PVC Expandido'
+      if (s === '/' || s.includes('home') || s.includes('produto personalizado') || s.includes('chapa inteira')) return 'Home / Personalizado'
+      return raw
+    }
+
+    const categoryFromPath = (path: string | null | undefined): string => {
+      if (!path) return 'Home / Personalizado'
+      const p = path.toLowerCase().replace(/\/+$/, '')
+      if (p === '' || p === '/') return 'Home / Personalizado'
+      if (p.includes('/chapas/acm')) return 'ACM'
+      if (p.includes('/chapas/acrilico')) return 'Acrílico'
+      if (p.includes('/chapas/policarbonato')) return 'Policarbonato'
+      if (p.includes('/chapas/petg')) return 'PETG'
+      if (p.includes('/chapas/poliestireno')) return 'Poliestireno'
+      if (p.includes('/chapas/pvc')) return 'PVC Expandido'
+      return 'Outros'
+    }
+
+    const gadsPerformance = async (start: Date, end: Date) => {
+      const [visitsRes, leadsRes] = await Promise.all([
+        supabase
+          .from('page_visits')
+          .select('page_path, visitor_id')
+          .eq('utm_source', 'googleads')
+          .gte('created_at', start.toISOString())
+          .lte('created_at', end.toISOString()),
+        supabase
+          .from('leads')
+          .select('produto_interesse')
+          .eq('utm_source', 'googleads')
+          .gte('created_at', start.toISOString())
+          .lte('created_at', end.toISOString()),
+      ])
+
+      const visitsByCat: Record<string, Set<string>> = {}
+      ;(visitsRes.data || []).forEach((r: any) => {
+        const cat = categoryFromPath(r.page_path)
+        if (!visitsByCat[cat]) visitsByCat[cat] = new Set()
+        visitsByCat[cat].add(r.visitor_id)
       })
-      return Object.entries(map)
-        .map(([category, count]) => ({ category, count }))
-        .sort((a, b) => b.count - a.count)
+      const leadsByCat: Record<string, number> = {}
+      ;(leadsRes.data || []).forEach((r: any) => {
+        const cat = normalizeCategory(r.produto_interesse)
+        leadsByCat[cat] = (leadsByCat[cat] || 0) + 1
+      })
+      const cats = new Set<string>([...Object.keys(visitsByCat), ...Object.keys(leadsByCat)])
+      return Array.from(cats).map(category => {
+        const visits = visitsByCat[category]?.size || 0
+        const leads = leadsByCat[category] || 0
+        const conversionRate = visits > 0 ? (leads / visits) * 100 : 0
+        return { category, visits, leads, conversionRate: Number(conversionRate.toFixed(2)) }
+      }).sort((a, b) => b.leads - a.leads || b.visits - a.visits)
     }
 
     // Period-scoped aggregates via RPC
@@ -105,7 +150,7 @@ Deno.serve(async (req) => {
       ] = await Promise.all([
         countLeads(start, end, false),
         countLeads(start, end, true),
-        leadsByCategoryGoogleAds(start, end),
+        gadsPerformance(start, end),
         supabase.rpc('get_top_pages', { p_start: start.toISOString(), p_end: end.toISOString(), p_limit: 5 }),
         supabase.rpc('get_campaign_stats', { p_start: start.toISOString(), p_end: end.toISOString() }),
         supabase.rpc('get_daily_visits', { p_start: start.toISOString(), p_end: end.toISOString() }),
