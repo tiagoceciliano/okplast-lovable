@@ -42,28 +42,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-const acrilicoSubPages = [
-  { title: "Caixas Sob Medida", path: "/acrilico-sob-medida/caixas-sob-medida" },
-  { title: "Cúpulas e Redomas", path: "/acrilico-sob-medida/cupulas-e-redomas" },
-  { title: "Potes para Doces", path: "/acrilico-sob-medida/potes-para-doces-e-guloseimas" },
-  { title: "Potes para Grãos", path: "/acrilico-sob-medida/potes-para-graos-e-cereais-a-granel" },
-  { title: "Urna de Acrílico", path: "/acrilico-sob-medida/urna-de-acrilico" },
-  { title: "Caixa de Sugestão", path: "/acrilico-sob-medida/caixa-de-sugestao" },
-  { title: "Medalhas Personalizadas", path: "/acrilico-sob-medida/medalhas-personalizadas" },
-  { title: "Troféus Personalizados", path: "/acrilico-sob-medida/trofeus-personalizados" },
-  { title: "Placa Customizada", path: "/acrilico-sob-medida/placa-de-acrilico-customizada" },
-  { title: "Placa Sinalização", path: "/acrilico-sob-medida/placa-de-acrilico-sinalizacao" },
-  { title: "Expositores Bijuterias", path: "/acrilico-sob-medida/expositores-para-bijuterias" },
-  { title: "Expositores Calçados", path: "/acrilico-sob-medida/expositores-para-calcados" },
-  { title: "Expositores Óculos", path: "/acrilico-sob-medida/expositores-para-oculos" },
-  { title: "Display de Acrílico", path: "/acrilico-sob-medida/display-de-acrilico" },
-  { title: "Porta Folder", path: "/acrilico-sob-medida/porta-folder" },
-  { title: "Quadro de Avisos", path: "/acrilico-sob-medida/quadro-de-avisos" },
-  { title: "Confeitaria", path: "/acrilico-sob-medida/confeitaria" },
-  { title: "Placa Gravada", path: "/acrilico-sob-medida/placa-gravada" },
-  { title: "Placa Personalizada", path: "/acrilico-sob-medida/placa-personalizada" },
-];
-
 const chapasSubPages = [
   { title: "Acrílico", path: "/chapas/acrilico" },
   { title: "Poliestireno", path: "/chapas/poliestireno" },
@@ -389,16 +367,6 @@ export function AdminSidebar() {
               title="Home"
               href={COMPANY.domain}
               collapsed={collapsed}
-            />
-
-            <SubPagesSection
-              title="Acrílico Sob Medida"
-              icon={Package}
-              hubPath="/acrilico-sob-medida"
-              subPages={acrilicoSubPages}
-              collapsed={collapsed}
-              open={!!openSections["Acrílico Sob Medida"]}
-              onToggle={() => toggleSection("Acrílico Sob Medida")}
             />
 
             <SubPagesSection
