@@ -44,6 +44,7 @@ const chapasSubPages = [
   { title: "Acrílico", path: "/chapas/acrilico" },
   { title: "Poliestireno", path: "/chapas/poliestireno" },
   { title: "PETG", path: "/chapas/petg" },
+  { title: "Policarbonato", path: "/chapas/policarbonato" },
   { title: "Policarbonato Alveolar", path: "/chapas/policarbonato-alveolar" },
   { title: "Policarbonato Compacto", path: "/chapas/policarbonato-compacto" },
   { title: "PVC Expandido", path: "/chapas/pvc-expandido" },
