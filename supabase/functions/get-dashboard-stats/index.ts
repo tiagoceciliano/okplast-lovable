@@ -186,6 +186,13 @@ Deno.serve(async (req) => {
         supabase.rpc('get_daily_visits', { p_start: start.toISOString(), p_end: end.toISOString() }),
       ])
 
+      // Daily leads (bucketed by São Paulo date)
+      const { data: leadsRows } = await supabase
+        .from('leads')
+        .select('created_at')
+        .gte('created_at', start.toISOString())
+        .lte('created_at', end.toISOString())
+
       const campaignStats = (campaignRes.data || []).map((c: any) => ({
         campaign: c.campaign,
         visits: Number(c.visits),
@@ -216,7 +223,15 @@ Deno.serve(async (req) => {
       })
       const chartData = days.map(date => ({ date, visits: chartMap[date] }))
 
-      return { totalLeads, gadsLeads, gadsPerformance: gadsPerf, campaignStats, chartData }
+      const leadsMap: Record<string, number> = {}
+      days.forEach(d => { leadsMap[d] = 0 })
+      ;(leadsRows || []).forEach((r: any) => {
+        const k = getSaoPauloDate(new Date(r.created_at)).toISOString().split('T')[0]
+        if (leadsMap[k] !== undefined) leadsMap[k]++
+      })
+      const leadsChartData = days.map(date => ({ date, visits: leadsMap[date] }))
+
+      return { totalLeads, gadsLeads, gadsPerformance: gadsPerf, campaignStats, chartData, leadsChartData }
     }
 
     const [current, previous, todayLeads, yesterdayLeads, todayGAds, yesterdayGAds] = await Promise.all([
