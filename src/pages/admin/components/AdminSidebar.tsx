@@ -194,7 +194,7 @@ const SubPagesSection = ({ title, icon: Icon, hubPath, subPages, collapsed, open
 };
 
 export function AdminSidebar() {
-  const { state } = useSidebar();
+  const { state, setOpen } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
   const navigate = useNavigate();
@@ -210,7 +210,11 @@ export function AdminSidebar() {
   };
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar
+      collapsible="icon"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+    >
       <SidebarHeader className="border-b">
         <div className="flex items-center justify-between p-2">
           {!collapsed && <h2 className="font-semibold text-lg">Admin</h2>}
