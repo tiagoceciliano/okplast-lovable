@@ -81,7 +81,11 @@ Deno.serve(async (req) => {
       const s = raw.toLowerCase()
       if (s.includes('acm')) return 'ACM'
       if (s.includes('acril')) return 'Acrílico'
-      if (s.includes('policarbonato')) return 'Policarbonato'
+      if (s.includes('policarbonato')) {
+        if (s.includes('alveolar')) return 'Policarbonato Alveolar'
+        if (s.includes('compacto')) return 'Policarbonato Compacto'
+        return 'Policarbonato'
+      }
       if (s.includes('petg')) return 'PETG'
       if (s.includes('poliestireno') || s.includes('ps)')) return 'Poliestireno'
       if (s.includes('pvc')) return 'PVC Expandido'
@@ -129,13 +133,41 @@ Deno.serve(async (req) => {
         const cat = normalizeCategory(r.produto_interesse)
         leadsByCat[cat] = (leadsByCat[cat] || 0) + 1
       })
+
+      // Consolidate Policarbonato Alveolar/Compacto under a parent "Policarbonato" row,
+      // since both share the same landing page and visits can't be split.
+      const POLI_SUBS = ['Policarbonato Alveolar', 'Policarbonato Compacto']
+      const poliChildren = POLI_SUBS
+        .map(name => ({ category: name, leads: leadsByCat[name] || 0 }))
+        .filter(c => c.leads > 0)
+        .sort((a, b) => b.leads - a.leads)
+      const poliLeadsTotal = poliChildren.reduce((s, c) => s + c.leads, 0)
+        + (leadsByCat['Policarbonato'] || 0)
+      const poliVisits = visitsByCat['Policarbonato']?.size || 0
+
       const cats = new Set<string>([...Object.keys(visitsByCat), ...Object.keys(leadsByCat)])
-      return Array.from(cats).map(category => {
+      POLI_SUBS.forEach(s => cats.delete(s))
+      cats.delete('Policarbonato')
+
+      const rows = Array.from(cats).map(category => {
         const visits = visitsByCat[category]?.size || 0
         const leads = leadsByCat[category] || 0
         const conversionRate = visits > 0 ? (leads / visits) * 100 : 0
-        return { category, visits, leads, conversionRate: Number(conversionRate.toFixed(2)) }
-      }).sort((a, b) => b.leads - a.leads || b.visits - a.visits)
+        return { category, visits, leads, conversionRate: Number(conversionRate.toFixed(2)) } as any
+      })
+
+      if (poliVisits > 0 || poliLeadsTotal > 0) {
+        const conversionRate = poliVisits > 0 ? (poliLeadsTotal / poliVisits) * 100 : 0
+        rows.push({
+          category: 'Policarbonato',
+          visits: poliVisits,
+          leads: poliLeadsTotal,
+          conversionRate: Number(conversionRate.toFixed(2)),
+          children: poliChildren,
+        } as any)
+      }
+
+      return rows.sort((a, b) => b.leads - a.leads || b.visits - a.visits)
     }
 
     // Period-scoped aggregates via RPC
