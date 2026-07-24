@@ -11,9 +11,10 @@ interface ConversionChartProps {
   isLoading?: boolean;
   title?: string;
   description?: string;
+  valueLabel?: string;
 }
 
-export function ConversionChart({ data, isLoading, title, description }: ConversionChartProps) {
+export function ConversionChart({ data, isLoading, title, description, valueLabel }: ConversionChartProps) {
   const formattedData = data.map(item => ({
     ...item,
     dateFormatted: new Date(item.date + 'T12:00:00-03:00').toLocaleDateString('pt-BR', { 
@@ -65,7 +66,7 @@ export function ConversionChart({ data, isLoading, title, description }: Convers
                 stroke="hsl(var(--primary))"
                 fillOpacity={1}
                 fill="url(#colorVisits)"
-                name="Visitas"
+                name={valueLabel ?? "Visitas"}
               />
             </AreaChart>
           </ResponsiveContainer>

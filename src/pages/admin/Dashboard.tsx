@@ -13,6 +13,7 @@ interface PeriodPayload {
   gadsPerformance: { category: string; visits: number; leads: number; conversionRate: number }[];
   campaignStats: { campaign: string; visits: number; leads: number; conversionRate: string }[];
   chartData: { date: string; visits: number }[];
+  leadsChartData: { date: string; visits: number }[];
 }
 
 interface DashboardResponse {
@@ -112,6 +113,14 @@ export default function Dashboard() {
           isLoading={isLoading}
           title="Visitas no período"
           description="Visualizações de página por dia"
+        />
+
+        <ConversionChart
+          data={data?.current.leadsChartData || []}
+          isLoading={isLoading}
+          title="Leads no período"
+          description="Leads capturados por dia"
+          valueLabel="Leads"
         />
 
         <UTMPerformanceTable
