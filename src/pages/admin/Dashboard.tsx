@@ -114,6 +114,14 @@ export default function Dashboard() {
           description="Visualizações de página por dia"
         />
 
+        <ConversionChart
+          data={data?.current.leadsChartData || []}
+          isLoading={isLoading}
+          title="Leads no período"
+          description="Leads capturados por dia"
+          valueLabel="Leads"
+        />
+
         <UTMPerformanceTable
           title="Performance por Campanha"
           description="Visitas, leads e conversão por utm_campaign"
