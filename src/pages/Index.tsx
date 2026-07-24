@@ -50,7 +50,7 @@ const localBusinessSchema = {
   image: "https://okplast.com.br/og-image.jpg",
   logo: "https://okplast.com.br/logo-horizontal.png",
   url: "https://okplast.com.br",
-  telephone: "+5521923679387",
+  telephone: "+5521923672701",
   email: "vendas@okplast.com.br",
   address: {
     "@type": "PostalAddress",

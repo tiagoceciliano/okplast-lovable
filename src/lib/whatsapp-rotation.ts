@@ -17,8 +17,7 @@ export interface WhatsAppNumber {
 
 // Fallback estático caso o banco esteja inacessível.
 export const WHATSAPP_NUMBERS: readonly WhatsAppNumber[] = [
-  { raw: "5521935058539", formatted: "(21) 93505-8539" },
-  { raw: "5521936181457", formatted: "(21) 93618-1457" },
+  { raw: "5521923672701", formatted: "(21) 92367-2701" },
 ] as const;
 
 const STORAGE_KEY = "okp-wa-raw";
