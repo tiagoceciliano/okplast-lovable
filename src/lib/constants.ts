@@ -9,7 +9,7 @@ export const COMPANY = {
   // — ver src/lib/whatsapp-rotation.ts e src/hooks/useWhatsAppNumber.ts.
   // As constantes abaixo continuam existindo apenas como fallback estático
   // (ex.: SSR de metadados). Nunca use para links wa.me diretamente.
-  phone: "(21) 93505-8539",
+  phone: "(21) 92367-2701",
   email: "vendas@okplast.com.br",
   domain: "https://okplast.com.br",
   businessHours: "Segunda a Sexta: 9h às 17h",
