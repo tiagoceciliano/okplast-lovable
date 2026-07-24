@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -51,8 +52,8 @@ export function GoogleAdsByCategoryTable({ current, isLoading }: Props) {
             </TableHeader>
             <TableBody>
               {rows.map(r => (
-                <>
-                  <TableRow key={r.category}>
+                <Fragment key={r.category}>
+                  <TableRow>
                     <TableCell className="font-medium">{r.category}</TableCell>
                     <TableCell className="text-right">{r.visits}</TableCell>
                     <TableCell className="text-right">{r.leads}</TableCell>
@@ -76,7 +77,7 @@ export function GoogleAdsByCategoryTable({ current, isLoading }: Props) {
                       </TableCell>
                     </TableRow>
                   ))}
-                </>
+                </Fragment>
               ))}
             </TableBody>
             <TableFooter>
