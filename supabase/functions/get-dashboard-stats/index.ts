@@ -122,11 +122,10 @@ Deno.serve(async (req) => {
           .lte('created_at', end.toISOString()),
       ])
 
-      const visitsByCat: Record<string, Set<string>> = {}
+      const visitsByCat: Record<string, number> = {}
       ;(visitsRes.data || []).forEach((r: any) => {
         const cat = categoryFromPath(r.page_path)
-        if (!visitsByCat[cat]) visitsByCat[cat] = new Set()
-        visitsByCat[cat].add(r.visitor_id)
+        visitsByCat[cat] = (visitsByCat[cat] || 0) + 1
       })
       const leadsByCat: Record<string, number> = {}
       ;(leadsRes.data || []).forEach((r: any) => {
@@ -143,21 +142,26 @@ Deno.serve(async (req) => {
         .sort((a, b) => b.leads - a.leads)
       const poliLeadsTotal = poliChildren.reduce((s, c) => s + c.leads, 0)
         + (leadsByCat['Policarbonato'] || 0)
-      const poliVisits = visitsByCat['Policarbonato']?.size || 0
+      const calculateConversionRate = (leads: number, visits: number) => {
+        if (visits <= 0) return 0
+        return Number(Math.min((leads / visits) * 100, 100).toFixed(2))
+      }
+
+      const poliVisits = visitsByCat['Policarbonato'] || 0
 
       const cats = new Set<string>([...Object.keys(visitsByCat), ...Object.keys(leadsByCat)])
       POLI_SUBS.forEach(s => cats.delete(s))
       cats.delete('Policarbonato')
 
       const rows = Array.from(cats).map(category => {
-        const visits = visitsByCat[category]?.size || 0
+        const visits = visitsByCat[category] || 0
         const leads = leadsByCat[category] || 0
-        const conversionRate = visits > 0 ? (leads / visits) * 100 : 0
-        return { category, visits, leads, conversionRate: Number(conversionRate.toFixed(2)) } as any
+        const conversionRate = calculateConversionRate(leads, visits)
+        return { category, visits, leads, conversionRate } as any
       })
 
       if (poliVisits > 0 || poliLeadsTotal > 0) {
-        const conversionRate = poliVisits > 0 ? (poliLeadsTotal / poliVisits) * 100 : 0
+        const conversionRate = calculateConversionRate(poliLeadsTotal, poliVisits)
         rows.push({
           category: 'Policarbonato',
           visits: poliVisits,

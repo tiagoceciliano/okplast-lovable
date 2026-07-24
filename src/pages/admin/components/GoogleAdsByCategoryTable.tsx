@@ -29,7 +29,7 @@ export function GoogleAdsByCategoryTable({ current, isLoading }: Props) {
   const rows = [...current].sort((a, b) => b.leads - a.leads || b.visits - a.visits);
   const totalVisits = rows.reduce((s, r) => s + r.visits, 0);
   const totalLeads = rows.reduce((s, r) => s + r.leads, 0);
-  const totalConv = totalVisits > 0 ? (totalLeads / totalVisits) * 100 : 0;
+  const totalConv = totalVisits > 0 ? Math.min((totalLeads / totalVisits) * 100, 100) : 0;
 
   return (
     <Card>
@@ -57,7 +57,7 @@ export function GoogleAdsByCategoryTable({ current, isLoading }: Props) {
                     <TableCell className="font-medium">{r.category}</TableCell>
                     <TableCell className="text-right">{r.visits}</TableCell>
                     <TableCell className="text-right">{r.leads}</TableCell>
-                    <TableCell className="text-right">{r.conversionRate.toFixed(2)}%</TableCell>
+                    <TableCell className="text-right">{Math.min(r.conversionRate, 100).toFixed(2)}%</TableCell>
                   </TableRow>
                   {r.children?.map(c => (
                     <TableRow key={`${r.category}-${c.category}`} className="bg-muted/20">

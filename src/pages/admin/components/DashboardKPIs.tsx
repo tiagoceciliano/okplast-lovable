@@ -33,6 +33,12 @@ interface KPIProps {
   isLoading: boolean;
   hint?: string;
 }
+
+function leadShare(part: number, total: number) {
+  if (total <= 0) return undefined;
+  return Math.min((part / total) * 100, 100).toFixed(1);
+}
+
 function KPI({ title, icon: Icon, value, previous, isLoading, hint }: KPIProps) {
   return (
     <Card>
@@ -75,6 +81,9 @@ export function DashboardKPIs({
   todayLeads, yesterdayLeads,
   todayGAdsLeads, yesterdayGAdsLeads,
 }: Props) {
+  const periodGAdsShare = leadShare(periodGAdsLeads, periodLeads);
+  const todayGAdsShare = leadShare(todayGAdsLeads, todayLeads);
+
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <KPI
@@ -90,7 +99,7 @@ export function DashboardKPIs({
         value={periodGAdsLeads}
         previous={compareEnabled ? previousPeriodGAdsLeads : null}
         isLoading={isLoading}
-        hint={periodLeads > 0 ? `${((periodGAdsLeads / periodLeads) * 100).toFixed(1)}% do total (${periodLeads})` : undefined}
+        hint={periodGAdsShare ? `${periodGAdsShare}% do total (${periodLeads})` : undefined}
       />
       <KPI
         title="Leads Hoje"
@@ -106,7 +115,7 @@ export function DashboardKPIs({
         value={todayGAdsLeads}
         previous={yesterdayGAdsLeads}
         isLoading={isLoading}
-        hint={todayLeads > 0 ? `${((todayGAdsLeads / todayLeads) * 100).toFixed(1)}% do total (${todayLeads}) · vs. Ontem` : "vs. Ontem"}
+        hint={todayGAdsShare ? `${todayGAdsShare}% do total (${todayLeads}) · vs. Ontem` : "vs. Ontem"}
       />
     </div>
   );
