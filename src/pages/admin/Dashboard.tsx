@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { AdminLayout } from "./AdminLayout";
 import { ConversionChart } from "./components/ConversionChart";
-import { PagesList } from "./components/PagesList";
 import { UTMPerformanceTable } from "./components/UTMPerformanceTable";
 import { DashboardPeriodFilter, computeRangeFromPreset, type DashboardPeriodState } from "./components/DashboardPeriodFilter";
 import { DashboardKPIs } from "./components/DashboardKPIs";
@@ -11,8 +10,7 @@ import { format } from "date-fns";
 interface PeriodPayload {
   totalLeads: number;
   gadsLeads: number;
-  gadsByCategory: { category: string; count: number }[];
-  topPages: { path: string; count: number }[];
+  gadsPerformance: { category: string; visits: number; leads: number; conversionRate: number }[];
   campaignStats: { campaign: string; visits: number; leads: number; conversionRate: string }[];
   chartData: { date: string; visits: number }[];
 }
@@ -105,9 +103,7 @@ export default function Dashboard() {
         />
 
         <GoogleAdsByCategoryTable
-          current={data?.current.gadsByCategory ?? []}
-          previous={data?.previous?.gadsByCategory ?? null}
-          compareEnabled={filter.compareEnabled}
+          current={data?.current.gadsPerformance ?? []}
           isLoading={isLoading}
         />
 
@@ -117,8 +113,6 @@ export default function Dashboard() {
           title="Visitas no período"
           description="Visualizações de página por dia"
         />
-
-        <PagesList topPages={data?.current.topPages || []} isLoading={isLoading} />
 
         <UTMPerformanceTable
           title="Performance por Campanha"
