@@ -143,20 +143,17 @@ Deno.serve(async (req) => {
       const [
         totalLeads,
         gadsLeads,
-        gadsByCategory,
-        topPagesRes,
+        gadsPerf,
         campaignRes,
         dailyRes,
       ] = await Promise.all([
         countLeads(start, end, false),
         countLeads(start, end, true),
         gadsPerformance(start, end),
-        supabase.rpc('get_top_pages', { p_start: start.toISOString(), p_end: end.toISOString(), p_limit: 5 }),
         supabase.rpc('get_campaign_stats', { p_start: start.toISOString(), p_end: end.toISOString() }),
         supabase.rpc('get_daily_visits', { p_start: start.toISOString(), p_end: end.toISOString() }),
       ])
 
-      const topPages = (topPagesRes.data || []).map((p: any) => ({ path: p.page_path, count: Number(p.visit_count) }))
       const campaignStats = (campaignRes.data || []).map((c: any) => ({
         campaign: c.campaign,
         visits: Number(c.visits),
@@ -187,7 +184,7 @@ Deno.serve(async (req) => {
       })
       const chartData = days.map(date => ({ date, visits: chartMap[date] }))
 
-      return { totalLeads, gadsLeads, gadsByCategory, topPages, campaignStats, chartData }
+      return { totalLeads, gadsLeads, gadsPerformance: gadsPerf, campaignStats, chartData }
     }
 
     const [current, previous, todayLeads, yesterdayLeads, todayGAds, yesterdayGAds] = await Promise.all([
