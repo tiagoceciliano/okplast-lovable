@@ -210,6 +210,12 @@ Deno.serve(async (req) => {
       startSP.setHours(0, 0, 0, 0)
       const endSP = getSaoPauloDate(end)
       endSP.setHours(0, 0, 0, 0)
+      // Don't include future dates in charts — cap end at today (São Paulo)
+      const todaySP = getSaoPauloDate(new Date())
+      todaySP.setHours(0, 0, 0, 0)
+      if (endSP.getTime() > todaySP.getTime()) {
+        endSP.setTime(todaySP.getTime())
+      }
       const days: string[] = []
       const cursor = new Date(startSP)
       // Cap chart to 90 days to avoid huge arrays
