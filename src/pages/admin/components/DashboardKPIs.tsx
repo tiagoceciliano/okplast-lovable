@@ -90,6 +90,7 @@ export function DashboardKPIs({
         value={periodGAdsLeads}
         previous={compareEnabled ? previousPeriodGAdsLeads : null}
         isLoading={isLoading}
+        hint={periodLeads > 0 ? `${((periodGAdsLeads / periodLeads) * 100).toFixed(1)}% do total (${periodLeads})` : undefined}
       />
       <KPI
         title="Leads Hoje"
@@ -105,7 +106,7 @@ export function DashboardKPIs({
         value={todayGAdsLeads}
         previous={yesterdayGAdsLeads}
         isLoading={isLoading}
-        hint="vs. Ontem"
+        hint={todayLeads > 0 ? `${((todayGAdsLeads / todayLeads) * 100).toFixed(1)}% do total (${todayLeads}) · vs. Ontem` : "vs. Ontem"}
       />
     </div>
   );
