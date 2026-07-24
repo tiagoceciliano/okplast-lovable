@@ -1,74 +1,49 @@
-# Melhorias no Dashboard Admin
+## Objetivo
 
-Foco em três blocos: **filtro global de período com comparação**, **KPIs de leads (total + Google Ads)** e **detalhamento por categoria dos leads Google Ads**. O filtro do topo controla **toda** a página — todos os cards, tabelas e gráficos abaixo respondem a ele.
+Separar **Policarbonato Alveolar** e **Policarbonato Compacto** na tabela "Performance Google Ads por categoria" do Dashboard, mesmo que ambos compartilhem a mesma landing page (`/chapas/policarbonato`).
 
-## 1. Filtro global de período (topo do Dashboard)
+## Contexto
 
-Novo componente `DashboardPeriodFilter` no topo, cujo estado alimenta **todas** as seções da página (KPIs, gráfico de visitas, top páginas, performance por campanha e nova tabela Google Ads por categoria). Nenhum bloco terá seu próprio seletor de período.
+- No formulário WhatsApp o usuário escolhe explicitamente "Policarbonato Alveolar" ou "Policarbonato Compacto" — isso já é salvo em `leads.produto_interesse`.
+- Visitas de página, porém, vêm de uma única URL `/chapas/policarbonato`, então **não dá para separar visitas** por sub-produto. Isso é uma limitação real de dados.
 
-- **Presets rápidos**:
-  - Hoje
-  - Ontem
-  - Esta semana (segunda a domingo)
-  - Semana passada (segunda a domingo)
-  - Este mês
-  - Mês passado
-  - Personalizado (calendário range)
-- **Toggle "Comparar períodos"**: mostra um segundo intervalo (Comparar com…). Ao ligar, sugere automaticamente o período anterior equivalente:
-  - Hoje → Ontem
-  - Ontem → Anteontem
-  - Esta semana → Semana passada
-  - Semana passada → 2 semanas atrás
-  - Este mês → Mês passado
-  - Mês passado → 2 meses atrás
-  - Personalizado → janela imediatamente anterior de mesmo tamanho (editável)
-- Semana com `weekStartsOn: 1` (segunda) e timezone America/Sao_Paulo.
-- Remover o seletor de período que hoje vive dentro de `UTMPerformanceTable` — vira controlado.
+## Proposta de visualização
 
-## 2. KPI Cards
-
-Quatro cards, cada um com **valor do período + variação vs. período de comparação** (Δ absoluto e %, seta colorida). Sem "Comparar", só o valor.
-
-1. **Leads no período** — total de `leads` no intervalo do filtro.
-2. **Leads Google Ads no período** — `utm_source = 'googleads'`.
-3. **Leads Hoje** — âncora fixa hoje vs. ontem (não depende do filtro).
-4. **Leads Google Ads Hoje** — âncora fixa hoje vs. ontem, `utm_source = 'googleads'`.
-
-## 3. Google Ads — Leads por categoria
-
-Nova tabela **"Leads Google Ads por categoria"** logo abaixo dos KPIs, respeitando o filtro global.
-
-- Colunas: Categoria (`produto_interesse`) · Leads no período · Leads no período de comparação · Δ / %.
-- Sem comparação: só Categoria e Leads.
-- Ordenação por leads desc. Linha total no rodapé.
-
-## 4. Layout final
+Manter a tabela atual (Categoria · Visitas · Leads · Conversão) e transformar a linha **Policarbonato** em uma linha "pai" expansível com duas sub-linhas:
 
 ```text
-[Título]
-[Filtro global: presets + calendário + toggle Comparar + intervalo de comparação]
-[KPI 1: Leads período] [KPI 2: GAds período] [KPI 3: Hoje] [KPI 4: GAds Hoje]
-[Tabela: Leads Google Ads por categoria]
-[Gráfico Visitas — usa o mesmo período]
-[Top páginas — usa o mesmo período]
-[Performance por Campanha — usa o mesmo período, sem seletor próprio]
+Categoria                    Visitas   Leads   Conversão
+▸ Policarbonato                 120      18      15,00%
+    └ Policarbonato Alveolar     —       12         —
+    └ Policarbonato Compacto     —        6         —
+ACM                              80       9      11,25%
+Acrílico                         ...
 ```
 
-`PeriodStatsTable` (visitas por categoria em Hoje/Ontem/7d) é removida — os novos KPIs cobrem esse acompanhamento e ela tem período próprio que conflita com o filtro global.
+- A linha pai continua mostrando o total de visitas e leads (soma dos dois sub-produtos) e a conversão agregada — assim o total da tabela não muda.
+- Sub-linhas mostram **apenas leads** (visitas e conversão ficam como "—" com tooltip explicando que a página é compartilhada).
+- Ordenação da tabela continua por leads desc no nível pai; sub-linhas ordenadas por leads desc.
+- Expandido por padrão (é a única categoria com sub-níveis) — sem toggle, pra ficar direto.
 
-## Detalhes técnicos
+Se preferir sem hierarquia, alternativa: listar "Policarbonato Alveolar" e "Policarbonato Compacto" como categorias separadas na tabela, cada uma com os leads corretos e visitas em branco/"—". Menos preciso pra taxa de conversão porque as visitas ficam órfãs.
 
-- **Edge function `get-dashboard-stats`**: passa a aceitar `startDate`, `endDate`, `compareStartDate`, `compareEndDate` e retorna, para **ambos** os intervalos:
-  - total de leads, leads Google Ads, visitas diárias (chart), top páginas, campaign stats, leads Google Ads por categoria.
-  - Cards "Hoje" e "GAds Hoje" continuam calculados com intervalos fixos (hoje/ontem) no server.
-- **Novas RPCs no banco** (SECURITY DEFINER, `search_path=''`, padrão das existentes):
-  - `get_google_ads_leads_count(p_start, p_end)` → total.
-  - `get_google_ads_leads_by_category(p_start, p_end)` → agrupado por `produto_interesse`.
-  - Filtro fixo: `utm_source = 'googleads'`.
-- **Front**:
-  - `DashboardPeriodFilter` novo em `src/pages/admin/components/`.
-  - `DashboardKPIs` substitui `LeadsKPICards`, aceita `{ current, previous, compareEnabled }` e renderiza delta.
-  - `GoogleAdsByCategoryTable` novo.
-  - `Dashboard.tsx` centraliza o estado `{ range, compareRange, compareEnabled }` e repassa para todos os blocos.
-  - `UTMPerformanceTable` deixa de ter `periodValue`/`onPeriodChange`.
-  - Cálculo dos intervalos usa `date-fns` com `startOfWeek/endOfWeek({ weekStartsOn: 1 })`, `startOfMonth/endOfMonth`, ajustando para SP como já feito no server.
+## Alterações técnicas
+
+**Edge function `get-dashboard-stats`** (`gadsPerformance`):
+- Agrupamento de leads muda de "Policarbonato" único para manter `produto_interesse` original quando começa com "Policarbonato " (mantém "Alveolar"/"Compacto"). Demais categorias inalteradas.
+- Retorno passa a incluir estrutura hierárquica:
+  ```ts
+  { category, visits, leads, conversionRate, children?: { category, leads }[] }
+  ```
+- Para "Policarbonato": `visits` = visitas do path `/chapas/policarbonato*`, `leads` = soma dos filhos, `children` = [{Alveolar, N}, {Compacto, M}].
+
+**Front `GoogleAdsByCategoryTable.tsx`**:
+- Renderizar sub-linhas indentadas quando `children` existir.
+- Célula de visitas/conversão dos filhos exibe "—".
+- Total no rodapé continua igual (soma das linhas-pai).
+
+Nenhuma mudança em banco, tracking ou formulário.
+
+## Pergunta rápida
+
+Vai com a versão **hierárquica** (linha pai Policarbonato + 2 sub-linhas)? Se preferir a versão plana (Alveolar e Compacto como categorias irmãs, sem visitas), me diga que ajusto o plano.
