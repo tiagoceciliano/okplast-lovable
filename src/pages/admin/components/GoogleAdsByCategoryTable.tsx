@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -7,6 +8,7 @@ interface Row {
   visits: number;
   leads: number;
   conversionRate: number;
+  children?: { category: string; leads: number }[];
 }
 
 interface Props {
@@ -50,12 +52,32 @@ export function GoogleAdsByCategoryTable({ current, isLoading }: Props) {
             </TableHeader>
             <TableBody>
               {rows.map(r => (
-                <TableRow key={r.category}>
-                  <TableCell className="font-medium">{r.category}</TableCell>
-                  <TableCell className="text-right">{r.visits}</TableCell>
-                  <TableCell className="text-right">{r.leads}</TableCell>
-                  <TableCell className="text-right">{r.conversionRate.toFixed(2)}%</TableCell>
-                </TableRow>
+                <Fragment key={r.category}>
+                  <TableRow>
+                    <TableCell className="font-medium">{r.category}</TableCell>
+                    <TableCell className="text-right">{r.visits}</TableCell>
+                    <TableCell className="text-right">{r.leads}</TableCell>
+                    <TableCell className="text-right">{r.conversionRate.toFixed(2)}%</TableCell>
+                  </TableRow>
+                  {r.children?.map(c => (
+                    <TableRow key={`${r.category}-${c.category}`} className="bg-muted/20">
+                      <TableCell className="pl-8 text-muted-foreground text-sm">└ {c.category}</TableCell>
+                      <TableCell
+                        className="text-right text-muted-foreground"
+                        title="Visitas não podem ser separadas: página compartilhada"
+                      >
+                        —
+                      </TableCell>
+                      <TableCell className="text-right">{c.leads}</TableCell>
+                      <TableCell
+                        className="text-right text-muted-foreground"
+                        title="Conversão não pode ser separada: página compartilhada"
+                      >
+                        —
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </Fragment>
               ))}
             </TableBody>
             <TableFooter>
