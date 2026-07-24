@@ -13,6 +13,7 @@ interface PeriodPayload {
   gadsPerformance: { category: string; visits: number; leads: number; conversionRate: number }[];
   campaignStats: { campaign: string; visits: number; leads: number; conversionRate: string }[];
   chartData: { date: string; visits: number }[];
+  leadsChartData: { date: string; visits: number }[];
 }
 
 interface DashboardResponse {
