@@ -9,9 +9,11 @@ interface ChartDataPoint {
 interface ConversionChartProps {
   data: ChartDataPoint[];
   isLoading?: boolean;
+  title?: string;
+  description?: string;
 }
 
-export function ConversionChart({ data, isLoading }: ConversionChartProps) {
+export function ConversionChart({ data, isLoading, title, description }: ConversionChartProps) {
   const formattedData = data.map(item => ({
     ...item,
     dateFormatted: new Date(item.date + 'T12:00:00-03:00').toLocaleDateString('pt-BR', { 
@@ -24,8 +26,8 @@ export function ConversionChart({ data, isLoading }: ConversionChartProps) {
   return (
     <Card className="col-span-4">
       <CardHeader>
-        <CardTitle>Visitas nos Últimos 7 Dias</CardTitle>
-        <CardDescription>Visualizações de página por dia</CardDescription>
+        <CardTitle>{title ?? "Visitas no período"}</CardTitle>
+        <CardDescription>{description ?? "Visualizações de página por dia"}</CardDescription>
       </CardHeader>
       <CardContent className="h-[300px]">
         {isLoading ? (
