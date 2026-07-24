@@ -17,7 +17,6 @@ const RESOURCES: { id: string; label: string; scopable: boolean }[] = [
   { id: "vendedores", label: "Vendedores/WhatsApp", scopable: false },
   { id: "produtos", label: "Produtos", scopable: false },
   { id: "meta", label: "Meta", scopable: false },
-  { id: "utm_terms", label: "Termos UTM", scopable: false },
   { id: "permissoes", label: "Permissões", scopable: false },
 ];
 
