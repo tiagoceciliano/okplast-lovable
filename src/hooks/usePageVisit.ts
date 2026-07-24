@@ -106,27 +106,24 @@ const TRACKED_PAGES_KEY = "okplast_tracked_pages";
        }
      };
  
-        // Adia o tracking para depois de load + 1.5s (tira da cadeia crítica sem perder visitas curtas).
-       let handle: number | null = null;
-       const kick = () => {
-         const ric: any = (window as any).requestIdleCallback;
-         handle = ric
-            ? ric(() => trackVisit(), { timeout: 2000 })
-            : window.setTimeout(() => trackVisit(), 800);
+       // Rastreia rapidamente para não perder visitas de usuários que
+       // clicam no WhatsApp em poucos segundos. Também dispara em
+       // visibilitychange/pagehide como rede de segurança.
+       let done = false;
+       const fire = () => {
+         if (done) return;
+         done = true;
+         trackVisit();
        };
-       let loadTimer: number | null = null;
-       if (document.readyState === "complete") {
-          loadTimer = window.setTimeout(kick, 1500);
-       } else {
-          const onLoad = () => { loadTimer = window.setTimeout(kick, 1500); };
-         window.addEventListener("load", onLoad, { once: true });
-       }
+       const t = window.setTimeout(fire, 300);
+       const onHide = () => fire();
+       window.addEventListener("pagehide", onHide, { once: true });
+       document.addEventListener("visibilitychange", () => {
+         if (document.visibilityState === "hidden") fire();
+       });
        return () => {
-         if (loadTimer != null) clearTimeout(loadTimer);
-         if (handle != null) {
-           const cic: any = (window as any).cancelIdleCallback;
-           if (cic) cic(handle); else clearTimeout(handle);
-         }
+         clearTimeout(t);
+         window.removeEventListener("pagehide", onHide);
        };
    }, [location.pathname]);
  }

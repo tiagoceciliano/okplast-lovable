@@ -110,38 +110,71 @@ Deno.serve(async (req) => {
       const [visitsRes, leadsRes] = await Promise.all([
         supabase
           .from('page_visits')
-          .select('page_path, visitor_id')
+          .select('page_path, visitor_id, utm_campaign')
           .eq('utm_source', 'googleads')
           .gte('created_at', start.toISOString())
           .lte('created_at', end.toISOString()),
         supabase
           .from('leads')
-          .select('produto_interesse')
+          .select('produto_interesse, utm_campaign')
           .eq('utm_source', 'googleads')
           .gte('created_at', start.toISOString())
           .lte('created_at', end.toISOString()),
       ])
 
-      const visitsByCat: Record<string, number> = {}
+      // Mapeia a campanha do Google Ads para a categoria correspondente.
+      // Assim visitas e leads são contados na MESMA dimensão (campanha),
+      // evitando que um lead apareça em uma categoria diferente da página
+      // que o visitante viu (ex.: viu /policarbonato mas escolheu ACM no modal).
+      const categoryFromCampaign = (c: string | null | undefined): string | null => {
+        if (!c) return null
+        const s = c.toLowerCase()
+        if (s.includes('acm')) return 'ACM'
+        if (s.includes('acrilico') || s.includes('acrílico')) return 'Acrílico'
+        if (s.includes('policarbonato')) return 'Policarbonato'
+        if (s.includes('petg')) return 'PETG'
+        if (s.includes('ps-') || s.includes('poliestireno')) return 'Poliestireno'
+        if (s.includes('pvc')) return 'PVC Expandido'
+        return null
+      }
+
+      // Visitas por categoria — visitantes únicos por campanha (dedup por visitor_id).
+      const visitorsByCat: Record<string, Set<string>> = {}
       ;(visitsRes.data || []).forEach((r: any) => {
-        const cat = categoryFromPath(r.page_path)
-        visitsByCat[cat] = (visitsByCat[cat] || 0) + 1
+        const cat = categoryFromCampaign(r.utm_campaign) || categoryFromPath(r.page_path)
+        if (cat === 'Outros' || cat === 'Home / Personalizado') return
+        if (!visitorsByCat[cat]) visitorsByCat[cat] = new Set()
+        if (r.visitor_id) visitorsByCat[cat].add(r.visitor_id)
       })
+      const visitsByCat: Record<string, number> = {}
+      Object.keys(visitorsByCat).forEach(k => { visitsByCat[k] = visitorsByCat[k].size })
+
+      // Leads por categoria — prioriza utm_campaign; fallback para produto_interesse.
       const leadsByCat: Record<string, number> = {}
+      const leadsByCatDetail: Record<string, Record<string, number>> = {}
       ;(leadsRes.data || []).forEach((r: any) => {
-        const cat = normalizeCategory(r.produto_interesse)
+        const cat = categoryFromCampaign(r.utm_campaign) || normalizeCategory(r.produto_interesse)
+        if (cat === 'Outros' || cat === 'Home / Personalizado') return
         leadsByCat[cat] = (leadsByCat[cat] || 0) + 1
+        // Detalhes para expandir Policarbonato em Alveolar/Compacto pelo produto escolhido
+        if (cat === 'Policarbonato') {
+          const sub = normalizeCategory(r.produto_interesse)
+          if (sub === 'Policarbonato Alveolar' || sub === 'Policarbonato Compacto') {
+            leadsByCatDetail['Policarbonato'] = leadsByCatDetail['Policarbonato'] || {}
+            leadsByCatDetail['Policarbonato'][sub] = (leadsByCatDetail['Policarbonato'][sub] || 0) + 1
+          }
+        }
       })
 
       // Consolidate Policarbonato Alveolar/Compacto under a parent "Policarbonato" row,
       // since both share the same landing page and visits can't be split.
       const POLI_SUBS = ['Policarbonato Alveolar', 'Policarbonato Compacto']
+      const poliDetail = leadsByCatDetail['Policarbonato'] || {}
       const poliChildren = POLI_SUBS
-        .map(name => ({ category: name, leads: leadsByCat[name] || 0 }))
+        .map(name => ({ category: name, leads: poliDetail[name] || 0 }))
         .filter(c => c.leads > 0)
         .sort((a, b) => b.leads - a.leads)
-      const poliLeadsTotal = poliChildren.reduce((s, c) => s + c.leads, 0)
-        + (leadsByCat['Policarbonato'] || 0)
+      const poliLeadsTotal = leadsByCat['Policarbonato'] || 0
       const calculateConversionRate = (leads: number, visits: number) => {
         if (visits <= 0) return 0
         return Number(Math.min((leads / visits) * 100, 100).toFixed(2))
