@@ -1,5 +1,6 @@
 import { ReactNode, lazy, Suspense } from "react";
 import { Header } from "./Header";
+import { AlertBanner } from "./AlertBanner";
 import { WhatsAppFloatingButton } from "./WhatsAppFloatingButton";
 import { useUTM } from "@/hooks/useUTM";
 import { usePageVisit } from "@/hooks/usePageVisit";
