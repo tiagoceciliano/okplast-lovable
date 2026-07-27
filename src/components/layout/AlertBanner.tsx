@@ -6,7 +6,11 @@ const STORAGE_KEY = "okplast-alert-banner-closed";
 const FULL_MESSAGE =
   "Não trabalhamos com placas customizadas, somente com chapas vendidas inteiras (podendo cortá-las para facilitar o transporte).";
 
-export function AlertBanner() {
+interface AlertBannerProps {
+  onVisibilityChange?: (visible: boolean) => void;
+}
+
+export function AlertBanner({ onVisibilityChange }: AlertBannerProps) {
   const [isVisible, setIsVisible] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
 
@@ -19,6 +23,10 @@ export function AlertBanner() {
       // localStorage indisponível (modo privado, etc.)
     }
   }, []);
+
+  useEffect(() => {
+    onVisibilityChange?.(isVisible);
+  }, [isVisible, onVisibilityChange]);
 
   const handleClose = () => {
     setIsVisible(false);
@@ -34,7 +42,7 @@ export function AlertBanner() {
   return (
     <div
       role="alert"
-      className="sticky top-0 z-40 w-full bg-gold text-gold-foreground text-xs sm:text-sm"
+      className="fixed bottom-0 left-0 right-0 z-50 w-full bg-gold text-gold-foreground text-xs sm:text-sm"
     >
       <div className="container-custom flex items-center justify-center gap-2 py-2 sm:py-2.5">
         <AlertTriangle
