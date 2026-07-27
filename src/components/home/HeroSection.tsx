@@ -21,7 +21,7 @@ export function HeroSection({ onWhatsAppClick }: HeroSectionProps) {
             Acrílico, Policarbonato, PETG, Poliestireno (PS), PVC Expandido e ACM no RJ
           </h2>
           <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
-            <strong className="text-foreground">{COMPANY.name}</strong> — {COMPANY.slogan}. Sua distribuidora de chapas plásticas no Rio de Janeiro com corte sob medida e o melhor preço do RJ. Atendemos toda a região metropolitana com entrega rápida.
+            <strong className="text-foreground">{COMPANY.name}</strong> — {COMPANY.slogan}. Sua distribuidora de chapas plásticas no Rio de Janeiro com o melhor preço do RJ. Atendemos toda a região metropolitana com entrega rápida.
           </p>
           <div className="flex flex-col items-center gap-4">
             <Button size="lg" className="btn-whatsapp text-lg px-8 py-6" onClick={onWhatsAppClick}>
