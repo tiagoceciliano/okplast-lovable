@@ -21,6 +21,7 @@ export function Layout({ children }: LayoutProps) {
 
   return (
     <div className="flex min-h-screen flex-col">
+      <AlertBanner />
       <Header />
       <main className="flex-1">{children}</main>
       <Suspense fallback={null}>
