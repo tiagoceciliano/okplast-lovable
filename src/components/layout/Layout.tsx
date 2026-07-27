@@ -1,5 +1,6 @@
 import { ReactNode, lazy, Suspense } from "react";
 import { Header } from "./Header";
+import { AlertBanner } from "./AlertBanner";
 import { WhatsAppFloatingButton } from "./WhatsAppFloatingButton";
 import { useUTM } from "@/hooks/useUTM";
 import { usePageVisit } from "@/hooks/usePageVisit";
@@ -20,6 +21,7 @@ export function Layout({ children }: LayoutProps) {
 
   return (
     <div className="flex min-h-screen flex-col">
+      <AlertBanner />
       <Header />
       <main className="flex-1">{children}</main>
       <Suspense fallback={null}>
