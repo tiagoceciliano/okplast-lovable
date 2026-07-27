@@ -1,49 +1,40 @@
 ## Objetivo
+Inserir um aviso discreto, fixo e visível em todas as páginas do site com a mensagem:
+> "Não trabalhamos com placas customizadas, somente com chapas vendidas inteiras (podendo cortá-las para facilitar o transporte)."
 
-Separar **Policarbonato Alveolar** e **Policarbonato Compacto** na tabela "Performance Google Ads por categoria" do Dashboard, mesmo que ambos compartilhem a mesma landing page (`/chapas/policarbonato`).
+## Onde vai aparecer
+No topo da página, acima do header, em todas as rotas do site (não na área administrativa). O header continuará fixo/sticky, deslizando junto com o banner.
 
-## Contexto
+## Como será visualmente
+- **Uma única linha fina** (altura ~36-40 px), sem quebrar a hierarquia visual.
+- **Cor sugerida**: tom âmbar/dourado (`gold` do design system) com texto escuro. É chamativo o suficiente para ser um alerta, mas não parece erro como o vermelho.
+- Ícone de alerta pequeno (ex.: triângulo ou ponto de exclamação) à esquerda.
+- Texto centralizado, fonte reduzida.
+- Botão de fechar (X) à direita, opcional, para não incomodar usuários recorrentes. O estado de fechamento pode ser lembrado via `localStorage`.
+- Em mobile, o texto pode reduzir levemente ou quebrar em duas linhas se necessário.
 
-- No formulário WhatsApp o usuário escolhe explicitamente "Policarbonato Alveolar" ou "Policarbonato Compacto" — isso já é salvo em `leads.produto_interesse`.
-- Visitas de página, porém, vêm de uma única URL `/chapas/policarbonato`, então **não dá para separar visitas** por sub-produto. Isso é uma limitação real de dados.
+## Implementação
+1. **Novo componente** `src/components/layout/AlertBanner.tsx`
+   - Recebe a mensagem como prop ou constante.
+   - Usa tokens semânticos do design system (`bg-gold`, `text-gold-foreground`, `bg-destructive` se preferir vermelho, etc.).
+   - Gerencia estado de aberto/fechado com `localStorage`.
+2. **Ajuste em `src/components/layout/Layout.tsx`**
+   - Renderiza `<AlertBanner />` imediatamente antes do `<Header />`.
+3. **Ajuste em `src/components/layout/Header.tsx`**
+   - Como o header é `sticky top-0`, ele precisa passar a ser `sticky top-[36px]` (ou a altura do banner) para não ficar escondido atrás do banner.
+   - Em mobile, se o banner quebrar em mais linhas, usar `top-[var(--banner-height)]` dinâmico.
+4. **(Opcional) Novo token CSS**
+   - Se o tom `gold` atual não for ideal, criar um token `--alert` e `--alert-foreground` em `src/index.css` e `tailwind.config.ts`.
 
-## Proposta de visualização
+## O que não será alterado
+- Nenhuma lógica de negócio, backend, admin ou CRM.
+- Nenhuma página de produto.
+- Não se altera o rodapé (a sugestão é topo, que é mais visível sem poluir o conteúdo).
 
-Manter a tabela atual (Categoria · Visitas · Leads · Conversão) e transformar a linha **Policarbonato** em uma linha "pai" expansível com duas sub-linhas:
+## Critério de aceitação
+- O banner aparece em todas as páginas do site.
+- O header continua sticky e desce junto com o banner ao rolar.
+- Em mobile o layout não quebra.
+- A mensagem está legível e discreta.
 
-```text
-Categoria                    Visitas   Leads   Conversão
-▸ Policarbonato                 120      18      15,00%
-    └ Policarbonato Alveolar     —       12         —
-    └ Policarbonato Compacto     —        6         —
-ACM                              80       9      11,25%
-Acrílico                         ...
-```
-
-- A linha pai continua mostrando o total de visitas e leads (soma dos dois sub-produtos) e a conversão agregada — assim o total da tabela não muda.
-- Sub-linhas mostram **apenas leads** (visitas e conversão ficam como "—" com tooltip explicando que a página é compartilhada).
-- Ordenação da tabela continua por leads desc no nível pai; sub-linhas ordenadas por leads desc.
-- Expandido por padrão (é a única categoria com sub-níveis) — sem toggle, pra ficar direto.
-
-Se preferir sem hierarquia, alternativa: listar "Policarbonato Alveolar" e "Policarbonato Compacto" como categorias separadas na tabela, cada uma com os leads corretos e visitas em branco/"—". Menos preciso pra taxa de conversão porque as visitas ficam órfãs.
-
-## Alterações técnicas
-
-**Edge function `get-dashboard-stats`** (`gadsPerformance`):
-- Agrupamento de leads muda de "Policarbonato" único para manter `produto_interesse` original quando começa com "Policarbonato " (mantém "Alveolar"/"Compacto"). Demais categorias inalteradas.
-- Retorno passa a incluir estrutura hierárquica:
-  ```ts
-  { category, visits, leads, conversionRate, children?: { category, leads }[] }
-  ```
-- Para "Policarbonato": `visits` = visitas do path `/chapas/policarbonato*`, `leads` = soma dos filhos, `children` = [{Alveolar, N}, {Compacto, M}].
-
-**Front `GoogleAdsByCategoryTable.tsx`**:
-- Renderizar sub-linhas indentadas quando `children` existir.
-- Célula de visitas/conversão dos filhos exibe "—".
-- Total no rodapé continua igual (soma das linhas-pai).
-
-Nenhuma mudança em banco, tracking ou formulário.
-
-## Pergunta rápida
-
-Vai com a versão **hierárquica** (linha pai Policarbonato + 2 sub-linhas)? Se preferir a versão plana (Alveolar e Compacto como categorias irmãs, sem visitas), me diga que ajusto o plano.
+Se preferir outra cor (vermelho/alaranjado) ou posição (rodapé fixo), posso ajustar o plano antes de implementar.
