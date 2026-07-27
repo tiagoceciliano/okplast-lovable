@@ -31,7 +31,7 @@ export function Layout({ children }: LayoutProps) {
       </Suspense>
       {/* Renderizado imediatamente (não-lazy) para reservar espaço
           e eliminar o CLS causado pela montagem tardia do container fixo. */}
-      <WhatsAppFloatingButton />
+      <WhatsAppFloatingButton bannerVisible={bannerVisible} />
       <AlertBanner onVisibilityChange={setBannerVisible} />
     </div>
   );
