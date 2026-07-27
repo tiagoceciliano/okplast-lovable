@@ -59,7 +59,7 @@ export function WhatsAppFloatingButton({ bannerVisible = false }: WhatsAppFloati
         </Suspense>
       )}
 
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+      <div className={cn("fixed right-6 z-50 flex flex-col items-end gap-3", bannerVisible ? "bottom-16" : "bottom-6")}>
         {/* Proactive Message */}
         {showProactiveMessage && !isWidgetOpen && (
           <div 
