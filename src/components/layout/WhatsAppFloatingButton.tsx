@@ -4,7 +4,11 @@ import { MessageCircle, X } from "lucide-react";
 // Lazy load do widget de chat (não-crítico)
 const WhatsAppChatWidget = lazy(() => import("./WhatsAppChatWidget").then(m => ({ default: m.WhatsAppChatWidget })));
 
-export function WhatsAppFloatingButton() {
+interface WhatsAppFloatingButtonProps {
+  bannerVisible?: boolean;
+}
+
+export function WhatsAppFloatingButton({ bannerVisible = false }: WhatsAppFloatingButtonProps) {
   const [showProactiveMessage, setShowProactiveMessage] = useState(false);
   const [isWidgetOpen, setIsWidgetOpen] = useState(false);
 
