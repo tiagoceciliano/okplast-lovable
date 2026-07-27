@@ -1,10 +1,15 @@
 import { useState, useEffect, lazy, Suspense } from "react";
 import { MessageCircle, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 // Lazy load do widget de chat (não-crítico)
 const WhatsAppChatWidget = lazy(() => import("./WhatsAppChatWidget").then(m => ({ default: m.WhatsAppChatWidget })));
 
-export function WhatsAppFloatingButton() {
+interface WhatsAppFloatingButtonProps {
+  bannerVisible?: boolean;
+}
+
+export function WhatsAppFloatingButton({ bannerVisible = false }: WhatsAppFloatingButtonProps) {
   const [showProactiveMessage, setShowProactiveMessage] = useState(false);
   const [isWidgetOpen, setIsWidgetOpen] = useState(false);
 
@@ -55,7 +60,7 @@ export function WhatsAppFloatingButton() {
         </Suspense>
       )}
 
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+      <div className={cn("fixed right-6 z-50 flex flex-col items-end gap-3", bannerVisible ? "bottom-16" : "bottom-6")}>
         {/* Proactive Message */}
         {showProactiveMessage && !isWidgetOpen && (
           <div 
