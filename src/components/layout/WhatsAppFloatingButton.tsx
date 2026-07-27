@@ -1,5 +1,6 @@
 import { useState, useEffect, lazy, Suspense } from "react";
 import { MessageCircle, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 // Lazy load do widget de chat (não-crítico)
 const WhatsAppChatWidget = lazy(() => import("./WhatsAppChatWidget").then(m => ({ default: m.WhatsAppChatWidget })));
