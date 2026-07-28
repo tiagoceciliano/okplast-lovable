@@ -1,32 +1,65 @@
 import { Link } from "react-router-dom";
 import { MapPin, Mail, Clock, MessageCircle } from "lucide-react";
-import { COMPANY } from "@/lib/constants";
+import { COMPANY, NAV_ITEMS } from "@/lib/constants";
 import logoImg from "@/assets/logo-okplast.png";
 import { GoogleMapEmbed } from "@/components/ui/GoogleMapEmbed";
 import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
 import { useWhatsAppNumber } from "@/hooks/useWhatsAppNumber";
 
 export function Footer() {
+  const CHAPAS_LINKS =
+    NAV_ITEMS.find((item) => item.label === "Chapas")?.children ?? [];
   const { openWhatsAppModal } = useWhatsAppModal();
   const whatsapp = useWhatsAppNumber();
   const currentYear = new Date().getFullYear();
   return <footer className="bg-primary text-primary-foreground">
       <div className="container-custom section-padding">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
-          {/* Contato */}
-          <div className="space-y-4">
-            <h3 className="font-bold text-lg uppercase tracking-wide">Contato</h3>
-            <ul className="space-y-3 text-sm text-primary-foreground/80">
-              <li className="flex items-start gap-2">
-                <MapPin className="h-4 w-4 mt-0.5 shrink-0" />
-                <span>{COMPANY.address}</span>
+          {/* Chapas */}
+          <nav className="space-y-4" aria-label="Chapas plásticas">
+            <h3 className="font-bold text-lg uppercase tracking-wide">Chapas</h3>
+            <ul className="space-y-2 text-sm text-primary-foreground/80">
+              <li>
+                <Link to="/chapas" className="font-semibold text-primary-foreground hover:text-accent transition-colors">
+                  Todas as chapas
+                </Link>
               </li>
-              <li className="flex items-center gap-2">
-                <Mail className="h-4 w-4 shrink-0" />
-                <span>{COMPANY.email}</span>
+              {CHAPAS_LINKS.map((item) => (
+                <li key={item.href}>
+                  <Link to={item.href} className="hover:text-primary-foreground transition-colors">
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          {/* Institucional */}
+          <nav className="space-y-4" aria-label="Institucional">
+            <h3 className="font-bold text-lg uppercase tracking-wide">Institucional</h3>
+            <ul className="space-y-2 text-sm text-primary-foreground/80">
+              <li>
+                <Link to="/home/sobre-nos" className="hover:text-primary-foreground transition-colors">
+                  Sobre Nós
+                </Link>
+              </li>
+              <li>
+                <Link to="/home/politica-de-venda" className="hover:text-primary-foreground transition-colors">
+                  Política de Venda
+                </Link>
+              </li>
+              <li>
+                <Link to="/home/termo-de-uso" className="hover:text-primary-foreground transition-colors">
+                  Termo de Uso
+                </Link>
+              </li>
+              <li>
+                <Link to="/home/politica-de-privacidade" className="hover:text-primary-foreground transition-colors">
+                  Política de Privacidade
+                </Link>
               </li>
             </ul>
-          </div>
+          </nav>
 
           {/* Atendimento */}
           <div className="space-y-4">
@@ -34,20 +67,17 @@ export function Footer() {
             <ul className="space-y-3 text-sm text-primary-foreground/80">
               <li className="flex items-center gap-2">
                 <MessageCircle className="h-4 w-4 shrink-0" />
-                <button 
-                  onClick={() => openWhatsAppModal()} 
+                <button
+                  onClick={() => openWhatsAppModal()}
                   className="hover:text-primary-foreground transition-colors text-left"
                 >
                   {whatsapp.formatted}
                 </button>
               </li>
-            </ul>
-          </div>
-
-          {/* Horários */}
-          <div className="space-y-4">
-            <h3 className="font-bold text-lg uppercase tracking-wide">Horários</h3>
-            <ul className="space-y-3 text-sm text-primary-foreground/80">
+              <li className="flex items-center gap-2">
+                <Mail className="h-4 w-4 shrink-0" />
+                <span>{COMPANY.email}</span>
+              </li>
               <li className="flex items-start gap-2">
                 <Clock className="h-4 w-4 mt-0.5 shrink-0" />
                 <div>
@@ -55,18 +85,11 @@ export function Footer() {
                   <p className="font-semibold text-primary-foreground">9h às 17h</p>
                 </div>
               </li>
+              <li className="flex items-start gap-2">
+                <MapPin className="h-4 w-4 mt-0.5 shrink-0" />
+                <span>{COMPANY.address}</span>
+              </li>
             </ul>
-            <div className="pt-4 space-y-2">
-              <Link to="/home/politica-de-venda" className="block text-sm text-primary-foreground/80 hover:text-primary-foreground transition-colors">
-                Política de Venda
-              </Link>
-              <Link to="/home/termo-de-uso" className="block text-sm text-primary-foreground/80 hover:text-primary-foreground transition-colors">
-                Termo de Uso
-              </Link>
-              <Link to="/home/politica-de-privacidade" className="block text-sm text-primary-foreground/80 hover:text-primary-foreground transition-colors">
-                Política de Privacidade
-              </Link>
-            </div>
           </div>
 
           {/* Mapa */}
