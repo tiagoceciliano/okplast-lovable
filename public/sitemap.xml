@@ -66,22 +66,4 @@
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
-  <url>
-    <loc>https://okplast.com.br/home/politica-de-venda</loc>
-    <lastmod>2026-03-14</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
-  </url>
-  <url>
-    <loc>https://okplast.com.br/home/termo-de-uso</loc>
-    <lastmod>2026-03-14</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
-  </url>
-  <url>
-    <loc>https://okplast.com.br/home/politica-de-privacidade</loc>
-    <lastmod>2026-03-14</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
-  </url>
 </urlset>
