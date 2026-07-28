@@ -1,12 +1,14 @@
 import { Link } from "react-router-dom";
 import { MapPin, Mail, Clock, MessageCircle } from "lucide-react";
-import { COMPANY } from "@/lib/constants";
+import { COMPANY, NAV_ITEMS } from "@/lib/constants";
 import logoImg from "@/assets/logo-okplast.png";
 import { GoogleMapEmbed } from "@/components/ui/GoogleMapEmbed";
 import { useWhatsAppModal } from "@/contexts/WhatsAppModalContext";
 import { useWhatsAppNumber } from "@/hooks/useWhatsAppNumber";
 
 export function Footer() {
+  const CHAPAS_LINKS =
+    NAV_ITEMS.find((item) => item.label === "Chapas")?.children ?? [];
   const { openWhatsAppModal } = useWhatsAppModal();
   const whatsapp = useWhatsAppNumber();
   const currentYear = new Date().getFullYear();
