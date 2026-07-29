@@ -65,7 +65,7 @@ export function HomeBelowFold({ onWhatsAppClick }: Props) {
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle className="h-5 w-5 text-accent shrink-0" />
-                  <span className="text-sm">Corte sua chapa interira</span>
+                  <span className="text-sm">Corte sua chapa inteira</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle className="h-5 w-5 text-accent shrink-0" />
