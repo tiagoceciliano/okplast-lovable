@@ -1,0 +1,1 @@
+delete from public.negociacoes where lead_id = 'adc1d5d7-cea9-4d6c-a0ba-9cc864ae27a4'; delete from public.leads where id = 'adc1d5d7-cea9-4d6c-a0ba-9cc864ae27a4';
