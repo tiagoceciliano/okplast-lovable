@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      health_alerts: {
+        Row: {
+          created_at: string
+          detalhe: string | null
+          id: string
+          notificado: boolean
+          tipo: string
+        }
+        Insert: {
+          created_at?: string
+          detalhe?: string | null
+          id?: string
+          notificado?: boolean
+          tipo: string
+        }
+        Update: {
+          created_at?: string
+          detalhe?: string | null
+          id?: string
+          notificado?: boolean
+          tipo?: string
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           cidade: string | null

@@ -52,3 +52,8 @@ window.addEventListener("load", () => {
 });
 
 createRoot(document.getElementById("root")!).render(<App />);
+
+// Reenvia leads que ficaram na fila por queda do backend
+import("@/lib/leadCapture").then(({ flushLeadQueue }) => {
+  setTimeout(() => flushLeadQueue(), 2000);
+});

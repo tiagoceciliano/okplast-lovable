@@ -17,8 +17,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { COMPANY } from "@/lib/constants";
 import { formatPhone, capitalizeName } from "./WhatsAppButton";
-import { supabase } from "@/integrations/supabase/client";
 import { getStoredUTM } from "@/hooks/useUTM";
+import { submitLead } from "@/lib/leadCapture";
 import { useWhatsAppNumber } from "@/hooks/useWhatsAppNumber";
 import { reportConversion } from "@/lib/conversion";
 import logoImage from "@/assets/logo-okplast.png";
@@ -85,19 +85,17 @@ export function WhatsAppChatWidget({ open, onOpenChange }: WhatsAppChatWidgetPro
       // Dispara webhook de forma assíncrona com UTMs corretos
       const utmData = getStoredUTM();
 
-      supabase.functions.invoke("process-lead", {
-        body: {
-          nome: nomeFormatado,
-          email: data.email,
-          telefone: telefoneFormatado,
-          produto_interesse: "Chapa Inteira",
-          mensagem: data.mensagem,
-          current_url: window.location.href,
-          destino_whatsapp: whatsapp.raw,
-          destino_whatsapp_formatado: whatsapp.formatted,
-          ...utmData,
-        },
-      }).catch(console.error);
+      submitLead({
+        nome: nomeFormatado,
+        email: data.email,
+        telefone: telefoneFormatado,
+        produto_interesse: "Chapa Inteira",
+        mensagem: data.mensagem,
+        current_url: window.location.href,
+        destino_whatsapp: whatsapp.raw,
+        destino_whatsapp_formatado: whatsapp.formatted,
+        ...utmData,
+      });
 
       form.reset();
       onOpenChange(false);
