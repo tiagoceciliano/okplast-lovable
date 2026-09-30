@@ -8,6 +8,13 @@
       "when": 1790774999696,
       "tag": "0000_whatsapp_inbox",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790811262261,
+      "tag": "0001_permissoes_conversas",
+      "breakpoints": true
     }
   ]
 }
