@@ -37,7 +37,7 @@ export function KanbanCard({ negociacao, vendedores, tarefasCount, comentariosCo
       {...attributes}
       {...listeners}
       onClick={onClick}
-      className="bg-card border rounded-lg p-3 shadow-sm hover:shadow-md cursor-pointer space-y-2"
+      className="bg-card border rounded-lg p-3 shadow-xs hover:shadow-md cursor-pointer space-y-2"
     >
       <div className="flex items-start justify-between gap-2">
         <h4 className="font-semibold text-sm leading-tight truncate">{negociacao.nome_cliente}</h4>

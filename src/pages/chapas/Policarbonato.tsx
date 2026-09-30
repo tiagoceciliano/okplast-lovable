@@ -122,7 +122,7 @@ export default function Policarbonato() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
             {/* Alveolar */}
-            <div className="bg-background rounded-xl border border-border overflow-hidden shadow-sm">
+            <div className="bg-background rounded-xl border border-border overflow-hidden shadow-xs">
               <div className="aspect-video bg-muted overflow-hidden">
                 <img
                   src={heroPolicarbonatoAlveolar}
@@ -157,7 +157,7 @@ export default function Policarbonato() {
             </div>
 
             {/* Compacto */}
-            <div className="bg-background rounded-xl border border-border overflow-hidden shadow-sm">
+            <div className="bg-background rounded-xl border border-border overflow-hidden shadow-xs">
               <div className="aspect-video bg-muted overflow-hidden">
                 <img
                   src={heroPolicarbonatoCompacto}

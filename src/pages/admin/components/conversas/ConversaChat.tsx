@@ -161,7 +161,7 @@ export function ConversaChat({ conversa, onMarcarLida }: Props) {
         )}
         {mensagens.map((m) => (
           <div key={m.id} className={`flex ${m.direcao === "saida" ? "justify-end" : "justify-start"}`}>
-            <div className={`max-w-[80%] rounded-lg px-3 py-1.5 text-sm shadow-sm ${
+            <div className={`max-w-[80%] rounded-lg px-3 py-1.5 text-sm shadow-xs ${
               m.direcao === "saida" ? "bg-primary text-primary-foreground" : "bg-background border"
             }`}>
               <div className="whitespace-pre-wrap break-words">{m.conteudo}</div>

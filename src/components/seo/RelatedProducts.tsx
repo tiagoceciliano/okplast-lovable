@@ -44,7 +44,7 @@ export function RelatedProducts({ currentSlug }: RelatedProductsProps) {
               to={`/chapas/${chapa.slug}`}
               className="group"
             >
-              <div className="bg-background rounded-lg overflow-hidden shadow-sm border hover:shadow-md transition-shadow">
+              <div className="bg-background rounded-lg overflow-hidden shadow-xs border hover:shadow-md transition-shadow">
                 <div className="aspect-square bg-muted overflow-hidden">
                   <img
                     src={chapa.image}

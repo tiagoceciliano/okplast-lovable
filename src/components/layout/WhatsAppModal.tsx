@@ -239,7 +239,7 @@ export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppMo
                           <FormControl>
                             <select
                               {...field}
-                              className="whatsapp-input h-8 text-sm w-full rounded-md border border-input bg-background px-2 focus:outline-none focus:ring-2 focus:ring-ring"
+                              className="whatsapp-input h-8 text-sm w-full rounded-md border border-input bg-background px-2 focus:outline-hidden focus:ring-2 focus:ring-ring"
                             >
                               <option value="" disabled>
                                 Tipo de Material

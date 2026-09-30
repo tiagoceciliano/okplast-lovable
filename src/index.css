@@ -199,7 +199,7 @@
   }
 
   .whatsapp-bubble-received {
-    @apply bg-white rounded-lg rounded-tl-none p-3 max-w-[85%] shadow-sm relative;
+    @apply bg-white rounded-lg rounded-tl-none p-3 max-w-[85%] shadow-xs relative;
   }
 
   .whatsapp-bubble-received::before {
@@ -210,7 +210,7 @@
   }
 
   .whatsapp-bubble-sent {
-    @apply bg-[#DCF8C6] rounded-lg rounded-tr-none p-3 ml-auto max-w-[95%] shadow-sm relative;
+    @apply bg-[#DCF8C6] rounded-lg rounded-tr-none p-3 ml-auto max-w-[95%] shadow-xs relative;
   }
 
   .whatsapp-bubble-sent::before {
