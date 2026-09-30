@@ -1,0 +1,27 @@
+{
+  "customizations": [
+    { "token": "--primary / --primary-foreground (azul #1a3a5c)", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--accent / --accent-foreground (verde #3bb78f)", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--background/--foreground/--card/--popover/--secondary/--muted/--destructive/--border/--input/--ring (light + dark)", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--whatsapp / --whatsapp-foreground", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--cta-email / --cta-email-foreground", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--gold / --gold-foreground", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--sidebar-background/-foreground/-primary/-accent/-border/-ring (light + dark)", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--radius: 0.5rem", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "@font-face Montserrat Fallback (metric-matched Arial)", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "font-sans/font-display Montserrat", "source": "tailwind.config.ts", "reappliedIn": "src/styles.css (@theme --font-sans/--font-display)" },
+    { "token": "container (center, padding 2rem, 2xl 1400px)", "source": "tailwind.config.ts", "reappliedIn": "src/styles.css (@utility container)" },
+    { "token": "keyframes/animation pulse-glow", "source": "tailwind.config.ts", "reappliedIn": "src/styles.css (@theme --animate-pulse-glow)" },
+    { "token": "keyframes/animation slide-up", "source": "tailwind.config.ts", "reappliedIn": "src/styles.css (@theme --animate-slide-up)" },
+    { "token": "keyframes/animation accordion-down/up", "source": "tailwind.config.ts", "reappliedIn": "src/styles.css (@theme --animate-accordion-*)" },
+    { "token": ".container-custom", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": ".btn-whatsapp", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": ".btn-cta-email", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": ".btn-gold", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": ".section-padding", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": ".gradient-primary / .bg-primary-solid", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": ".decorative-divider", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": ".whatsapp-modal/.whatsapp-header/.whatsapp-chat-area/.whatsapp-bubble-*/.whatsapp-time/.whatsapp-input/.whatsapp-send-button/.whatsapp-chat-widget/.whatsapp-proactive-message (+ mobile media queries)", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "base layer: border-border, body bg/text/antialiased/Montserrat, h1-h6 bold Montserrat", "source": "src/index.css", "reappliedIn": "src/styles.css" }
+  ]
+}
