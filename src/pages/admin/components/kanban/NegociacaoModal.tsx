@@ -11,6 +11,7 @@ import { Check, X, Trash2, Plus, UserCheck } from "lucide-react";
 import { toast } from "sonner";
 import { ETAPAS, brl, type EtapaId, type Negociacao, type VendedorLite } from "./types";
 import { usePermissions } from "@/hooks/usePermissions";
+import { ConversaChat, type Conversa } from "../conversas/ConversaChat";
 
 interface Props {
   negociacao: Negociacao | null;
@@ -37,6 +38,7 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
   const [novaTarefa, setNovaTarefa] = useState("");
   const [novaData, setNovaData] = useState("");
   const [produtos, setProdutos] = useState<ProdutoLite[]>([]);
+  const [conversa, setConversa] = useState<Conversa | null>(null);
 
   useEffect(() => setN(negociacao), [negociacao]);
   useEffect(() => {
@@ -56,6 +58,16 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
     supabase.from("produtos").select("id,nome,material").eq("ativo", true).order("nome")
       .then(({ data }) => setProdutos((data as ProdutoLite[]) || []));
   }, []);
+
+  // Localiza a conversa WhatsApp pelo telefone da negociação
+  useEffect(() => {
+    setConversa(null);
+    const d = (negociacao?.telefone || "").replace(/\D/g, "");
+    if (!negociacao || d.length < 10) return;
+    const candidatos = d.startsWith("55") ? [d, d.slice(2)] : [`55${d}`, d];
+    supabase.from("whatsapp_conversas").select("*").in("telefone", candidatos).limit(1)
+      .then(({ data }) => setConversa((data?.[0] as Conversa) || null));
+  }, [negociacao?.id, negociacao?.telefone]);
 
   if (!n) return null;
   const canEdit = can("negociacoes", "edit", n.responsavel_id);
@@ -233,6 +245,15 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
                 {coments.length === 0 && <li className="text-xs text-muted-foreground">Nenhum comentário.</li>}
               </ul>
             </div>
+
+            {conversa && (
+              <div>
+                <Label className="text-xs">Conversa WhatsApp</Label>
+                <div className="h-72 border rounded-md p-2">
+                  <ConversaChat conversa={conversa} />
+                </div>
+              </div>
+            )}
 
             <div>
               <Label className="text-xs">Histórico</Label>

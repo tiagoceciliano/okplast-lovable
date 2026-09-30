@@ -256,6 +256,21 @@ export function AdminSidebar() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip="Conversas">
+                  <NavLink
+                    to="/admin/conversas"
+                    className={({ isActive }) => cn(
+                      "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-muted",
+                      isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
+                      collapsed && "justify-center px-0"
+                    )}
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                    {!collapsed && <span>Conversas</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip="Negociações">
                   <NavLink
                     to="/admin/negociacoes"
