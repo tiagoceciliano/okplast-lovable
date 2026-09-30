@@ -12,6 +12,8 @@ interface Body {
   tipo: "text" | "template";
   texto?: string;
   template?: { name: string; language: string; parametros?: string[] };
+  criar_apenas?: boolean; // cria/retorna a conversa sem enviar mensagem
+  nome_contato?: string;
 }
 
 Deno.serve(async (req) => {
@@ -64,6 +66,14 @@ Deno.serve(async (req) => {
     }
   }
   if (!conversa) return json({ error: "Informe conversa_id ou telefone" }, 400);
+
+  if (body.criar_apenas) {
+    if (body.nome_contato?.trim() && !conversa.nome_contato) {
+      await admin.from("whatsapp_conversas").update({ nome_contato: body.nome_contato.trim() }).eq("id", conversa.id);
+      conversa.nome_contato = body.nome_contato.trim();
+    }
+    return json({ success: true, conversa });
+  }
 
   // Permissão: admin/gestor ou responsável pela conversa
   const isAdminGestor = (roles ?? []).some((r: any) => ["admin", "gestor"].includes(r.role));

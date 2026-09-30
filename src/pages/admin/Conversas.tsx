@@ -60,35 +60,20 @@ export default function Conversas() {
     const tel = novoTelefone.replace(/\D/g, "");
     if (tel.length < 12) { toast.error("Informe o número com DDI e DDD, ex: 5521999998888"); return; }
     setCriando(true);
-    // Conversa nova: janela fechada, então o primeiro contato precisa ser por
-    // mensagem pronta — o envio em si acontece na tela da conversa.
     const { data, error } = await supabase.functions.invoke("whatsapp-send", {
-      body: { telefone: tel, tipo: "text", texto: "__noop__" },
+      body: { telefone: tel, tipo: "text", criar_apenas: true, nome_contato: novoNome.trim() || undefined },
     });
     setCriando(false);
-    // Se a janela estiver fechada (esperado), a função devolve 422 mas já criou a conversa
     if (error) {
-      const { data: existente } = await supabase
-        .from("whatsapp_conversas").select("*").eq("telefone", tel).maybeSingle();
-      if (existente) {
-        if (novoNome.trim()) {
-          await supabase.from("whatsapp_conversas").update({ nome_contato: novoNome.trim() }).eq("id", existente.id);
-        }
-        await carregar();
-        setSelecionada(existente as Conversa);
-        setNovaAberta(false); setNovoTelefone(""); setNovoNome("");
-        toast.success("Conversa criada. Envie uma mensagem pronta para iniciar o contato.");
-        return;
-      }
-      toast.error("Não foi possível criar a conversa.");
+      const detalhe = (error as any)?.context ? await (error as any).context.text().catch(() => "") : "";
+      toast.error("Não foi possível criar a conversa. " + detalhe);
       return;
     }
     await carregar();
-    if ((data as any)?.conversa_id) {
-      const { data: conv } = await supabase.from("whatsapp_conversas").select("*").eq("id", (data as any).conversa_id).single();
-      if (conv) setSelecionada(conv as Conversa);
-    }
+    const conv = (data as any)?.conversa;
+    if (conv) setSelecionada(conv as Conversa);
     setNovaAberta(false); setNovoTelefone(""); setNovoNome("");
+    toast.success("Conversa criada. Envie uma mensagem pronta para iniciar o contato.");
   };
 
   return (
