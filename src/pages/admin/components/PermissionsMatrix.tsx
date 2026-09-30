@@ -12,6 +12,7 @@ const RESOURCES: { id: string; label: string; scopable: boolean }[] = [
   { id: "radar", label: "Radar", scopable: false },
   { id: "leads", label: "Leads", scopable: true },
   { id: "negociacoes", label: "Negociações", scopable: true },
+  { id: "conversas", label: "Conversas WhatsApp", scopable: true },
   { id: "tarefas", label: "Tarefas", scopable: true },
   { id: "comentarios", label: "Comentários", scopable: true },
   { id: "vendedores", label: "Vendedores/WhatsApp", scopable: false },
