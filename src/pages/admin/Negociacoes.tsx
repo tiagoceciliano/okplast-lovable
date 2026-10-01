@@ -63,9 +63,10 @@ export default function Negociacoes() {
       if (encontrada) setAtivo(encontrada);
     }
     const waRows = (wa.data || []) as { user_id: string | null; nome_vendedor: string; numero_raw: string; numero_formatado: string }[];
-    const vs = waRows
-      .filter((v) => v.user_id)
-      .map((v) => ({ user_id: v.user_id!, nome: v.nome_vendedor }));
+    const { data: equipe } = await supabase.rpc("list_equipe");
+    const vs = (equipe ?? [])
+      .filter((u) => u.roles?.includes("vendedor"))
+      .map((u) => ({ user_id: u.id, nome: u.nome }));
     setVendedores(vs);
     const nmap: Record<string, { user_id: string | null; nome: string; formatado: string }> = {};
     waRows.forEach((v) => { nmap[v.numero_raw] = { user_id: v.user_id, nome: v.nome_vendedor, formatado: v.numero_formatado }; });

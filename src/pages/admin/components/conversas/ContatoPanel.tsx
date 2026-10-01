@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Phone, Mail, User, Tag, StickyNote, Workflow, Settings2, ChevronDown, Plus, MessageCircle, CheckSquare, CalendarClock } from "lucide-react";
+import { Loader2, Phone, Mail, User, Tag, StickyNote, Workflow, Settings2, ChevronDown, Plus, MessageCircle, CheckSquare, CalendarClock, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { ETAPAS, brl, type Negociacao } from "../kanban/types";
 import { useEtiquetas } from "./tags";
@@ -40,7 +40,12 @@ const fmt = (iso: string) =>
 
 export function ContatoPanel({ conversa, onNomeAtualizado, onNegociacaoVinculada }: Props) {
   const navigate = useNavigate();
-  const [neg, setNeg] = useState<Negociacao | null>(null);
+  const [negs, setNegs] = useState<Negociacao[]>([]);
+  const [selId, setSelId] = useState<string | null>(null);
+  const neg = negs.find((n) => n.id === selId) ?? null;
+  const setNeg = (n: Negociacao) => setNegs((prev) => prev.map((item) => (item.id === n.id ? n : item)));
+  const [equipe, setEquipe] = useState<Record<string, string>>({});
+  const [me, setMe] = useState<{ id: string; gestor: boolean } | null>(null);
   const [notas, setNotas] = useState<Nota[]>([]);
   const [novaNota, setNovaNota] = useState("");
   const [nome, setNome] = useState(conversa.nome_contato ?? "");
@@ -50,41 +55,57 @@ export function ContatoPanel({ conversa, onNomeAtualizado, onNegociacaoVinculada
   const [gerenciar, setGerenciar] = useState(false);
   const [tarefas, setTarefas] = useState<Tarefa[]>([]);
   const [novaTarefa, setNovaTarefa] = useState("");
+  const podeEditar = !!neg && !!me && (me.gestor || neg.responsavel_id === me.id);
+
+  useEffect(() => {
+    (async () => {
+      const [{ data: lista }, { data: { session } }] = await Promise.all([
+        supabase.rpc("list_equipe"),
+        supabase.auth.getSession(),
+      ]);
+      setEquipe(Object.fromEntries((lista ?? []).map((u) => [u.id, u.nome])));
+      const eu = (lista ?? []).find((u) => u.id === session?.user.id);
+      if (session) setMe({ id: session.user.id, gestor: !!eu?.roles?.some((r) => r === "admin" || r === "gestor") });
+    })();
+  }, []);
 
   useEffect(() => {
     setNome(conversa.nome_contato ?? "");
     let ativo = true;
     (async () => {
       setCarregando(true);
-      let query = supabase.from("negociacoes").select("*").limit(1);
-      query = conversa.negociacao_id
-        ? query.eq("id", conversa.negociacao_id)
-        : query.eq("telefone", conversa.telefone);
-      const { data } = await query.maybeSingle();
+      const { data } = await supabase.rpc("list_negociacoes_conversa", { _conversa_id: conversa.id });
       if (!ativo) return;
-      const n = (data as Negociacao | null) ?? null;
-      setNeg(n);
-      if (n) {
-        if (!conversa.negociacao_id) {
-          const { error: vinculoError } = await supabase
-            .from("whatsapp_conversas")
-            .update({ negociacao_id: n.id })
-            .eq("id", conversa.id);
-          if (!vinculoError && ativo) onNegociacaoVinculada?.(n.id);
-        }
-        const [{ data: cms }, { data: tasks }] = await Promise.all([
-          supabase.from("negociacao_comentarios").select("id,texto,autor_id,created_at").eq("negociacao_id", n.id).order("created_at", { ascending: false }),
-          supabase.from("negociacao_tarefas").select("id,titulo,concluida,data_vencimento").eq("negociacao_id", n.id).order("created_at"),
-        ]);
-        if (ativo) setNotas((cms as Nota[]) || []);
-        if (ativo) setTarefas((tasks as Tarefa[]) || []);
-      } else {
-        setNotas([]);
+      const lista = (data as Negociacao[] | null) ?? [];
+      setNegs(lista);
+      const principal = lista.find((n) => n.status === "aberto") ?? lista.find((n) => n.id === conversa.negociacao_id) ?? lista[0] ?? null;
+      setSelId(principal?.id ?? null);
+      if (principal && conversa.negociacao_id !== principal.id && principal.status === "aberto") {
+        const { error: vinculoError } = await supabase
+          .from("whatsapp_conversas")
+          .update({ negociacao_id: principal.id })
+          .eq("id", conversa.id);
+        if (!vinculoError && ativo) onNegociacaoVinculada?.(principal.id);
       }
       if (ativo) setCarregando(false);
     })();
     return () => { ativo = false; };
   }, [conversa.id, conversa.negociacao_id, conversa.telefone, conversa.nome_contato]);
+
+  useEffect(() => {
+    if (!selId) { setNotas([]); setTarefas([]); return; }
+    let ativo = true;
+    (async () => {
+      const [{ data: cms }, { data: tasks }] = await Promise.all([
+        supabase.from("negociacao_comentarios").select("id,texto,autor_id,created_at").eq("negociacao_id", selId).order("created_at", { ascending: false }),
+        supabase.from("negociacao_tarefas").select("id,titulo,concluida,data_vencimento").eq("negociacao_id", selId).order("created_at"),
+      ]);
+      if (!ativo) return;
+      setNotas((cms as Nota[]) || []);
+      setTarefas((tasks as Tarefa[]) || []);
+    })();
+    return () => { ativo = false; };
+  }, [selId]);
 
   const salvarNome = async () => {
     const valor = nome.trim();
@@ -96,6 +117,7 @@ export function ContatoPanel({ conversa, onNomeAtualizado, onNegociacaoVinculada
   };
 
   const mudarEtapa = async (etapa: string) => {
+    if (!podeEditar) { toast.error("Somente o responsável pode editar esta negociação"); return; }
     if (!neg) return;
     const { error } = await supabase
       .from("negociacoes")
@@ -107,6 +129,7 @@ export function ContatoPanel({ conversa, onNomeAtualizado, onNegociacaoVinculada
   };
 
   const alternarTag = async (tagId: string) => {
+    if (!podeEditar) { toast.error("Somente o responsável pode editar esta negociação"); return; }
     if (!neg) return;
     const atuais = neg.tags || [];
     const proximas = atuais.includes(tagId) ? atuais.filter((t) => t !== tagId) : [...atuais, tagId];
@@ -117,6 +140,7 @@ export function ContatoPanel({ conversa, onNomeAtualizado, onNegociacaoVinculada
   };
 
   const adicionarNota = async () => {
+    if (!podeEditar) { toast.error("Somente o responsável pode editar esta negociação"); return; }
     if (!neg || !novaNota.trim()) return;
     setSalvando(true);
     const { data: { session } } = await supabase.auth.getSession();
@@ -132,6 +156,7 @@ export function ContatoPanel({ conversa, onNomeAtualizado, onNegociacaoVinculada
   };
 
   const adicionarTarefa = async () => {
+    if (!podeEditar) { toast.error("Somente o responsável pode editar esta negociação"); return; }
     if (!neg || !novaTarefa.trim()) return;
     const { data: { session } } = await supabase.auth.getSession();
     const { data, error } = await supabase.from("negociacao_tarefas").insert({ negociacao_id: neg.id, titulo: novaTarefa.trim(), created_by: session?.user.id ?? null }).select("id,titulo,concluida,data_vencimento").single();
@@ -140,6 +165,7 @@ export function ContatoPanel({ conversa, onNomeAtualizado, onNegociacaoVinculada
   };
 
   const alternarTarefa = async (tarefa: Tarefa) => {
+    if (!podeEditar) { toast.error("Somente o responsável pode editar esta negociação"); return; }
     const concluida = !tarefa.concluida;
     const { error } = await supabase.from("negociacao_tarefas").update({ concluida }).eq("id", tarefa.id);
     if (error) toast.error(error.message); else setTarefas((prev) => prev.map((item) => item.id === tarefa.id ? { ...item, concluida } : item));
@@ -200,68 +226,72 @@ export function ContatoPanel({ conversa, onNomeAtualizado, onNegociacaoVinculada
 
       {!carregando && neg && (
         <>
-          {/* Negociação */}
-           <Section title="Negociação" icon={Workflow}>
-             <HoverCard openDelay={250} closeDelay={100}>
-              <HoverCardTrigger asChild>
-               <button
-                 type="button"
-                 className="w-full rounded-md border p-2.5 text-left transition hover:border-primary/40 hover:bg-muted/40"
-                 onClick={() => navigate(`/admin/negociacoes?negociacao=${neg.id}`)}
-                 aria-label={`Abrir negociação de ${neg.nome_cliente} no funil`}
-               >
-             <div className="mb-2 flex items-start justify-between gap-2"><div className="min-w-0"><p className="truncate text-xs font-semibold">{neg.nome_cliente}</p><p className="text-[10px] uppercase text-primary">● {ETAPAS.find((e) => e.id === neg.etapa)?.label}</p></div><span className="shrink-0 text-xs font-bold">{brl(neg.valor)}</span></div>
-               <p className="text-[10px] text-muted-foreground">Clique para abrir no funil</p>
-               </button>
-              </HoverCardTrigger>
-              <HoverCardContent side="left" align="start" className="w-72 space-y-3 p-3">
-                <div><p className="text-sm font-semibold">{neg.nome_cliente}</p><p className="text-xs text-muted-foreground">{ETAPAS.find((e) => e.id === neg.etapa)?.label} · {neg.status}</p></div>
-                <div className="grid grid-cols-[84px_1fr] gap-x-2 gap-y-1.5 text-xs">
-                  <span className="text-muted-foreground">Valor</span><span className="font-semibold">{brl(neg.valor)}</span>
-                  <span className="text-muted-foreground">Produto</span><span className="truncate">{neg.nome_produto || neg.produto || neg.material || "Não informado"}</span>
-                  <span className="text-muted-foreground">Telefone</span><span>{neg.telefone || conversa.telefone}</span>
-                  <span className="text-muted-foreground">E-mail</span><span className="truncate">{neg.email || "Não informado"}</span>
-                  {neg.utm_campaign && <><span className="text-muted-foreground">Campanha</span><span className="truncate">{neg.utm_campaign}</span></>}
-                </div>
-              </HoverCardContent>
-             </HoverCard>
-             <div className="mt-2 rounded-md border p-2.5">
-            <Select value={neg.etapa} onValueChange={mudarEtapa}>
-              <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {ETAPAS.map((e) => (
-                  <SelectItem key={e.id} value={e.id}>{e.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-             <div className="mt-2 space-y-1 text-xs">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Valor</span>
-                <span className="font-medium">{brl(neg.valor)}</span>
-              </div>
-              {(neg.nome_produto || neg.produto) && (
-                <div className="flex justify-between gap-3">
-                  <span className="text-muted-foreground">Produto</span>
-                  <span className="truncate text-right">{neg.nome_produto || neg.produto}</span>
-                </div>
-              )}
-              {neg.utm_campaign && (
-                <div className="flex justify-between gap-3">
-                  <span className="text-muted-foreground">Campanha</span>
-                  <span className="truncate text-right">{neg.utm_campaign}</span>
-                </div>
-              )}
-              </div>
+          {/* Negociações */}
+           <Section title={negs.length > 1 ? `Negociações (${negs.length})` : "Negociação"} icon={Workflow}>
+             <div className="space-y-2">
+             {negs.map((n) => {
+               const etapa = ETAPAS.find((e) => e.id === n.etapa)?.label;
+               const ativoCard = n.id === selId;
+               const editavel = !!me && (me.gestor || n.responsavel_id === me.id);
+               const statusCls = n.status === "ganho" ? "text-muted-foreground" : n.status === "perdido" ? "text-destructive" : "text-primary";
+               return (
+                 <div key={n.id} className={`rounded-md border transition ${ativoCard ? "border-primary/50 bg-muted/30" : "hover:border-primary/30"}`}>
+                   <HoverCard openDelay={300} closeDelay={100}>
+                     <HoverCardTrigger asChild>
+                       <button type="button" onClick={() => setSelId(n.id)} className="w-full p-2.5 text-left">
+                         <div className="flex items-start justify-between gap-2">
+                           <div className="min-w-0">
+                             <p className="truncate text-xs font-semibold">{n.nome_produto || n.produto || n.nome_cliente}</p>
+                             <p className={`text-[10px] font-semibold uppercase ${statusCls}`}>● {n.status === "aberto" ? etapa : n.status}</p>
+                           </div>
+                           <span className="shrink-0 text-xs font-bold">{brl(n.valor)}</span>
+                         </div>
+                         <div className="mt-1.5 flex items-center justify-between gap-2 text-[10px] text-muted-foreground">
+                           <span className="truncate"><User className="mr-1 inline h-3 w-3" />{(n.responsavel_id && equipe[n.responsavel_id]) || "Sem responsável"}</span>
+                           {!editavel && <span className="flex shrink-0 items-center gap-0.5"><Lock className="h-3 w-3" /> Só leitura</span>}
+                         </div>
+                       </button>
+                     </HoverCardTrigger>
+                     <HoverCardContent side="left" align="start" className="w-72 space-y-3 p-3">
+                       <div><p className="text-sm font-semibold">{n.nome_cliente}</p><p className="text-xs text-muted-foreground">{etapa} · {n.status}</p></div>
+                       <div className="grid grid-cols-[84px_1fr] gap-x-2 gap-y-1.5 text-xs">
+                         <span className="text-muted-foreground">Valor</span><span className="font-semibold">{brl(n.valor)}</span>
+                         <span className="text-muted-foreground">Produto</span><span className="truncate">{n.nome_produto || n.produto || n.material || "Não informado"}</span>
+                         <span className="text-muted-foreground">Responsável</span><span className="truncate">{(n.responsavel_id && equipe[n.responsavel_id]) || "Sem responsável"}</span>
+                         <span className="text-muted-foreground">E-mail</span><span className="truncate">{n.email || "Não informado"}</span>
+                         {n.utm_campaign && <><span className="text-muted-foreground">Campanha</span><span className="truncate">{n.utm_campaign}</span></>}
+                       </div>
+                     </HoverCardContent>
+                   </HoverCard>
+                   {ativoCard && (
+                     <div className="space-y-2 border-t px-2.5 pb-2.5 pt-2">
+                       {editavel ? (
+                         <Select value={n.etapa} onValueChange={mudarEtapa}>
+                           <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                           <SelectContent>{ETAPAS.map((e) => <SelectItem key={e.id} value={e.id}>{e.label}</SelectItem>)}</SelectContent>
+                         </Select>
+                       ) : (
+                         <p className="text-[11px] text-muted-foreground">Negociação de outro vendedor — apenas visualização.</p>
+                       )}
+                       {editavel && (
+                         <Button variant="link" size="sm" className="h-auto p-0 text-[11px]" onClick={() => navigate(`/admin/negociacoes?negociacao=${n.id}`)}>Abrir no funil</Button>
+                       )}
+                     </div>
+                   )}
+                 </div>
+               );
+             })}
              </div>
            </Section>
 
            <Section title="Tarefas" icon={CheckSquare} initial={false}>
-             <div className="space-y-2">{tarefas.map((t) => <label key={t.id} className="flex items-start gap-2 text-xs"><Checkbox checked={t.concluida} onCheckedChange={() => alternarTarefa(t)} /><span className={t.concluida ? "text-muted-foreground line-through" : ""}>{t.titulo}</span>{t.data_vencimento && <CalendarClock className="ml-auto h-3.5 w-3.5 text-muted-foreground" />}</label>)}<div className="flex gap-1"><Input value={novaTarefa} onChange={(e) => setNovaTarefa(e.target.value)} placeholder="Nova tarefa" className="h-8 text-xs" onKeyDown={(e) => { if (e.key === "Enter") adicionarTarefa(); }} /><Button size="icon" className="h-8 w-8" onClick={adicionarTarefa} disabled={!novaTarefa.trim()}><Plus /></Button></div></div>
+             <div className="space-y-2">{tarefas.map((t) => <label key={t.id} className="flex items-start gap-2 text-xs"><Checkbox disabled={!podeEditar} checked={t.concluida} onCheckedChange={() => alternarTarefa(t)} /><span className={t.concluida ? "text-muted-foreground line-through" : ""}>{t.titulo}</span>{t.data_vencimento && <CalendarClock className="ml-auto h-3.5 w-3.5 text-muted-foreground" />}</label>)}{podeEditar && <div className="flex gap-1"><Input value={novaTarefa} onChange={(e) => setNovaTarefa(e.target.value)} placeholder="Nova tarefa" className="h-8 text-xs" onKeyDown={(e) => { if (e.key === "Enter") adicionarTarefa(); }} /><Button size="icon" className="h-8 w-8" onClick={adicionarTarefa} disabled={!novaTarefa.trim()}><Plus /></Button></div>}</div>
            </Section>
 
           {/* Notas internas */}
            <Section title="Notas" icon={StickyNote}>
-            <Textarea
+            {podeEditar && <>
+<Textarea
               value={novaNota}
               onChange={(e) => setNovaNota(e.target.value)}
               rows={2}
@@ -270,7 +300,7 @@ export function ContatoPanel({ conversa, onNomeAtualizado, onNegociacaoVinculada
             />
             <Button size="sm" className="mt-2 w-full" disabled={!novaNota.trim() || salvando} onClick={adicionarNota}>
               {salvando ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : null} Salvar nota
-            </Button>
+            </Button></>}
             <div className="mt-3 space-y-2">
               {notas.map((n) => (
                 <div key={n.id} className="rounded-md bg-gold/20 px-2.5 py-2 text-xs">

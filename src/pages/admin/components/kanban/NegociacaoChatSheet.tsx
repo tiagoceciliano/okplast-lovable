@@ -42,8 +42,7 @@ export function NegociacaoChatSheet({ negociacao, onClose, onChanged }: Props) {
 
   useEffect(() => { setTags(negociacao?.tags ?? []); }, [negociacao?.id]);
   useEffect(() => {
-    supabase.from("whatsapp_numbers").select("user_id,nome_vendedor").eq("ativo", true).not("user_id", "is", null)
-      .then(({ data }) => setAtendentes(Array.from(new Map((data ?? []).map((d) => [d.user_id as string, d.nome_vendedor])), ([id, nome]) => ({ id, nome }))));
+    supabase.rpc("list_equipe").then(({ data }) => setAtendentes((data ?? []).map((u) => ({ id: u.id, nome: u.nome }))));
   }, []);
 
   const transferir = async (responsavelId: string) => {
