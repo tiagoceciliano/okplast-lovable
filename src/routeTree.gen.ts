@@ -24,6 +24,7 @@ import { Route as AdminMetaRouteImport } from './routes/admin/meta'
 import { Route as AdminNegociacoesRouteImport } from './routes/admin/negociacoes'
 import { Route as AdminProdutosRouteImport } from './routes/admin/produtos'
 import { Route as AdminRadarRouteImport } from './routes/admin/radar'
+import { Route as AdminTagsRouteImport } from './routes/admin/tags'
 import { Route as AdminVendedoresRouteImport } from './routes/admin/vendedores'
 import { Route as AdminWhatsappRouteImport } from './routes/admin/whatsapp'
 import { Route as PublicChapasIndexRouteImport } from './routes/_public/chapas/index'
@@ -115,6 +116,11 @@ const AdminProdutosRoute = AdminProdutosRouteImport.update({
 const AdminRadarRoute = AdminRadarRouteImport.update({
   id: '/admin/radar',
   path: '/admin/radar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminTagsRoute = AdminTagsRouteImport.update({
+  id: '/admin/tags',
+  path: '/admin/tags',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminVendedoresRoute = AdminVendedoresRouteImport.update({
@@ -226,6 +232,7 @@ export interface FileRoutesByFullPath {
   '/admin/negociacoes': typeof AdminNegociacoesRoute
   '/admin/produtos': typeof AdminProdutosRoute
   '/admin/radar': typeof AdminRadarRoute
+  '/admin/tags': typeof AdminTagsRoute
   '/admin/vendedores': typeof AdminVendedoresRoute
   '/admin/whatsapp': typeof AdminWhatsappRoute
   '/admin/': typeof AdminIndexRoute
@@ -258,6 +265,7 @@ export interface FileRoutesByTo {
   '/admin/negociacoes': typeof AdminNegociacoesRoute
   '/admin/produtos': typeof AdminProdutosRoute
   '/admin/radar': typeof AdminRadarRoute
+  '/admin/tags': typeof AdminTagsRoute
   '/admin/vendedores': typeof AdminVendedoresRoute
   '/admin/whatsapp': typeof AdminWhatsappRoute
   '/': typeof PublicIndexRoute
@@ -293,6 +301,7 @@ export interface FileRoutesById {
   '/admin/negociacoes': typeof AdminNegociacoesRoute
   '/admin/produtos': typeof AdminProdutosRoute
   '/admin/radar': typeof AdminRadarRoute
+  '/admin/tags': typeof AdminTagsRoute
   '/admin/vendedores': typeof AdminVendedoresRoute
   '/admin/whatsapp': typeof AdminWhatsappRoute
   '/_public/': typeof PublicIndexRoute
@@ -329,6 +338,7 @@ export interface FileRouteTypes {
     | '/admin/negociacoes'
     | '/admin/produtos'
     | '/admin/radar'
+    | '/admin/tags'
     | '/admin/vendedores'
     | '/admin/whatsapp'
     | '/admin/'
@@ -361,6 +371,7 @@ export interface FileRouteTypes {
     | '/admin/negociacoes'
     | '/admin/produtos'
     | '/admin/radar'
+    | '/admin/tags'
     | '/admin/vendedores'
     | '/admin/whatsapp'
     | '/'
@@ -395,6 +406,7 @@ export interface FileRouteTypes {
     | '/admin/negociacoes'
     | '/admin/produtos'
     | '/admin/radar'
+    | '/admin/tags'
     | '/admin/vendedores'
     | '/admin/whatsapp'
     | '/_public/'
@@ -425,6 +437,7 @@ export interface RootRouteChildren {
   AdminNegociacoesRoute: typeof AdminNegociacoesRoute
   AdminProdutosRoute: typeof AdminProdutosRoute
   AdminRadarRoute: typeof AdminRadarRoute
+  AdminTagsRoute: typeof AdminTagsRoute
   AdminVendedoresRoute: typeof AdminVendedoresRoute
   AdminWhatsappRoute: typeof AdminWhatsappRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -537,6 +550,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/radar'
       fullPath: '/admin/radar'
       preLoaderRoute: typeof AdminRadarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/tags': {
+      id: '/admin/tags'
+      path: '/admin/tags'
+      fullPath: '/admin/tags'
+      preLoaderRoute: typeof AdminTagsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/vendedores': {
@@ -719,6 +739,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminNegociacoesRoute: AdminNegociacoesRoute,
   AdminProdutosRoute: AdminProdutosRoute,
   AdminRadarRoute: AdminRadarRoute,
+  AdminTagsRoute: AdminTagsRoute,
   AdminVendedoresRoute: AdminVendedoresRoute,
   AdminWhatsappRoute: AdminWhatsappRoute,
   AdminIndexRoute: AdminIndexRoute,
