@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      etiquetas: {
+        Row: {
+          cor: string
+          created_at: string
+          escopo: string
+          id: string
+          nome: string
+          owner_id: string | null
+        }
+        Insert: {
+          cor?: string
+          created_at?: string
+          escopo?: string
+          id?: string
+          nome: string
+          owner_id?: string | null
+        }
+        Update: {
+          cor?: string
+          created_at?: string
+          escopo?: string
+          id?: string
+          nome?: string
+          owner_id?: string | null
+        }
+        Relationships: []
+      }
       health_alerts: {
         Row: {
           created_at: string
