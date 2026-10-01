@@ -73,10 +73,12 @@ export default function Negociacoes() {
     waRows.forEach((v) => { nmap[v.numero_raw] = { user_id: v.user_id, nome: v.nome_vendedor, formatado: v.numero_formatado }; });
     setNumeroMap(nmap);
 
-    const cT: Record<string, number> = {};
+    const cT: Record<string, { pend: number; total: number }> = {};
     const vV: Record<string, boolean> = {};
     (tar.data || []).forEach((t: { negociacao_id: string; concluida: boolean; data_vencimento: string | null }) => {
-      if (!t.concluida) cT[t.negociacao_id] = (cT[t.negociacao_id] || 0) + 1;
+      const e = (cT[t.negociacao_id] ||= { pend: 0, total: 0 });
+      e.total++;
+      if (!t.concluida) e.pend++;
       if (!t.concluida && t.data_vencimento && new Date(t.data_vencimento) < new Date()) {
         vV[t.negociacao_id] = true;
       }
@@ -88,7 +90,7 @@ export default function Negociacoes() {
     (coms || []).forEach((c: { negociacao_id: string }) => { cC[c.negociacao_id] = (cC[c.negociacao_id] || 0) + 1; });
     setCountsC(cC);
 
-    const { data: convs } = await supabase.from("whatsapp_conversas").select("telefone,negociacao_id,nao_lidas");
+    const { data: convs } = await supabase.from("whatsapp_conversas").select("id,telefone,negociacao_id,nao_lidas");
     const norm = (t: string | null) => { const d = (t || "").replace(/\D/g, ""); return d.startsWith("55") ? d.slice(2) : d; };
     const porTel = new Map<string, number>();
     const porNeg = new Map<string, number>();
