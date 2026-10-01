@@ -14,6 +14,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { listTeamMembers } from "@/lib/list-team-members.functions";
+import { whatsappTemplates, type WhatsAppTemplate } from "@/lib/whatsapp-templates.functions";
+
+interface Atendente { id: string; nome: string; email: string | null }
 
 type FiltroId = "abertos" | "meus" | "seguindo" | "arquivados" | "nao_atribuidos";
 
@@ -47,10 +53,13 @@ export default function Conversas() {
   const [novaAberta, setNovaAberta] = useState(false);
   const [novoTelefone, setNovoTelefone] = useState("");
   const [novoNome, setNovoNome] = useState("");
-  const [novoTexto, setNovoTexto] = useState("");
   const [criando, setCriando] = useState(false);
   const etiquetas = useEtiquetas();
   const [gerenciarTags, setGerenciarTags] = useState(false);
+  const [atendentes, setAtendentes] = useState<Atendente[]>([]);
+  const [templates, setTemplates] = useState<WhatsAppTemplate[]>([]);
+  const [templateNovo, setTemplateNovo] = useState("");
+  const [transferindo, setTransferindo] = useState(false);
 
   const carregar = async () => {
     const { data, error } = await supabase
@@ -75,6 +84,19 @@ export default function Conversas() {
   };
 
   useEffect(() => { carregar(); }, []);
+
+  useEffect(() => {
+    (async () => {
+      const { data: numeros } = await supabase.from("whatsapp_numbers").select("user_id,nome_vendedor,ativo").eq("ativo", true).not("user_id", "is", null);
+      const nomes = new Map((numeros ?? []).map((item) => [item.user_id as string, item.nome_vendedor]));
+      let emails = new Map<string, string | null>();
+      try {
+        const equipe = await listTeamMembers();
+        emails = new Map(equipe.users.map((item) => [item.id, item.email]));
+      } catch { /* vendedores podem não listar credenciais da equipe */ }
+      setAtendentes(Array.from(nomes, ([id, nome]) => ({ id, nome, email: emails.get(id) ?? null })));
+    })();
+  }, []);
 
   useEffect(() => {
     const canal = supabase
@@ -111,14 +133,50 @@ export default function Conversas() {
       toast.error("Não foi possível criar a conversa. " + detalhe);
       return;
     }
-    await carregar();
     const conv = (data as any)?.conversa;
+    if (conv && templateNovo) {
+      const template = templates.find((item) => item.nome === templateNovo);
+      if (template) {
+        const { error: sendError } = await supabase.functions.invoke("whatsapp-send", { body: { conversa_id: conv.id, tipo: "template", template: { name: template.nome, language: template.idioma, parametros: [] } } });
+        if (sendError) toast.error("Atendimento criado, mas a mensagem pronta não foi enviada.");
+      }
+    }
+    await carregar();
     if (conv) setSelecionada(conv as Conversa);
     setNovaAberta(false); setNovoTelefone(""); setNovoNome("");
-    toast.success("Conversa criada. Envie uma mensagem pronta para iniciar o contato.");
+    setTemplateNovo("");
+    toast.success(templateNovo ? "Atendimento criado e mensagem pronta enviada." : "Atendimento aberto.");
   };
 
   const aberta = janelaAberta(selecionada);
+  const conversaExistente = useMemo(() => {
+    const tel = novoTelefone.replace(/\D/g, "");
+    return tel.length >= 8 ? conversas.find((item) => item.telefone.endsWith(tel.slice(-8))) ?? null : null;
+  }, [novoTelefone, conversas]);
+  const responsavel = selecionada ? atendentes.find((item) => item.id === selecionada.responsavel_id) : undefined;
+  const nomeAtendente = (id: string | null) => atendentes.find((item) => item.id === id)?.nome || "Sem responsável";
+  const iniciaisAtendente = (id: string | null) => {
+    const nome = nomeAtendente(id);
+    return id ? nome.split(/\s+/).slice(0, 2).map((parte) => parte.charAt(0)).join("").toUpperCase() : "—";
+  };
+  const transferir = async (responsavelId: string) => {
+    if (!selecionada || transferindo) return;
+    setTransferindo(true);
+    const { error } = await supabase.from("whatsapp_conversas").update({ responsavel_id: responsavelId }).eq("id", selecionada.id);
+    if (!error && selecionada.negociacao_id) await supabase.from("negociacoes").update({ responsavel_id: responsavelId }).eq("id", selecionada.negociacao_id);
+    setTransferindo(false);
+    if (error) { toast.error(error.message); return; }
+    const atualizada = { ...selecionada, responsavel_id: responsavelId };
+    setSelecionada(atualizada);
+    setConversas((prev) => prev.map((item) => item.id === atualizada.id ? atualizada : item));
+    toast.success("Atendimento transferido");
+  };
+  const abrirNova = async () => {
+    setNovaAberta(true);
+    if (!templates.length) {
+      try { const result = await whatsappTemplates(); setTemplates(result.templates.filter((item) => item.status === "APPROVED")); } catch { /* mensagem exibida no seletor */ }
+    }
+  };
 
   return (
     <AdminLayout fullBleed>
@@ -161,7 +219,7 @@ export default function Conversas() {
                 <Button variant="ghost" className="w-full justify-start" onClick={() => setGerenciarTags(true)}><Tag /> Gerenciar etiquetas</Button>
               </PopoverContent>
             </Popover>
-            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setNovaAberta(true)} aria-label="Nova conversa"><Plus /></Button>
+            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={abrirNova} aria-label="Nova conversa"><Plus /></Button>
           </div>
           <div className="border-b p-2">
             <div className="relative">
@@ -206,18 +264,12 @@ export default function Conversas() {
                         </span>
                       )}
                     </div>
+                    <div className="mt-1 flex items-center gap-1.5">
+                      <TooltipProvider delayDuration={150}><Tooltip><TooltipTrigger asChild><span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-muted px-1 text-[8px] font-bold text-muted-foreground">{iniciaisAtendente(c.responsavel_id)}</span></TooltipTrigger><TooltipContent>{nomeAtendente(c.responsavel_id)}</TooltipContent></Tooltip></TooltipProvider>
+                      {tags.slice(0, 3).map((t) => { const d = tagDef(t, etiquetas); return <span key={t} className={`truncate rounded border px-1.5 py-px text-[9px] font-semibold ${d.className}`}>{d.label}</span>; })}
+                    </div>
                     {tags.length > 0 && (
-                       <div className="mt-1.5 flex min-w-0 items-center gap-1 overflow-hidden">
-                         <span className="shrink-0 text-[9px] font-semibold text-accent">● COMERCIAL</span>
-                        {tags.slice(0, 3).map((t) => {
-                          const d = tagDef(t, etiquetas);
-                          return (
-                            <span key={t} className={`rounded-full border px-1.5 py-px text-[9px] font-semibold ${d.className}`}>
-                              {d.label}
-                            </span>
-                          );
-                        })}
-                      </div>
+                      <span className="sr-only">{tags.length} etiquetas</span>
                     )}
                   </div>
                 </button>
@@ -242,7 +294,13 @@ export default function Conversas() {
                      <div className="flex items-center gap-1 truncate text-[10px] text-muted-foreground"><span className="h-1.5 w-1.5 rounded-full bg-whatsapp" /> WhatsApp · {selecionada.telefone}</div>
                   </div>
                 </div>
-                 <span className="hidden shrink-0 items-center gap-1 text-[10px] font-medium text-muted-foreground sm:flex"><span className="h-2 w-2 rounded-full bg-accent" /> COMERCIAL</span>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <span className={`hidden items-center gap-1 rounded px-2 py-1 text-[10px] font-semibold sm:flex ${aberta ? "bg-accent/10 text-accent" : "bg-gold/15 text-gold-foreground"}`}><Clock className="h-3 w-3" />{aberta ? "Janela aberta" : "Janela fechada"}</span>
+                    <Select value={selecionada.responsavel_id ?? "sem"} onValueChange={transferir} disabled={transferindo || atendentes.length === 0}>
+                      <SelectTrigger className="h-8 w-[148px] text-xs"><SelectValue placeholder="Responsável" /></SelectTrigger>
+                      <SelectContent>{!selecionada.responsavel_id && <SelectItem value="sem" disabled>Sem responsável</SelectItem>}{atendentes.map((item) => <SelectItem key={item.id} value={item.id}>{item.nome}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </div>
               </div>
                <div className="min-h-0 flex-1">
                 <ConversaChat
@@ -296,10 +354,8 @@ export default function Conversas() {
                 placeholder="5521999998888"
               />
             </div>
-             <div>
-               <Label className="text-xs">Texto</Label>
-               <Textarea value={novoTexto} onChange={(e) => setNovoTexto(e.target.value)} rows={6} placeholder="A primeira mensagem será enviada após criar a conversa." />
-             </div>
+            {conversaExistente ? <div className={`rounded-md border p-3 text-sm ${janelaAberta(conversaExistente) ? "bg-accent/10" : "bg-gold/10"}`}><p className="font-semibold">Este número já possui atendimento.</p><p className="mt-1 text-xs text-muted-foreground">{janelaAberta(conversaExistente) ? "A janela está aberta: você pode escrever qualquer mensagem." : "A janela está fechada: só mensagens prontas podem ser enviadas."}</p><Button className="mt-3 w-full" onClick={() => { setSelecionada(conversaExistente); setNovaAberta(false); }}>Abrir atendimento existente</Button></div> : <>
+              <div><Label className="text-xs">Mensagem inicial</Label><Select value={templateNovo} onValueChange={setTemplateNovo}><SelectTrigger><SelectValue placeholder="Escolher mensagem pronta aprovada" /></SelectTrigger><SelectContent>{templates.filter((item) => item.variaveis === 0).map((item) => <SelectItem key={item.nome} value={item.nome}>{item.nome}</SelectItem>)}{templates.filter((item) => item.variaveis === 0).length === 0 && <div className="p-2 text-xs text-muted-foreground">Nenhuma mensagem pronta sem variáveis disponível.</div>}</SelectContent></Select>{templateNovo && <p className="mt-2 whitespace-pre-wrap rounded-md bg-muted p-2 text-xs text-muted-foreground">{templates.find((item) => item.nome === templateNovo)?.texto}</p>}</div>
             <div>
               <Label className="text-xs">Nome do contato (opcional)</Label>
               <Input value={novoNome} onChange={(e) => setNovoNome(e.target.value)} placeholder="Nome do cliente" />
@@ -307,10 +363,11 @@ export default function Conversas() {
             <p className="text-xs text-muted-foreground">
               O primeiro contato com um número novo precisa ser uma <strong>mensagem pronta</strong> aprovada pela Meta.
             </p>
-            <Button onClick={criarConversa} disabled={criando} className="w-full">
+             <Button onClick={criarConversa} disabled={criando || !templateNovo} className="w-full">
               {criando ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : null}
-               Criar atendimento
+                Criar e enviar mensagem pronta
             </Button>
+             </>}
           </div>
         </DialogContent>
       </Dialog>
