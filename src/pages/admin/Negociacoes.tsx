@@ -36,6 +36,7 @@ export default function Negociacoes() {
   const [chats, setChats] = useState<Record<string, number>>({});
   const [chatAtivo, setChatAtivo] = useState<Negociacao | null>(null);
   const [venc, setVenc] = useState<Record<string, boolean>>({});
+  const [agend, setAgend] = useState<Record<string, number>>({});
   const [novaOpen, setNovaOpen] = useState(false);
   const [ganhoPending, setGanhoPending] = useState<Negociacao | null>(null);
   const [filtroProduto, setFiltroProduto] = useState("all");
