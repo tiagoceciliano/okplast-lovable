@@ -7,12 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Check, X, Trash2, Plus, UserCheck, MessageCirclePlus, Link2 } from "lucide-react";
+import { Check, X, Trash2, Plus, UserCheck, MessageCirclePlus, Link2, MessageCircle, History } from "lucide-react";
 import { toast } from "sonner";
 import { ETAPAS, brl, type EtapaId, type Negociacao, type VendedorLite } from "./types";
 import { usePermissions } from "@/hooks/usePermissions";
 import { type Conversa } from "../conversas/ConversaChat";
 import { useNavigate } from "@/lib/router-compat";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { tagDef, tagsDe, useEtiquetas } from "../conversas/tags";
 
 interface Props {
   negociacao: Negociacao | null;
@@ -117,6 +119,7 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
   };
 
   if (!n) return null;
+  const etiquetas = useEtiquetas();
   const canEdit = can("negociacoes", "edit", n.responsavel_id);
   const canDelete = can("negociacoes", "delete", n.responsavel_id);
 
@@ -176,7 +179,7 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
     toast.success(`Atribuído a ${destinoInfo.nome}`);
   };
 
-  // Produtos filtrados pelo material atual (não pode editar material aqui)
+  // Produtos filtrados pelo material atual
   const produtosDoMaterial = n.material
     ? produtos.filter((p) => (p.material || "").toLowerCase() === (n.material || "").toLowerCase())
     : produtos;
@@ -192,6 +195,11 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
         <DialogHeader>
           <div className="flex items-center gap-2">
             <DialogTitle className="text-xl flex-1">{n.nome_cliente}</DialogTitle>
+            {conversa && (
+              <Button size="sm" variant="ghost" className="text-primary" onClick={() => navigate(`/admin/conversas?conversa=${conversa.id}`)}>
+                <MessageCircle className="h-4 w-4 mr-1" /> Conversa{conversa.nao_lidas > 0 ? ` (${conversa.nao_lidas})` : ""}
+              </Button>
+            )}
             {canEdit && (
               <>
                 <Button size="sm" variant="outline" className="text-emerald-600" onClick={irParaVenda}>
@@ -244,6 +252,20 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
         <div className="grid min-h-0 lg:grid-cols-[minmax(0,1fr)_300px]">
           {/* Coluna esquerda: comentarios + tarefas + historico */}
           <div className="space-y-5 p-5">
+            <div className="rounded-md border bg-muted/30 p-3">
+              <div className="mb-2 flex items-center gap-2 text-sm font-semibold"><History className="h-4 w-4 text-primary" /> Histórico</div>
+              <ol className="relative max-h-56 space-y-2.5 overflow-y-auto border-l-2 border-primary/30 pl-4">
+                {hist.map((h) => (
+                  <li key={h.id} className="relative text-sm">
+                    <span className="absolute -left-[21px] top-1.5 h-2.5 w-2.5 rounded-full bg-primary" />
+                    <p className="font-medium">{h.descricao || h.tipo}</p>
+                    <p className="text-[11px] text-muted-foreground">{new Date(h.created_at).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })}</p>
+                  </li>
+                ))}
+                {hist.length === 0 && <li className="text-xs text-muted-foreground">Sem histórico.</li>}
+              </ol>
+            </div>
+
             <div>
               <Label className="text-xs">Novo comentário</Label>
               <Textarea value={novoComent} onChange={(e) => setNovoComent(e.target.value)} rows={2} placeholder="Escreva uma nota interna…" />
@@ -320,25 +342,6 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
               </div>
             )}
 
-            {conversa && (
-              <div>
-                <Label className="text-xs">Conversa WhatsApp</Label>
-                <Button className="mt-1 w-full" variant="outline" onClick={() => navigate(`/admin/conversas?conversa=${conversa.id}`)}>
-                  <MessageCirclePlus /> Ir para conversa{conversa.nao_lidas > 0 ? ` (${conversa.nao_lidas} não lidas)` : ""}
-                </Button>
-              </div>
-            )}
-
-            <div>
-              <Label className="text-xs">Histórico</Label>
-              <ul className="space-y-1 max-h-32 overflow-y-auto text-xs text-muted-foreground">
-                {hist.map((h) => (
-                  <li key={h.id}>
-                    • {h.descricao || h.tipo} — {new Date(h.created_at).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })}
-                  </li>
-                ))}
-              </ul>
-            </div>
           </div>
 
           {/* Coluna direita: dados */}
@@ -392,8 +395,15 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
                 <div className="text-[11px] text-muted-foreground">{brl(n.valor)}</div>
               </div>
               <div>
-                <Label className="text-xs">Material (não editável)</Label>
-                <Input value={n.material ?? ""} disabled readOnly />
+                <Label className="text-xs">Material</Label>
+                <Select value={n.material ?? ""} onValueChange={(v) => patchN({ material: v })} disabled={!canEdit}>
+                  <SelectTrigger><SelectValue placeholder="Selecione…" /></SelectTrigger>
+                  <SelectContent>
+                    {Array.from(new Set([...(n.material ? [n.material] : []), ...produtos.map((p) => p.material).filter((m): m is string => !!m)])).map((m) => (
+                      <SelectItem key={m} value={m}>{m}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             <div>
@@ -427,10 +437,26 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
               </div>
             )}
             <div>
-              <Label className="text-xs">Tags (separadas por vírgula)</Label>
-              <Input value={n.tags.join(", ")} disabled={!canEdit}
-                onChange={(e) => setN({ ...n, tags: e.target.value.split(",").map((x) => x.trim()).filter(Boolean) })}
-                onBlur={() => patchN({ tags: n.tags })} />
+              <Label className="text-xs">Etiquetas</Label>
+              <div className="mt-1 flex flex-wrap items-center gap-1">
+                {n.tags.map((id) => { const t = tagDef(id, etiquetas); return (
+                  <button key={id} type="button" disabled={!canEdit} onClick={() => patchN({ tags: n.tags.filter((x) => x !== id) })} className={`rounded border px-1.5 py-0.5 text-[10px] font-semibold ${t.className}`}>{t.label}{canEdit && " ×"}</button>
+                ); })}
+                {canEdit && (
+                  <Popover>
+                    <PopoverTrigger asChild><Button size="sm" variant="ghost" className="h-6 px-1.5 text-[11px]"><Plus className="h-3 w-3" /> Adicionar</Button></PopoverTrigger>
+                    <PopoverContent align="start" className="max-h-64 w-60 overflow-y-auto p-2">
+                      {tagsDe(etiquetas, "negociacao").map((t) => (
+                        <Button key={t.id} variant="ghost" className="h-8 w-full justify-start" onClick={() => patchN({ tags: n.tags.includes(t.id) ? n.tags.filter((x) => x !== t.id) : [...n.tags, t.id] })}>
+                          <span className={`rounded border px-1.5 py-0.5 text-[10px] ${t.className}`}>{t.label}</span>
+                          {n.tags.includes(t.id) && <Check className="ml-auto h-4 w-4" />}
+                        </Button>
+                      ))}
+                    </PopoverContent>
+                  </Popover>
+                )}
+                {n.tags.length === 0 && !canEdit && <span className="text-xs text-muted-foreground">Nenhuma</span>}
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
