@@ -44,7 +44,7 @@ export function MotivosCarousel({ className }: MotivosCarouselProps) {
       {motivos.map((motivo, index) => (
         <div 
           key={index} 
-          className="bg-card border-2 border-primary rounded-xl p-6 text-center shadow-sm hover:shadow-md transition-shadow"
+          className="bg-card border-2 border-primary rounded-xl p-6 text-center shadow-xs hover:shadow-md transition-shadow"
         >
           <div className="flex justify-center mb-4">
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">

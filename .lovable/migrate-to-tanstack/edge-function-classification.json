@@ -1,0 +1,15 @@
+{"functions": [
+  {"name": "list-team-members", "classification": "internal-only", "signal": "called from src/pages/admin/Vendedores.tsx", "outcome": "migrated"},
+  {"name": "create-team-member", "classification": "internal-only", "signal": "called from 2 sites in Vendedores.tsx", "outcome": "migrated"},
+  {"name": "update-team-member", "classification": "internal-only", "signal": "called from 2 sites in Vendedores.tsx", "outcome": "migrated"},
+  {"name": "get-leads", "classification": "internal-only", "signal": "called from Leads.tsx", "outcome": "migrated"},
+  {"name": "whatsapp-templates", "classification": "internal-only", "signal": "called from ConversaChat.tsx", "outcome": "migrated"},
+  {"name": "get-dashboard-stats", "classification": "internal-only", "signal": "raw fetch from Dashboard; large aggregation surface — deferred to a follow-up turn", "outcome": "left"},
+  {"name": "manage-lead", "classification": "internal-only", "signal": "3 call sites; deferred to a follow-up turn", "outcome": "left"},
+  {"name": "process-lead", "classification": "internal-only", "signal": "conversion-critical lead capture + Kinbox webhook; deferred to a follow-up turn with care", "outcome": "left"},
+  {"name": "track-visit", "classification": "internal-only", "signal": "beacon-style raw fetch keepalive from usePageVisit; deferred to a follow-up turn as server route", "outcome": "left"},
+  {"name": "whatsapp-send", "classification": "internal-only", "signal": "recently stabilized WhatsApp sending; deferred to a follow-up turn", "outcome": "left"},
+  {"name": "health-monitor", "classification": "cron target", "signal": "pg_cron net.http_post in supabase/migrations/20260814222404_*.sql every 15min", "outcome": "left"},
+  {"name": "whatsapp-webhook", "classification": "webhook receiver", "signal": "Meta webhook verification endpoint, verify_jwt=false", "outcome": "left"},
+  {"name": "migrate-images", "classification": "unknown", "signal": "no internal call sites, no signature signal — default external", "outcome": "left"}
+]}

@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { MapPin, Mail, Clock, MessageCircle } from "lucide-react";
 import { COMPANY, NAV_ITEMS } from "@/lib/constants";
 import logoImg from "@/assets/logo-okplast.png";

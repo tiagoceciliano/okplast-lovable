@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { COMPANY } from "@/lib/constants";
@@ -271,7 +271,7 @@ export default function Index() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {tiposChapas.map((chapa, index) => (
               <Link key={index} to={chapa.href} className="group">
-                <div className="bg-background rounded-lg overflow-hidden shadow-sm border hover:shadow-md transition-shadow">
+                <div className="bg-background rounded-lg overflow-hidden shadow-xs border hover:shadow-md transition-shadow">
                   <div className="aspect-square bg-muted overflow-hidden">
                     <img
                       src={chapa.imageUrl}

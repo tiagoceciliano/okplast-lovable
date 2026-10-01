@@ -1,4 +1,4 @@
- import { Link } from "react-router-dom";
+ import { Link } from "@/lib/router-compat";
   import { SEOHead, createBreadcrumbSchema, createProductSchema } from "@/components/SEOHead";
  import { Button } from "@/components/ui/button";
 import { MessageCircle } from "lucide-react";
@@ -163,7 +163,7 @@ import { MessageCircle } from "lucide-react";
              {coresDisponiveis.map((cor, index) => (
                <div key={index} className="text-center">
                  <div 
-                   className="w-full aspect-square rounded-lg border-2 border-border shadow-sm mb-2"
+                   className="w-full aspect-square rounded-lg border-2 border-border shadow-xs mb-2"
                    style={{ 
                      background: cor.cor === "transparent" 
                        ? "repeating-conic-gradient(#ccc 0% 25%, transparent 0% 50%) 50% / 10px 10px"
