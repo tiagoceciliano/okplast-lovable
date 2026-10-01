@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 
 import imgAcrilicoTransparente from "@/assets/chapas-hero/acrilico-transparente.webp";
 import imgPetg from "@/assets/chapas-hero/petg.webp";
