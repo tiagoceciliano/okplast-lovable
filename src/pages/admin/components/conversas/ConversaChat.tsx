@@ -384,7 +384,7 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
                 {saida && (
                   <span className="mb-0.5 flex items-center gap-0.5 text-[11px] font-semibold text-foreground/80">
                     {autor}
-                    {m.status === "failed" ? <AlertCircle className="h-3 w-3 text-destructive" /> : m.status === "read" ? <CheckCheck className="h-3.5 w-3.5 text-chat-tick" /> : m.status === "delivered" ? <CheckCheck className="h-3.5 w-3.5 text-muted-foreground" /> : <Check className="h-3.5 w-3.5 text-muted-foreground" />}
+                    {m.status === "enviando" ? <Clock className="h-3 w-3 text-muted-foreground" /> : m.status === "failed" ? <AlertCircle className="h-3 w-3 text-destructive" /> : m.status === "read" ? <CheckCheck className="h-3.5 w-3.5 text-chat-tick" /> : m.status === "delivered" ? <CheckCheck className="h-3.5 w-3.5 text-muted-foreground" /> : <Check className="h-3.5 w-3.5 text-muted-foreground" />}
                   </span>
                 )}
                 <div className={`flex items-end gap-2 rounded-2xl px-3.5 py-2 text-sm shadow-sm ${saida ? "bg-chat-out" : "bg-chat-in"}`}>
