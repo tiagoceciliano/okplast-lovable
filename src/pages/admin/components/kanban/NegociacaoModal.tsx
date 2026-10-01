@@ -260,8 +260,14 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
                 {hist.map((h) => (
                   <li key={h.id} className="relative text-sm">
                     <span className="absolute -left-[21px] top-1.5 h-2.5 w-2.5 rounded-full bg-primary" />
-                    <p className="font-medium">{h.descricao || h.tipo}</p>
-                    <p className="text-[11px] text-muted-foreground"><span className="font-semibold text-foreground/80">{h.autor_id ? nomesEquipe[h.autor_id] || "Usuário" : "Sistema (automático)"}</span> · {new Date(h.created_at).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })}</p>
+                    <div className="flex items-baseline gap-3">
+                      <p className="min-w-0 flex-1 truncate font-medium" title={h.descricao || h.tipo}>{h.descricao || h.tipo}</p>
+                      <p className="shrink-0 whitespace-nowrap text-right text-[11px] text-muted-foreground">
+                        <span className="font-semibold text-foreground/80">{h.autor_id ? nomesEquipe[h.autor_id] || "Usuário" : "Sistema (automático)"}</span>
+                        {" · "}
+                        {new Date(h.created_at).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}
+                      </p>
+                    </div>
                   </li>
                 ))}
                 {hist.length === 0 && <li className="text-xs text-muted-foreground">Sem histórico.</li>}
