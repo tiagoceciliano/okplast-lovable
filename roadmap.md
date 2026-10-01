@@ -16,3 +16,12 @@
 - [x] Ajustar etiquetas aplicadas, seletor e gerenciamento para suportar muitas etiquetas
 - [x] Manter e integrar negociação, tarefas e notas no painel lateral
 - [x] Validar o fluxo completo em uma conta autenticada e em larguras desktop menores
+
+## Funil e negociação no padrão Kinbox
+- [ ] Reproduzir o quadro compacto com busca, filtros, ordenação e totais por etapa
+- [ ] Abrir o chat lateral pelo balão do card sem sair do funil
+- [ ] Permitir associar conversa existente ou criar uma nova em cards sem conversa
+- [ ] Recriar o detalhe da negociação com etapas, dados, comentários, tarefas e histórico
+- [ ] Adicionar contador regressivo da janela de 24 horas no chat
+- [ ] Agendar mensagens futuras com envio bloqueado após o fechamento da janela
+- [ ] Validar o fluxo autenticado de funil, vínculo, chat, tarefas, comentários e agendamento
