@@ -78,6 +78,13 @@
       "when": 1790865853390,
       "tag": "0010_historico_autor_real",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1790877973583,
+      "tag": "0011_perf_indexes",
+      "breakpoints": true
     }
   ]
 }
