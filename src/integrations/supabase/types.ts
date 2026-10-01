@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       etiquetas: {
         Row: {
+          aplica_em: string[]
           cor: string
           created_at: string
           escopo: string
@@ -24,6 +25,7 @@ export type Database = {
           owner_id: string | null
         }
         Insert: {
+          aplica_em?: string[]
           cor?: string
           created_at?: string
           escopo?: string
@@ -32,6 +34,7 @@ export type Database = {
           owner_id?: string | null
         }
         Update: {
+          aplica_em?: string[]
           cor?: string
           created_at?: string
           escopo?: string
@@ -656,6 +659,7 @@ export type Database = {
           nome_contato: string | null
           resolvida_em: string | null
           responsavel_id: string | null
+          tags: string[]
           telefone: string
           ultima_entrada_cliente_em: string | null
           ultima_mensagem: string | null
@@ -670,6 +674,7 @@ export type Database = {
           nome_contato?: string | null
           resolvida_em?: string | null
           responsavel_id?: string | null
+          tags?: string[]
           telefone: string
           ultima_entrada_cliente_em?: string | null
           ultima_mensagem?: string | null
@@ -684,6 +689,7 @@ export type Database = {
           nome_contato?: string | null
           resolvida_em?: string | null
           responsavel_id?: string | null
+          tags?: string[]
           telefone?: string
           ultima_entrada_cliente_em?: string | null
           ultima_mensagem?: string | null
