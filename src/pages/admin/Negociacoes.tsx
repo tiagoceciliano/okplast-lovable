@@ -29,6 +29,7 @@ export default function Negociacoes() {
   const [dragging, setDragging] = useState<Negociacao | null>(null);
   const [countsT, setCountsT] = useState<Record<string, number>>({});
   const [countsC, setCountsC] = useState<Record<string, number>>({});
+  const [chats, setChats] = useState<Record<string, number>>({});
   const [venc, setVenc] = useState<Record<string, boolean>>({});
   const [novaOpen, setNovaOpen] = useState(false);
   const [ganhoPending, setGanhoPending] = useState<Negociacao | null>(null);
@@ -66,6 +67,21 @@ export default function Negociacoes() {
     const cC: Record<string, number> = {};
     (coms || []).forEach((c: { negociacao_id: string }) => { cC[c.negociacao_id] = (cC[c.negociacao_id] || 0) + 1; });
     setCountsC(cC);
+
+    const { data: convs } = await supabase.from("whatsapp_conversas").select("telefone,negociacao_id,nao_lidas");
+    const norm = (t: string | null) => { const d = (t || "").replace(/\D/g, ""); return d.startsWith("55") ? d.slice(2) : d; };
+    const porTel = new Map<string, number>();
+    const porNeg = new Map<string, number>();
+    (convs || []).forEach((c) => {
+      porTel.set(norm(c.telefone), c.nao_lidas);
+      if (c.negociacao_id) porNeg.set(c.negociacao_id, c.nao_lidas);
+    });
+    const ch: Record<string, number> = {};
+    ((neg.data as Negociacao[]) || []).forEach((n) => {
+      const v = porNeg.get(n.id) ?? (n.telefone ? porTel.get(norm(n.telefone)) : undefined);
+      if (v !== undefined) ch[n.id] = v;
+    });
+    setChats(ch);
   };
 
   useEffect(() => { load(); }, []);
@@ -163,6 +179,7 @@ export default function Negociacoes() {
                   countsTarefas={countsT}
                   countsComentarios={countsC}
                   vencidas={venc}
+                  chats={chats}
                   onCardClick={(n) => setAtivo(n)}
                   onAdd={() => setNovaOpen(true)}
                   canAdd={podeCriar}
