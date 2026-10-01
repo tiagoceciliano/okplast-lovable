@@ -10,10 +10,11 @@ interface Props {
   label: string;
   negociacoes: Negociacao[];
   vendedores: VendedorLite[];
-  countsTarefas: Record<string, number>;
+  countsTarefas: Record<string, { pend: number; total: number }>;
   countsComentarios: Record<string, number>;
   vencidas: Record<string, boolean>;
   chats?: Record<string, number>;
+  agendamentos?: Record<string, number>;
   onCardClick: (n: Negociacao) => void;
   onChatClick: (n: Negociacao) => void;
   onAdd: () => void;
