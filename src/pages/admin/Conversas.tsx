@@ -83,6 +83,11 @@ export default function Conversas() {
     }
   };
 
+  const selecionarConversa = (conversa: Conversa) => {
+    setSelecionada(conversa);
+    setConversas((prev) => prev.map((item) => item.id === conversa.id ? { ...item, nao_lidas: 0 } : item));
+  };
+
   useEffect(() => { carregar(); }, []);
 
   useEffect(() => {
@@ -243,7 +248,7 @@ export default function Conversas() {
               return (
                 <button
                   key={c.id}
-                  onClick={() => setSelecionada(c)}
+                   onClick={() => selecionarConversa(c)}
                   className={`flex w-full gap-2.5 border-b px-3 py-2.5 text-left transition hover:bg-muted/50 ${
                     selecionada?.id === c.id ? "bg-secondary" : c.nao_lidas > 0 ? "bg-destructive/5" : ""
                   }`}
@@ -354,7 +359,7 @@ export default function Conversas() {
                 placeholder="5521999998888"
               />
             </div>
-            {conversaExistente ? <div className={`rounded-md border p-3 text-sm ${janelaAberta(conversaExistente) ? "bg-accent/10" : "bg-gold/10"}`}><p className="font-semibold">Este número já possui atendimento.</p><p className="mt-1 text-xs text-muted-foreground">{janelaAberta(conversaExistente) ? "A janela está aberta: você pode escrever qualquer mensagem." : "A janela está fechada: só mensagens prontas podem ser enviadas."}</p><Button className="mt-3 w-full" onClick={() => { setSelecionada(conversaExistente); setNovaAberta(false); }}>Abrir atendimento existente</Button></div> : <>
+            {conversaExistente ? <div className={`rounded-md border p-3 text-sm ${janelaAberta(conversaExistente) ? "bg-accent/10" : "bg-gold/10"}`}><p className="font-semibold">Este número já possui atendimento.</p><p className="mt-1 text-xs text-muted-foreground">{janelaAberta(conversaExistente) ? "A janela está aberta: você pode escrever qualquer mensagem." : "A janela está fechada: só mensagens prontas podem ser enviadas."}</p><Button className="mt-3 w-full" onClick={() => { selecionarConversa(conversaExistente); setNovaAberta(false); }}>Abrir atendimento existente</Button></div> : <>
               <div><Label className="text-xs">Mensagem inicial</Label><Select value={templateNovo} onValueChange={setTemplateNovo}><SelectTrigger><SelectValue placeholder="Escolher mensagem pronta aprovada" /></SelectTrigger><SelectContent>{templates.filter((item) => item.variaveis === 0).map((item) => <SelectItem key={item.nome} value={item.nome}>{item.nome}</SelectItem>)}{templates.filter((item) => item.variaveis === 0).length === 0 && <div className="p-2 text-xs text-muted-foreground">Nenhuma mensagem pronta sem variáveis disponível.</div>}</SelectContent></Select>{templateNovo && <p className="mt-2 whitespace-pre-wrap rounded-md bg-muted p-2 text-xs text-muted-foreground">{templates.find((item) => item.nome === templateNovo)?.texto}</p>}</div>
             <div>
               <Label className="text-xs">Nome do contato (opcional)</Label>
