@@ -56,8 +56,12 @@ Deno.serve(async (req) => {
     conversa = data;
   } else if (body.telefone) {
     const tel = body.telefone.replace(/\D/g, "");
-    const { data } = await admin.from("whatsapp_conversas").select("*").eq("telefone", tel).maybeSingle();
-    conversa = data;
+    const { data } = await admin.from("whatsapp_conversas").select("*").like("telefone", `%${tel.slice(-8)}`).order("created_at").limit(1);
+    conversa = data?.[0] ?? null;
+    if (conversa?.resolvida_em) {
+      await admin.from("whatsapp_conversas").update({ resolvida_em: null }).eq("id", conversa.id);
+      conversa.resolvida_em = null;
+    }
     if (!conversa) {
       const { data: novo, error: cErr } = await admin.from("whatsapp_conversas")
         .insert({ telefone: tel, responsavel_id: user.id }).select("*").single();
