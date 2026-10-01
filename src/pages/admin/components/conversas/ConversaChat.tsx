@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { whatsappTemplates } from "@/lib/whatsapp-templates.functions";
+import { sendWhatsAppMedia } from "@/lib/whatsapp-media.functions";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Send, Clock, LayoutTemplate, Loader2, Check, CheckCheck, AlertCircle, MoreHorizontal, Search, Bell, Tag, Smile, Paperclip, MessageSquareText, CalendarClock, X } from "lucide-react";
+import { Send, Clock, LayoutTemplate, Loader2, Check, CheckCheck, AlertCircle, MoreHorizontal, Search, Bell, Tag, Smile, Paperclip, MessageSquareText, CalendarClock, X, FileUp } from "lucide-react";
 import { toast } from "sonner";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import type { TagDef } from "./tags";
@@ -99,7 +100,13 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas = []
   const [horaAgendada, setHoraAgendada] = useState("");
   const [agendando, setAgendando] = useState(false);
   const [agora, setAgora] = useState(() => Date.now());
+  const [emojiOpen, setEmojiOpen] = useState(false);
+  const [notaOpen, setNotaOpen] = useState(false);
+  const [nota, setNota] = useState("");
+  const [salvandoNota, setSalvandoNota] = useState(false);
+  const [anexando, setAnexando] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const limite = janelaLimite(conversa);
   const aberta = limite > agora;
@@ -252,6 +259,41 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas = []
     toast.success("Agendamento cancelado");
   };
 
+  const anexar = async (file: File | undefined) => {
+    if (!file || anexando) return;
+    if (file.size > 16 * 1024 * 1024) { toast.error("O arquivo deve ter no máximo 16 MB."); return; }
+    const base64 = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result).split(",")[1] ?? "");
+      reader.onerror = () => reject(new Error("Falha ao ler o arquivo"));
+      reader.readAsDataURL(file);
+    });
+    setAnexando(true);
+    try {
+      await sendWhatsAppMedia({ data: { conversaId: conversa.id, nome: file.name, mime: file.type || "application/octet-stream", base64, legenda: texto.trim() || undefined } });
+      setTexto("");
+      toast.success("Arquivo enviado");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Falha ao enviar arquivo");
+    } finally {
+      setAnexando(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  };
+
+  const salvarNota = async () => {
+    if (!conversa.negociacao_id) { toast.error("Vincule uma negociação antes de criar uma nota."); return; }
+    if (!nota.trim()) return;
+    setSalvandoNota(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    const { error } = await supabase.from("negociacao_comentarios").insert({ negociacao_id: conversa.negociacao_id, texto: nota.trim(), autor_id: user?.id ?? null });
+    setSalvandoNota(false);
+    if (error) { toast.error(error.message); return; }
+    setNota(""); setNotaOpen(false); toast.success("Nota interna salva");
+  };
+
+  const emojis = ["😀", "😊", "👍", "🙏", "✅", "📦", "🚚", "💰", "📏", "Olá!", "Obrigado!"];
+
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div className="grid min-h-11 shrink-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b px-3 py-1.5">
@@ -274,7 +316,7 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas = []
       <div className="min-h-0 flex-1 space-y-2 overflow-y-auto bg-secondary/30 p-4">
         {mensagens.length === 0 && (
           <p className="text-xs text-muted-foreground text-center py-6">
-            Nenhuma mensagem ainda. Respostas do cliente chegam no aplicativo WhatsApp do celular.
+            Nenhuma mensagem ainda. Inicie o atendimento com uma mensagem pronta.
           </p>
         )}
         {mensagensVisiveis.map((m) => (
@@ -309,6 +351,20 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas = []
         <div ref={bottomRef} />
       </div>
 
+      <div className="flex min-h-10 shrink-0 items-center gap-1 overflow-x-auto border-t bg-background px-3 py-1.5">
+        {tags.map((id) => {
+          const item = etiquetas.find((e) => e.id === id);
+          return item ? <button key={id} onClick={() => alternarTag(id)} className={`shrink-0 rounded border px-1.5 py-0.5 text-[9px] font-semibold ${item.className}`}>{item.label} ×</button> : null;
+        })}
+        <Popover>
+          <PopoverTrigger asChild><Button variant="ghost" size="sm" className="h-7 px-2 text-xs"><Tag /> Etiqueta</Button></PopoverTrigger>
+          <PopoverContent align="start" className="max-h-72 w-64 overflow-y-auto p-2">
+            {etiquetas.length === 0 && <p className="p-2 text-xs text-muted-foreground">Nenhuma etiqueta disponível.</p>}
+            {etiquetas.map((item) => <Button key={item.id} variant="ghost" className="h-8 w-full justify-start" onClick={() => alternarTag(item.id)}><span className={`rounded border px-1.5 py-0.5 text-[9px] ${item.className}`}>{item.label}</span>{tags.includes(item.id) && <Check className="ml-auto" />}</Button>)}
+          </PopoverContent>
+        </Popover>
+      </div>
+
       {/* Aviso de janela */}
       {!aberta && (
         <div className="flex shrink-0 items-start gap-2 border-y bg-gold/10 px-3 py-2 text-xs text-gold-foreground">
@@ -325,9 +381,16 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas = []
         <div className="m-3 shrink-0 rounded-lg border bg-background p-2 shadow-sm">
           <Textarea value={texto} onChange={(e) => setTexto(e.target.value)} placeholder="Digite sua mensagem…" rows={2} className="min-h-14 resize-none border-0 p-1 shadow-none focus-visible:ring-0" onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); enviar(); } }} />
           <div className="flex items-center gap-1">
-            <Button size="icon" variant="ghost" className="h-8 w-8" disabled aria-label="Anexar arquivo"><Paperclip /></Button>
-            <Button size="icon" variant="ghost" className="h-8 w-8" disabled aria-label="Emoji"><Smile /></Button>
-            <Button size="icon" variant="ghost" className="h-8 w-8" disabled aria-label="Nota interna"><MessageSquareText /></Button>
+            <input ref={fileRef} type="file" className="hidden" accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.txt" onChange={(event) => anexar(event.target.files?.[0])} />
+            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => fileRef.current?.click()} disabled={anexando} aria-label="Anexar arquivo">{anexando ? <Loader2 className="animate-spin" /> : <Paperclip />}</Button>
+            <Popover open={emojiOpen} onOpenChange={setEmojiOpen}>
+              <PopoverTrigger asChild><Button size="icon" variant="ghost" className="h-8 w-8" aria-label="Inserir emoji"><Smile /></Button></PopoverTrigger>
+              <PopoverContent align="start" className="grid w-52 grid-cols-5 gap-1 p-2">{emojis.map((emoji) => <Button key={emoji} variant="ghost" size="sm" className="h-8 px-1 text-base" onClick={() => { setTexto((value) => value + emoji); setEmojiOpen(false); }}>{emoji}</Button>)}</PopoverContent>
+            </Popover>
+            <Popover open={notaOpen} onOpenChange={setNotaOpen}>
+              <PopoverTrigger asChild><Button size="icon" variant="ghost" className="h-8 w-8" aria-label="Criar nota interna"><MessageSquareText /></Button></PopoverTrigger>
+              <PopoverContent align="start" className="w-80 p-3"><p className="mb-2 text-sm font-semibold">Nota interna</p><Textarea value={nota} onChange={(event) => setNota(event.target.value)} rows={3} placeholder="Visível somente para sua equipe" /><Button className="mt-2 w-full" size="sm" onClick={salvarNota} disabled={!nota.trim() || salvandoNota}>{salvandoNota ? <Loader2 className="animate-spin" /> : <MessageSquareText />} Salvar nota</Button></PopoverContent>
+            </Popover>
             <Popover open={agendamentoOpen} onOpenChange={setAgendamentoOpen}>
               <PopoverTrigger asChild><Button size="icon" variant="ghost" className="h-8 w-8" aria-label="Agendar mensagem"><CalendarClock /></Button></PopoverTrigger>
               <PopoverContent align="start" className="w-auto p-3">
@@ -344,7 +407,7 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas = []
           </div>
         </div>
       ) : (
-         <div className="m-3 shrink-0 space-y-2 rounded-md border p-2">
+         <div className="m-3 shrink-0 space-y-2 rounded-md border bg-background p-3 shadow-sm">
           <div className="flex items-center gap-2">
             <LayoutTemplate className="h-4 w-4 text-muted-foreground" />
             <Select value={templateSel} onValueChange={(v) => { setTemplateSel(v); setParams([]); }}>
@@ -389,18 +452,6 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas = []
               </Button>
             </>
           )}
-      <div className="flex min-h-9 shrink-0 items-center gap-1 overflow-x-auto border-t px-3 py-1.5">
-        {tags.map((id) => {
-          const item = etiquetas.find((e) => e.id === id);
-          return item ? <button key={id} onClick={() => alternarTag(id)} className={`shrink-0 rounded border px-1.5 py-0.5 text-[9px] font-semibold ${item.className}`}>{item.label} ×</button> : null;
-        })}
-        <Popover>
-          <PopoverTrigger asChild><Button variant="ghost" size="sm" className="h-7 px-2 text-xs"><Tag /> Adicionar</Button></PopoverTrigger>
-          <PopoverContent align="start" className="max-h-72 w-64 overflow-y-auto p-2">
-            {etiquetas.map((item) => <Button key={item.id} variant="ghost" className="h-8 w-full justify-start" onClick={() => alternarTag(item.id)}><span className={`rounded border px-1.5 py-0.5 text-[9px] ${item.className}`}>{item.label}</span>{tags.includes(item.id) && <Check className="ml-auto" />}</Button>)}
-          </PopoverContent>
-        </Popover>
-      </div>
         </div>
       )}
       {agendamentos.length > 0 && (

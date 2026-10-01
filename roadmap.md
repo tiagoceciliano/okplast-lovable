@@ -12,10 +12,12 @@
 - [ ] Criar/aprovar templates na Meta (mensagens prontas) — aprovação pode levar até 48h
 
 ## Atendimento no padrão Kinbox
-- [x] Reproduzir a disposição completa dos prints: navegação do chat, lista, cabeçalho, mensagens, ações e detalhes
-- [x] Ajustar etiquetas aplicadas, seletor e gerenciamento para suportar muitas etiquetas
+- [ ] Reproduzir a disposição completa dos prints: navegação do chat, lista, cabeçalho, mensagens, ações e detalhes
+- [ ] Ajustar etiquetas aplicadas, seletor e gerenciamento para suportar muitas etiquetas
 - [x] Manter e integrar negociação, tarefas e notas no painel lateral
-- [x] Validar o fluxo completo em uma conta autenticada e em larguras desktop menores
+- [ ] Implementar atribuição e transferência de responsável no atendimento
+- [ ] Tornar anexo, emoji e nota interna funcionais
+- [ ] Validar o fluxo completo em uma conta autenticada e em larguras desktop menores
 
 ## Funil e negociação no padrão Kinbox
 - [x] Reproduzir o quadro compacto com busca, filtros, ordenação e totais por etapa
