@@ -8,7 +8,7 @@ import { EtiquetasManager } from "./components/conversas/EtiquetasManager";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Plus, Tag, Search, Loader2, Inbox, UserRound, Bookmark, Archive, SlidersHorizontal, ArrowDownAZ, EyeOff, MoreHorizontal, PanelRightClose, Menu, Settings2 } from "lucide-react";
+import { MessageCircle, Plus, Tag, Search, Loader2, Inbox, UserRound, Bookmark, Archive, SlidersHorizontal, ArrowDownAZ, EyeOff, MoreHorizontal, Menu, Settings2, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";

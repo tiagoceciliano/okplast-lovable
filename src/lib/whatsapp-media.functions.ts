@@ -51,8 +51,8 @@ export const sendWhatsAppMedia = createServerFn({ method: "POST" })
 
     const tipo = data.mime.startsWith("image/") ? "image" : data.mime.startsWith("video/") ? "video" : data.mime.startsWith("audio/") ? "audio" : "document";
     const media: Record<string, string> = { id: mediaId };
-    if (tipo === "document") media.filename = data.nome;
-    if (data.legenda?.trim() && (tipo === "image" || tipo === "video" || tipo === "document")) media.caption = data.legenda.trim();
+    if (tipo === "document") media['filename'] = data.nome;
+    if (data.legenda?.trim() && (tipo === "image" || tipo === "video" || tipo === "document")) media['caption'] = data.legenda.trim();
     const sent = await fetch(`${GATEWAY_URL}/messages`, {
       method: "POST",
       headers: { ...headers, "Content-Type": "application/json" },
