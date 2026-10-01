@@ -59,7 +59,6 @@ export default function Vendedores() {
   };
   const [rows, setRows] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [editCred, setEditCred] = useState<Member | null>(null);
   const [editFull, setEditFull] = useState<Member | null>(null);
@@ -113,10 +112,6 @@ export default function Vendedores() {
     setLoading(false);
   };
   useEffect(() => { load(); }, []);
-
-  const updateRow = (id: string, patch: Partial<Member>) => {
-    setRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch, _dirty: true } : r)));
-  };
 
   const removeRow = async (row: Member) => {
     if (!confirm(`Remover ${row.nome_vendedor}?`)) return;

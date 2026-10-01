@@ -29,6 +29,6 @@
 - [x] Validar o fluxo autenticado de funil, vínculo, chat, tarefas, comentários e agendamento
 
 ## Configurações no padrão Kinbox
-- [ ] Criar área compartilhada de Configurações
-- [ ] Implementar Membros, Tags e Grupos
-- [ ] Validar CRUD e apresentação autenticada
+- [x] Criar área compartilhada de Configurações
+- [x] Implementar Membros, Tags e Grupos
+- [x] Validar CRUD e apresentação autenticada
