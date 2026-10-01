@@ -1,21 +1,22 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { CalendarClock, MessageCircle, MessageCirclePlus, MessageSquare } from "lucide-react";
+import { ListTodo, MessageCircle, MessageCirclePlus, MessageSquare, CalendarClock } from "lucide-react";
 import { tagDef, useEtiquetas } from "../conversas/tags";
 import { brl, type Negociacao, type VendedorLite } from "./types";
 
 interface Props {
   negociacao: Negociacao;
   vendedores: VendedorLite[];
-  tarefasCount?: number | undefined;
+  tarefasCount?: { pend: number; total: number } | undefined;
   comentariosCount?: number | undefined;
   hasVencida?: boolean | undefined;
   chatNaoLidas?: number | undefined;
+  agendamentosCount?: number | undefined;
   onClick: () => void;
   onChatClick: () => void;
 }
 
-export function KanbanCard({ negociacao, vendedores, tarefasCount, comentariosCount, hasVencida, chatNaoLidas, onClick, onChatClick }: Props) {
+export function KanbanCard({ negociacao, vendedores, tarefasCount, comentariosCount, hasVencida, chatNaoLidas, agendamentosCount, onClick, onChatClick }: Props) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: negociacao.id,
     data: { type: "card", etapa: negociacao.etapa },
@@ -79,8 +80,21 @@ export function KanbanCard({ negociacao, vendedores, tarefasCount, comentariosCo
       <div className="flex items-center justify-between pt-1">
         <span className="text-xs font-semibold">{brl(negociacao.valor)}</span>
         <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-          {tarefasCount ? <span className="flex items-center gap-0.5"><CalendarClock className="h-3 w-3"/>{tarefasCount}</span> : null}
-          {comentariosCount ? <span className="flex items-center gap-0.5"><MessageSquare className="h-3 w-3"/>{comentariosCount}</span> : null}
+          {agendamentosCount ? (
+            <span className="flex items-center gap-0.5 text-primary" title={`${agendamentosCount} mensagem(ns) agendada(s)`}>
+              <CalendarClock className="h-3.5 w-3.5" />{agendamentosCount}
+            </span>
+          ) : null}
+          {tarefasCount ? (
+            <span className="flex items-center gap-0.5" title={`Tarefas: ${tarefasCount.pend} pendente(s) de ${tarefasCount.total}`}>
+              <ListTodo className="h-3.5 w-3.5" />{tarefasCount.pend}/{tarefasCount.total}
+            </span>
+          ) : null}
+          {comentariosCount ? (
+            <span className="flex items-center gap-0.5" title={`${comentariosCount} comentário(s)`}>
+              <MessageSquare className="h-3.5 w-3.5" />{comentariosCount}
+            </span>
+          ) : null}
           <span className="flex items-center gap-1" title={responsavel?.nome || "Sem responsável"}><span className="h-1.5 w-1.5 rounded-full bg-accent" />COMERCIAL</span>
         </div>
       </div>

@@ -31,11 +31,12 @@ export default function Negociacoes() {
   const [filtroResp, setFiltroResp] = useState<string>("all");
   const [ativo, setAtivo] = useState<Negociacao | null>(null);
   const [dragging, setDragging] = useState<Negociacao | null>(null);
-  const [countsT, setCountsT] = useState<Record<string, number>>({});
+  const [countsT, setCountsT] = useState<Record<string, { pend: number; total: number }>>({});
   const [countsC, setCountsC] = useState<Record<string, number>>({});
   const [chats, setChats] = useState<Record<string, number>>({});
   const [chatAtivo, setChatAtivo] = useState<Negociacao | null>(null);
   const [venc, setVenc] = useState<Record<string, boolean>>({});
+  const [agend, setAgend] = useState<Record<string, number>>({});
   const [novaOpen, setNovaOpen] = useState(false);
   const [ganhoPending, setGanhoPending] = useState<Negociacao | null>(null);
   const [filtroProduto, setFiltroProduto] = useState("all");
@@ -49,10 +50,11 @@ export default function Negociacoes() {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
   const load = async () => {
-    const [neg, wa, tar] = await Promise.all([
+    const [neg, wa, tar, agd] = await Promise.all([
       supabase.from("negociacoes").select("*").order("posicao"),
       supabase.from("whatsapp_numbers").select("user_id,nome_vendedor,numero_raw,numero_formatado"),
       supabase.from("negociacao_tarefas").select("negociacao_id,concluida,data_vencimento"),
+      supabase.from("whatsapp_agendamentos").select("conversa_id").eq("status", "pendente"),
     ]);
     if (neg.error) { toast.error(neg.error.message); return; }
     const negociacoes = (neg.data as Negociacao[]) || [];
@@ -72,10 +74,12 @@ export default function Negociacoes() {
     waRows.forEach((v) => { nmap[v.numero_raw] = { user_id: v.user_id, nome: v.nome_vendedor, formatado: v.numero_formatado }; });
     setNumeroMap(nmap);
 
-    const cT: Record<string, number> = {};
+    const cT: Record<string, { pend: number; total: number }> = {};
     const vV: Record<string, boolean> = {};
     (tar.data || []).forEach((t: { negociacao_id: string; concluida: boolean; data_vencimento: string | null }) => {
-      if (!t.concluida) cT[t.negociacao_id] = (cT[t.negociacao_id] || 0) + 1;
+      const e = (cT[t.negociacao_id] ||= { pend: 0, total: 0 });
+      e.total++;
+      if (!t.concluida) e.pend++;
       if (!t.concluida && t.data_vencimento && new Date(t.data_vencimento) < new Date()) {
         vV[t.negociacao_id] = true;
       }
@@ -87,13 +91,15 @@ export default function Negociacoes() {
     (coms || []).forEach((c: { negociacao_id: string }) => { cC[c.negociacao_id] = (cC[c.negociacao_id] || 0) + 1; });
     setCountsC(cC);
 
-    const { data: convs } = await supabase.from("whatsapp_conversas").select("telefone,negociacao_id,nao_lidas");
+    const { data: convs } = await supabase.from("whatsapp_conversas").select("id,telefone,negociacao_id,nao_lidas");
     const norm = (t: string | null) => { const d = (t || "").replace(/\D/g, ""); return d.startsWith("55") ? d.slice(2) : d; };
     const porTel = new Map<string, number>();
     const porNeg = new Map<string, number>();
+    const convById = new Map<string, { negociacao_id: string | null; telefone: string | null }>();
     (convs || []).forEach((c) => {
       porTel.set(norm(c.telefone), c.nao_lidas);
       if (c.negociacao_id) porNeg.set(c.negociacao_id, c.nao_lidas);
+      convById.set(c.id, { negociacao_id: c.negociacao_id, telefone: c.telefone });
     });
     const ch: Record<string, number> = {};
     ((neg.data as Negociacao[]) || []).forEach((n) => {
@@ -101,6 +107,20 @@ export default function Negociacoes() {
       if (v !== undefined) ch[n.id] = v;
     });
     setChats(ch);
+
+    // Agendamentos pendentes por negociação (via conversa vinculada ou telefone)
+    const agendamentosPorNeg: Record<string, number> = {};
+    const negPorTel = new Map<string, string>();
+    ((neg.data as Negociacao[]) || []).forEach((n) => {
+      if (n.telefone) negPorTel.set(norm(n.telefone), n.id);
+    });
+    ((agd.data || []) as { conversa_id: string }[]).forEach((a) => {
+      const conv = convById.get(a.conversa_id);
+      if (!conv) return;
+      const negId = conv.negociacao_id ?? (conv.telefone ? negPorTel.get(norm(conv.telefone)) : undefined);
+      if (negId) agendamentosPorNeg[negId] = (agendamentosPorNeg[negId] || 0) + 1;
+    });
+    setAgend(agendamentosPorNeg);
   };
 
   useEffect(() => { load(); }, []);
@@ -225,6 +245,7 @@ export default function Negociacoes() {
                   countsComentarios={countsC}
                   vencidas={venc}
                   chats={chats}
+                  agendamentos={agend}
                   onCardClick={(n) => setAtivo(n)}
                    onChatClick={(n) => setChatAtivo(n)}
                   onAdd={() => setNovaOpen(true)}
