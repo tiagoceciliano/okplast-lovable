@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { getEquipe } from "@/lib/adminCache";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -59,8 +60,8 @@ export function ContatoPanel({ conversa, onNomeAtualizado, onNegociacaoVinculada
 
   useEffect(() => {
     (async () => {
-      const [{ data: lista }, { data: { session } }] = await Promise.all([
-        supabase.rpc("list_equipe"),
+      const [lista, { data: { session } }] = await Promise.all([
+        getEquipe(),
         supabase.auth.getSession(),
       ]);
       setEquipe(Object.fromEntries((lista ?? []).map((u) => [u.id, u.nome])));

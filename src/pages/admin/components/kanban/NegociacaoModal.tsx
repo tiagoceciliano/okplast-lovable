@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { getEquipe } from "@/lib/adminCache";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -45,7 +46,7 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
   const navigate = useNavigate();
   const etiquetas = useEtiquetas();
   const [nomesEquipe, setNomesEquipe] = useState<Record<string, string>>({});
-  useEffect(() => { supabase.rpc("list_equipe").then(({ data }) => setNomesEquipe(Object.fromEntries((data ?? []).map((u) => [u.id, u.nome])))); }, []);
+  useEffect(() => { getEquipe().then((data) => setNomesEquipe(Object.fromEntries((data).map((u) => [u.id, u.nome])))); }, []);
 
   useEffect(() => setN(negociacao), [negociacao]);
   useEffect(() => {

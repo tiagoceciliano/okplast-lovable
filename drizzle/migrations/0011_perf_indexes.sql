@@ -1,0 +1,10 @@
+CREATE INDEX IF NOT EXISTS idx_wa_conversas_telefone ON public.whatsapp_conversas(telefone);
+CREATE INDEX IF NOT EXISTS idx_wa_conversas_negociacao ON public.whatsapp_conversas(negociacao_id);
+CREATE INDEX IF NOT EXISTS idx_wa_mensagens_conversa_created ON public.whatsapp_mensagens(conversa_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_neg_tarefas_neg ON public.negociacao_tarefas(negociacao_id);
+CREATE INDEX IF NOT EXISTS idx_neg_comentarios_neg ON public.negociacao_comentarios(negociacao_id);
+CREATE INDEX IF NOT EXISTS idx_neg_historico_neg ON public.negociacao_historico(negociacao_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_wa_agend_pendente ON public.whatsapp_agendamentos(conversa_id) WHERE status = 'pendente';
+CREATE INDEX IF NOT EXISTS idx_negociacoes_status_updated ON public.negociacoes(status, updated_at);
+CREATE INDEX IF NOT EXISTS idx_negociacoes_responsavel ON public.negociacoes(responsavel_id);
+CREATE INDEX IF NOT EXISTS idx_whatsapp_numbers_raw ON public.whatsapp_numbers(numero_raw);

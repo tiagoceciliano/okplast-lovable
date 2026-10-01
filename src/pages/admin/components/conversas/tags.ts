@@ -27,9 +27,17 @@ export const CORES_SWATCH: Record<string, string> = {
 };
 
 let cache: TagDef[] = [];
+let carregado = false;
+let inflight: Promise<void> | null = null;
 const listeners = new Set<(t: TagDef[]) => void>();
 
-export async function recarregarEtiquetas() {
+export function recarregarEtiquetas() {
+  if (inflight) return inflight;
+  inflight = carregarEtiquetas().finally(() => { inflight = null; });
+  return inflight;
+}
+
+async function carregarEtiquetas() {
   const { data } = await supabase.from("etiquetas").select("*").order("created_at");
   cache = (data || []).map((e) => ({
     id: e.id,
@@ -40,6 +48,7 @@ export async function recarregarEtiquetas() {
     owner_id: e.owner_id,
     aplica_em: (e.aplica_em ?? ["conversa", "negociacao"]) as TagDef["aplica_em"],
   }));
+  carregado = true;
   listeners.forEach((l) => l(cache));
 }
 
@@ -47,7 +56,7 @@ export function useEtiquetas() {
   const [tags, setTags] = useState<TagDef[]>(cache);
   useEffect(() => {
     listeners.add(setTags);
-    if (!cache.length) recarregarEtiquetas();
+    if (!carregado) recarregarEtiquetas();
     return () => { listeners.delete(setTags); };
   }, []);
   return tags;

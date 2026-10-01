@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { getEquipe, memoGet, memoSet } from "@/lib/adminCache";
 import { AdminLayout } from "./AdminLayout";
 import { ConversaChat, janelaAberta, type Conversa } from "./components/conversas/ConversaChat";
 import { ContatoPanel } from "./components/conversas/ContatoPanel";
@@ -68,6 +69,7 @@ export default function Conversas() {
       .order("ultima_mensagem_em", { ascending: false, nullsFirst: false });
     if (error) toast.error(error.message);
     const lista = (data as Conversa[]) || [];
+    memoSet("conversas", lista);
     setConversas(lista);
     setLoading(false);
     const alvo = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("conversa") : null;
@@ -88,7 +90,7 @@ export default function Conversas() {
 
   useEffect(() => {
     (async () => {
-      const { data: equipe } = await supabase.rpc("list_equipe");
+      const equipe = await getEquipe();
       setAtendentes((equipe ?? []).map((u) => ({ id: u.id, nome: u.nome, email: u.email ?? null })));
     })();
   }, []);
@@ -96,7 +98,24 @@ export default function Conversas() {
   useEffect(() => {
     const canal = supabase
       .channel("wa-conversas")
-      .on("postgres_changes", { event: "*", schema: "public", table: "whatsapp_conversas" }, () => carregar())
+      .on("postgres_changes", { event: "*", schema: "public", table: "whatsapp_conversas" }, (payload) => {
+        // Atualiza só a conversa que mudou, sem recarregar a lista inteira
+        if (payload.eventType === "DELETE") {
+          const id = (payload.old as { id?: string }).id;
+          setConversas((prev) => prev.filter((c) => c.id !== id));
+          return;
+        }
+        const nova = payload.new as Conversa;
+        setConversas((prev) => {
+          const sem = prev.filter((c) => c.id !== nova.id);
+          const lista = [nova, ...sem].sort((a, b) =>
+            new Date(b.ultima_mensagem_em ?? 0).getTime() - new Date(a.ultima_mensagem_em ?? 0).getTime());
+          memoSet("conversas", lista);
+          return lista;
+        });
+        setTagsPorConversa((prev) => ({ ...prev, [nova.id]: nova.tags ?? [] }));
+        setSelecionada((atual) => (atual && atual.id === nova.id ? { ...atual, ...nova, nao_lidas: atual.nao_lidas } : atual));
+      })
       .subscribe();
     return () => { supabase.removeChannel(canal); };
   }, []);

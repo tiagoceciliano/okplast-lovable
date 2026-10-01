@@ -4,6 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useEtiquetas } from "../conversas/tags";
 import { useNavigate } from "@/lib/router-compat";
 import { supabase } from "@/integrations/supabase/client";
+import { getEquipe } from "@/lib/adminCache";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,7 +43,7 @@ export function NegociacaoChatSheet({ negociacao, onClose, onChanged }: Props) {
 
   useEffect(() => { setTags(conversa?.tags ?? []); }, [conversa?.id]);
   useEffect(() => {
-    supabase.rpc("list_equipe").then(({ data }) => setAtendentes((data ?? []).map((u) => ({ id: u.id, nome: u.nome }))));
+    getEquipe().then((data) => setAtendentes((data).map((u) => ({ id: u.id, nome: u.nome }))));
   }, []);
 
   const transferir = async (responsavelId: string) => {

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { getEquipe, memoGet, memoSet } from "@/lib/adminCache";
 import { whatsappTemplates } from "@/lib/whatsapp-templates.functions";
 import { sendWhatsAppMedia } from "@/lib/whatsapp-media.functions";
 import EmojiPicker, { EmojiStyle } from "emoji-picker-react";
@@ -132,6 +133,8 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
   // Carrega mensagens + marca como lida
   useEffect(() => {
     let ativo = true;
+    const memo = memoGet<Mensagem[]>(`msgs:${conversa.id}`);
+    setMensagens(memo ?? []);
     (async () => {
       const { data } = await supabase
         .from("whatsapp_mensagens")
@@ -139,7 +142,7 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
         .eq("conversa_id", conversa.id)
         .order("created_at", { ascending: true })
         .limit(5000);
-      if (ativo) setMensagens((data as Mensagem[]) || []);
+      if (ativo) { const l = (data as Mensagem[]) || []; memoSet(`msgs:${conversa.id}`, l); setMensagens(l); }
       if (conversa.nao_lidas > 0) {
         await supabase.from("whatsapp_conversas").update({ nao_lidas: 0 }).eq("id", conversa.id);
         onMarcarLida?.();
@@ -156,7 +159,16 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
         event: "INSERT", schema: "public", table: "whatsapp_mensagens",
         filter: `conversa_id=eq.${conversa.id}`,
       }, (payload) => {
-        setMensagens((prev) => [...prev, payload.new as Mensagem]);
+        const nova = payload.new as Mensagem;
+        setMensagens((prev) => {
+          // Substitui o balão provisório ("enviando") pela mensagem confirmada
+          const idx = prev.findIndex((m) => m.id.startsWith("tmp-") && m.direcao === nova.direcao && m.conteudo === nova.conteudo);
+          const base = idx >= 0 ? prev.filter((_, i) => i !== idx) : prev;
+          if (base.some((m) => m.id === nova.id)) return base;
+          const lista = [...base, nova];
+          memoSet(`msgs:${conversa.id}`, lista);
+          return lista;
+        });
       })
       .subscribe();
     return () => { supabase.removeChannel(canal); };
@@ -178,18 +190,21 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
   }, [aberta]);
 
   const enviar = async () => {
-    if (!texto.trim() || enviando) return;
-    setEnviando(true);
+    const conteudo = texto.trim();
+    if (!conteudo) return;
+    // Mostra o balão na hora; o servidor confirma em segundo plano
+    const tmpId = `tmp-${Date.now()}`;
+    setMensagens((prev) => [...prev, { id: tmpId, direcao: "saida", tipo: "text", conteudo, status: "enviando", created_at: new Date().toISOString(), autor_id: null } as unknown as Mensagem]);
+    setTexto("");
     const { error } = await supabase.functions.invoke("whatsapp-send", {
-      body: { conversa_id: conversa.id, tipo: "text", texto: texto.trim() },
+      body: { conversa_id: conversa.id, tipo: "text", texto: conteudo },
     });
-    setEnviando(false);
     if (error) {
+      setMensagens((prev) => prev.filter((m) => m.id !== tmpId));
+      setTexto((t) => t || conteudo);
       const detalhe = (error as any)?.context ? await (error as any).context.text().catch(() => "") : "";
       toast.error("Falha ao enviar: " + (detalhe || error.message));
-      return;
     }
-    setTexto("");
   };
 
   const enviarTemplate = async () => {
@@ -216,7 +231,7 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
   const tSel = templates.find((x) => x.nome === templateSel);
   const [nomesEquipe, setNomesEquipe] = useState<Record<string, string>>({});
   useEffect(() => {
-    supabase.rpc("list_equipe").then(({ data }) => setNomesEquipe(Object.fromEntries((data ?? []).map((u) => [u.id, u.nome]))));
+    getEquipe().then((data) => setNomesEquipe(Object.fromEntries((data).map((u) => [u.id, u.nome]))));
   }, []);
   const iniciais = (nome: string) => nome.trim().split(/\s+/).slice(0, 2).map((p) => p[0]).join("").toUpperCase() || "?";
   const nomeCliente = conversa.nome_contato || conversa.telefone;
@@ -369,7 +384,7 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
                 {saida && (
                   <span className="mb-0.5 flex items-center gap-0.5 text-[11px] font-semibold text-foreground/80">
                     {autor}
-                    {m.status === "failed" ? <AlertCircle className="h-3 w-3 text-destructive" /> : m.status === "read" ? <CheckCheck className="h-3.5 w-3.5 text-chat-tick" /> : m.status === "delivered" ? <CheckCheck className="h-3.5 w-3.5 text-muted-foreground" /> : <Check className="h-3.5 w-3.5 text-muted-foreground" />}
+                    {m.status === "enviando" ? <Clock className="h-3 w-3 text-muted-foreground" /> : m.status === "failed" ? <AlertCircle className="h-3 w-3 text-destructive" /> : m.status === "read" ? <CheckCheck className="h-3.5 w-3.5 text-chat-tick" /> : m.status === "delivered" ? <CheckCheck className="h-3.5 w-3.5 text-muted-foreground" /> : <Check className="h-3.5 w-3.5 text-muted-foreground" />}
                   </span>
                 )}
                 <div className={`flex items-end gap-2 rounded-2xl px-3.5 py-2 text-sm shadow-sm ${saida ? "bg-chat-out" : "bg-chat-in"}`}>
