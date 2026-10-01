@@ -8,18 +8,20 @@ import { EtiquetasManager } from "./components/conversas/EtiquetasManager";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Plus, Tag, Search, Loader2, Clock, CircleDot } from "lucide-react";
+import { MessageCircle, Plus, Tag, Search, Loader2, Inbox, UserRound, Bookmark, Archive, SlidersHorizontal, ArrowDownAZ, EyeOff, MoreHorizontal, PanelRightClose, Menu, Settings2 } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-type FiltroId = "meus" | "nao_atribuidos" | "aguardando" | "todos";
+type FiltroId = "abertos" | "meus" | "seguindo" | "arquivados" | "nao_atribuidos";
 
 const FILTROS: { id: FiltroId; label: string }[] = [
+  { id: "abertos", label: "Abertos" },
   { id: "meus", label: "Meus" },
-  { id: "nao_atribuidos", label: "Não atribuídos" },
-  { id: "aguardando", label: "Aguardando" },
-  { id: "todos", label: "Todos" },
+  { id: "seguindo", label: "Seguindo" },
+  { id: "arquivados", label: "Arquivados" },
 ];
 
 function fmtData(iso: string | null) {
@@ -40,11 +42,12 @@ export default function Conversas() {
   const [tagsPorConversa, setTagsPorConversa] = useState<Record<string, string[]>>({});
   const [selecionada, setSelecionada] = useState<Conversa | null>(null);
   const [busca, setBusca] = useState("");
-  const [filtro, setFiltro] = useState<FiltroId>("todos");
+  const [filtro, setFiltro] = useState<FiltroId>("abertos");
   const [loading, setLoading] = useState(true);
   const [novaAberta, setNovaAberta] = useState(false);
   const [novoTelefone, setNovoTelefone] = useState("");
   const [novoNome, setNovoNome] = useState("");
+  const [novoTexto, setNovoTexto] = useState("");
   const [criando, setCriando] = useState(false);
   const etiquetas = useEtiquetas();
   const [gerenciarTags, setGerenciarTags] = useState(false);
@@ -85,8 +88,8 @@ export default function Conversas() {
     const q = busca.trim().toLowerCase();
     return conversas.filter((c) => {
       if (filtro === "meus" && c.responsavel_id !== user?.id) return false;
-      if (filtro === "nao_atribuidos" && c.responsavel_id) return false;
-      if (filtro === "aguardando" && c.nao_lidas === 0) return false;
+       if (filtro === "nao_atribuidos" && c.responsavel_id) return false;
+       if (filtro === "arquivados") return false;
       if (!q) return true;
       return (
         (c.nome_contato || "").toLowerCase().includes(q) ||
@@ -118,25 +121,49 @@ export default function Conversas() {
   const aberta = janelaAberta(selecionada);
 
   return (
-    <AdminLayout>
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="flex items-center gap-2 text-2xl font-bold">
-          <MessageCircle className="h-6 w-6" /> Atendimento WhatsApp
-        </h1>
-        <div className="flex gap-2">
-        <Button size="sm" variant="outline" onClick={() => setGerenciarTags(true)}>
-          <Tag className="mr-1 h-4 w-4" /> Etiquetas
-        </Button>
-        <Button size="sm" onClick={() => setNovaAberta(true)}>
-          <Plus className="mr-1 h-4 w-4" /> Nova conversa
-        </Button>
-        </div>
-      </div>
+    <AdminLayout fullBleed>
+      <div className="grid h-screen min-h-[560px] overflow-hidden bg-muted/40 xl:grid-cols-[170px_320px_minmax(390px,1fr)_270px] lg:grid-cols-[72px_300px_minmax(390px,1fr)_250px]">
+        <aside className="hidden min-h-0 border-r bg-card px-2 py-4 lg:flex lg:flex-col">
+          <div className="mb-4 flex items-center gap-2 px-2 xl:px-3">
+            <MessageCircle className="h-5 w-5 text-primary" />
+            <span className="hidden font-bold xl:inline">Chat</span>
+          </div>
+          <nav className="space-y-1">
+            {FILTROS.map((f, index) => {
+              const Icon = [Inbox, UserRound, Bookmark, Archive][index] || Inbox;
+              return <Button key={f.id} variant={filtro === f.id ? "secondary" : "ghost"} className="h-9 w-full justify-start px-2 xl:px-3" onClick={() => setFiltro(f.id)} title={f.label}>
+                <Icon className="shrink-0" /><span className="hidden xl:inline">{f.label}</span>
+              </Button>;
+            })}
+          </nav>
+          <div className="mt-7 hidden xl:block">
+            <p className="mb-2 px-3 text-xs font-semibold text-muted-foreground">Filtros</p>
+            <Button variant={filtro === "nao_atribuidos" ? "secondary" : "ghost"} className="h-9 w-full justify-start text-xs" onClick={() => setFiltro("nao_atribuidos")}>
+              <span className="h-2 w-2 rounded-full bg-destructive" /> Sem responsável
+            </Button>
+          </div>
+          <Button variant="ghost" className="mt-auto h-9 justify-start px-2 xl:px-3" onClick={() => setGerenciarTags(true)} title="Gerenciar etiquetas">
+            <Settings2 /><span className="hidden xl:inline">Etiquetas</span>
+          </Button>
+        </aside>
 
-      <div className="grid h-[calc(100vh-160px)] min-h-[460px] gap-0 overflow-hidden rounded-lg border bg-card lg:grid-cols-[300px_1fr_300px]">
         {/* Coluna 1 — lista de atendimentos */}
-        <div className="flex min-h-0 flex-col border-r">
-          <div className="space-y-2 border-b p-2">
+        <div className="flex min-h-0 flex-col border-r bg-card">
+          <div className="flex h-14 items-center gap-2 border-b px-3">
+            <Menu className="h-4 w-4 text-muted-foreground" />
+            <h1 className="min-w-0 flex-1 truncate text-base font-bold">{FILTROS.find((item) => item.id === filtro)?.label || "Abertos"}</h1>
+            <Popover>
+              <PopoverTrigger asChild><Button size="icon" variant="ghost" className="h-8 w-8" aria-label="Opções da lista"><MoreHorizontal /></Button></PopoverTrigger>
+              <PopoverContent align="end" className="w-52 p-1">
+                <Button variant="ghost" className="w-full justify-start"><SlidersHorizontal /> Filtrar por</Button>
+                <Button variant="ghost" className="w-full justify-start"><ArrowDownAZ /> Ordenar por</Button>
+                <Button variant="ghost" className="w-full justify-start"><EyeOff /> Esconder etiquetas</Button>
+                <Button variant="ghost" className="w-full justify-start" onClick={() => setGerenciarTags(true)}><Tag /> Gerenciar etiquetas</Button>
+              </PopoverContent>
+            </Popover>
+            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setNovaAberta(true)} aria-label="Nova conversa"><Plus /></Button>
+          </div>
+          <div className="border-b p-2">
             <div className="relative">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -145,19 +172,6 @@ export default function Conversas() {
                 placeholder="Buscar nome ou número…"
                 className="h-9 pl-8"
               />
-            </div>
-            <div className="flex gap-1 overflow-x-auto">
-              {FILTROS.map((f) => (
-                <button
-                  key={f.id}
-                  onClick={() => setFiltro(f.id)}
-                  className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-medium transition ${
-                    filtro === f.id ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/70"
-                  }`}
-                >
-                  {f.label}
-                </button>
-              ))}
             </div>
           </div>
 
@@ -172,8 +186,8 @@ export default function Conversas() {
                 <button
                   key={c.id}
                   onClick={() => setSelecionada(c)}
-                  className={`flex w-full gap-2.5 border-b px-3 py-3 text-left transition hover:bg-muted/50 ${
-                    selecionada?.id === c.id ? "bg-muted" : ""
+                  className={`flex w-full gap-2.5 border-b px-3 py-2.5 text-left transition hover:bg-muted/50 ${
+                    selecionada?.id === c.id ? "bg-secondary" : c.nao_lidas > 0 ? "bg-destructive/5" : ""
                   }`}
                 >
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
@@ -181,19 +195,20 @@ export default function Conversas() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="truncate text-sm font-medium">{c.nome_contato || c.telefone}</span>
+                      <span className="truncate text-sm font-semibold">{c.nome_contato || c.telefone}</span>
                       <span className="shrink-0 text-[10px] text-muted-foreground">{fmtData(c.ultima_mensagem_em)}</span>
                     </div>
                     <div className="mt-0.5 flex items-center justify-between gap-2">
-                      <span className="truncate text-xs text-muted-foreground">{c.ultima_mensagem || "—"}</span>
+                      <span className="truncate text-[11px] text-muted-foreground">{c.ultima_mensagem || "—"}</span>
                       {c.nao_lidas > 0 && (
-                        <span className="shrink-0 rounded-full bg-emerald-500 px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                          <span className="shrink-0 rounded-full bg-accent px-1.5 py-0.5 text-[10px] font-semibold text-accent-foreground">
                           {c.nao_lidas}
                         </span>
                       )}
                     </div>
                     {tags.length > 0 && (
-                      <div className="mt-1.5 flex flex-wrap gap-1">
+                       <div className="mt-1.5 flex min-w-0 items-center gap-1 overflow-hidden">
+                         <span className="shrink-0 text-[9px] font-semibold text-accent">● COMERCIAL</span>
                         {tags.slice(0, 3).map((t) => {
                           const d = tagDef(t, etiquetas);
                           return (
@@ -212,10 +227,10 @@ export default function Conversas() {
         </div>
 
         {/* Coluna 2 — chat */}
-        <div className="flex min-h-0 flex-col">
+         <div className="flex min-h-0 flex-col bg-card">
           {selecionada ? (
             <>
-              <div className="flex items-center justify-between gap-3 border-b px-4 py-2.5">
+               <div className="grid h-14 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b px-4">
                 <div className="flex min-w-0 items-center gap-2.5">
                   <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
                     {inicial(selecionada)}
@@ -224,23 +239,17 @@ export default function Conversas() {
                     <div className="truncate font-semibold leading-tight">
                       {selecionada.nome_contato || selecionada.telefone}
                     </div>
-                    <div className="text-xs text-muted-foreground">{selecionada.telefone}</div>
+                     <div className="flex items-center gap-1 truncate text-[10px] text-muted-foreground"><span className="h-1.5 w-1.5 rounded-full bg-whatsapp" /> WhatsApp · {selecionada.telefone}</div>
                   </div>
                 </div>
-                <span
-                  className={`flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-                    aberta
-                      ? "bg-emerald-500/15 text-emerald-600"
-                      : "bg-amber-500/15 text-amber-600"
-                  }`}
-                >
-                  {aberta ? <CircleDot className="h-3 w-3" /> : <Clock className="h-3 w-3" />}
-                  {aberta ? "Janela aberta" : "Janela 24h fechada"}
-                </span>
+                 <span className="hidden shrink-0 items-center gap-1 text-[10px] font-medium text-muted-foreground sm:flex"><span className="h-2 w-2 rounded-full bg-accent" /> COMERCIAL</span>
               </div>
-              <div className="min-h-0 flex-1 p-3">
+               <div className="min-h-0 flex-1">
                 <ConversaChat
                   conversa={selecionada}
+                   tags={tagsPorConversa[selecionada.id] || []}
+                   etiquetas={etiquetas}
+                   onTagsChange={(tags) => setTagsPorConversa((prev) => ({ ...prev, [selecionada.id]: tags }))}
                   onMarcarLida={() => {
                     setConversas((prev) => prev.map((c) => (c.id === selecionada.id ? { ...c, nao_lidas: 0 } : c)));
                   }}
@@ -255,7 +264,7 @@ export default function Conversas() {
         </div>
 
         {/* Coluna 3 — contato e negócio */}
-        <div className="hidden min-h-0 border-l lg:block">
+         <div className="hidden min-h-0 border-l bg-card lg:block">
           {selecionada ? (
             <ContatoPanel
               key={selecionada.id}
@@ -270,14 +279,14 @@ export default function Conversas() {
           ) : (
             <p className="p-4 text-xs text-muted-foreground">Dados do contato aparecem aqui.</p>
           )}
-        </div>
+       </div>
       </div>
 
       <EtiquetasManager open={gerenciarTags} onOpenChange={setGerenciarTags} />
       {/* Nova conversa */}
       <Dialog open={novaAberta} onOpenChange={setNovaAberta}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader><DialogTitle>Nova conversa</DialogTitle></DialogHeader>
+         <DialogContent className="max-w-lg">
+           <DialogHeader><DialogTitle>Enviar mensagem</DialogTitle></DialogHeader>
           <div className="space-y-3">
             <div>
               <Label className="text-xs">Número com DDI e DDD</Label>
@@ -287,6 +296,10 @@ export default function Conversas() {
                 placeholder="5521999998888"
               />
             </div>
+             <div>
+               <Label className="text-xs">Texto</Label>
+               <Textarea value={novoTexto} onChange={(e) => setNovoTexto(e.target.value)} rows={6} placeholder="A primeira mensagem será enviada após criar a conversa." />
+             </div>
             <div>
               <Label className="text-xs">Nome do contato (opcional)</Label>
               <Input value={novoNome} onChange={(e) => setNovoNome(e.target.value)} placeholder="Nome do cliente" />
@@ -296,7 +309,7 @@ export default function Conversas() {
             </p>
             <Button onClick={criarConversa} disabled={criando} className="w-full">
               {criando ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : null}
-              Criar conversa
+               Criar atendimento
             </Button>
           </div>
         </DialogContent>

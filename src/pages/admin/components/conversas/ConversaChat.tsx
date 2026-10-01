@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Send, Clock, LayoutTemplate, Loader2, Check, CheckCheck, AlertCircle } from "lucide-react";
+import { Send, Clock, LayoutTemplate, Loader2, Check, CheckCheck, AlertCircle, MoreHorizontal, Search, Bell, Tag, Smile, Paperclip, MessageSquareText } from "lucide-react";
 import { toast } from "sonner";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import type { TagDef } from "./tags";
 
 export interface Conversa {
   id: string;
@@ -53,15 +55,19 @@ export function janelaAberta(conversa: Conversa | null): boolean {
 interface Props {
   conversa: Conversa;
   onMarcarLida?: () => void;
+  tags?: string[];
+  etiquetas?: TagDef[];
+  onTagsChange?: (tags: string[]) => void;
 }
 
-export function ConversaChat({ conversa, onMarcarLida }: Props) {
+export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas = [], onTagsChange }: Props) {
   const [mensagens, setMensagens] = useState<Mensagem[]>([]);
   const [texto, setTexto] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [templates, setTemplates] = useState<Template[]>([]);
   const [templateSel, setTemplateSel] = useState("");
   const [params, setParams] = useState<string[]>([]);
+  const [busca, setBusca] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const aberta = janelaAberta(conversa);
@@ -151,26 +157,49 @@ export function ConversaChat({ conversa, onMarcarLida }: Props) {
   };
 
   const tSel = templates.find((x) => x.nome === templateSel);
+  const mensagensVisiveis = busca.trim() ? mensagens.filter((m) => (m.conteudo || "").toLowerCase().includes(busca.toLowerCase())) : mensagens;
+
+  const marcarNaoLida = async () => {
+    const { error } = await supabase.from("whatsapp_conversas").update({ nao_lidas: 1 }).eq("id", conversa.id);
+    if (error) toast.error(error.message); else toast.success("Conversa marcada como não lida");
+  };
+
+  const alternarTag = async (tagId: string) => {
+    if (!conversa.negociacao_id) { toast.error("Vincule uma negociação para aplicar etiquetas"); return; }
+    const proximas = tags.includes(tagId) ? tags.filter((id) => id !== tagId) : [...tags, tagId];
+    const { error } = await supabase.from("negociacoes").update({ tags: proximas }).eq("id", conversa.negociacao_id);
+    if (error) toast.error(error.message); else onTagsChange?.(proximas);
+  };
 
   return (
-    <div className="flex flex-col h-full min-h-0">
+    <div className="flex h-full min-h-0 flex-col">
+      <div className="flex h-11 shrink-0 items-center justify-end gap-1 border-b px-3">
+        <Button variant="ghost" size="sm" className="h-8"><Check className="h-4 w-4" /> Resolver</Button>
+        <Popover>
+          <PopoverTrigger asChild><Button size="icon" variant="ghost" className="h-8 w-8" aria-label="Mais ações"><MoreHorizontal /></Button></PopoverTrigger>
+          <PopoverContent align="end" className="w-60 p-1">
+            <Button variant="ghost" className="w-full justify-start" onClick={marcarNaoLida}><Bell /> Marcar como não lida</Button>
+            <div className="relative p-1"><Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" /><Input value={busca} onChange={(e) => setBusca(e.target.value)} className="h-9 pl-8" placeholder="Pesquisar mensagem" /></div>
+          </PopoverContent>
+        </Popover>
+      </div>
       {/* Mensagens */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-2 bg-muted/20 rounded-md">
+      <div className="min-h-0 flex-1 space-y-2 overflow-y-auto bg-secondary/30 p-4">
         {mensagens.length === 0 && (
           <p className="text-xs text-muted-foreground text-center py-6">
             Nenhuma mensagem ainda. Respostas do cliente chegam no aplicativo WhatsApp do celular.
           </p>
         )}
-        {mensagens.map((m) => (
+        {mensagensVisiveis.map((m) => (
           <div key={m.id} className={`flex ${m.direcao === "saida" ? "justify-end" : "justify-start"}`}>
             <div className={`max-w-[78%] px-3 py-1.5 text-sm shadow-sm ${
-              m.direcao === "saida"
-                ? "rounded-2xl rounded-br-sm bg-emerald-600 text-white"
+               m.direcao === "saida"
+                 ? "rounded-lg rounded-br-sm bg-secondary text-foreground"
                 : "rounded-2xl rounded-bl-sm border bg-background"
             }`}>
               <div className="whitespace-pre-wrap break-words">{m.conteudo}</div>
               <div className={`mt-0.5 flex items-center justify-end gap-1 text-[10px] ${
-                m.direcao === "saida" ? "text-white/70" : "text-muted-foreground"
+                 "text-muted-foreground"
               }`}>
                 {fmtHora(m.created_at)}
                 {m.direcao === "saida" && m.status && (
@@ -195,7 +224,7 @@ export function ConversaChat({ conversa, onMarcarLida }: Props) {
 
       {/* Aviso de janela */}
       {!aberta && (
-        <div className="mt-2 flex items-start gap-2 rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
+        <div className="flex shrink-0 items-start gap-2 border-y bg-gold/10 px-3 py-2 text-xs text-gold-foreground">
           <Clock className="h-4 w-4 shrink-0 mt-0.5" />
           <span>
             Janela de 24h fechada: só é possível enviar <strong>mensagens prontas</strong> aprovadas pela Meta.
@@ -206,23 +235,18 @@ export function ConversaChat({ conversa, onMarcarLida }: Props) {
 
       {/* Composer */}
       {aberta ? (
-        <div className="mt-2 flex gap-2">
-          <Textarea
-            value={texto}
-            onChange={(e) => setTexto(e.target.value)}
-            placeholder="Digite a mensagem…"
-            rows={2}
-            className="resize-none"
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); enviar(); }
-            }}
-          />
-          <Button onClick={enviar} disabled={!texto.trim() || enviando} className="self-end">
-            {enviando ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-          </Button>
+        <div className="m-3 shrink-0 rounded-lg border bg-background p-2 shadow-sm">
+          <Textarea value={texto} onChange={(e) => setTexto(e.target.value)} placeholder="Digite sua mensagem…" rows={2} className="min-h-14 resize-none border-0 p-1 shadow-none focus-visible:ring-0" onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); enviar(); } }} />
+          <div className="flex items-center gap-1">
+            <Button size="icon" variant="ghost" className="h-8 w-8" disabled aria-label="Anexar arquivo"><Paperclip /></Button>
+            <Button size="icon" variant="ghost" className="h-8 w-8" disabled aria-label="Emoji"><Smile /></Button>
+            <Button size="icon" variant="ghost" className="h-8 w-8" disabled aria-label="Nota interna"><MessageSquareText /></Button>
+            <span className="ml-1 text-[10px] text-muted-foreground">Enter para enviar · Shift + Enter para nova linha</span>
+            <Button size="icon" onClick={enviar} disabled={!texto.trim() || enviando} className="ml-auto h-8 w-8" aria-label="Enviar mensagem">{enviando ? <Loader2 className="animate-spin" /> : <Send />}</Button>
+          </div>
         </div>
       ) : (
-        <div className="mt-2 space-y-2 rounded-md border p-2">
+         <div className="m-3 shrink-0 space-y-2 rounded-md border p-2">
           <div className="flex items-center gap-2">
             <LayoutTemplate className="h-4 w-4 text-muted-foreground" />
             <Select value={templateSel} onValueChange={(v) => { setTemplateSel(v); setParams([]); }}>
@@ -267,6 +291,18 @@ export function ConversaChat({ conversa, onMarcarLida }: Props) {
               </Button>
             </>
           )}
+      <div className="flex min-h-9 shrink-0 items-center gap-1 overflow-x-auto border-t px-3 py-1.5">
+        {tags.map((id) => {
+          const item = etiquetas.find((e) => e.id === id);
+          return item ? <button key={id} onClick={() => alternarTag(id)} className={`shrink-0 rounded border px-1.5 py-0.5 text-[9px] font-semibold ${item.className}`}>{item.label} ×</button> : null;
+        })}
+        <Popover>
+          <PopoverTrigger asChild><Button variant="ghost" size="sm" className="h-7 px-2 text-xs"><Tag /> Adicionar</Button></PopoverTrigger>
+          <PopoverContent align="start" className="max-h-72 w-64 overflow-y-auto p-2">
+            {etiquetas.map((item) => <Button key={item.id} variant="ghost" className="h-8 w-full justify-start" onClick={() => alternarTag(item.id)}><span className={`rounded border px-1.5 py-0.5 text-[9px] ${item.className}`}>{item.label}</span>{tags.includes(item.id) && <Check className="ml-auto" />}</Button>)}
+          </PopoverContent>
+        </Popover>
+      </div>
         </div>
       )}
     </div>

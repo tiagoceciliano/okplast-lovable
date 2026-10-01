@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, Users, Lock, Check, X } from "lucide-react";
+import { Pencil, Trash2, Users, Lock, Check, X, Search } from "lucide-react";
 import { toast } from "sonner";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { CORES, CORES_SWATCH, recarregarEtiquetas, useEtiquetas, type TagDef } from "./tags";
@@ -19,6 +19,7 @@ export function EtiquetasManager({ open, onOpenChange }: Props) {
   const [cor, setCor] = useState("sky");
   const [escopo, setEscopo] = useState<"todos" | "pessoal">("pessoal");
   const [salvando, setSalvando] = useState(false);
+  const [busca, setBusca] = useState("");
 
   const limpar = () => { setEditId(null); setNome(""); setCor("sky"); setEscopo("pessoal"); };
   const editar = (t: TagDef) => { setEditId(t.id); setNome(t.label); setCor(t.cor); setEscopo(t.escopo); };
@@ -48,7 +49,7 @@ export function EtiquetasManager({ open, onOpenChange }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) limpar(); }}>
-      <DialogContent className="max-w-md">
+       <DialogContent className="max-w-lg">
         <DialogHeader><DialogTitle>Etiquetas</DialogTitle></DialogHeader>
 
         <div className="space-y-3 rounded-md border p-3">
@@ -84,8 +85,9 @@ export function EtiquetasManager({ open, onOpenChange }: Props) {
           </div>
         </div>
 
-        <div className="max-h-72 space-y-1 overflow-y-auto">
-          {tags.map((t) => (
+         <div className="relative"><Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" /><Input value={busca} onChange={(e) => setBusca(e.target.value)} placeholder="Buscar etiqueta" className="pl-9" /></div>
+         <div className="max-h-72 space-y-1 overflow-y-auto">
+           {tags.filter((t) => t.label.toLowerCase().includes(busca.toLowerCase())).map((t) => (
             <div key={t.id} className="flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-muted/50">
               <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${t.className}`}>{t.label}</span>
               <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
