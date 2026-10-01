@@ -528,6 +528,72 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_agendamentos: {
+        Row: {
+          autor_id: string
+          conversa_id: string
+          created_at: string
+          enviado_em: string | null
+          enviar_em: string
+          erro: string | null
+          id: string
+          janela_limite: string
+          mensagem_id: string | null
+          proxima_tentativa_em: string | null
+          status: string
+          tentativas: number
+          texto: string
+          updated_at: string
+        }
+        Insert: {
+          autor_id: string
+          conversa_id: string
+          created_at?: string
+          enviado_em?: string | null
+          enviar_em: string
+          erro?: string | null
+          id?: string
+          janela_limite: string
+          mensagem_id?: string | null
+          proxima_tentativa_em?: string | null
+          status?: string
+          tentativas?: number
+          texto: string
+          updated_at?: string
+        }
+        Update: {
+          autor_id?: string
+          conversa_id?: string
+          created_at?: string
+          enviado_em?: string | null
+          enviar_em?: string
+          erro?: string | null
+          id?: string
+          janela_limite?: string
+          mensagem_id?: string | null
+          proxima_tentativa_em?: string | null
+          status?: string
+          tentativas?: number
+          texto?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_agendamentos_conversa_id_fkey"
+            columns: ["conversa_id"]
+            isOneToOne: false
+            referencedRelation: "whatsapp_conversas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whatsapp_agendamentos_mensagem_id_fkey"
+            columns: ["mensagem_id"]
+            isOneToOne: false
+            referencedRelation: "whatsapp_mensagens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       whatsapp_conversas: {
         Row: {
           created_at: string
@@ -705,6 +771,32 @@ export type Database = {
       can_access_negociacao: {
         Args: { _neg_id: string; _user_id: string }
         Returns: boolean
+      }
+      cancel_whatsapp_agendamento: { Args: { _id: string }; Returns: boolean }
+      claim_due_whatsapp_agendamentos: {
+        Args: { _limit?: number }
+        Returns: {
+          autor_id: string
+          conversa_id: string
+          created_at: string
+          enviado_em: string | null
+          enviar_em: string
+          erro: string | null
+          id: string
+          janela_limite: string
+          mensagem_id: string | null
+          proxima_tentativa_em: string | null
+          status: string
+          tentativas: number
+          texto: string
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "whatsapp_agendamentos"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       get_campaign_stats: {
         Args: { p_end: string; p_start: string }
