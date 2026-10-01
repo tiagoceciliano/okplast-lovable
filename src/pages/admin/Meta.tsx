@@ -87,18 +87,18 @@ export default function MetaPage() {
     let metaId = metaMes?.id;
     if (!metaId) {
       const { data, error } = await supabase.from("metas").insert({ mes, valor_total: total }).select().single();
-      if (error) { setSaving(false); return toast.error(error.message); }
+      if (error) { setSaving(false); { toast.error(error.message); return; } }
       metaId = (data as MetaMes).id;
     } else {
       const { error } = await supabase.from("metas").update({ valor_total: total }).eq("id", metaId);
-      if (error) { setSaving(false); return toast.error(error.message); }
+      if (error) { setSaving(false); { toast.error(error.message); return; } }
     }
     // upsert cada vendedor
     for (const v of vendedores) {
       const val = Number(porVendedor[v.user_id] || 0);
       const { error } = await supabase.from("metas_vendedores")
         .upsert({ meta_id: metaId, user_id: v.user_id, valor: val }, { onConflict: "meta_id,user_id" });
-      if (error) { setSaving(false); return toast.error(error.message); }
+      if (error) { setSaving(false); { toast.error(error.message); return; } }
     }
     setSaving(false);
     toast.success("Meta salva");

@@ -231,14 +231,15 @@ function NotFoundComponent() {
   );
 }
 
-function RootErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function RootErrorComponent({ error, reset }: { error: unknown; reset: () => void }) {
   const router = useRouter();
+  const err = error instanceof Error ? error : new Error(String(error));
 
-  console.error(error);
+  console.error(err);
 
   useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
-  }, [error]);
+    reportLovableError(err, { boundary: "tanstack_root_error_component" });
+  }, [err]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-6">

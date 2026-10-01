@@ -41,7 +41,7 @@ export function GanhoDialog({ negociacao, onClose, onDone }: Props) {
     if (!linkBling.trim()) { toast.error("Cole o Link do PV do Bling"); return; }
     try {
       new URL(linkBling.trim());
-    } catch { return toast.error("Link do PV do Bling inválido"); }
+    } catch { { toast.error("Link do PV do Bling inválido"); return; } }
 
     setSaving(true);
     const { error } = await supabase.from("negociacoes").update({
