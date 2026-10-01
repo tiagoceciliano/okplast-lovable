@@ -43,6 +43,13 @@
       "when": 1790856573733,
       "tag": "0005_fix_schedule_policy_precision",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1790857805378,
+      "tag": "0006_create_team_groups",
+      "breakpoints": true
     }
   ]
 }

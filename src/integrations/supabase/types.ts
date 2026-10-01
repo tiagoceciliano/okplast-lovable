@@ -510,6 +510,59 @@ export type Database = {
         }
         Relationships: []
       }
+      team_group_members: {
+        Row: {
+          created_at: string
+          group_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          group_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          group_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "team_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_groups: {
+        Row: {
+          cor: string
+          created_at: string
+          created_by: string
+          id: string
+          nome: string
+          updated_at: string
+        }
+        Insert: {
+          cor?: string
+          created_at?: string
+          created_by: string
+          id?: string
+          nome: string
+          updated_at?: string
+        }
+        Update: {
+          cor?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          nome?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
