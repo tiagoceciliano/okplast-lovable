@@ -16,7 +16,9 @@ import {
   Boxes,
   Settings,
   Radar,
-  ShieldCheck
+  ShieldCheck,
+  Folder,
+  Tag
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
@@ -296,8 +298,10 @@ export function AdminSidebar() {
             {collapsed ? (
               <SidebarMenu>
                 {[
-                  { to: "/admin/vendedores", label: "Vendedores", icon: MessageCircle },
+                  { to: "/admin/vendedores", label: "Membros", icon: Users },
                   { to: "/admin/vendedores?tab=permissoes", label: "Permissões", icon: ShieldCheck },
+                  { to: "/admin/grupos", label: "Grupos", icon: Folder },
+                  { to: "/admin/tags", label: "Tags", icon: Tag },
                   { to: "/admin/produtos", label: "Produtos", icon: Boxes },
                   { to: "/admin/meta", label: "Meta", icon: Target },
                 ].map((it) => (
@@ -331,7 +335,19 @@ export function AdminSidebar() {
                       "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm hover:bg-muted",
                       isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
                     )}>
-                      <MessageCircle className="h-3.5 w-3.5" /> Vendedores
+                      <Users className="h-3.5 w-3.5" /> Membros
+                    </NavLink>
+                    <NavLink to="/admin/grupos" className={({ isActive }) => cn(
+                      "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm hover:bg-muted",
+                      isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
+                    )}>
+                      <Folder className="h-3.5 w-3.5" /> Grupos
+                    </NavLink>
+                    <NavLink to="/admin/tags" className={({ isActive }) => cn(
+                      "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm hover:bg-muted",
+                      isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
+                    )}>
+                      <Tag className="h-3.5 w-3.5" /> Tags
                     </NavLink>
                     <NavLink to="/admin/vendedores?tab=permissoes" className={({ isActive }) => cn(
                       "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm hover:bg-muted",

@@ -18,6 +18,7 @@ import { Route as PublicSobreNosRouteImport } from './routes/_public/sobre-nos'
 import { Route as PublicTermoUsoRouteImport } from './routes/_public/termo-uso'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminConversasRouteImport } from './routes/admin/conversas'
+import { Route as AdminGruposRouteImport } from './routes/admin/grupos'
 import { Route as AdminLeadsRouteImport } from './routes/admin/leads'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AdminMetaRouteImport } from './routes/admin/meta'
@@ -86,6 +87,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const AdminConversasRoute = AdminConversasRouteImport.update({
   id: '/admin/conversas',
   path: '/admin/conversas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminGruposRoute = AdminGruposRouteImport.update({
+  id: '/admin/grupos',
+  path: '/admin/grupos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminLeadsRoute = AdminLeadsRouteImport.update({
@@ -226,6 +232,7 @@ export interface FileRoutesByFullPath {
   '/sobre-nos': typeof PublicSobreNosRoute
   '/termo-uso': typeof PublicTermoUsoRoute
   '/admin/conversas': typeof AdminConversasRoute
+  '/admin/grupos': typeof AdminGruposRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/meta': typeof AdminMetaRoute
@@ -259,6 +266,7 @@ export interface FileRoutesByTo {
   '/sobre-nos': typeof PublicSobreNosRoute
   '/termo-uso': typeof PublicTermoUsoRoute
   '/admin/conversas': typeof AdminConversasRoute
+  '/admin/grupos': typeof AdminGruposRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/meta': typeof AdminMetaRoute
@@ -295,6 +303,7 @@ export interface FileRoutesById {
   '/_public/sobre-nos': typeof PublicSobreNosRoute
   '/_public/termo-uso': typeof PublicTermoUsoRoute
   '/admin/conversas': typeof AdminConversasRoute
+  '/admin/grupos': typeof AdminGruposRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/meta': typeof AdminMetaRoute
@@ -332,6 +341,7 @@ export interface FileRouteTypes {
     | '/sobre-nos'
     | '/termo-uso'
     | '/admin/conversas'
+    | '/admin/grupos'
     | '/admin/leads'
     | '/admin/login'
     | '/admin/meta'
@@ -365,6 +375,7 @@ export interface FileRouteTypes {
     | '/sobre-nos'
     | '/termo-uso'
     | '/admin/conversas'
+    | '/admin/grupos'
     | '/admin/leads'
     | '/admin/login'
     | '/admin/meta'
@@ -400,6 +411,7 @@ export interface FileRouteTypes {
     | '/_public/sobre-nos'
     | '/_public/termo-uso'
     | '/admin/conversas'
+    | '/admin/grupos'
     | '/admin/leads'
     | '/admin/login'
     | '/admin/meta'
@@ -431,6 +443,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   PublicRoute: typeof PublicRouteWithChildren
   AdminConversasRoute: typeof AdminConversasRoute
+  AdminGruposRoute: typeof AdminGruposRoute
   AdminLeadsRoute: typeof AdminLeadsRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AdminMetaRoute: typeof AdminMetaRoute
@@ -508,6 +521,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/conversas'
       fullPath: '/admin/conversas'
       preLoaderRoute: typeof AdminConversasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/grupos': {
+      id: '/admin/grupos'
+      path: '/admin/grupos'
+      fullPath: '/admin/grupos'
+      preLoaderRoute: typeof AdminGruposRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/leads': {
@@ -733,6 +753,7 @@ const PublicRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   PublicRoute: PublicRouteWithChildren,
   AdminConversasRoute: AdminConversasRoute,
+  AdminGruposRoute: AdminGruposRoute,
   AdminLeadsRoute: AdminLeadsRoute,
   AdminLoginRoute: AdminLoginRoute,
   AdminMetaRoute: AdminMetaRoute,
