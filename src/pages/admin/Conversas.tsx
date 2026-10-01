@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { getEquipe } from "@/lib/adminCache";
 import { AdminLayout } from "./AdminLayout";
 import { ConversaChat, janelaAberta, type Conversa } from "./components/conversas/ConversaChat";
 import { ContatoPanel } from "./components/conversas/ContatoPanel";
@@ -88,7 +89,7 @@ export default function Conversas() {
 
   useEffect(() => {
     (async () => {
-      const { data: equipe } = await supabase.rpc("list_equipe");
+      const equipe = await getEquipe();
       setAtendentes((equipe ?? []).map((u) => ({ id: u.id, nome: u.nome, email: u.email ?? null })));
     })();
   }, []);

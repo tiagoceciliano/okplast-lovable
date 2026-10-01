@@ -5,6 +5,7 @@ import {
 } from "@dnd-kit/core";
 import { AdminLayout } from "./AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
+import { getEquipe } from "@/lib/adminCache";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -65,7 +66,7 @@ export default function Negociacoes() {
       if (encontrada) setAtivo(encontrada);
     }
     const waRows = (wa.data || []) as { user_id: string | null; nome_vendedor: string; numero_raw: string; numero_formatado: string }[];
-    const { data: equipe } = await supabase.rpc("list_equipe");
+    const equipe = await getEquipe();
     const vs = (equipe ?? [])
       .filter((u) => u.roles?.includes("vendedor"))
       .map((u) => ({ user_id: u.id, nome: u.nome }));

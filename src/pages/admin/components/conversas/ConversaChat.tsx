@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { getEquipe } from "@/lib/adminCache";
 import { whatsappTemplates } from "@/lib/whatsapp-templates.functions";
 import { sendWhatsAppMedia } from "@/lib/whatsapp-media.functions";
 import EmojiPicker, { EmojiStyle } from "emoji-picker-react";
@@ -216,7 +217,7 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
   const tSel = templates.find((x) => x.nome === templateSel);
   const [nomesEquipe, setNomesEquipe] = useState<Record<string, string>>({});
   useEffect(() => {
-    supabase.rpc("list_equipe").then(({ data }) => setNomesEquipe(Object.fromEntries((data ?? []).map((u) => [u.id, u.nome]))));
+    getEquipe().then((data) => setNomesEquipe(Object.fromEntries((data).map((u) => [u.id, u.nome]))));
   }, []);
   const iniciais = (nome: string) => nome.trim().split(/\s+/).slice(0, 2).map((p) => p[0]).join("").toUpperCase() || "?";
   const nomeCliente = conversa.nome_contato || conversa.telefone;
