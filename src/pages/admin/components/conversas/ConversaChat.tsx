@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { whatsappTemplates } from "@/lib/whatsapp-templates.functions";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -106,9 +107,10 @@ export function ConversaChat({ conversa, onMarcarLida }: Props) {
   useEffect(() => {
     if (aberta) return;
     (async () => {
-      const { data, error } = await supabase.functions.invoke("whatsapp-templates");
-      if (error) return;
-      setTemplates(((data as any)?.templates || []).filter((t: Template) => t.status === "APPROVED"));
+      try {
+        const data = await whatsappTemplates();
+        setTemplates((data.templates || []).filter((t: Template) => t.status === "APPROVED"));
+      } catch { /* silencioso */ }
     })();
   }, [aberta]);
 
