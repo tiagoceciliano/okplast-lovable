@@ -48,6 +48,7 @@
         "date-fns": "^4.1.0",
         "embla-carousel-autoplay": "^8.6.0",
         "embla-carousel-react": "^8.6.0",
+        "emoji-picker-react": "^4.22.3",
         "input-otp": "^1.4.2",
         "lucide-react": "^0.575.0",
         "next-themes": "^0.3.0",
@@ -868,6 +869,8 @@
 
     "embla-carousel-reactive-utils": ["embla-carousel-reactive-utils@8.6.0", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/embla-carousel-reactive-utils/-/embla-carousel-reactive-utils-8.6.0.tgz", { "peerDependencies": { "embla-carousel": "8.6.0" } }, "sha512-fMVUDUEx0/uIEDM0Mz3dHznDhfX+znCCDCeIophYb1QGVM7YThSWX+wz11zlYwWFOr74b4QLGg0hrGPJeG2s4A=="],
 
+    "emoji-picker-react": ["emoji-picker-react@4.22.3", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/emoji-picker-react/-/emoji-picker-react-4.22.3.tgz", { "dependencies": { "shipstyles": "1.0.0" }, "peerDependencies": { "react": ">=16.8" } }, "sha512-jrAkkoN69l5lA2Xp6P5axqoK1YdHNS1+MKMlLxwltnnnaXrojUjZaolgI/U8vdx8vFWqG42yYqpLSR83f6pwiw=="],
+
     "enhanced-resolve": ["enhanced-resolve@5.26.0", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/enhanced-resolve/-/enhanced-resolve-5.26.0.tgz", { "dependencies": { "graceful-fs": "^4.2.4", "tapable": "^2.3.3" } }, "sha512-9vhedylFonb2YGogzUKX6+Ja72gOJbN1QHAqdrvqLwhdl/QWbKopzoUC9EbQNVsAns/bx/4uyqalrQAoy1IByw=="],
 
     "entities": ["entities@6.0.1", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/entities/-/entities-6.0.1.tgz", {}, "sha512-aN97NXWF6AWBTahfVOIrB/NShkzi5H7F9r1s9mD3cDj4Ko5f2qhhVoYMibXF7GlLveb/D2ioWay8lxI97Ven3g=="],
@@ -1231,6 +1234,8 @@
     "shebang-regex": ["shebang-regex@3.0.0", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/shebang-regex/-/shebang-regex-3.0.0.tgz", {}, "sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A=="],
 
     "shell-quote": ["shell-quote@1.11.0", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/shell-quote/-/shell-quote-1.11.0.tgz", {}, "sha512-JdxDPD0DBTyu08pq0kPC0xSNet/qsU07qT6IsX1AS8oO2ICNRY4ldNa8OAI6PuwAH8tG3lxEhbqmyp4Dw4036g=="],
+
+    "shipstyles": ["shipstyles@1.0.0", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/shipstyles/-/shipstyles-1.0.0.tgz", {}, "sha512-1AcihfXo/mSxqeOdoKqq/5TNv+vSH0dBYPFq88PUX5FBkK5pRmY5TP9SuMNio85PQ+euUI67+KpSVk1cUVDCgA=="],
 
     "siginfo": ["siginfo@2.0.0", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/siginfo/-/siginfo-2.0.0.tgz", {}, "sha512-ybx0WO1/8bSBLEWXZvEd7gMW3Sn3JFlW3TvX1nREbDLRNQNaeNN8WK0meBwPdAaOI7TtRRRJn/Es1zhrrCHu7g=="],
 

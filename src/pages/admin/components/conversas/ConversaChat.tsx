@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { whatsappTemplates } from "@/lib/whatsapp-templates.functions";
 import { sendWhatsAppMedia } from "@/lib/whatsapp-media.functions";
+import EmojiPicker, { EmojiStyle } from "emoji-picker-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -292,7 +293,6 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas = []
     setNota(""); setNotaOpen(false); toast.success("Nota interna salva");
   };
 
-  const emojis = ["😀", "😊", "👍", "🙏", "✅", "📦", "🚚", "💰", "📏", "Olá!", "Obrigado!"];
 
   return (
     <div className="flex h-full min-h-0 flex-col">
@@ -385,7 +385,9 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas = []
             <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => fileRef.current?.click()} disabled={anexando} aria-label="Anexar arquivo">{anexando ? <Loader2 className="animate-spin" /> : <Paperclip />}</Button>
             <Popover open={emojiOpen} onOpenChange={setEmojiOpen}>
               <PopoverTrigger asChild><Button size="icon" variant="ghost" className="h-8 w-8" aria-label="Inserir emoji"><Smile /></Button></PopoverTrigger>
-              <PopoverContent align="start" className="grid w-52 grid-cols-5 gap-1 p-2">{emojis.map((emoji) => <Button key={emoji} variant="ghost" size="sm" className="h-8 px-1 text-base" onClick={() => { setTexto((value) => value + emoji); setEmojiOpen(false); }}>{emoji}</Button>)}</PopoverContent>
+              <PopoverContent align="start" className="w-auto border-0 p-0">
+                <EmojiPicker onEmojiClick={(e) => setTexto((value) => value + e.emoji)} emojiStyle={EmojiStyle.NATIVE} searchPlaceholder="Buscar emoji" previewConfig={{ showPreview: false }} width={340} height={400} lazyLoadEmojis />
+              </PopoverContent>
             </Popover>
             <Popover open={notaOpen} onOpenChange={setNotaOpen}>
               <PopoverTrigger asChild><Button size="icon" variant="ghost" className="h-8 w-8" aria-label="Criar nota interna"><MessageSquareText /></Button></PopoverTrigger>

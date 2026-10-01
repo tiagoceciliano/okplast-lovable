@@ -36,6 +36,13 @@
       "when": 1790821050653,
       "tag": "0004_create_whatsapp_schedules",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1790856573733,
+      "tag": "0005_fix_schedule_policy_precision",
+      "breakpoints": true
     }
   ]
 }
