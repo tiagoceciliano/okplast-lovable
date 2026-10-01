@@ -308,9 +308,19 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas = []
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div className="grid min-h-11 shrink-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b px-3 py-1.5">
-        <div className="flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground">
-          <Clock className="h-3.5 w-3.5 shrink-0" />
-          <span className="truncate">{aberta ? `Janela encerra em ${formatRemaining(restante)}` : "Janela de 24h encerrada"}</span>
+        <div className={`flex min-w-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold tabular-nums ${
+          !aberta
+            ? "bg-destructive/10 text-destructive"
+            : restante <= 15 * 60 * 1000
+              ? "bg-destructive text-destructive-foreground animate-pulse"
+              : restante <= 2 * 60 * 60 * 1000
+                ? "bg-amber-500/20 text-amber-700 dark:text-amber-400"
+                : "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
+        }`}>
+          <Clock className="h-4 w-4 shrink-0" />
+          <span className="truncate" title={aberta ? `A janela fecha às ${new Date(limite).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}` : undefined}>
+            {aberta ? `Janela encerra em ${formatRemaining(restante)}` : "Janela de 24h encerrada"}
+          </span>
         </div>
         <div className="flex shrink-0 items-center gap-1">
         <Button variant="ghost" size="sm" className="h-8" onClick={alternarResolvida}><Check className="h-4 w-4" /> {resolvida ? "Reabrir" : "Resolver"}</Button>
