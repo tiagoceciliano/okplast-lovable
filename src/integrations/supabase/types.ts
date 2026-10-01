@@ -950,6 +950,50 @@ export type Database = {
         Returns: boolean
       }
       is_admin_or_gestor: { Args: { _user_id: string }; Returns: boolean }
+      list_equipe: {
+        Args: never
+        Returns: {
+          email: string
+          id: string
+          nome: string
+          roles: string[]
+        }[]
+      }
+      list_negociacoes_conversa: {
+        Args: { _conversa_id: string }
+        Returns: {
+          created_at: string
+          destino_whatsapp: string | null
+          email: string | null
+          etapa: Database["public"]["Enums"]["negociacao_etapa"]
+          id: string
+          lead_id: string | null
+          link_pv_bling: string | null
+          material: string | null
+          mensagem: string | null
+          nome_cliente: string
+          nome_produto: string | null
+          posicao: number
+          produto: string | null
+          responsavel_id: string | null
+          status: string
+          tags: string[]
+          telefone: string | null
+          updated_at: string
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          utm_term: string | null
+          valor: number | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "negociacoes"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
     }
     Enums: {
       app_role: "admin" | "user" | "gestor" | "vendedor"

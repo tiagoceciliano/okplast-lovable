@@ -57,6 +57,13 @@
       "when": 1790863320179,
       "tag": "0007_conversa_resolvida",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1790865372809,
+      "tag": "0008_conversa_negociacoes_equipe",
+      "breakpoints": true
     }
   ]
 }
