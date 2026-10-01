@@ -53,6 +53,7 @@ export default function Negociacoes() {
       supabase.from("negociacoes").select("*").order("posicao"),
       supabase.from("whatsapp_numbers").select("user_id,nome_vendedor,numero_raw,numero_formatado"),
       supabase.from("negociacao_tarefas").select("negociacao_id,concluida,data_vencimento"),
+      supabase.from("whatsapp_agendamentos").select("conversa_id").eq("status", "pendente"),
     ]);
     if (neg.error) { toast.error(neg.error.message); return; }
     const negociacoes = (neg.data as Negociacao[]) || [];
