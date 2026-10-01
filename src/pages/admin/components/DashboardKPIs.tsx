@@ -31,7 +31,7 @@ interface KPIProps {
   value: number;
   previous?: number | null;
   isLoading: boolean;
-  hint?: string;
+  hint?: string | undefined;
 }
 
 function leadShare(part: number, total: number) {

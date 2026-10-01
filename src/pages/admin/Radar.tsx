@@ -19,7 +19,7 @@ function labelMes(iso: string) {
   return d.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
 }
 function shiftMonth(iso: string, n: number) {
-  const [y, m] = iso.split("-").map(Number);
+  const [y = 0, m = 1] = iso.split("-").map(Number);
   const d = new Date(y, (m - 1) + n, 1);
   return d.toISOString().slice(0, 10);
 }

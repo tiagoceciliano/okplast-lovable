@@ -54,7 +54,7 @@ const TIPOS_MATERIAL = [
 interface WhatsAppModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  defaultProduto?: string;
+  defaultProduto?: string | undefined;
 }
 
 export function WhatsAppModal({ open, onOpenChange, defaultProduto }: WhatsAppModalProps) {

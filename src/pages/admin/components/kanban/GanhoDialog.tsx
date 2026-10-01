@@ -35,10 +35,10 @@ export function GanhoDialog({ negociacao, onClose, onDone }: Props) {
   if (!negociacao) return null;
 
   const submit = async () => {
-    if (!nomeProduto.trim()) return toast.error("Selecione o produto vendido");
+    if (!nomeProduto.trim()) { toast.error("Selecione o produto vendido"); return; }
     const v = Number(valor);
-    if (!v || v <= 0) return toast.error("Informe o valor do produto");
-    if (!linkBling.trim()) return toast.error("Cole o Link do PV do Bling");
+    if (!v || v <= 0) { toast.error("Informe o valor do produto"); return; }
+    if (!linkBling.trim()) { toast.error("Cole o Link do PV do Bling"); return; }
     try {
       new URL(linkBling.trim());
     } catch { return toast.error("Link do PV do Bling inválido"); }
@@ -52,7 +52,7 @@ export function GanhoDialog({ negociacao, onClose, onDone }: Props) {
       link_pv_bling: linkBling.trim(),
     }).eq("id", negociacao.id);
     setSaving(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Venda registrada");
     onDone();
   };

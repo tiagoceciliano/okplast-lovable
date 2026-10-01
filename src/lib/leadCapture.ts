@@ -144,7 +144,7 @@ export async function flushLeadQueue(): Promise<void> {
   const remaining: QueuedLead[] = [];
   for (const item of items) {
     try {
-      await invokeProcessLead({ ...item.payload, mensagem: item.payload.mensagem });
+      await invokeProcessLead(item.payload);
     } catch {
       remaining.push(item);
     }

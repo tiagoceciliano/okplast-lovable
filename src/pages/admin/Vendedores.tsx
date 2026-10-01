@@ -120,7 +120,7 @@ export default function Vendedores() {
     if (!confirm(`Remover ${row.nome_vendedor}?`)) return;
     if (row.id) {
       const { error } = await supabase.from("whatsapp_numbers").delete().eq("id", row.id);
-      if (error) return toast.error(error.message);
+      if (error) { toast.error(error.message); return; }
     }
     toast.success("Removido");
     setRows((p) => p.filter((r) => r.id !== row.id));
@@ -316,14 +316,14 @@ function EditMemberDialog({ member, users, onClose, onSaved }: { member: Member 
 
   const submit = async () => {
     if (!member?.id) return;
-    if (senha && senha.length < 6) return toast.error("Senha precisa ter no mínimo 6 caracteres");
+    if (senha && senha.length < 6) { toast.error("Senha precisa ter no mínimo 6 caracteres"); return; }
     setSaving(true);
     try {
       // Caso 1: criar novo login
       if (userId === "new") {
         if (!email || !senha) {
           setSaving(false);
-          return toast.error("Informe e-mail e senha para criar o login");
+          { toast.error("Informe e-mail e senha para criar o login"); return; }
         }
         const raw = numero ? toRaw(numero) : member.numero_raw;
         // Atualiza whatsapp_numbers primeiro (dados do form) — sem tocar user_id
@@ -463,8 +463,8 @@ function EditCredentialsDialog({ member, onClose, onSaved }: { member: Member | 
 
   const submit = async () => {
     if (!member?.user_id) return;
-    if (!email && !senha) return toast.error("Informe email ou nova senha");
-    if (senha && senha.length < 6) return toast.error("Senha precisa ter no mínimo 6 caracteres");
+    if (!email && !senha) { toast.error("Informe email ou nova senha"); return; }
+    if (senha && senha.length < 6) { toast.error("Senha precisa ter no mínimo 6 caracteres"); return; }
     setSaving(true);
     try {
       const body: { user_id: string; email?: string; password?: string } = { user_id: member.user_id };
@@ -509,7 +509,7 @@ function AddMemberDialog({ open, onOpenChange, onCreated }: { open: boolean; onO
   const [saving, setSaving] = useState(false);
 
   const submit = async () => {
-    if (!nome || !email || !senha) return toast.error("Preencha nome, email e senha");
+    if (!nome || !email || !senha) { toast.error("Preencha nome, email e senha"); return; }
     setSaving(true);
     try {
       const raw = numero ? toRaw(numero) : null;

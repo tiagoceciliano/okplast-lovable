@@ -24,7 +24,7 @@ function labelMes(iso: string) {
   return d.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
 }
 function shiftMonth(iso: string, n: number) {
-  const [y, m] = iso.split("-").map(Number);
+  const [y = 0, m = 1] = iso.split("-").map(Number);
   const d = new Date(y, (m - 1) + n, 1);
   return d.toISOString().slice(0, 10);
 }
@@ -79,9 +79,9 @@ export default function MetaPage() {
   const falta = Math.max(0, total - totalRealizado);
 
   const salvar = async () => {
-    if (total <= 0) return toast.error("Informe a meta total do mês");
+    if (total <= 0) { toast.error("Informe a meta total do mês"); return; }
     if (Math.abs(somaPorVend - total) > 0.01) {
-      return toast.error(`Soma das metas individuais (${brl(somaPorVend)}) deve bater com a meta total (${brl(total)})`);
+      { toast.error(`Soma das metas individuais (${brl(somaPorVend)}) deve bater com a meta total (${brl(total)})`); return; }
     }
     setSaving(true);
     let metaId = metaMes?.id;
