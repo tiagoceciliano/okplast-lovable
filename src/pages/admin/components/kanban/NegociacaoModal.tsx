@@ -213,10 +213,14 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
               </>
             )}
             {canDelete && (
-              <Button size="icon" variant="ghost" onClick={removerNegociacao}>
+              <Button size="icon" variant="ghost" className="border border-transparent hover:border-destructive/30" title="Excluir negociação" aria-label="Excluir negociação" onClick={removerNegociacao}>
                 <Trash2 className="h-4 w-4 text-destructive" />
               </Button>
             )}
+            <div className="ml-1 h-6 w-px bg-border" />
+            <Button size="icon" variant="outline" className="rounded-full" title="Fechar" aria-label="Fechar negociação" onClick={onClose}>
+              <X className="h-4 w-4" />
+            </Button>
           </div>
           <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
             {n.telefone && <span>{n.telefone}</span>}
