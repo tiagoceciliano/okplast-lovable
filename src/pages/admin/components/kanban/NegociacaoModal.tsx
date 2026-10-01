@@ -179,7 +179,8 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
 
   return (
     <Dialog open={!!negociacao} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="h-[92vh] max-h-[92vh] w-[94vw] max-w-[1180px] overflow-y-auto p-0">
+        <div className="sticky top-0 z-10 border-b bg-background px-5 py-4">
         <DialogHeader>
           <div className="flex items-center gap-2">
             <DialogTitle className="text-xl flex-1">{n.nome_cliente}</DialogTitle>
@@ -210,7 +211,7 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
         </DialogHeader>
 
         {/* Barra de etapas */}
-        <div className="flex gap-1 flex-wrap">
+        <div className="mt-3 grid grid-cols-3 overflow-hidden rounded-md border sm:grid-cols-6">
           {ETAPAS.map((e) => (
             <button
               key={e.id}
@@ -222,18 +223,19 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
                 }
                 patchN({ etapa: e.id as EtapaId });
               }}
-              className={`text-xs px-3 py-1.5 rounded-full border transition ${
-                n.etapa === e.id ? "bg-primary text-primary-foreground border-primary" : "bg-background hover:bg-muted"
+              className={`border-r px-2 py-2 text-[10px] font-semibold uppercase transition ${
+                n.etapa === e.id ? "bg-primary text-primary-foreground" : "bg-muted/40 hover:bg-muted"
               } disabled:opacity-60`}
             >
               {e.label}
             </button>
           ))}
         </div>
+        </div>
 
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid min-h-0 lg:grid-cols-[minmax(0,1fr)_300px]">
           {/* Coluna esquerda: comentarios + tarefas + historico */}
-          <div className="space-y-4">
+          <div className="space-y-5 p-5">
             <div>
               <Label className="text-xs">Novo comentário</Label>
               <Textarea value={novoComent} onChange={(e) => setNovoComent(e.target.value)} rows={2} placeholder="Escreva uma nota interna…" />
@@ -332,7 +334,7 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
           </div>
 
           {/* Coluna direita: dados */}
-          <div className="space-y-3">
+          <div className="space-y-3 border-l bg-muted/20 p-4">
             <div>
               <Label className="text-xs">Responsável</Label>
               <Select
