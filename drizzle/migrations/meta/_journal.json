@@ -29,6 +29,13 @@
       "when": 1790816796644,
       "tag": "0003_etiquetas",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1790821050653,
+      "tag": "0004_create_whatsapp_schedules",
+      "breakpoints": true
     }
   ]
 }

@@ -15,20 +15,21 @@ interface Props {
   vencidas: Record<string, boolean>;
   chats?: Record<string, number>;
   onCardClick: (n: Negociacao) => void;
+  onChatClick: (n: Negociacao) => void;
   onAdd: () => void;
   canAdd: boolean;
 }
 
 export function KanbanColumn({
   etapaId, label, negociacoes, vendedores,
-  countsTarefas, countsComentarios, vencidas, chats = {}, onCardClick, onAdd, canAdd,
+  countsTarefas, countsComentarios, vencidas, chats = {}, onCardClick, onChatClick, onAdd, canAdd,
 }: Props) {
   const { setNodeRef, isOver } = useDroppable({ id: etapaId, data: { type: "column", etapa: etapaId } });
   const total = negociacoes.reduce((s, n) => s + (n.valor ?? 0), 0);
 
   return (
-    <div className="flex flex-col w-72 shrink-0 bg-muted/40 rounded-lg">
-      <div className="p-3 border-b sticky top-0 bg-muted/40 rounded-t-lg">
+    <div className="flex w-[258px] shrink-0 flex-col rounded-md bg-muted/50">
+      <div className="sticky top-0 rounded-t-md border-b bg-muted/90 p-2.5 backdrop-blur">
         <div className="flex items-center justify-between">
           <h3 className="font-semibold text-sm">{label}</h3>
           <span className="text-xs text-muted-foreground bg-background px-2 py-0.5 rounded-full">
@@ -52,6 +53,7 @@ export function KanbanColumn({
               hasVencida={vencidas[n.id]}
               chatNaoLidas={chats[n.id]}
               onClick={() => onCardClick(n)}
+              onChatClick={() => onChatClick(n)}
             />
           ))}
         </SortableContext>

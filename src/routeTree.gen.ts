@@ -39,6 +39,7 @@ import { Route as PublicHomePoliticaDePrivacidadeRouteImport } from './routes/_p
 import { Route as PublicHomePoliticaDeVendaRouteImport } from './routes/_public/home/politica-de-venda'
 import { Route as PublicHomeSobreNosRouteImport } from './routes/_public/home/sobre-nos'
 import { Route as PublicHomeTermoDeUsoRouteImport } from './routes/_public/home/termo-de-uso'
+import { Route as ApiPublicWhatsappProcessSchedulesRouteImport } from './routes/api/public/whatsapp/process-schedules'
 import { Route as ApiPublicWhatsappWebhookRouteImport } from './routes/api/public/whatsapp/webhook'
 
 const PublicRoute = PublicRouteImport.update({
@@ -198,6 +199,12 @@ const PublicHomeTermoDeUsoRoute = PublicHomeTermoDeUsoRouteImport.update({
   path: '/home/termo-de-uso',
   getParentRoute: () => PublicRoute,
 } as any)
+const ApiPublicWhatsappProcessSchedulesRoute =
+  ApiPublicWhatsappProcessSchedulesRouteImport.update({
+    id: '/api/public/whatsapp/process-schedules',
+    path: '/api/public/whatsapp/process-schedules',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicWhatsappWebhookRoute =
   ApiPublicWhatsappWebhookRouteImport.update({
     id: '/api/public/whatsapp/webhook',
@@ -235,6 +242,7 @@ export interface FileRoutesByFullPath {
   '/home/sobre-nos': typeof PublicHomeSobreNosRoute
   '/home/termo-de-uso': typeof PublicHomeTermoDeUsoRoute
   '/chapas/': typeof PublicChapasIndexRoute
+  '/api/public/whatsapp/process-schedules': typeof ApiPublicWhatsappProcessSchedulesRoute
   '/api/public/whatsapp/webhook': typeof ApiPublicWhatsappWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -267,6 +275,7 @@ export interface FileRoutesByTo {
   '/home/sobre-nos': typeof PublicHomeSobreNosRoute
   '/home/termo-de-uso': typeof PublicHomeTermoDeUsoRoute
   '/chapas': typeof PublicChapasIndexRoute
+  '/api/public/whatsapp/process-schedules': typeof ApiPublicWhatsappProcessSchedulesRoute
   '/api/public/whatsapp/webhook': typeof ApiPublicWhatsappWebhookRoute
 }
 export interface FileRoutesById {
@@ -301,6 +310,7 @@ export interface FileRoutesById {
   '/_public/home/sobre-nos': typeof PublicHomeSobreNosRoute
   '/_public/home/termo-de-uso': typeof PublicHomeTermoDeUsoRoute
   '/_public/chapas/': typeof PublicChapasIndexRoute
+  '/api/public/whatsapp/process-schedules': typeof ApiPublicWhatsappProcessSchedulesRoute
   '/api/public/whatsapp/webhook': typeof ApiPublicWhatsappWebhookRoute
 }
 export interface FileRouteTypes {
@@ -335,6 +345,7 @@ export interface FileRouteTypes {
     | '/home/sobre-nos'
     | '/home/termo-de-uso'
     | '/chapas/'
+    | '/api/public/whatsapp/process-schedules'
     | '/api/public/whatsapp/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -367,6 +378,7 @@ export interface FileRouteTypes {
     | '/home/sobre-nos'
     | '/home/termo-de-uso'
     | '/chapas'
+    | '/api/public/whatsapp/process-schedules'
     | '/api/public/whatsapp/webhook'
   id:
     | '__root__'
@@ -400,6 +412,7 @@ export interface FileRouteTypes {
     | '/_public/home/sobre-nos'
     | '/_public/home/termo-de-uso'
     | '/_public/chapas/'
+    | '/api/public/whatsapp/process-schedules'
     | '/api/public/whatsapp/webhook'
   fileRoutesById: FileRoutesById
 }
@@ -415,6 +428,7 @@ export interface RootRouteChildren {
   AdminVendedoresRoute: typeof AdminVendedoresRoute
   AdminWhatsappRoute: typeof AdminWhatsappRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  ApiPublicWhatsappProcessSchedulesRoute: typeof ApiPublicWhatsappProcessSchedulesRoute
   ApiPublicWhatsappWebhookRoute: typeof ApiPublicWhatsappWebhookRoute
 }
 
@@ -630,6 +644,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicHomeTermoDeUsoRouteImport
       parentRoute: typeof PublicRoute
     }
+    '/api/public/whatsapp/process-schedules': {
+      id: '/api/public/whatsapp/process-schedules'
+      path: '/api/public/whatsapp/process-schedules'
+      fullPath: '/api/public/whatsapp/process-schedules'
+      preLoaderRoute: typeof ApiPublicWhatsappProcessSchedulesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/whatsapp/webhook': {
       id: '/api/public/whatsapp/webhook'
       path: '/api/public/whatsapp/webhook'
@@ -701,6 +722,8 @@ const rootRouteChildren: RootRouteChildren = {
   AdminVendedoresRoute: AdminVendedoresRoute,
   AdminWhatsappRoute: AdminWhatsappRoute,
   AdminIndexRoute: AdminIndexRoute,
+  ApiPublicWhatsappProcessSchedulesRoute:
+    ApiPublicWhatsappProcessSchedulesRoute,
   ApiPublicWhatsappWebhookRoute: ApiPublicWhatsappWebhookRoute,
 }
 export const routeTree = rootRouteImport
