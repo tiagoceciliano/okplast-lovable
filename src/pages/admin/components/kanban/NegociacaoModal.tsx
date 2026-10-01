@@ -43,6 +43,7 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
   const [produtos, setProdutos] = useState<ProdutoLite[]>([]);
   const [conversa, setConversa] = useState<Conversa | null>(null);
   const navigate = useNavigate();
+  const etiquetas = useEtiquetas();
 
   useEffect(() => setN(negociacao), [negociacao]);
   useEffect(() => {
@@ -119,7 +120,6 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
   };
 
   if (!n) return null;
-  const etiquetas = useEtiquetas();
   const canEdit = can("negociacoes", "edit", n.responsavel_id);
   const canDelete = can("negociacoes", "delete", n.responsavel_id);
 
