@@ -245,6 +245,7 @@ export default function Negociacoes() {
                   countsComentarios={countsC}
                   vencidas={venc}
                   chats={chats}
+                  agendamentos={agend}
                   onCardClick={(n) => setAtivo(n)}
                    onChatClick={(n) => setChatAtivo(n)}
                   onAdd={() => setNovaOpen(true)}
