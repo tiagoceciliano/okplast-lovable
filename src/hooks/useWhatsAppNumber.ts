@@ -11,7 +11,7 @@ import {
  * Faz a leitura no client após o mount para evitar hydration mismatch.
  */
 export function useWhatsAppNumber(): WhatsAppNumber {
-  const [number, setNumber] = useState<WhatsAppNumber>(WHATSAPP_NUMBERS[0]);
+  const [number, setNumber] = useState<WhatsAppNumber>(WHATSAPP_NUMBERS[0]!);
 
   useEffect(() => {
     // Primeiro, define imediatamente com base no cache/localStorage
