@@ -1,6 +1,7 @@
 export const ETAPAS = [
   { id: "entrada", label: "Entrada" },
   { id: "em_contato", label: "Em Contato" },
+  { id: "orcamento", label: "Orçamento Enviado" },
   { id: "negociacao", label: "Negociação" },
   { id: "venda_realizada", label: "Venda Realizada" },
   { id: "perdido", label: "Perdido" },

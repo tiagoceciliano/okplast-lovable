@@ -1,6 +1,6 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { CalendarClock, Clock, MessageCircle, MessageCirclePlus, MessageSquare, Phone, User } from "lucide-react";
+import { CalendarClock, MessageCircle, MessageCirclePlus, MessageSquare } from "lucide-react";
 import { tagDef, useEtiquetas } from "../conversas/tags";
 import { brl, type Negociacao, type VendedorLite } from "./types";
 
@@ -12,9 +12,10 @@ interface Props {
   hasVencida?: boolean | undefined;
   chatNaoLidas?: number | undefined;
   onClick: () => void;
+  onChatClick: () => void;
 }
 
-export function KanbanCard({ negociacao, vendedores, tarefasCount, comentariosCount, hasVencida, chatNaoLidas, onClick }: Props) {
+export function KanbanCard({ negociacao, vendedores, tarefasCount, comentariosCount, hasVencida, chatNaoLidas, onClick, onChatClick }: Props) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: negociacao.id,
     data: { type: "card", etapa: negociacao.etapa },
@@ -23,16 +24,7 @@ export function KanbanCard({ negociacao, vendedores, tarefasCount, comentariosCo
   const etiquetas = useEtiquetas();
   const temChat = chatNaoLidas !== undefined;
   const responsavel = vendedores.find((v) => v.user_id === negociacao.responsavel_id);
-  const dataRef = negociacao.created_at;
-  const dataFmt = dataRef
-    ? new Intl.DateTimeFormat("pt-BR", {
-        timeZone: "America/Sao_Paulo",
-        day: "2-digit",
-        month: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-      }).format(new Date(dataRef))
-    : "";
+  const initial = (responsavel?.nome || negociacao.nome_cliente).charAt(0).toUpperCase();
 
   return (
     <div
@@ -41,43 +33,41 @@ export function KanbanCard({ negociacao, vendedores, tarefasCount, comentariosCo
       {...attributes}
       {...listeners}
       onClick={onClick}
-      className="bg-card border rounded-lg p-3 shadow-xs hover:shadow-md cursor-pointer space-y-2"
+      className="cursor-pointer space-y-1.5 rounded-md border bg-card p-2.5 shadow-xs transition hover:border-primary/40 hover:shadow-sm"
     >
       <div className="flex items-start justify-between gap-2">
         <h4 className="font-semibold text-sm leading-tight truncate">{negociacao.nome_cliente}</h4>
         <div className="flex items-center gap-1.5 shrink-0">
-        {temChat ? (
-          <span className="relative text-emerald-600" title="Chat WhatsApp vinculado">
+        <button
+          type="button"
+          onPointerDown={(event) => event.stopPropagation()}
+          onClick={(event) => { event.stopPropagation(); onChatClick(); }}
+          className={temChat ? "relative text-whatsapp" : "text-muted-foreground/60"}
+          title={temChat ? "Ver conversa associada" : "Associar uma conversa"}
+          aria-label={temChat ? "Ver conversa associada" : "Associar uma conversa"}
+        >
+          {temChat ? (
+            <>
             <MessageCircle className="h-4 w-4" />
-            {chatNaoLidas! > 0 && (
-              <span className="absolute -right-1.5 -top-1.5 min-w-[14px] rounded-full bg-emerald-500 px-1 text-center text-[9px] font-bold leading-[14px] text-white">
+            {(chatNaoLidas ?? 0) > 0 && (
+              <span className="absolute -right-1.5 -top-1.5 min-w-[14px] rounded-full bg-accent px-1 text-center text-[9px] font-bold leading-[14px] text-accent-foreground">
                 {chatNaoLidas}
               </span>
             )}
-          </span>
-        ) : (
-          <span className="text-muted-foreground/60" title="Sem chat — abra o card para vincular">
+            </>
+          ) : (
             <MessageCirclePlus className="h-4 w-4" />
-          </span>
-        )}
+          )}
+        </button>
         {hasVencida && (
           <span className="w-2 h-2 rounded-full bg-destructive shrink-0" title="Tarefa vencida" />
         )}
         </div>
       </div>
-      {negociacao.telefone && (
-        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-          <Phone className="h-3 w-3" /> {negociacao.telefone}
-        </div>
-      )}
-      {negociacao.produto && (
-        <div className="text-xs text-muted-foreground truncate">{negociacao.produto}</div>
-      )}
-      {dataFmt && (
-        <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
-          <Clock className="h-3 w-3" /> {dataFmt}
-        </div>
-      )}
+      <div className="flex min-w-0 items-center gap-1.5 text-[11px] text-muted-foreground">
+        <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-primary/10 text-[8px] font-bold text-primary">{initial}</span>
+        <span className="truncate">{negociacao.produto || negociacao.nome_cliente}</span>
+      </div>
       {negociacao.tags.length > 0 && (
         <div className="flex flex-wrap gap-1">
           {negociacao.tags.map((t) => {
@@ -86,14 +76,12 @@ export function KanbanCard({ negociacao, vendedores, tarefasCount, comentariosCo
           })}
         </div>
       )}
-      <div className="flex items-center justify-between pt-1 border-t">
-        <span className="text-sm font-semibold text-primary">{brl(negociacao.valor)}</span>
+      <div className="flex items-center justify-between pt-1">
+        <span className="text-xs font-semibold">{brl(negociacao.valor)}</span>
         <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
           {tarefasCount ? <span className="flex items-center gap-0.5"><CalendarClock className="h-3 w-3"/>{tarefasCount}</span> : null}
           {comentariosCount ? <span className="flex items-center gap-0.5"><MessageSquare className="h-3 w-3"/>{comentariosCount}</span> : null}
-          <span className="flex items-center gap-0.5" title={responsavel?.nome || "Sem responsável"}>
-            <User className="h-3 w-3" />{responsavel?.nome?.split(" ")[0] || "—"}
-          </span>
+          <span className="flex items-center gap-1" title={responsavel?.nome || "Sem responsável"}><span className="h-1.5 w-1.5 rounded-full bg-accent" />COMERCIAL</span>
         </div>
       </div>
     </div>
