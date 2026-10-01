@@ -3,11 +3,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { AdminLayout } from "./AdminLayout";
 import { ConversaChat, janelaAberta, type Conversa } from "./components/conversas/ConversaChat";
 import { ContatoPanel } from "./components/conversas/ContatoPanel";
-import { tagDef } from "./components/conversas/tags";
+import { tagDef, useEtiquetas } from "./components/conversas/tags";
+import { EtiquetasManager } from "./components/conversas/EtiquetasManager";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Plus, Search, Loader2, Clock, CircleDot } from "lucide-react";
+import { MessageCircle, Plus, Tag, Search, Loader2, Clock, CircleDot } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
@@ -45,6 +46,8 @@ export default function Conversas() {
   const [novoTelefone, setNovoTelefone] = useState("");
   const [novoNome, setNovoNome] = useState("");
   const [criando, setCriando] = useState(false);
+  const etiquetas = useEtiquetas();
+  const [gerenciarTags, setGerenciarTags] = useState(false);
 
   const carregar = async () => {
     const { data, error } = await supabase
@@ -120,9 +123,14 @@ export default function Conversas() {
         <h1 className="flex items-center gap-2 text-2xl font-bold">
           <MessageCircle className="h-6 w-6" /> Atendimento WhatsApp
         </h1>
+        <div className="flex gap-2">
+        <Button size="sm" variant="outline" onClick={() => setGerenciarTags(true)}>
+          <Tag className="mr-1 h-4 w-4" /> Etiquetas
+        </Button>
         <Button size="sm" onClick={() => setNovaAberta(true)}>
           <Plus className="mr-1 h-4 w-4" /> Nova conversa
         </Button>
+        </div>
       </div>
 
       <div className="grid h-[calc(100vh-160px)] min-h-[460px] gap-0 overflow-hidden rounded-lg border bg-card lg:grid-cols-[300px_1fr_300px]">
@@ -187,7 +195,7 @@ export default function Conversas() {
                     {tags.length > 0 && (
                       <div className="mt-1.5 flex flex-wrap gap-1">
                         {tags.slice(0, 3).map((t) => {
-                          const d = tagDef(t);
+                          const d = tagDef(t, etiquetas);
                           return (
                             <span key={t} className={`rounded-full border px-1.5 py-px text-[9px] font-semibold ${d.className}`}>
                               {d.label}
@@ -265,6 +273,7 @@ export default function Conversas() {
         </div>
       </div>
 
+      <EtiquetasManager open={gerenciarTags} onOpenChange={setGerenciarTags} />
       {/* Nova conversa */}
       <Dialog open={novaAberta} onOpenChange={setNovaAberta}>
         <DialogContent className="max-w-sm">
