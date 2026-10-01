@@ -23,7 +23,7 @@ interface Props {
 
 export function KanbanColumn({
   etapaId, label, negociacoes, vendedores,
-  countsTarefas, countsComentarios, vencidas, chats = {}, onCardClick, onChatClick, onAdd, canAdd,
+  countsTarefas, countsComentarios, vencidas, chats = {}, agendamentos = {}, onCardClick, onChatClick, onAdd, canAdd,
 }: Props) {
   const { setNodeRef, isOver } = useDroppable({ id: etapaId, data: { type: "column", etapa: etapaId } });
   const total = negociacoes.reduce((s, n) => s + (n.valor ?? 0), 0);
@@ -53,6 +53,7 @@ export function KanbanColumn({
               comentariosCount={countsComentarios[n.id]}
               hasVencida={vencidas[n.id]}
               chatNaoLidas={chats[n.id]}
+              agendamentosCount={agendamentos[n.id]}
               onClick={() => onCardClick(n)}
               onChatClick={() => onChatClick(n)}
             />
