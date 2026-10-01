@@ -36,6 +36,7 @@ interface Mensagem {
   conteudo: string | null;
   status: string | null;
   created_at: string;
+  autor_id?: string | null;
 }
 
 interface Template {
@@ -134,7 +135,7 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
     (async () => {
       const { data } = await supabase
         .from("whatsapp_mensagens")
-        .select("id,direcao,tipo,conteudo,status,created_at")
+        .select("id,direcao,tipo,conteudo,status,created_at,autor_id")
         .eq("conversa_id", conversa.id)
         .order("created_at", { ascending: true })
         .limit(5000);
@@ -213,6 +214,20 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
   };
 
   const tSel = templates.find((x) => x.nome === templateSel);
+  const [nomesEquipe, setNomesEquipe] = useState<Record<string, string>>({});
+  useEffect(() => {
+    supabase.rpc("list_equipe").then(({ data }) => setNomesEquipe(Object.fromEntries((data ?? []).map((u) => [u.id, u.nome]))));
+  }, []);
+  const iniciais = (nome: string) => nome.trim().split(/\s+/).slice(0, 2).map((p) => p[0]).join("").toUpperCase() || "?";
+  const nomeCliente = conversa.nome_contato || conversa.telefone;
+  const diaLabel = (iso: string) => {
+    const tz = { timeZone: "America/Sao_Paulo" } as const;
+    const d = new Date(iso).toLocaleDateString("pt-BR", tz);
+    const hoje = new Date().toLocaleDateString("pt-BR", tz);
+    const ontem = new Date(Date.now() - 864e5).toLocaleDateString("pt-BR", tz);
+    return d === hoje ? "Hoje" : d === ontem ? "Ontem" : d;
+  };
+  const restanteCurto = (ms: number) => { const t = Math.max(0, Math.floor(ms / 1000)); return `${Math.floor(t / 3600)}h ${Math.floor((t % 3600) / 60)}m ${t % 60}s`; };
   const mensagensVisiveis = busca.trim() ? mensagens.filter((m) => (m.conteudo || "").toLowerCase().includes(busca.toLowerCase())) : mensagens;
 
   const [resolvida, setResolvida] = useState(!!conversa.resolvida_em);
@@ -335,56 +350,39 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
         </div>
       </div>
       {/* Mensagens */}
-      <div className="min-h-0 flex-1 space-y-2 overflow-y-auto bg-secondary/30 p-4">
+      <div className="chat-wallpaper min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-4 sm:px-8">
         {mensagens.length === 0 && (
-          <p className="text-xs text-muted-foreground text-center py-6">
+          <p className="mx-auto w-fit rounded-lg bg-chat-in px-3 py-1.5 text-center text-xs text-muted-foreground shadow-sm">
             Nenhuma mensagem ainda. Inicie o atendimento com uma mensagem pronta.
           </p>
         )}
-        {mensagensVisiveis.map((m) => (
-          <div key={m.id} className={`flex ${m.direcao === "saida" ? "justify-end" : "justify-start"}`}>
-            <div className={`max-w-[78%] px-3 py-1.5 text-sm shadow-sm ${
-               m.direcao === "saida"
-                 ? "rounded-lg rounded-br-sm bg-secondary text-foreground"
-                : "rounded-2xl rounded-bl-sm border bg-background"
-            }`}>
-              <div className="whitespace-pre-wrap break-words">{m.conteudo}</div>
-              <div className={`mt-0.5 flex items-center justify-end gap-1 text-[10px] ${
-                 "text-muted-foreground"
-              }`}>
-                {fmtHora(m.created_at)}
-                {m.direcao === "saida" && m.status && (
-                  <span className="inline-flex items-center">
-                    {m.status === "failed" ? (
-                      <AlertCircle className="h-3 w-3" />
-                    ) : m.status === "read" ? (
-                      <CheckCheck className="h-3 w-3 text-sky-200" />
-                    ) : m.status === "delivered" ? (
-                      <CheckCheck className="h-3 w-3" />
-                    ) : (
-                      <Check className="h-3 w-3" />
-                    )}
+        {mensagensVisiveis.map((m, i) => {
+          const saida = m.direcao === "saida";
+          const autor = saida ? (m.autor_id && nomesEquipe[m.autor_id]) || "Equipe" : nomeCliente;
+          const novoDia = i === 0 || diaLabel(mensagensVisiveis[i - 1]!.created_at) !== diaLabel(m.created_at);
+          return (
+          <div key={m.id}>
+            {novoDia && <div className="my-4 text-center text-xs font-semibold text-muted-foreground">{diaLabel(m.created_at)}</div>}
+            <div className={`flex items-end gap-2.5 ${saida ? "justify-end" : "justify-start"}`}>
+              {!saida && <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-chat-avatar text-xs font-semibold text-chat-avatar-foreground">{iniciais(nomeCliente)}</div>}
+              <div className={`flex max-w-[72%] flex-col ${saida ? "items-end" : "items-start"}`}>
+                {saida && (
+                  <span className="mb-0.5 flex items-center gap-0.5 text-[11px] font-semibold text-foreground/80">
+                    {autor}
+                    {m.status === "failed" ? <AlertCircle className="h-3 w-3 text-destructive" /> : m.status === "read" ? <CheckCheck className="h-3.5 w-3.5 text-chat-tick" /> : m.status === "delivered" ? <CheckCheck className="h-3.5 w-3.5 text-muted-foreground" /> : <Check className="h-3.5 w-3.5 text-muted-foreground" />}
                   </span>
                 )}
+                <div className={`flex items-end gap-2 rounded-2xl px-3.5 py-2 text-sm shadow-sm ${saida ? "bg-chat-out" : "bg-chat-in"}`}>
+                  <span className="whitespace-pre-wrap break-words">{m.conteudo}</span>
+                  <span className="shrink-0 translate-y-0.5 text-[10px] text-muted-foreground">{fmtHora(m.created_at)}</span>
+                </div>
               </div>
+              {saida && <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-chat-avatar text-xs font-semibold text-chat-avatar-foreground">{iniciais(autor)}</div>}
             </div>
           </div>
-        ))}
-        <div ref={bottomRef} />
-      </div>
-
-      <div className="flex min-h-10 shrink-0 items-center gap-1 overflow-x-auto border-t bg-background px-3 py-1.5">
-        {tags.map((id) => {
-          const item = etiquetas.find((e) => e.id === id);
-          return item ? <button key={id} onClick={() => alternarTag(id)} className={`shrink-0 rounded border px-1.5 py-0.5 text-[9px] font-semibold ${item.className}`}>{item.label} ×</button> : null;
+          );
         })}
-        <Popover>
-          <PopoverTrigger asChild><Button variant="ghost" size="sm" className="h-7 px-2 text-xs"><Tag /> Etiqueta</Button></PopoverTrigger>
-          <PopoverContent align="start" className="max-h-72 w-64 overflow-y-auto p-2">
-            {etiquetas.length === 0 && <p className="p-2 text-xs text-muted-foreground">Nenhuma etiqueta disponível.</p>}
-            {etiquetas.map((item) => <Button key={item.id} variant="ghost" className="h-8 w-full justify-start" onClick={() => alternarTag(item.id)}><span className={`rounded border px-1.5 py-0.5 text-[9px] ${item.className}`}>{item.label}</span>{tags.includes(item.id) && <Check className="ml-auto" />}</Button>)}
-          </PopoverContent>
-        </Popover>
+        <div ref={bottomRef} />
       </div>
 
       {/* Aviso de janela */}
@@ -400,9 +398,10 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
 
       {/* Composer */}
       {aberta ? (
-        <div className="m-3 shrink-0 rounded-lg border bg-background p-2 shadow-sm">
-          <Textarea value={texto} onChange={(e) => setTexto(e.target.value)} placeholder="Digite sua mensagem…" rows={2} className="min-h-14 resize-none border-0 p-1 shadow-none focus-visible:ring-0" onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); enviar(); } }} />
+        <div className="shrink-0 bg-chat-bg px-4 pb-2 pt-1 sm:px-8"><div className="rounded-2xl border bg-background/70 p-3 shadow-sm backdrop-blur">
+          <Textarea value={texto} onChange={(e) => setTexto(e.target.value)} placeholder="Shift + Enter para nova linha." rows={2} className="min-h-14 resize-none border-0 p-1 shadow-none focus-visible:ring-0" onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); enviar(); } }} />
           <div className="flex items-center gap-1">
+            <span className={`mr-auto flex items-center gap-1.5 text-xs font-semibold tabular-nums ${restante <= 2 * 60 * 60 * 1000 ? "text-destructive" : "text-muted-foreground"}`}><Clock className="h-4 w-4" /> {restanteCurto(restante)}</span>
             <input ref={fileRef} type="file" className="hidden" accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.txt" onChange={(event) => anexar(event.target.files?.[0])} />
             <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => fileRef.current?.click()} disabled={anexando} aria-label="Anexar arquivo">{anexando ? <Loader2 className="animate-spin" /> : <Paperclip />}</Button>
             <Popover open={emojiOpen} onOpenChange={setEmojiOpen}>
@@ -426,10 +425,9 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
                 </Button>
               </PopoverContent>
             </Popover>
-            <span className="ml-1 hidden text-[10px] text-muted-foreground xl:inline">Enter envia · Shift + Enter quebra linha</span>
-            <Button size="icon" onClick={enviar} disabled={!texto.trim() || enviando} className="ml-auto h-8 w-8" aria-label="Enviar mensagem">{enviando ? <Loader2 className="animate-spin" /> : <Send />}</Button>
+            <Button size="icon" onClick={enviar} disabled={!texto.trim() || enviando} className="ml-1 h-9 w-9 rounded-xl" aria-label="Enviar mensagem">{enviando ? <Loader2 className="animate-spin" /> : <Send />}</Button>
           </div>
-        </div>
+        </div></div>
       ) : (
          <div className="m-3 shrink-0 space-y-2 rounded-md border bg-background p-3 shadow-sm">
           <div className="flex items-center gap-2">
@@ -478,6 +476,20 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
           )}
         </div>
       )}
+      <div className="flex min-h-10 shrink-0 items-center gap-1 overflow-x-auto bg-chat-bg px-4 pb-2">
+        {tags.map((id) => {
+          const item = etiquetas.find((e) => e.id === id);
+          return item ? <button key={id} onClick={() => alternarTag(id)} className={`shrink-0 rounded border px-1.5 py-0.5 text-[9px] font-semibold ${item.className}`}>{item.label} ×</button> : null;
+        })}
+        <Popover>
+          <PopoverTrigger asChild><Button variant="ghost" size="sm" className="h-7 px-2 text-xs"><Tag /></Button></PopoverTrigger>
+          <PopoverContent align="start" className="max-h-72 w-64 overflow-y-auto p-2">
+            {etiquetas.length === 0 && <p className="p-2 text-xs text-muted-foreground">Nenhuma etiqueta disponível.</p>}
+            {etiquetas.map((item) => <Button key={item.id} variant="ghost" className="h-8 w-full justify-start" onClick={() => alternarTag(item.id)}><span className={`rounded border px-1.5 py-0.5 text-[9px] ${item.className}`}>{item.label}</span>{tags.includes(item.id) && <Check className="ml-auto" />}</Button>)}
+          </PopoverContent>
+        </Popover>
+      </div>
+
       {agendamentos.length > 0 && (
         <div className="shrink-0 border-t bg-muted/30 px-3 py-2">
           <div className="mb-1 flex items-center gap-1 text-[10px] font-semibold uppercase text-muted-foreground"><CalendarClock className="h-3 w-3" /> Agendamentos</div>
