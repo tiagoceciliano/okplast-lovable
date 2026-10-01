@@ -19,8 +19,10 @@ import { GanhoDialog } from "./components/kanban/GanhoDialog";
 import { NegociacaoChatSheet } from "./components/kanban/NegociacaoChatSheet";
 import { ETAPAS, type EtapaId, type Negociacao, type VendedorLite } from "./components/kanban/types";
 import { usePermissions } from "@/hooks/usePermissions";
+import { useSearchParams } from "@/lib/router-compat";
 
 export default function Negociacoes() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const { can, loading: permLoading } = usePermissions();
   const [items, setItems] = useState<Negociacao[]>([]);
   const [vendedores, setVendedores] = useState<VendedorLite[]>([]);
@@ -53,7 +55,13 @@ export default function Negociacoes() {
       supabase.from("negociacao_tarefas").select("negociacao_id,concluida,data_vencimento"),
     ]);
     if (neg.error) { toast.error(neg.error.message); return; }
-    setItems((neg.data as Negociacao[]) || []);
+    const negociacoes = (neg.data as Negociacao[]) || [];
+    setItems(negociacoes);
+    const negociacaoId = searchParams.get("negociacao");
+    if (negociacaoId) {
+      const encontrada = negociacoes.find((item) => item.id === negociacaoId);
+      if (encontrada) setAtivo(encontrada);
+    }
     const waRows = (wa.data || []) as { user_id: string | null; nome_vendedor: string; numero_raw: string; numero_formatado: string }[];
     const vs = waRows
       .filter((v) => v.user_id)
@@ -234,7 +242,14 @@ export default function Negociacoes() {
         negociacao={ativo}
         vendedores={vendedores}
         numeroMap={numeroMap}
-        onClose={() => setAtivo(null)}
+        onClose={() => {
+          setAtivo(null);
+          if (searchParams.has("negociacao")) {
+            const next = new URLSearchParams(searchParams);
+            next.delete("negociacao");
+            setSearchParams(next, { replace: true });
+          }
+        }}
         onChanged={load}
         onRequestGanho={(n) => setGanhoPending(n)}
       />

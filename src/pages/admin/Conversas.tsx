@@ -332,6 +332,11 @@ export default function Conversas() {
             <ContatoPanel
               key={selecionada.id}
               conversa={selecionada}
+               onNegociacaoVinculada={(negociacaoId) => {
+                 const atualizada = { ...selecionada, negociacao_id: negociacaoId };
+                 setSelecionada(atualizada);
+                 setConversas((prev) => prev.map((c) => c.id === atualizada.id ? atualizada : c));
+               }}
               onNomeAtualizado={(nome) => {
                 setSelecionada({ ...selecionada, nome_contato: nome });
                 setConversas((prev) =>

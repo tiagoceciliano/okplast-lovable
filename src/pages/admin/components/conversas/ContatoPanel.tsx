@@ -14,6 +14,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { useNavigate } from "@/lib/router-compat";
 
 interface Nota {
   id: string;
@@ -25,6 +27,7 @@ interface Nota {
 interface Props {
   conversa: Conversa;
   onNomeAtualizado?: (nome: string) => void;
+  onNegociacaoVinculada?: (negociacaoId: string) => void;
 }
 
 interface Tarefa { id: string; titulo: string; concluida: boolean; data_vencimento: string | null }
@@ -35,7 +38,8 @@ const fmt = (iso: string) =>
     day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit",
   });
 
-export function ContatoPanel({ conversa, onNomeAtualizado }: Props) {
+export function ContatoPanel({ conversa, onNomeAtualizado, onNegociacaoVinculada }: Props) {
+  const navigate = useNavigate();
   const [neg, setNeg] = useState<Negociacao | null>(null);
   const [notas, setNotas] = useState<Nota[]>([]);
   const [novaNota, setNovaNota] = useState("");
@@ -61,6 +65,13 @@ export function ContatoPanel({ conversa, onNomeAtualizado }: Props) {
       const n = (data as Negociacao | null) ?? null;
       setNeg(n);
       if (n) {
+        if (!conversa.negociacao_id) {
+          const { error: vinculoError } = await supabase
+            .from("whatsapp_conversas")
+            .update({ negociacao_id: n.id })
+            .eq("id", conversa.id);
+          if (!vinculoError && ativo) onNegociacaoVinculada?.(n.id);
+        }
         const [{ data: cms }, { data: tasks }] = await Promise.all([
           supabase.from("negociacao_comentarios").select("id,texto,autor_id,created_at").eq("negociacao_id", n.id).order("created_at", { ascending: false }),
           supabase.from("negociacao_tarefas").select("id,titulo,concluida,data_vencimento").eq("negociacao_id", n.id).order("created_at"),
@@ -190,9 +201,31 @@ export function ContatoPanel({ conversa, onNomeAtualizado }: Props) {
       {!carregando && neg && (
         <>
           {/* Negociação */}
-           <Section title="Negociações" icon={Workflow}>
-             <div className="rounded-md border p-2.5">
+           <Section title="Negociação" icon={Workflow}>
+             <HoverCard openDelay={250} closeDelay={100}>
+              <HoverCardTrigger asChild>
+               <button
+                 type="button"
+                 className="w-full rounded-md border p-2.5 text-left transition hover:border-primary/40 hover:bg-muted/40"
+                 onClick={() => navigate(`/admin/negociacoes?negociacao=${neg.id}`)}
+                 aria-label={`Abrir negociação de ${neg.nome_cliente} no funil`}
+               >
              <div className="mb-2 flex items-start justify-between gap-2"><div className="min-w-0"><p className="truncate text-xs font-semibold">{neg.nome_cliente}</p><p className="text-[10px] uppercase text-primary">● {ETAPAS.find((e) => e.id === neg.etapa)?.label}</p></div><span className="shrink-0 text-xs font-bold">{brl(neg.valor)}</span></div>
+               <p className="text-[10px] text-muted-foreground">Clique para abrir no funil</p>
+               </button>
+              </HoverCardTrigger>
+              <HoverCardContent side="left" align="start" className="w-72 space-y-3 p-3">
+                <div><p className="text-sm font-semibold">{neg.nome_cliente}</p><p className="text-xs text-muted-foreground">{ETAPAS.find((e) => e.id === neg.etapa)?.label} · {neg.status}</p></div>
+                <div className="grid grid-cols-[84px_1fr] gap-x-2 gap-y-1.5 text-xs">
+                  <span className="text-muted-foreground">Valor</span><span className="font-semibold">{brl(neg.valor)}</span>
+                  <span className="text-muted-foreground">Produto</span><span className="truncate">{neg.nome_produto || neg.produto || neg.material || "Não informado"}</span>
+                  <span className="text-muted-foreground">Telefone</span><span>{neg.telefone || conversa.telefone}</span>
+                  <span className="text-muted-foreground">E-mail</span><span className="truncate">{neg.email || "Não informado"}</span>
+                  {neg.utm_campaign && <><span className="text-muted-foreground">Campanha</span><span className="truncate">{neg.utm_campaign}</span></>}
+                </div>
+              </HoverCardContent>
+             </HoverCard>
+             <div className="mt-2 rounded-md border p-2.5">
             <Select value={neg.etapa} onValueChange={mudarEtapa}>
               <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
               <SelectContent>
