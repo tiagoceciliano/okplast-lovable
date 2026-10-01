@@ -2,5 +2,3 @@ project_id = "osfxdoxfiyyqcpahuwci"
 
 [functions.health-monitor]
 verify_jwt = false
-[functions.whatsapp-webhook]
-verify_jwt = false
