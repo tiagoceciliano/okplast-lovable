@@ -1,21 +1,22 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { CalendarClock, MessageCircle, MessageCirclePlus, MessageSquare } from "lucide-react";
+import { ListTodo, MessageCircle, MessageCirclePlus, MessageSquare, CalendarClock } from "lucide-react";
 import { tagDef, useEtiquetas } from "../conversas/tags";
 import { brl, type Negociacao, type VendedorLite } from "./types";
 
 interface Props {
   negociacao: Negociacao;
   vendedores: VendedorLite[];
-  tarefasCount?: number | undefined;
+  tarefasCount?: { pend: number; total: number } | undefined;
   comentariosCount?: number | undefined;
   hasVencida?: boolean | undefined;
   chatNaoLidas?: number | undefined;
+  agendamentosCount?: number | undefined;
   onClick: () => void;
   onChatClick: () => void;
 }
 
-export function KanbanCard({ negociacao, vendedores, tarefasCount, comentariosCount, hasVencida, chatNaoLidas, onClick, onChatClick }: Props) {
+export function KanbanCard({ negociacao, vendedores, tarefasCount, comentariosCount, hasVencida, chatNaoLidas, agendamentosCount, onClick, onChatClick }: Props) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: negociacao.id,
     data: { type: "card", etapa: negociacao.etapa },
