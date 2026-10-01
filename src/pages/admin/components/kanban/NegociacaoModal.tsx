@@ -27,7 +27,7 @@ interface Props {
 
 interface Tarefa { id: string; titulo: string; data_vencimento: string | null; concluida: boolean; }
 interface Comentario { id: string; texto: string; autor_id: string | null; created_at: string; }
-interface Hist { id: string; tipo: string; descricao: string | null; created_at: string; }
+interface Hist { id: string; autor_id: string | null; tipo: string; descricao: string | null; created_at: string; }
 
 interface ProdutoLite { id: string; nome: string; material: string | null; }
 
@@ -44,6 +44,8 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
   const [conversa, setConversa] = useState<Conversa | null>(null);
   const navigate = useNavigate();
   const etiquetas = useEtiquetas();
+  const [nomesEquipe, setNomesEquipe] = useState<Record<string, string>>({});
+  useEffect(() => { supabase.rpc("list_equipe").then(({ data }) => setNomesEquipe(Object.fromEntries((data ?? []).map((u) => [u.id, u.nome])))); }, []);
 
   useEffect(() => setN(negociacao), [negociacao]);
   useEffect(() => {
@@ -259,7 +261,7 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
                   <li key={h.id} className="relative text-sm">
                     <span className="absolute -left-[21px] top-1.5 h-2.5 w-2.5 rounded-full bg-primary" />
                     <p className="font-medium">{h.descricao || h.tipo}</p>
-                    <p className="text-[11px] text-muted-foreground">{new Date(h.created_at).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })}</p>
+                    <p className="text-[11px] text-muted-foreground"><span className="font-semibold text-foreground/80">{h.autor_id ? nomesEquipe[h.autor_id] || "Usuário" : "Sistema (automático)"}</span> · {new Date(h.created_at).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })}</p>
                   </li>
                 ))}
                 {hist.length === 0 && <li className="text-xs text-muted-foreground">Sem histórico.</li>}
