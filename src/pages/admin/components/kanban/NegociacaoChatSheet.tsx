@@ -40,7 +40,7 @@ export function NegociacaoChatSheet({ negociacao, onClose, onChanged }: Props) {
   const etiquetas = useEtiquetas();
   const navigate = useNavigate();
 
-  useEffect(() => { setTags(negociacao?.tags ?? []); }, [negociacao?.id]);
+  useEffect(() => { setTags(conversa?.tags ?? []); }, [conversa?.id]);
   useEffect(() => {
     supabase.rpc("list_equipe").then(({ data }) => setAtendentes((data ?? []).map((u) => ({ id: u.id, nome: u.nome }))));
   }, []);

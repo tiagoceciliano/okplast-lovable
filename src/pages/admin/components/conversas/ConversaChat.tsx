@@ -21,6 +21,7 @@ export interface Conversa {
   nome_contato: string | null;
   negociacao_id: string | null;
   responsavel_id: string | null;
+  tags?: string[];
   ultima_mensagem: string | null;
   ultima_mensagem_em: string | null;
   ultima_entrada_cliente_em: string | null;
@@ -88,7 +89,8 @@ interface Props {
   onTagsChange?: (tags: string[]) => void;
 }
 
-export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas = [], onTagsChange }: Props) {
+export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: todasEtiquetas = [], onTagsChange }: Props) {
+  const etiquetas = todasEtiquetas.filter((t) => t.aplica_em.includes("conversa"));
   const [mensagens, setMensagens] = useState<Mensagem[]>([]);
   const [texto, setTexto] = useState("");
   const [enviando, setEnviando] = useState(false);
@@ -229,9 +231,8 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas = []
   };
 
   const alternarTag = async (tagId: string) => {
-    if (!conversa.negociacao_id) { toast.error("Vincule uma negociação para aplicar etiquetas"); return; }
     const proximas = tags.includes(tagId) ? tags.filter((id) => id !== tagId) : [...tags, tagId];
-    const { error } = await supabase.from("negociacoes").update({ tags: proximas }).eq("id", conversa.negociacao_id);
+    const { error } = await supabase.from("whatsapp_conversas").update({ tags: proximas }).eq("id", conversa.id);
     if (error) toast.error(error.message); else onTagsChange?.(proximas);
   };
 

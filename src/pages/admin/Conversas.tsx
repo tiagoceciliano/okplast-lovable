@@ -76,16 +76,7 @@ export default function Conversas() {
       if (c) setSelecionada((atual) => atual ?? c);
     }
 
-    const ids = lista.map((c) => c.negociacao_id).filter((v): v is string => !!v);
-    if (ids.length) {
-      const { data: negs } = await supabase.from("negociacoes").select("id,tags").in("id", ids);
-      const porNeg = new Map((negs || []).map((n) => [n.id as string, (n.tags as string[]) || []]));
-      const mapa: Record<string, string[]> = {};
-      for (const c of lista) {
-        if (c.negociacao_id) mapa[c.id] = porNeg.get(c.negociacao_id) || [];
-      }
-      setTagsPorConversa(mapa);
-    }
+    setTagsPorConversa(Object.fromEntries(lista.map((c) => [c.id, c.tags ?? []])));
   };
 
   const selecionarConversa = (conversa: Conversa) => {

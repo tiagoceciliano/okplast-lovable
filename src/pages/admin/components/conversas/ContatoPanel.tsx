@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Loader2, Phone, Mail, User, Tag, StickyNote, Workflow, Settings2, ChevronDown, Plus, MessageCircle, CheckSquare, CalendarClock, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { ETAPAS, brl, type Negociacao } from "../kanban/types";
-import { useEtiquetas } from "./tags";
+import { useEtiquetas, tagsDe } from "./tags";
 import { EtiquetasManager } from "./EtiquetasManager";
 import type { Conversa } from "./ConversaChat";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -51,7 +51,7 @@ export function ContatoPanel({ conversa, onNomeAtualizado, onNegociacaoVinculada
   const [nome, setNome] = useState(conversa.nome_contato ?? "");
   const [carregando, setCarregando] = useState(true);
   const [salvando, setSalvando] = useState(false);
-  const TAGS = useEtiquetas();
+  const TAGS = tagsDe(useEtiquetas(), "negociacao");
   const [gerenciar, setGerenciar] = useState(false);
   const [tarefas, setTarefas] = useState<Tarefa[]>([]);
   const [novaTarefa, setNovaTarefa] = useState("");
@@ -210,7 +210,7 @@ export function ContatoPanel({ conversa, onNomeAtualizado, onNegociacaoVinculada
               <Mail className="h-3.5 w-3.5 shrink-0" /> {neg.email}
             </div>
           )}
-           {neg && <div><div className="mb-1.5 flex items-center text-muted-foreground"><Tag className="mr-2 h-3.5 w-3.5" /> Etiquetas</div><div className="flex flex-wrap gap-1">{(neg.tags || []).map((id) => { const item = TAGS.find((t) => t.id === id); return item ? <button key={id} onClick={() => alternarTag(id)} className={`rounded border px-1.5 py-0.5 text-[9px] font-semibold ${item.className}`}>{item.label} ×</button> : null; })}<Popover><PopoverTrigger asChild><Button variant="ghost" size="sm" className="h-6 px-1.5 text-[10px]"><Plus /> Adicionar</Button></PopoverTrigger><PopoverContent align="end" className="max-h-64 w-60 overflow-y-auto p-2">{TAGS.map((item) => <Button key={item.id} variant="ghost" className="h-8 w-full justify-start" onClick={() => alternarTag(item.id)}><span className={`rounded border px-1.5 py-0.5 text-[9px] ${item.className}`}>{item.label}</span>{(neg.tags || []).includes(item.id) && <span className="ml-auto">✓</span>}</Button>)}<Button variant="outline" className="mt-2 h-8 w-full" onClick={() => setGerenciar(true)}><Settings2 /> Gerenciar</Button></PopoverContent></Popover></div></div>}
+           {neg && <div><div className="mb-1.5 flex items-center text-muted-foreground"><Tag className="mr-2 h-3.5 w-3.5" /> Etiquetas da negociação</div><div className="flex flex-wrap gap-1">{(neg.tags || []).map((id) => { const item = TAGS.find((t) => t.id === id); return item ? <button key={id} onClick={() => alternarTag(id)} className={`rounded border px-1.5 py-0.5 text-[9px] font-semibold ${item.className}`}>{item.label} ×</button> : null; })}<Popover><PopoverTrigger asChild><Button variant="ghost" size="sm" className="h-6 px-1.5 text-[10px]"><Plus /> Adicionar</Button></PopoverTrigger><PopoverContent align="end" className="max-h-64 w-60 overflow-y-auto p-2">{TAGS.map((item) => <Button key={item.id} variant="ghost" className="h-8 w-full justify-start" onClick={() => alternarTag(item.id)}><span className={`rounded border px-1.5 py-0.5 text-[9px] ${item.className}`}>{item.label}</span>{(neg.tags || []).includes(item.id) && <span className="ml-auto">✓</span>}</Button>)}<Button variant="outline" className="mt-2 h-8 w-full" onClick={() => setGerenciar(true)}><Settings2 /> Gerenciar</Button></PopoverContent></Popover></div></div>}
          </div>
       </Section>
 
