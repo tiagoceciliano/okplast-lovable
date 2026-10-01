@@ -18,12 +18,14 @@ import { Route as PublicSobreNosRouteImport } from './routes/_public/sobre-nos'
 import { Route as PublicTermoUsoRouteImport } from './routes/_public/termo-uso'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminConversasRouteImport } from './routes/admin/conversas'
+import { Route as AdminGruposRouteImport } from './routes/admin/grupos'
 import { Route as AdminLeadsRouteImport } from './routes/admin/leads'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AdminMetaRouteImport } from './routes/admin/meta'
 import { Route as AdminNegociacoesRouteImport } from './routes/admin/negociacoes'
 import { Route as AdminProdutosRouteImport } from './routes/admin/produtos'
 import { Route as AdminRadarRouteImport } from './routes/admin/radar'
+import { Route as AdminTagsRouteImport } from './routes/admin/tags'
 import { Route as AdminVendedoresRouteImport } from './routes/admin/vendedores'
 import { Route as AdminWhatsappRouteImport } from './routes/admin/whatsapp'
 import { Route as PublicChapasIndexRouteImport } from './routes/_public/chapas/index'
@@ -87,6 +89,11 @@ const AdminConversasRoute = AdminConversasRouteImport.update({
   path: '/admin/conversas',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminGruposRoute = AdminGruposRouteImport.update({
+  id: '/admin/grupos',
+  path: '/admin/grupos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminLeadsRoute = AdminLeadsRouteImport.update({
   id: '/admin/leads',
   path: '/admin/leads',
@@ -115,6 +122,11 @@ const AdminProdutosRoute = AdminProdutosRouteImport.update({
 const AdminRadarRoute = AdminRadarRouteImport.update({
   id: '/admin/radar',
   path: '/admin/radar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminTagsRoute = AdminTagsRouteImport.update({
+  id: '/admin/tags',
+  path: '/admin/tags',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminVendedoresRoute = AdminVendedoresRouteImport.update({
@@ -220,12 +232,14 @@ export interface FileRoutesByFullPath {
   '/sobre-nos': typeof PublicSobreNosRoute
   '/termo-uso': typeof PublicTermoUsoRoute
   '/admin/conversas': typeof AdminConversasRoute
+  '/admin/grupos': typeof AdminGruposRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/meta': typeof AdminMetaRoute
   '/admin/negociacoes': typeof AdminNegociacoesRoute
   '/admin/produtos': typeof AdminProdutosRoute
   '/admin/radar': typeof AdminRadarRoute
+  '/admin/tags': typeof AdminTagsRoute
   '/admin/vendedores': typeof AdminVendedoresRoute
   '/admin/whatsapp': typeof AdminWhatsappRoute
   '/admin/': typeof AdminIndexRoute
@@ -252,12 +266,14 @@ export interface FileRoutesByTo {
   '/sobre-nos': typeof PublicSobreNosRoute
   '/termo-uso': typeof PublicTermoUsoRoute
   '/admin/conversas': typeof AdminConversasRoute
+  '/admin/grupos': typeof AdminGruposRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/meta': typeof AdminMetaRoute
   '/admin/negociacoes': typeof AdminNegociacoesRoute
   '/admin/produtos': typeof AdminProdutosRoute
   '/admin/radar': typeof AdminRadarRoute
+  '/admin/tags': typeof AdminTagsRoute
   '/admin/vendedores': typeof AdminVendedoresRoute
   '/admin/whatsapp': typeof AdminWhatsappRoute
   '/': typeof PublicIndexRoute
@@ -287,12 +303,14 @@ export interface FileRoutesById {
   '/_public/sobre-nos': typeof PublicSobreNosRoute
   '/_public/termo-uso': typeof PublicTermoUsoRoute
   '/admin/conversas': typeof AdminConversasRoute
+  '/admin/grupos': typeof AdminGruposRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/meta': typeof AdminMetaRoute
   '/admin/negociacoes': typeof AdminNegociacoesRoute
   '/admin/produtos': typeof AdminProdutosRoute
   '/admin/radar': typeof AdminRadarRoute
+  '/admin/tags': typeof AdminTagsRoute
   '/admin/vendedores': typeof AdminVendedoresRoute
   '/admin/whatsapp': typeof AdminWhatsappRoute
   '/_public/': typeof PublicIndexRoute
@@ -323,12 +341,14 @@ export interface FileRouteTypes {
     | '/sobre-nos'
     | '/termo-uso'
     | '/admin/conversas'
+    | '/admin/grupos'
     | '/admin/leads'
     | '/admin/login'
     | '/admin/meta'
     | '/admin/negociacoes'
     | '/admin/produtos'
     | '/admin/radar'
+    | '/admin/tags'
     | '/admin/vendedores'
     | '/admin/whatsapp'
     | '/admin/'
@@ -355,12 +375,14 @@ export interface FileRouteTypes {
     | '/sobre-nos'
     | '/termo-uso'
     | '/admin/conversas'
+    | '/admin/grupos'
     | '/admin/leads'
     | '/admin/login'
     | '/admin/meta'
     | '/admin/negociacoes'
     | '/admin/produtos'
     | '/admin/radar'
+    | '/admin/tags'
     | '/admin/vendedores'
     | '/admin/whatsapp'
     | '/'
@@ -389,12 +411,14 @@ export interface FileRouteTypes {
     | '/_public/sobre-nos'
     | '/_public/termo-uso'
     | '/admin/conversas'
+    | '/admin/grupos'
     | '/admin/leads'
     | '/admin/login'
     | '/admin/meta'
     | '/admin/negociacoes'
     | '/admin/produtos'
     | '/admin/radar'
+    | '/admin/tags'
     | '/admin/vendedores'
     | '/admin/whatsapp'
     | '/_public/'
@@ -419,12 +443,14 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   PublicRoute: typeof PublicRouteWithChildren
   AdminConversasRoute: typeof AdminConversasRoute
+  AdminGruposRoute: typeof AdminGruposRoute
   AdminLeadsRoute: typeof AdminLeadsRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AdminMetaRoute: typeof AdminMetaRoute
   AdminNegociacoesRoute: typeof AdminNegociacoesRoute
   AdminProdutosRoute: typeof AdminProdutosRoute
   AdminRadarRoute: typeof AdminRadarRoute
+  AdminTagsRoute: typeof AdminTagsRoute
   AdminVendedoresRoute: typeof AdminVendedoresRoute
   AdminWhatsappRoute: typeof AdminWhatsappRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -497,6 +523,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminConversasRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/grupos': {
+      id: '/admin/grupos'
+      path: '/admin/grupos'
+      fullPath: '/admin/grupos'
+      preLoaderRoute: typeof AdminGruposRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/leads': {
       id: '/admin/leads'
       path: '/admin/leads'
@@ -537,6 +570,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/radar'
       fullPath: '/admin/radar'
       preLoaderRoute: typeof AdminRadarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/tags': {
+      id: '/admin/tags'
+      path: '/admin/tags'
+      fullPath: '/admin/tags'
+      preLoaderRoute: typeof AdminTagsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/vendedores': {
@@ -713,12 +753,14 @@ const PublicRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   PublicRoute: PublicRouteWithChildren,
   AdminConversasRoute: AdminConversasRoute,
+  AdminGruposRoute: AdminGruposRoute,
   AdminLeadsRoute: AdminLeadsRoute,
   AdminLoginRoute: AdminLoginRoute,
   AdminMetaRoute: AdminMetaRoute,
   AdminNegociacoesRoute: AdminNegociacoesRoute,
   AdminProdutosRoute: AdminProdutosRoute,
   AdminRadarRoute: AdminRadarRoute,
+  AdminTagsRoute: AdminTagsRoute,
   AdminVendedoresRoute: AdminVendedoresRoute,
   AdminWhatsappRoute: AdminWhatsappRoute,
   AdminIndexRoute: AdminIndexRoute,

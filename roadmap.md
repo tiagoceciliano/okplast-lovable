@@ -27,3 +27,8 @@
 - [x] Adicionar contador regressivo da janela de 24 horas no chat
 - [x] Agendar mensagens futuras com envio bloqueado após o fechamento da janela
 - [x] Validar o fluxo autenticado de funil, vínculo, chat, tarefas, comentários e agendamento
+
+## Configurações no padrão Kinbox
+- [x] Criar área compartilhada de Configurações
+- [x] Implementar Membros, Tags e Grupos
+- [x] Validar CRUD e apresentação autenticada

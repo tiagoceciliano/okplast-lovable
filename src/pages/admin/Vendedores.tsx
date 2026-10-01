@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "@/lib/router-compat";
-import { AdminLayout } from "./AdminLayout";
+import { ConfiguracoesLayout } from "./components/ConfiguracoesLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Plus, Trash2, Save, Loader2, Users, KeyRound, Pencil } from "lucide-react";
+import { Plus, Trash2, Loader2, KeyRound, Pencil, Search } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { PermissionsMatrix } from "./components/PermissionsMatrix";
 import { listTeamMembers } from "@/lib/list-team-members.functions";
@@ -58,11 +59,11 @@ export default function Vendedores() {
   };
   const [rows, setRows] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [editCred, setEditCred] = useState<Member | null>(null);
   const [editFull, setEditFull] = useState<Member | null>(null);
   const [teamUsers, setTeamUsers] = useState<TeamUser[]>([]);
+  const [busca, setBusca] = useState("");
 
   const load = async () => {
     setLoading(true);
@@ -112,10 +113,6 @@ export default function Vendedores() {
   };
   useEffect(() => { load(); }, []);
 
-  const updateRow = (id: string, patch: Partial<Member>) => {
-    setRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch, _dirty: true } : r)));
-  };
-
   const removeRow = async (row: Member) => {
     if (!confirm(`Remover ${row.nome_vendedor}?`)) return;
     if (row.id) {
@@ -129,131 +126,31 @@ export default function Vendedores() {
   const activeReceivers = rows.filter((r) => r.ativo && r.recebe_lead);
   const totalPeso = activeReceivers.reduce((s, r) => s + (r.peso || 0), 0);
 
-  const saveAll = async () => {
-    if (activeReceivers.length > 0 && totalPeso !== 100) {
-      toast.error(`Soma dos pesos dos que recebem lead deve ser 100% (atual: ${totalPeso}%)`);
-      return;
-    }
-    setSaving(true);
-    try {
-      for (const r of rows) {
-        if (!r._dirty || !r.id) continue;
-        const raw = toRaw(r.numero_formatado);
-        const { error } = await supabase.from("whatsapp_numbers").update({
-          nome_vendedor: r.nome_vendedor,
-          numero_raw: raw,
-          numero_formatado: formatDisplay(raw),
-          peso: r.peso,
-          ativo: r.ativo,
-          recebe_lead: r.recebe_lead,
-        }).eq("id", r.id);
-        if (error) throw error;
-
-        // Atualiza role se mudou
-        if (r.user_id) {
-          await supabase.from("user_roles").delete().eq("user_id", r.user_id);
-          await supabase.from("user_roles").insert({ user_id: r.user_id, role: r.role });
-        }
-      }
-      toast.success("Salvo");
-      try { window.localStorage.removeItem("okp-wa-cache"); } catch {}
-      load();
-    } catch (e) { toast.error((e as Error).message); }
-    finally { setSaving(false); }
-  };
+  const filteredRows = rows.filter((row) => `${row.nome_vendedor} ${row.email ?? ""}`.toLowerCase().includes(busca.trim().toLowerCase()));
+  const roleLabel = (role: Role) => role === "admin" ? "PROPRIETÁRIO" : role === "gestor" ? "GERENTE" : "VENDEDOR";
 
   return (
-    <AdminLayout>
-      <div className="max-w-6xl mx-auto space-y-6">
-        <div className="flex items-center gap-3">
-          <Users className="h-6 w-6 text-primary" />
-          <div>
-            <h1 className="text-2xl font-bold">Vendedores & WhatsApp</h1>
-            <p className="text-sm text-muted-foreground">Gerencie a equipe, o rateio de WhatsApp e as permissões.</p>
-          </div>
-        </div>
-
+    <ConfiguracoesLayout active={tab === "permissoes" ? "permissoes" : "membros"}>
+      <div>
         <Tabs value={tab} onValueChange={setTab}>
-          <TabsList>
-            <TabsTrigger value="equipe">Equipe</TabsTrigger>
-            <TabsTrigger value="permissoes">Permissões</TabsTrigger>
-            <TabsTrigger value="rateio">Como funciona o rateio</TabsTrigger>
-          </TabsList>
+          <TabsList className="sr-only"><TabsTrigger value="equipe">Equipe</TabsTrigger><TabsTrigger value="permissoes">Permissões</TabsTrigger><TabsTrigger value="rateio">Rateio</TabsTrigger></TabsList>
 
           <TabsContent value="equipe" className="space-y-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle>Membros da equipe</CardTitle>
-                  <CardDescription>
-                    Total de peso dos ativos que recebem lead:{" "}
-                    <strong className={totalPeso === 100 ? "text-emerald-600" : "text-destructive"}>{totalPeso}%</strong>
-                  </CardDescription>
-                </div>
-                <Button size="sm" onClick={() => setAddOpen(true)}>
-                  <Plus className="h-4 w-4 mr-2" /> Adicionar membro
-                </Button>
-              </CardHeader>
-              <CardContent className="space-y-3">
+            <div className="mb-3 flex items-center justify-between"><h1 className="text-xl font-bold">Membros</h1><Button size="sm" variant="outline" onClick={() => setAddOpen(true)}><Plus className="h-4 w-4" /> Convidar membro</Button></div>
+            <div className="relative"><Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" /><Input value={busca} onChange={(e) => setBusca(e.target.value)} placeholder="Pesquisar por nome ou e-mail" className="h-10 border-primary pl-9" /></div>
+            <div className="flex items-center justify-between"><div className="inline-flex h-8 items-center rounded-md border bg-card px-3 text-xs">Tudo</div><p className="text-xs text-muted-foreground">Rateio ativo: <strong className={totalPeso === 100 ? "text-emerald-600" : "text-destructive"}>{totalPeso}%</strong></p></div>
+            <div className="overflow-hidden rounded-md border bg-card">
                 {loading ? <div className="flex justify-center py-8"><Loader2 className="animate-spin"/></div> :
-                 rows.length === 0 ? <p className="text-center text-muted-foreground py-6">Nenhum membro. Adicione um vendedor ou gestor.</p> :
-                 rows.map((row) => (
-                  <div key={row.id} className="p-3 border rounded-lg bg-card space-y-2">
-                   <div className="grid grid-cols-1 md:grid-cols-[1fr,1fr,140px,100px,auto,auto,auto,auto] gap-2 items-end">
-                    <div>
-                      <Label className="text-xs">Nome</Label>
-                      <Input value={row.nome_vendedor} onChange={(e) => updateRow(row.id!, { nome_vendedor: e.target.value })} />
-                    </div>
-                    <div>
-                      <Label className="text-xs">WhatsApp</Label>
-                      <Input value={row.numero_formatado} onChange={(e) => updateRow(row.id!, { numero_formatado: formatDisplay(e.target.value) })} maxLength={15} />
-                    </div>
-                    <div>
-                      <Label className="text-xs">Papel</Label>
-                      <Select value={row.role} onValueChange={(v) => updateRow(row.id!, { role: v as Role, recebe_lead: v !== "gestor", peso: v === "gestor" ? 0 : row.peso })}>
-                        <SelectTrigger><SelectValue/></SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="admin">Admin</SelectItem>
-                          <SelectItem value="gestor">Gestor</SelectItem>
-                          <SelectItem value="vendedor">Vendedor</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label className="text-xs">Peso (%)</Label>
-                      <Input type="number" min={0} max={100} value={row.peso} disabled={!row.recebe_lead}
-                        onChange={(e) => updateRow(row.id!, { peso: Math.max(0, Math.min(100, Number(e.target.value) || 0)) })} />
-                    </div>
-                    <div className="flex flex-col items-center gap-1">
-                      <Label className="text-xs">Recebe</Label>
-                      <Switch checked={row.recebe_lead} onCheckedChange={(v) => updateRow(row.id!, { recebe_lead: v, peso: v ? row.peso : 0 })} />
-                    </div>
-                    <div className="flex flex-col items-center gap-1">
-                      <Label className="text-xs">Ativo</Label>
-                      <Switch checked={row.ativo} onCheckedChange={(v) => updateRow(row.id!, { ativo: v })} />
-                    </div>
-                    <Button variant="ghost" size="icon" onClick={() => setEditCred(row)} disabled={!row.user_id} title="Editar email/senha">
-                      <KeyRound className="h-4 w-4"/>
-                    </Button>
-                    <Button variant="ghost" size="icon" onClick={() => setEditFull(row)} title="Editar tudo">
-                      <Pencil className="h-4 w-4"/>
-                    </Button>
-                    <Button variant="ghost" size="icon" onClick={() => removeRow(row)} className="text-destructive">
-                      <Trash2 className="h-4 w-4"/>
-                    </Button>
-                  </div>
-                   <div className="text-xs text-muted-foreground pl-1">
-                     {row.user_id ? (row.email ? <>Login: <strong className="text-foreground">{row.email}</strong></> : "Sem email vinculado") : "Sem usuário de login"}
+                 filteredRows.length === 0 ? <p className="py-8 text-center text-sm text-muted-foreground">Nenhum membro encontrado.</p> :
+                 filteredRows.map((row, index) => (
+                   <div key={row.id} className="grid min-h-12 grid-cols-[minmax(0,1.2fr)_minmax(120px,.8fr)_90px_auto] items-center gap-3 border-b px-3 last:border-b-0 hover:bg-muted/35">
+                     <div className="flex min-w-0 items-center gap-3"><Avatar className="h-7 w-7"><AvatarFallback className={index % 2 ? "bg-amber-100 text-amber-700 text-[10px]" : "bg-violet-100 text-violet-700 text-[10px]"}>{row.nome_vendedor.charAt(0).toUpperCase()}</AvatarFallback></Avatar><div className="min-w-0"><p className="truncate text-sm font-medium">{row.nome_vendedor}</p><p className="truncate text-[10px] text-muted-foreground">{row.email || "Sem e-mail de login"}</p></div></div>
+                     <span className="w-fit rounded bg-muted px-2 py-0.5 text-[10px] font-medium">{roleLabel(row.role)}</span>
+                     <span className={row.ativo ? "text-xs font-semibold text-emerald-600" : "text-xs text-muted-foreground"}>{row.ativo ? "Online" : "Inativo"}</span>
+                     <div className="flex"><Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditCred(row)} disabled={!row.user_id} title="Editar e-mail e senha"><KeyRound className="h-3.5 w-3.5"/></Button><Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditFull(row)} title="Editar membro"><Pencil className="h-3.5 w-3.5"/></Button><Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => removeRow(row)} title="Remover"><Trash2 className="h-3.5 w-3.5"/></Button></div>
                    </div>
-                  </div>
                  ))}
-                <div className="flex justify-end pt-4 border-t">
-                  <Button onClick={saveAll} disabled={saving || loading}>
-                    {saving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin"/>Salvando…</> : <><Save className="h-4 w-4 mr-2"/>Salvar alterações</>}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            </div>
           </TabsContent>
 
           <TabsContent value="permissoes">
@@ -285,7 +182,7 @@ export default function Vendedores() {
       <AddMemberDialog open={addOpen} onOpenChange={setAddOpen} onCreated={load} />
       <EditCredentialsDialog member={editCred} onClose={() => setEditCred(null)} onSaved={load} />
       <EditMemberDialog member={editFull} users={teamUsers} onClose={() => setEditFull(null)} onSaved={load} />
-    </AdminLayout>
+    </ConfiguracoesLayout>
   );
 }
 
