@@ -31,7 +31,7 @@ export default function Negociacoes() {
   const [filtroResp, setFiltroResp] = useState<string>("all");
   const [ativo, setAtivo] = useState<Negociacao | null>(null);
   const [dragging, setDragging] = useState<Negociacao | null>(null);
-  const [countsT, setCountsT] = useState<Record<string, number>>({});
+  const [countsT, setCountsT] = useState<Record<string, { pend: number; total: number }>>({});
   const [countsC, setCountsC] = useState<Record<string, number>>({});
   const [chats, setChats] = useState<Record<string, number>>({});
   const [chatAtivo, setChatAtivo] = useState<Negociacao | null>(null);
