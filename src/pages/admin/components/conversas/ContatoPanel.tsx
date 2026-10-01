@@ -233,7 +233,7 @@ export function ContatoPanel({ conversa, onNomeAtualizado, onNegociacaoVinculada
                const etapa = ETAPAS.find((e) => e.id === n.etapa)?.label;
                const ativoCard = n.id === selId;
                const editavel = !!me && (me.gestor || n.responsavel_id === me.id);
-               const statusCls = n.status === "ganho" ? "text-success" : n.status === "perdido" ? "text-destructive" : "text-primary";
+               const statusCls = n.status === "ganho" ? "text-muted-foreground" : n.status === "perdido" ? "text-destructive" : "text-primary";
                return (
                  <div key={n.id} className={`rounded-md border transition ${ativoCard ? "border-primary/50 bg-muted/30" : "hover:border-primary/30"}`}>
                    <HoverCard openDelay={300} closeDelay={100}>
@@ -290,7 +290,8 @@ export function ContatoPanel({ conversa, onNomeAtualizado, onNegociacaoVinculada
 
           {/* Notas internas */}
            <Section title="Notas" icon={StickyNote}>
-            <Textarea
+            {podeEditar && <>
+<Textarea
               value={novaNota}
               onChange={(e) => setNovaNota(e.target.value)}
               rows={2}
@@ -299,7 +300,7 @@ export function ContatoPanel({ conversa, onNomeAtualizado, onNegociacaoVinculada
             />
             <Button size="sm" className="mt-2 w-full" disabled={!novaNota.trim() || salvando} onClick={adicionarNota}>
               {salvando ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : null} Salvar nota
-            </Button>
+            </Button></>}
             <div className="mt-3 space-y-2">
               {notas.map((n) => (
                 <div key={n.id} className="rounded-md bg-gold/20 px-2.5 py-2 text-xs">

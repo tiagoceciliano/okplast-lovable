@@ -97,14 +97,8 @@ export default function Conversas() {
 
   useEffect(() => {
     (async () => {
-      const { data: numeros } = await supabase.from("whatsapp_numbers").select("user_id,nome_vendedor,ativo").eq("ativo", true).not("user_id", "is", null);
-      const nomes = new Map((numeros ?? []).map((item) => [item.user_id as string, item.nome_vendedor]));
-      let emails = new Map<string, string | null>();
-      try {
-        const equipe = await listTeamMembers();
-        emails = new Map(equipe.users.map((item) => [item.id, item.email]));
-      } catch { /* vendedores podem não listar credenciais da equipe */ }
-      setAtendentes(Array.from(nomes, ([id, nome]) => ({ id, nome, email: emails.get(id) ?? null })));
+      const { data: equipe } = await supabase.rpc("list_equipe");
+      setAtendentes((equipe ?? []).map((u) => ({ id: u.id, nome: u.nome, email: u.email ?? null })));
     })();
   }, []);
 
