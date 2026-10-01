@@ -70,6 +70,11 @@ export default function Conversas() {
     const lista = (data as Conversa[]) || [];
     setConversas(lista);
     setLoading(false);
+    const alvo = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("conversa") : null;
+    if (alvo) {
+      const c = lista.find((item) => item.id === alvo);
+      if (c) setSelecionada((atual) => atual ?? c);
+    }
 
     const ids = lista.map((c) => c.negociacao_id).filter((v): v is string => !!v);
     if (ids.length) {

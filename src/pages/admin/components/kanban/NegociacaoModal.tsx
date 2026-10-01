@@ -11,7 +11,8 @@ import { Check, X, Trash2, Plus, UserCheck, MessageCirclePlus, Link2 } from "luc
 import { toast } from "sonner";
 import { ETAPAS, brl, type EtapaId, type Negociacao, type VendedorLite } from "./types";
 import { usePermissions } from "@/hooks/usePermissions";
-import { ConversaChat, type Conversa } from "../conversas/ConversaChat";
+import { type Conversa } from "../conversas/ConversaChat";
+import { useNavigate } from "@/lib/router-compat";
 
 interface Props {
   negociacao: Negociacao | null;
@@ -39,6 +40,7 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
   const [novaData, setNovaData] = useState("");
   const [produtos, setProdutos] = useState<ProdutoLite[]>([]);
   const [conversa, setConversa] = useState<Conversa | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => setN(negociacao), [negociacao]);
   useEffect(() => {
@@ -321,9 +323,9 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
             {conversa && (
               <div>
                 <Label className="text-xs">Conversa WhatsApp</Label>
-                <div className="h-72 border rounded-md p-2">
-                  <ConversaChat conversa={conversa} />
-                </div>
+                <Button className="mt-1 w-full" variant="outline" onClick={() => navigate(`/admin/conversas?conversa=${conversa.id}`)}>
+                  <MessageCirclePlus /> Ir para conversa{conversa.nao_lidas > 0 ? ` (${conversa.nao_lidas} não lidas)` : ""}
+                </Button>
               </div>
             )}
 

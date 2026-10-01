@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { MessageCirclePlus, Link2, Loader2 } from "lucide-react";
+import { MessageCirclePlus, Link2, Loader2, UserRound, ExternalLink } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useEtiquetas } from "../conversas/tags";
+import { useNavigate } from "@/lib/router-compat";
 import { supabase } from "@/integrations/supabase/client";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -32,6 +35,26 @@ export function NegociacaoChatSheet({ negociacao, onClose, onChanged }: Props) {
   const [livres, setLivres] = useState<Conversa[]>([]);
   const [busca, setBusca] = useState("");
   const [loading, setLoading] = useState(false);
+  const [atendentes, setAtendentes] = useState<{ id: string; nome: string }[]>([]);
+  const [tags, setTags] = useState<string[]>([]);
+  const etiquetas = useEtiquetas();
+  const navigate = useNavigate();
+
+  useEffect(() => { setTags(negociacao?.tags ?? []); }, [negociacao?.id]);
+  useEffect(() => {
+    supabase.from("whatsapp_numbers").select("user_id,nome_vendedor").eq("ativo", true).not("user_id", "is", null)
+      .then(({ data }) => setAtendentes(Array.from(new Map((data ?? []).map((d) => [d.user_id as string, d.nome_vendedor])), ([id, nome]) => ({ id, nome }))));
+  }, []);
+
+  const transferir = async (responsavelId: string) => {
+    if (!conversa) return;
+    const { error } = await supabase.from("whatsapp_conversas").update({ responsavel_id: responsavelId }).eq("id", conversa.id);
+    if (error) { toast.error(error.message); return; }
+    if (conversa.negociacao_id) await supabase.from("negociacoes").update({ responsavel_id: responsavelId }).eq("id", conversa.negociacao_id);
+    setConversa({ ...conversa, responsavel_id: responsavelId });
+    onChanged();
+    toast.success("Atendimento transferido");
+  };
 
   const carregar = async () => {
     setConversa(null); setLivres([]);
@@ -102,11 +125,24 @@ export function NegociacaoChatSheet({ negociacao, onClose, onChanged }: Props) {
     <Sheet open={Boolean(negociacao)} onOpenChange={(open) => !open && onClose()}>
       <SheetContent side="right" className="flex w-[min(720px,92vw)] max-w-none flex-col gap-0 p-0 sm:max-w-none">
         <SheetHeader className="border-b px-4 py-3 text-left">
-          <SheetTitle className="pr-8">{negociacao?.nome_cliente || "Conversa"}</SheetTitle>
-          <SheetDescription>{negociacao?.telefone || "Associe uma conversa para continuar"}</SheetDescription>
+          <div className="flex items-center gap-2 pr-8">
+            <div className="min-w-0 flex-1">
+              <SheetTitle className="truncate">{negociacao?.nome_cliente || "Conversa"}</SheetTitle>
+              <SheetDescription>{negociacao?.telefone || "Associe uma conversa para continuar"}</SheetDescription>
+            </div>
+            {conversa && (
+              <>
+                <Select value={conversa.responsavel_id ?? "sem"} onValueChange={transferir}>
+                  <SelectTrigger className="h-8 w-44 text-xs"><UserRound className="h-3.5 w-3.5" /><SelectValue placeholder="Transferir" /></SelectTrigger>
+                  <SelectContent>{!conversa.responsavel_id && <SelectItem value="sem" disabled>Sem responsável</SelectItem>}{atendentes.map((a) => <SelectItem key={a.id} value={a.id}>{a.nome}</SelectItem>)}</SelectContent>
+                </Select>
+                <Button size="sm" variant="outline" className="h-8" onClick={() => navigate(`/admin/conversas?conversa=${conversa.id}`)}><ExternalLink /> Abrir</Button>
+              </>
+            )}
+          </div>
         </SheetHeader>
         {conversa ? (
-          <div className="min-h-0 flex-1"><ConversaChat conversa={conversa} /></div>
+          <div className="min-h-0 flex-1"><ConversaChat conversa={conversa} tags={tags} etiquetas={etiquetas} onTagsChange={(t) => { setTags(t); onChanged(); }} /></div>
         ) : (
           <div className="flex flex-1 flex-col p-5">
             <div className="mx-auto w-full max-w-lg space-y-4">
