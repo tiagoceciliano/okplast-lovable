@@ -64,6 +64,13 @@
       "when": 1790865372809,
       "tag": "0008_conversa_negociacoes_equipe",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1790865620813,
+      "tag": "0009_separar_tags_conversa_negociacao",
+      "breakpoints": true
     }
   ]
 }

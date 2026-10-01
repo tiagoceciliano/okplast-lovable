@@ -8,6 +8,7 @@ export interface TagDef {
   cor: string;
   escopo: "todos" | "pessoal";
   owner_id: string | null;
+  aplica_em: ("conversa" | "negociacao")[];
 }
 
 export const CORES: Record<string, string> = {
@@ -37,6 +38,7 @@ export async function recarregarEtiquetas() {
     className: CORES[e.cor] ?? CORES["slate"]!,
     escopo: e.escopo as TagDef["escopo"],
     owner_id: e.owner_id,
+    aplica_em: (e.aplica_em ?? ["conversa", "negociacao"]) as TagDef["aplica_em"],
   }));
   listeners.forEach((l) => l(cache));
 }
@@ -59,4 +61,7 @@ export const tagDef = (id: string, lista: TagDef[] = cache): TagDef =>
     cor: "slate",
     escopo: "todos",
     owner_id: null,
+    aplica_em: ["conversa", "negociacao"],
   };
+
+export const tagsDe = (lista: TagDef[], tipo: "conversa" | "negociacao") => lista.filter((t) => t.aplica_em.includes(tipo));
