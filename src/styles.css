@@ -79,6 +79,12 @@
   --color-cta-email: hsl(var(--cta-email));
   --color-cta-email-foreground: hsl(var(--cta-email-foreground));
   --color-gold: hsl(var(--gold));
+  --color-chat-bg: hsl(var(--chat-bg));
+  --color-chat-in: hsl(var(--chat-in));
+  --color-chat-out: hsl(var(--chat-out));
+  --color-chat-avatar: hsl(var(--chat-avatar));
+  --color-chat-avatar-foreground: hsl(var(--chat-avatar-foreground));
+  --color-chat-tick: hsl(var(--chat-tick));
   --color-gold-foreground: hsl(var(--gold-foreground));
 
   --color-sidebar: hsl(var(--sidebar-background));
@@ -191,6 +197,12 @@
 
   /* Gold/Yellow for accent buttons */
   --gold: 45 90% 50%;
+  --chat-bg: 36 22% 92%;
+  --chat-in: 0 0% 100%;
+  --chat-out: 190 70% 89%;
+  --chat-avatar: 290 60% 90%;
+  --chat-avatar-foreground: 285 60% 42%;
+  --chat-tick: 199 85% 55%;
   --gold-foreground: 0 0% 15%;
 
   /* Sidebar */
@@ -205,6 +217,12 @@
 }
 
 .dark {
+  --chat-bg: 200 15% 12%;
+  --chat-in: 200 15% 20%;
+  --chat-out: 190 45% 25%;
+  --chat-avatar: 290 30% 30%;
+  --chat-avatar-foreground: 290 70% 85%;
+  --chat-tick: 199 85% 60%;
   --background: 212 55% 8%;
   --foreground: 0 0% 98%;
 
@@ -410,4 +428,9 @@
       max-width: 200px;
     }
   }
+}
+
+@utility chat-wallpaper {
+  background-color: var(--color-chat-bg);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' fill='none' stroke='%23000' stroke-opacity='.045' stroke-width='1.4'%3E%3Ccircle cx='20' cy='20' r='8'/%3E%3Cpath d='M70 12h18v14H70zM14 70l10 10 10-10M60 60c8-10 20 0 28-8M95 90a8 8 0 1 0 0 .1M40 100h14M47 93v14M100 40l6 6-6 6-6-6z'/%3E%3C/svg%3E");
 }
