@@ -16,7 +16,8 @@ export const Route = createFileRoute("/api/public/whatsapp/process-schedules")({
     handlers: {
       POST: async ({ request }) => {
         const apiKey = request.headers.get("apikey");
-        if (!apiKey || apiKey !== process.env["SUPABASE_ANON_KEY"]) {
+        const validKeys = [process.env["SUPABASE_ANON_KEY"], process.env["SUPABASE_PUBLISHABLE_KEY"]].filter(Boolean);
+        if (!apiKey || !validKeys.includes(apiKey)) {
           return Response.json({ error: "Não autorizado" }, { status: 401 });
         }
         const lovableKey = process.env["LOVABLE_API_KEY"];

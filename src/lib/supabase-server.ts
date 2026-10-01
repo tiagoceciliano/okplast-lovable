@@ -11,7 +11,7 @@ export function getSupabaseUrl(): string {
 
 export function getAnonKey(): string {
   const key =
-    process.env['SUPABASE_ANON_KEY'] ?? process.env['VITE_SUPABASE_PUBLISHABLE_KEY'];
+    process.env['SUPABASE_ANON_KEY'] ?? process.env['SUPABASE_PUBLISHABLE_KEY'] ?? process.env['VITE_SUPABASE_PUBLISHABLE_KEY'];
   if (!key) throw new Error("Chave pública do backend não configurada");
   return key;
 }
