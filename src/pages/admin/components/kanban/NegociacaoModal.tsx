@@ -70,12 +70,18 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
     if (porNeg?.[0]) { setConversa(porNeg[0] as Conversa); return; }
     const d = (negociacao.telefone || "").replace(/\D/g, "");
     if (d.length >= 10) {
-      const candidatos = d.startsWith("55") ? [d, d.slice(2)] : [`55${d}`, d];
-      const { data } = await supabase.from("whatsapp_conversas").select("*").in("telefone", candidatos).limit(1);
-      const c = data?.[0] as Conversa | undefined;
+      const normalizado = d.startsWith("55") && d.length > 11 ? d.slice(2) : d;
+      const { data } = await supabase.from("whatsapp_conversas").select("*").limit(500);
+      const c = (data as Conversa[] | null)?.find((item) => {
+        const telefone = item.telefone.replace(/\D/g, "");
+        const telefoneNormalizado = telefone.startsWith("55") && telefone.length > 11 ? telefone.slice(2) : telefone;
+        return telefoneNormalizado === normalizado;
+      });
       if (c) {
-        if (!c.negociacao_id) await supabase.from("whatsapp_conversas").update({ negociacao_id: negociacao.id }).eq("id", c.id);
-        setConversa(c); return;
+        const { data: vinculada, error } = await supabase.from("whatsapp_conversas").update({ negociacao_id: negociacao.id }).eq("id", c.id).select("*").single();
+        if (!error && vinculada) setConversa(vinculada as Conversa);
+        if (!error) onChanged();
+        return;
       }
     }
     const { data: livres } = await supabase.from("whatsapp_conversas").select("*").is("negociacao_id", null)
