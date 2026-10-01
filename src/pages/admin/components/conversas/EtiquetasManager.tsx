@@ -12,7 +12,8 @@ interface Props { open: boolean; onOpenChange: (v: boolean) => void }
 
 export function EtiquetasManager({ open, onOpenChange }: Props) {
   const tags = useEtiquetas();
-  const { user, isAdminOrGestor } = useCurrentUser() as any;
+  const { user } = useCurrentUser();
+  const isAdminOrGestor = !!user?.roles.some((r) => r === "admin" || r === "gestor");
   const [editId, setEditId] = useState<string | null>(null);
   const [nome, setNome] = useState("");
   const [cor, setCor] = useState("sky");
