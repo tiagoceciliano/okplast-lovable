@@ -25,6 +25,7 @@ export interface Conversa {
   ultima_mensagem_em: string | null;
   ultima_entrada_cliente_em: string | null;
   nao_lidas: number;
+  resolvida_em?: string | null;
 }
 
 interface Mensagem {
@@ -134,7 +135,7 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas = []
         .select("id,direcao,tipo,conteudo,status,created_at")
         .eq("conversa_id", conversa.id)
         .order("created_at", { ascending: true })
-        .limit(200);
+        .limit(5000);
       if (ativo) setMensagens((data as Mensagem[]) || []);
       if (conversa.nao_lidas > 0) {
         await supabase.from("whatsapp_conversas").update({ nao_lidas: 0 }).eq("id", conversa.id);
@@ -211,6 +212,16 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas = []
 
   const tSel = templates.find((x) => x.nome === templateSel);
   const mensagensVisiveis = busca.trim() ? mensagens.filter((m) => (m.conteudo || "").toLowerCase().includes(busca.toLowerCase())) : mensagens;
+
+  const [resolvida, setResolvida] = useState(!!conversa.resolvida_em);
+  useEffect(() => { setResolvida(!!conversa.resolvida_em); }, [conversa.id, conversa.resolvida_em]);
+  const alternarResolvida = async () => {
+    const valor = resolvida ? null : new Date().toISOString();
+    const { error } = await supabase.from("whatsapp_conversas").update({ resolvida_em: valor }).eq("id", conversa.id);
+    if (error) { toast.error(error.message); return; }
+    setResolvida(!!valor);
+    toast.success(valor ? "Atendimento resolvido. Se o cliente escrever, ele reabre com todo o histórico." : "Atendimento reaberto");
+  };
 
   const marcarNaoLida = async () => {
     const { error } = await supabase.from("whatsapp_conversas").update({ nao_lidas: 1 }).eq("id", conversa.id);
@@ -302,7 +313,7 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas = []
           <span className="truncate">{aberta ? `Janela encerra em ${formatRemaining(restante)}` : "Janela de 24h encerrada"}</span>
         </div>
         <div className="flex shrink-0 items-center gap-1">
-        <Button variant="ghost" size="sm" className="h-8"><Check className="h-4 w-4" /> Resolver</Button>
+        <Button variant="ghost" size="sm" className="h-8" onClick={alternarResolvida}><Check className="h-4 w-4" /> {resolvida ? "Reabrir" : "Resolver"}</Button>
         <Popover>
           <PopoverTrigger asChild><Button size="icon" variant="ghost" className="h-8 w-8" aria-label="Mais ações"><MoreHorizontal /></Button></PopoverTrigger>
           <PopoverContent align="end" className="w-60 p-1">
