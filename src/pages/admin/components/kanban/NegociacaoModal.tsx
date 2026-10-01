@@ -40,6 +40,7 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
   const [novaData, setNovaData] = useState("");
   const [produtos, setProdutos] = useState<ProdutoLite[]>([]);
   const [conversa, setConversa] = useState<Conversa | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => setN(negociacao), [negociacao]);
   useEffect(() => {
