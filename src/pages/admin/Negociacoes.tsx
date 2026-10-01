@@ -98,12 +98,26 @@ export default function Negociacoes() {
 
   const filtered = useMemo(() => items.filter((n) => {
     if (filtroResp !== "all" && n.responsavel_id !== (filtroResp === "none" ? null : filtroResp)) return false;
+    if (filtroProduto !== "all" && (n.produto || n.material || "") !== filtroProduto) return false;
+    if (filtroTag !== "all" && !n.tags.includes(filtroTag)) return false;
+    if (filtroStatus !== "all" && n.status !== filtroStatus) return false;
+    if (filtroEtapa !== "all" && n.etapa !== filtroEtapa) return false;
+    if (filtroInicio && new Date(n.created_at) < new Date(`${filtroInicio}T00:00:00`)) return false;
+    if (filtroFim && new Date(n.created_at) > new Date(`${filtroFim}T23:59:59`)) return false;
     if (busca) {
       const q = busca.toLowerCase();
       return [n.nome_cliente, n.telefone, n.email, n.produto].some((x) => (x || "").toLowerCase().includes(q));
     }
     return true;
-  }), [items, busca, filtroResp]);
+  }), [items, busca, filtroResp, filtroProduto, filtroTag, filtroStatus, filtroEtapa, filtroInicio, filtroFim]);
+
+  const produtosFiltro = useMemo(() => Array.from(new Set(items.map((n) => n.produto || n.material).filter((v): v is string => Boolean(v)))).sort(), [items]);
+  const tagsFiltro = useMemo(() => Array.from(new Set(items.flatMap((n) => n.tags))).sort(), [items]);
+  const filtrosAtivos = [filtroResp, filtroProduto, filtroTag, filtroStatus, filtroEtapa].filter((value) => value !== "all").length + (filtroInicio ? 1 : 0) + (filtroFim ? 1 : 0);
+
+  const limparFiltros = () => {
+    setFiltroResp("all"); setFiltroProduto("all"); setFiltroTag("all"); setFiltroStatus("all"); setFiltroEtapa("all"); setFiltroInicio(""); setFiltroFim("");
+  };
 
   const byEtapa = useMemo(() => {
     const map: Record<EtapaId, Negociacao[]> = {
@@ -157,12 +171,12 @@ export default function Negociacoes() {
   if (permLoading) return <AdminLayout><div className="p-8">Carregando…</div></AdminLayout>;
 
   return (
-    <AdminLayout>
-      <div className="space-y-4 h-full flex flex-col">
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <h1 className="text-2xl font-bold">Negociações</h1>
-            <p className="text-sm text-muted-foreground">Pipeline de vendas</p>
+    <AdminLayout fullBleed>
+      <div className="flex h-screen min-h-[580px] flex-col overflow-hidden bg-card">
+        <div className="grid shrink-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b px-5 py-3">
+          <div className="min-w-0">
+            <h1 className="truncate text-lg font-bold">Venda</h1>
+            <p className="text-xs text-muted-foreground">Funil comercial</p>
           </div>
           {podeCriar && (
             <Button onClick={() => setNovaOpen(true)}>
@@ -170,21 +184,28 @@ export default function Negociacoes() {
             </Button>
           )}
         </div>
-        <div className="flex gap-2 items-center">
-          <Input placeholder="Buscar…" value={busca} onChange={(e) => setBusca(e.target.value)} className="max-w-xs" />
-          <Select value={filtroResp} onValueChange={setFiltroResp}>
-            <SelectTrigger className="w-52"><SelectValue placeholder="Responsável" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos os responsáveis</SelectItem>
-              <SelectItem value="none">Sem responsável</SelectItem>
-              {vendedores.map((v) => <SelectItem key={v.user_id} value={v.user_id}>{v.nome}</SelectItem>)}
-            </SelectContent>
-          </Select>
+        </div>
+
+        <div className="flex shrink-0 items-center gap-2 border-b px-5 py-2">
+          <div className="relative w-60"><Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" /><Input placeholder="Pesquisar" value={busca} onChange={(e) => setBusca(e.target.value)} className="h-9 pl-8" /></div>
+          <Popover>
+            <PopoverTrigger asChild><Button variant="ghost" size="sm"><Filter /> Filtrar {filtrosAtivos > 0 && <span className="rounded-full bg-primary px-1.5 text-[10px] text-primary-foreground">{filtrosAtivos}</span>}</Button></PopoverTrigger>
+            <PopoverContent align="start" className="w-80 space-y-3 p-3">
+              <p className="text-sm font-semibold">Filtros</p>
+              <Select value={filtroResp} onValueChange={setFiltroResp}><SelectTrigger><SelectValue placeholder="Responsável" /></SelectTrigger><SelectContent><SelectItem value="all">Todos os responsáveis</SelectItem><SelectItem value="none">Sem responsável</SelectItem>{vendedores.map((v) => <SelectItem key={v.user_id} value={v.user_id}>{v.nome}</SelectItem>)}</SelectContent></Select>
+              <Select value={filtroProduto} onValueChange={setFiltroProduto}><SelectTrigger><SelectValue placeholder="Produto" /></SelectTrigger><SelectContent><SelectItem value="all">Todos os produtos</SelectItem>{produtosFiltro.map((produto) => <SelectItem key={produto} value={produto}>{produto}</SelectItem>)}</SelectContent></Select>
+              <Select value={filtroTag} onValueChange={setFiltroTag}><SelectTrigger><SelectValue placeholder="Etiqueta" /></SelectTrigger><SelectContent><SelectItem value="all">Todas as etiquetas</SelectItem>{tagsFiltro.map((tag) => <SelectItem key={tag} value={tag}>{tag}</SelectItem>)}</SelectContent></Select>
+              <div className="grid grid-cols-2 gap-2"><Select value={filtroEtapa} onValueChange={setFiltroEtapa}><SelectTrigger><SelectValue placeholder="Etapa" /></SelectTrigger><SelectContent><SelectItem value="all">Todas as etapas</SelectItem>{ETAPAS.map((etapa) => <SelectItem key={etapa.id} value={etapa.id}>{etapa.label}</SelectItem>)}</SelectContent></Select><Select value={filtroStatus} onValueChange={setFiltroStatus}><SelectTrigger><SelectValue placeholder="Status" /></SelectTrigger><SelectContent><SelectItem value="all">Todos os status</SelectItem><SelectItem value="aberto">Aberto</SelectItem><SelectItem value="ganho">Ganho</SelectItem><SelectItem value="perdido">Perdido</SelectItem></SelectContent></Select></div>
+              <div className="grid grid-cols-2 gap-2"><div><span className="mb-1 flex items-center gap-1 text-[10px] text-muted-foreground"><CalendarDays className="h-3 w-3" /> De</span><Input type="date" value={filtroInicio} onChange={(e) => setFiltroInicio(e.target.value)} /></div><div><span className="mb-1 flex items-center gap-1 text-[10px] text-muted-foreground"><CalendarDays className="h-3 w-3" /> Até</span><Input type="date" value={filtroFim} onChange={(e) => setFiltroFim(e.target.value)} /></div></div>
+              <Button variant="ghost" size="sm" className="w-full" onClick={limparFiltros}><X /> Limpar filtros</Button>
+            </PopoverContent>
+          </Popover>
+          <Select value={ordenacao} onValueChange={setOrdenacao}><SelectTrigger className="ml-auto h-9 w-44"><ArrowDownAZ className="h-4 w-4" /><SelectValue /></SelectTrigger><SelectContent><SelectItem value="recentes">Mais recentes</SelectItem><SelectItem value="antigos">Mais antigos</SelectItem><SelectItem value="maior_valor">Maior valor</SelectItem><SelectItem value="menor_valor">Menor valor</SelectItem></SelectContent></Select>
         </div>
 
         <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
-          <div className="flex-1 overflow-x-auto">
-            <div className="flex gap-3 pb-4 min-h-[500px]">
+          <div className="flex-1 overflow-auto bg-muted/20 p-3">
+            <div className="flex min-h-full gap-2 pb-2">
               {ETAPAS.map((e) => (
                 <KanbanColumn
                   key={e.id}
@@ -197,6 +218,7 @@ export default function Negociacoes() {
                   vencidas={venc}
                   chats={chats}
                   onCardClick={(n) => setAtivo(n)}
+                   onChatClick={(n) => setChatAtivo(n)}
                   onAdd={() => setNovaOpen(true)}
                   canAdd={podeCriar}
                 />
@@ -204,7 +226,7 @@ export default function Negociacoes() {
             </div>
           </div>
           <DragOverlay>
-            {dragging && <KanbanCard negociacao={dragging} vendedores={vendedores} onClick={() => {}} />}
+            {dragging && <KanbanCard negociacao={dragging} vendedores={vendedores} onClick={() => {}} onChatClick={() => {}} />}
           </DragOverlay>
         </DndContext>
       </div>
@@ -230,6 +252,7 @@ export default function Negociacoes() {
         onClose={() => setGanhoPending(null)}
         onDone={() => { setGanhoPending(null); load(); }}
       />
+      <NegociacaoChatSheet negociacao={chatAtivo} onClose={() => setChatAtivo(null)} onChanged={load} />
     </AdminLayout>
   );
 }
