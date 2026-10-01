@@ -40,7 +40,12 @@ const fmt = (iso: string) =>
 
 export function ContatoPanel({ conversa, onNomeAtualizado, onNegociacaoVinculada }: Props) {
   const navigate = useNavigate();
-  const [neg, setNeg] = useState<Negociacao | null>(null);
+  const [negs, setNegs] = useState<Negociacao[]>([]);
+  const [selId, setSelId] = useState<string | null>(null);
+  const neg = negs.find((n) => n.id === selId) ?? null;
+  const setNeg = (n: Negociacao) => setNegs((prev) => prev.map((item) => (item.id === n.id ? n : item)));
+  const [equipe, setEquipe] = useState<Record<string, string>>({});
+  const [me, setMe] = useState<{ id: string; gestor: boolean } | null>(null);
   const [notas, setNotas] = useState<Nota[]>([]);
   const [novaNota, setNovaNota] = useState("");
   const [nome, setNome] = useState(conversa.nome_contato ?? "");
@@ -50,41 +55,57 @@ export function ContatoPanel({ conversa, onNomeAtualizado, onNegociacaoVinculada
   const [gerenciar, setGerenciar] = useState(false);
   const [tarefas, setTarefas] = useState<Tarefa[]>([]);
   const [novaTarefa, setNovaTarefa] = useState("");
+  const podeEditar = !!neg && !!me && (me.gestor || neg.responsavel_id === me.id);
+
+  useEffect(() => {
+    (async () => {
+      const [{ data: lista }, { data: { session } }] = await Promise.all([
+        supabase.rpc("list_equipe"),
+        supabase.auth.getSession(),
+      ]);
+      setEquipe(Object.fromEntries((lista ?? []).map((u) => [u.id, u.nome])));
+      const eu = (lista ?? []).find((u) => u.id === session?.user.id);
+      if (session) setMe({ id: session.user.id, gestor: !!eu?.roles?.some((r) => r === "admin" || r === "gestor") });
+    })();
+  }, []);
 
   useEffect(() => {
     setNome(conversa.nome_contato ?? "");
     let ativo = true;
     (async () => {
       setCarregando(true);
-      let query = supabase.from("negociacoes").select("*").limit(1);
-      query = conversa.negociacao_id
-        ? query.eq("id", conversa.negociacao_id)
-        : query.eq("telefone", conversa.telefone);
-      const { data } = await query.maybeSingle();
+      const { data } = await supabase.rpc("list_negociacoes_conversa", { _conversa_id: conversa.id });
       if (!ativo) return;
-      const n = (data as Negociacao | null) ?? null;
-      setNeg(n);
-      if (n) {
-        if (!conversa.negociacao_id) {
-          const { error: vinculoError } = await supabase
-            .from("whatsapp_conversas")
-            .update({ negociacao_id: n.id })
-            .eq("id", conversa.id);
-          if (!vinculoError && ativo) onNegociacaoVinculada?.(n.id);
-        }
-        const [{ data: cms }, { data: tasks }] = await Promise.all([
-          supabase.from("negociacao_comentarios").select("id,texto,autor_id,created_at").eq("negociacao_id", n.id).order("created_at", { ascending: false }),
-          supabase.from("negociacao_tarefas").select("id,titulo,concluida,data_vencimento").eq("negociacao_id", n.id).order("created_at"),
-        ]);
-        if (ativo) setNotas((cms as Nota[]) || []);
-        if (ativo) setTarefas((tasks as Tarefa[]) || []);
-      } else {
-        setNotas([]);
+      const lista = (data as Negociacao[] | null) ?? [];
+      setNegs(lista);
+      const principal = lista.find((n) => n.status === "aberto") ?? lista.find((n) => n.id === conversa.negociacao_id) ?? lista[0] ?? null;
+      setSelId(principal?.id ?? null);
+      if (principal && conversa.negociacao_id !== principal.id && principal.status === "aberto") {
+        const { error: vinculoError } = await supabase
+          .from("whatsapp_conversas")
+          .update({ negociacao_id: principal.id })
+          .eq("id", conversa.id);
+        if (!vinculoError && ativo) onNegociacaoVinculada?.(principal.id);
       }
       if (ativo) setCarregando(false);
     })();
     return () => { ativo = false; };
   }, [conversa.id, conversa.negociacao_id, conversa.telefone, conversa.nome_contato]);
+
+  useEffect(() => {
+    if (!selId) { setNotas([]); setTarefas([]); return; }
+    let ativo = true;
+    (async () => {
+      const [{ data: cms }, { data: tasks }] = await Promise.all([
+        supabase.from("negociacao_comentarios").select("id,texto,autor_id,created_at").eq("negociacao_id", selId).order("created_at", { ascending: false }),
+        supabase.from("negociacao_tarefas").select("id,titulo,concluida,data_vencimento").eq("negociacao_id", selId).order("created_at"),
+      ]);
+      if (!ativo) return;
+      setNotas((cms as Nota[]) || []);
+      setTarefas((tasks as Tarefa[]) || []);
+    })();
+    return () => { ativo = false; };
+  }, [selId]);
 
   const salvarNome = async () => {
     const valor = nome.trim();
