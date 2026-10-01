@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Send, Clock, LayoutTemplate, Loader2 } from "lucide-react";
+import { Send, Clock, LayoutTemplate, Loader2, Check, CheckCheck, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 
 export interface Conversa {
@@ -163,12 +163,29 @@ export function ConversaChat({ conversa, onMarcarLida }: Props) {
         )}
         {mensagens.map((m) => (
           <div key={m.id} className={`flex ${m.direcao === "saida" ? "justify-end" : "justify-start"}`}>
-            <div className={`max-w-[80%] rounded-lg px-3 py-1.5 text-sm shadow-xs ${
-              m.direcao === "saida" ? "bg-primary text-primary-foreground" : "bg-background border"
+            <div className={`max-w-[78%] px-3 py-1.5 text-sm shadow-sm ${
+              m.direcao === "saida"
+                ? "rounded-2xl rounded-br-sm bg-emerald-600 text-white"
+                : "rounded-2xl rounded-bl-sm border bg-background"
             }`}>
               <div className="whitespace-pre-wrap break-words">{m.conteudo}</div>
-              <div className={`text-[10px] mt-0.5 ${m.direcao === "saida" ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
-                {fmtHora(m.created_at)}{m.status ? ` · ${m.status}` : ""}
+              <div className={`mt-0.5 flex items-center justify-end gap-1 text-[10px] ${
+                m.direcao === "saida" ? "text-white/70" : "text-muted-foreground"
+              }`}>
+                {fmtHora(m.created_at)}
+                {m.direcao === "saida" && m.status && (
+                  <span className="inline-flex items-center">
+                    {m.status === "failed" ? (
+                      <AlertCircle className="h-3 w-3" />
+                    ) : m.status === "read" ? (
+                      <CheckCheck className="h-3 w-3 text-sky-200" />
+                    ) : m.status === "delivered" ? (
+                      <CheckCheck className="h-3 w-3" />
+                    ) : (
+                      <Check className="h-3 w-3" />
+                    )}
+                  </span>
+                )}
               </div>
             </div>
           </div>
