@@ -4,10 +4,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Phone, Mail, User, Tag, StickyNote, Workflow } from "lucide-react";
+import { Loader2, Phone, Mail, User, Tag, StickyNote, Workflow, Settings2 } from "lucide-react";
 import { toast } from "sonner";
 import { ETAPAS, brl, type Negociacao } from "../kanban/types";
-import { TAGS, tagDef } from "./tags";
+import { useEtiquetas } from "./tags";
+import { EtiquetasManager } from "./EtiquetasManager";
 import type { Conversa } from "./ConversaChat";
 
 interface Nota {
@@ -35,6 +36,8 @@ export function ContatoPanel({ conversa, onNomeAtualizado }: Props) {
   const [nome, setNome] = useState(conversa.nome_contato ?? "");
   const [carregando, setCarregando] = useState(true);
   const [salvando, setSalvando] = useState(false);
+  const TAGS = useEtiquetas();
+  const [gerenciar, setGerenciar] = useState(false);
 
   useEffect(() => {
     setNome(conversa.nome_contato ?? "");
@@ -111,6 +114,7 @@ export function ContatoPanel({ conversa, onNomeAtualizado }: Props) {
 
   return (
     <div className="flex h-full min-h-0 flex-col overflow-y-auto">
+      <EtiquetasManager open={gerenciar} onOpenChange={setGerenciar} />
       {/* Contato */}
       <div className="border-b p-4">
         <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -184,6 +188,9 @@ export function ContatoPanel({ conversa, onNomeAtualizado }: Props) {
           <div className="border-b p-4">
             <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               <Tag className="h-3.5 w-3.5" /> Etiquetas
+              <button onClick={() => setGerenciar(true)} className="ml-auto flex items-center gap-1 normal-case tracking-normal text-primary hover:underline">
+                <Settings2 className="h-3.5 w-3.5" /> Gerenciar
+              </button>
             </div>
             <div className="flex flex-wrap gap-1.5">
               {TAGS.map((t) => {

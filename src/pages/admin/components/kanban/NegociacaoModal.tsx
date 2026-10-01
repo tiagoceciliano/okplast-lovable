@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Check, X, Trash2, Plus, UserCheck } from "lucide-react";
+import { Check, X, Trash2, Plus, UserCheck, MessageCirclePlus, Link2 } from "lucide-react";
 import { toast } from "sonner";
 import { ETAPAS, brl, type EtapaId, type Negociacao, type VendedorLite } from "./types";
 import { usePermissions } from "@/hooks/usePermissions";
@@ -59,15 +59,54 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
       .then(({ data }) => setProdutos((data as ProdutoLite[]) || []));
   }, []);
 
-  // Localiza a conversa WhatsApp pelo telefone da negociação
-  useEffect(() => {
+  // Localiza a conversa WhatsApp: primeiro pelo vínculo, depois pelo telefone
+  const [semVinculo, setSemVinculo] = useState<Conversa[]>([]);
+  const [vincSel, setVincSel] = useState("");
+  const [vinculando, setVinculando] = useState(false);
+  const buscarConversa = async () => {
     setConversa(null);
-    const d = (negociacao?.telefone || "").replace(/\D/g, "");
-    if (!negociacao || d.length < 10) return;
-    const candidatos = d.startsWith("55") ? [d, d.slice(2)] : [`55${d}`, d];
-    supabase.from("whatsapp_conversas").select("*").in("telefone", candidatos).limit(1)
-      .then(({ data }) => setConversa((data?.[0] as Conversa) || null));
-  }, [negociacao?.id, negociacao?.telefone]);
+    if (!negociacao) return;
+    const { data: porNeg } = await supabase.from("whatsapp_conversas").select("*").eq("negociacao_id", negociacao.id).limit(1);
+    if (porNeg?.[0]) { setConversa(porNeg[0] as Conversa); return; }
+    const d = (negociacao.telefone || "").replace(/\D/g, "");
+    if (d.length >= 10) {
+      const candidatos = d.startsWith("55") ? [d, d.slice(2)] : [`55${d}`, d];
+      const { data } = await supabase.from("whatsapp_conversas").select("*").in("telefone", candidatos).limit(1);
+      const c = data?.[0] as Conversa | undefined;
+      if (c) {
+        if (!c.negociacao_id) await supabase.from("whatsapp_conversas").update({ negociacao_id: negociacao.id }).eq("id", c.id);
+        setConversa(c); return;
+      }
+    }
+    const { data: livres } = await supabase.from("whatsapp_conversas").select("*").is("negociacao_id", null)
+      .order("ultima_mensagem_em", { ascending: false, nullsFirst: false }).limit(100);
+    setSemVinculo((livres as Conversa[]) || []);
+  };
+  useEffect(() => { buscarConversa(); }, [negociacao?.id, negociacao?.telefone]);
+
+  const vincularExistente = async () => {
+    if (!negociacao || !vincSel) return;
+    setVinculando(true);
+    const { error } = await supabase.from("whatsapp_conversas").update({ negociacao_id: negociacao.id }).eq("id", vincSel);
+    setVinculando(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Chat vinculado"); setVincSel(""); buscarConversa(); onChanged();
+  };
+  const abrirNovoChat = async () => {
+    if (!negociacao) return;
+    let tel = (negociacao.telefone || "").replace(/\D/g, "");
+    if (tel.length >= 10 && !tel.startsWith("55")) tel = `55${tel}`;
+    if (tel.length < 12) { toast.error("Cadastre o telefone com DDD na negociação primeiro."); return; }
+    setVinculando(true);
+    const { data, error } = await supabase.functions.invoke("whatsapp-send", {
+      body: { telefone: tel, tipo: "text", criar_apenas: true, nome_contato: negociacao.nome_cliente },
+    });
+    const conv = (data as { conversa?: Conversa } | null)?.conversa;
+    if (!error && conv) await supabase.from("whatsapp_conversas").update({ negociacao_id: negociacao.id }).eq("id", conv.id);
+    setVinculando(false);
+    if (error || !conv) { toast.error("Não foi possível abrir o chat."); return; }
+    toast.success("Chat aberto e vinculado"); buscarConversa(); onChanged();
+  };
 
   if (!n) return null;
   const canEdit = can("negociacoes", "edit", n.responsavel_id);
@@ -245,6 +284,31 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
                 {coments.length === 0 && <li className="text-xs text-muted-foreground">Nenhum comentário.</li>}
               </ul>
             </div>
+
+            {!conversa && (
+              <div className="rounded-md border border-dashed p-3 space-y-2">
+                <Label className="text-xs">Conversa WhatsApp</Label>
+                <p className="text-xs text-muted-foreground">Esta negociação ainda não tem chat vinculado.</p>
+                <Button size="sm" className="w-full" onClick={abrirNovoChat} disabled={vinculando}>
+                  <MessageCirclePlus className="h-4 w-4 mr-1" /> Abrir chat com {n.telefone || "o cliente"}
+                </Button>
+                {semVinculo.length > 0 && (
+                  <div className="flex gap-2">
+                    <Select value={vincSel} onValueChange={setVincSel}>
+                      <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Ou vincular conversa existente…" /></SelectTrigger>
+                      <SelectContent>
+                        {semVinculo.map((c) => (
+                          <SelectItem key={c.id} value={c.id}>{c.nome_contato ? `${c.nome_contato} · ${c.telefone}` : c.telefone}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button size="sm" variant="outline" onClick={vincularExistente} disabled={!vincSel || vinculando}>
+                      <Link2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
 
             {conversa && (
               <div>
