@@ -82,7 +82,7 @@ const TRACKED_PAGES_KEY = "okplast_tracked_pages";
            user_agent: navigator.userAgent,
          };
  
-          const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+          const supabaseUrl = import.meta.env["VITE_SUPABASE_URL"];
           const url = `${supabaseUrl}/functions/v1/track-visit`;
           const body = JSON.stringify(payload);
 

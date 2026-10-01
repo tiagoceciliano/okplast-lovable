@@ -4,10 +4,10 @@
  * automaticamente antes de enviar ao Google Ads.
  */
 export interface ConversionUserData {
-  email?: string;
-  phone?: string;
-  firstName?: string;
-  lastName?: string;
+  email?: string | undefined;
+  phone?: string | undefined;
+  firstName?: string | undefined;
+  lastName?: string | undefined;
 }
 
 /**
@@ -39,8 +39,8 @@ export function reportConversion(userData?: ConversionUserData): void {
       const payload: Record<string, string> = {};
       const email = normalizeEmail(userData.email);
       const phone = normalizePhoneBR(userData.phone);
-      if (email) payload.email = email;
-      if (phone) payload.phone_number = phone;
+      if (email) payload["email"] = email;
+      if (phone) payload["phone_number"] = phone;
       if (userData.firstName) payload["address.first_name"] = userData.firstName.trim();
       if (userData.lastName) payload["address.last_name"] = userData.lastName.trim();
       if (Object.keys(payload).length > 0) {

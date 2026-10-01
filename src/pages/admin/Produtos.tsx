@@ -47,7 +47,7 @@ export default function Produtos() {
   const remover = async (id: string) => {
     if (!confirm("Excluir este produto?")) return;
     const { error } = await supabase.from("produtos").delete().eq("id", id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     setRows((p) => p.filter((r) => r.id !== id));
   };
 
@@ -130,9 +130,9 @@ function NovoProdutoDialog({ open, onOpenChange, onCreated }: { open: boolean; o
   }, [material, autoChapa]);
 
   const submit = async () => {
-    if (!nome.trim()) return toast.error("Nome é obrigatório");
+    if (!nome.trim()) { toast.error("Nome é obrigatório"); return; }
     const p = Number(preco);
-    if (isNaN(p) || p < 0) return toast.error("Preço inválido");
+    if (isNaN(p) || p < 0) { toast.error("Preço inválido"); return; }
     setSaving(true);
     const { error } = await supabase.from("produtos").insert({
       nome: nome.trim(),
@@ -140,7 +140,7 @@ function NovoProdutoDialog({ open, onOpenChange, onCreated }: { open: boolean; o
       preco: p,
     });
     setSaving(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Produto criado");
     onOpenChange(false);
     onCreated();

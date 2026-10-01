@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Eye, Pencil, Trash2, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { getLeads } from "@/lib/get-leads.functions";
 import { AdminLayout } from "./AdminLayout";
 import { LeadDetailsModal } from "./components/LeadDetailsModal";
 import { LeadEditModal } from "./components/LeadEditModal";
@@ -80,9 +81,8 @@ const Leads = () => {
   const fetchLeads = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('get-leads');
-      if (error) throw error;
-      setLeads(data.leads || []);
+      const data = await getLeads();
+      setLeads((data.leads || []) as unknown as Lead[]);
       setSelectedIds([]);
     } catch (error) {
       console.error('Error fetching leads:', error);

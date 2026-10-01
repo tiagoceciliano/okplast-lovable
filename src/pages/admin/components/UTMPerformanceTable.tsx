@@ -143,7 +143,7 @@ export function UTMPerformanceTable({
           </div>
           <div className="flex items-center gap-2">
             {showFilter && filterOptions.length > 0 && (
-              <Select value={filterValue} onValueChange={onFilterChange}>
+              <Select value={filterValue} onValueChange={(v) => onFilterChange?.(v)}>
                 <SelectTrigger className="w-[200px]">
                   <SelectValue placeholder={filterLabel} />
                 </SelectTrigger>

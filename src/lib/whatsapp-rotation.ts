@@ -81,7 +81,7 @@ function writeStoredRaw(raw: string) {
 function pickWeighted(numbers: CachedItem[]): WhatsAppNumber {
   const total = numbers.reduce((s, n) => s + Math.max(0, n.peso), 0);
   if (total <= 0) {
-    const n = numbers[0];
+    const n = numbers[0]!;
     return { raw: n.raw, formatted: n.formatted };
   }
   let r = Math.random() * total;
@@ -89,7 +89,7 @@ function pickWeighted(numbers: CachedItem[]): WhatsAppNumber {
     r -= Math.max(0, n.peso);
     if (r <= 0) return { raw: n.raw, formatted: n.formatted };
   }
-  const last = numbers[numbers.length - 1];
+  const last = numbers[numbers.length - 1]!;
   return { raw: last.raw, formatted: last.formatted };
 }
 

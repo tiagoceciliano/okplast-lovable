@@ -6,9 +6,9 @@ import { brl, type Negociacao, type VendedorLite } from "./types";
 interface Props {
   negociacao: Negociacao;
   vendedores: VendedorLite[];
-  tarefasCount?: number;
-  comentariosCount?: number;
-  hasVencida?: boolean;
+  tarefasCount?: number | undefined;
+  comentariosCount?: number | undefined;
+  hasVencida?: boolean | undefined;
   onClick: () => void;
 }
 

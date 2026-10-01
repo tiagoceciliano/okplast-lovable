@@ -50,10 +50,10 @@ export default function Dashboard() {
         params.set("compareStartDate", ymd(filter.compareRange.from));
         params.set("compareEndDate", ymd(filter.compareRange.to));
       }
-      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-dashboard-stats?${params}`;
+      const url = `${import.meta.env["VITE_SUPABASE_URL"]}/functions/v1/get-dashboard-stats?${params}`;
       const res = await fetch(url, {
         headers: {
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          Authorization: `Bearer ${import.meta.env["VITE_SUPABASE_PUBLISHABLE_KEY"]}`,
           "Content-Type": "application/json",
         },
       });
