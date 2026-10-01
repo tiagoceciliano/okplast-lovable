@@ -245,6 +245,10 @@ export default function Negociacoes() {
               <Select value={filtroTag} onValueChange={setFiltroTag}><SelectTrigger><SelectValue placeholder="Etiqueta" /></SelectTrigger><SelectContent><SelectItem value="all">Todas as etiquetas</SelectItem>{tagsFiltro.map((tag) => <SelectItem key={tag} value={tag}>{tag}</SelectItem>)}</SelectContent></Select>
               <div className="grid grid-cols-2 gap-2"><Select value={filtroEtapa} onValueChange={setFiltroEtapa}><SelectTrigger><SelectValue placeholder="Etapa" /></SelectTrigger><SelectContent><SelectItem value="all">Todas as etapas</SelectItem>{ETAPAS.map((etapa) => <SelectItem key={etapa.id} value={etapa.id}>{etapa.label}</SelectItem>)}</SelectContent></Select><Select value={filtroStatus} onValueChange={setFiltroStatus}><SelectTrigger><SelectValue placeholder="Status" /></SelectTrigger><SelectContent><SelectItem value="all">Todos os status</SelectItem><SelectItem value="aberto">Aberto</SelectItem><SelectItem value="ganho">Ganho</SelectItem><SelectItem value="perdido">Perdido</SelectItem></SelectContent></Select></div>
               <div className="grid grid-cols-2 gap-2"><div><span className="mb-1 flex items-center gap-1 text-[10px] text-muted-foreground"><CalendarDays className="h-3 w-3" /> De</span><Input type="date" value={filtroInicio} onChange={(e) => setFiltroInicio(e.target.value)} /></div><div><span className="mb-1 flex items-center gap-1 text-[10px] text-muted-foreground"><CalendarDays className="h-3 w-3" /> Até</span><Input type="date" value={filtroFim} onChange={(e) => setFiltroFim(e.target.value)} /></div></div>
+              <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                <input type="checkbox" checked={incluirAntigas} onChange={(e) => { setIncluirAntigas(e.target.checked); load(e.target.checked); }} />
+                Incluir ganhas/perdidas com mais de 90 dias
+              </label>
               <Button variant="ghost" size="sm" className="w-full" onClick={limparFiltros}><X /> Limpar filtros</Button>
             </PopoverContent>
           </Popover>
