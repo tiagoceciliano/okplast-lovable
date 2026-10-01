@@ -30,7 +30,20 @@ export function NegociacaoChatSheet({ negociacao, onClose, onChanged }: Props) {
     const telefone = digits(negociacao.telefone);
     if (telefone.length >= 10) {
       const { data: candidatas } = await supabase.from("whatsapp_conversas").select("*").or(`telefone.eq.${telefone},telefone.eq.55${telefone}`).limit(1);
-      if (candidatas?.[0]) { setLivres(candidatas as Conversa[]); return; }
+      const candidata = candidatas?.[0] as Conversa | undefined;
+      if (candidata && !candidata.negociacao_id) {
+        const { data: vinculadaPorTelefone, error } = await supabase
+          .from("whatsapp_conversas")
+          .update({ negociacao_id: negociacao.id })
+          .eq("id", candidata.id)
+          .select("*")
+          .single();
+        if (!error && vinculadaPorTelefone) {
+          setConversa(vinculadaPorTelefone as Conversa);
+          onChanged();
+          return;
+        }
+      }
     }
     const { data } = await supabase.from("whatsapp_conversas").select("*").is("negociacao_id", null).order("ultima_mensagem_em", { ascending: false, nullsFirst: false }).limit(100);
     setLivres((data as Conversa[]) || []);
