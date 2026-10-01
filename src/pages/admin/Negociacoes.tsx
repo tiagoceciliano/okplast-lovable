@@ -94,9 +94,11 @@ export default function Negociacoes() {
     const norm = (t: string | null) => { const d = (t || "").replace(/\D/g, ""); return d.startsWith("55") ? d.slice(2) : d; };
     const porTel = new Map<string, number>();
     const porNeg = new Map<string, number>();
+    const convById = new Map<string, { negociacao_id: string | null; telefone: string | null }>();
     (convs || []).forEach((c) => {
       porTel.set(norm(c.telefone), c.nao_lidas);
       if (c.negociacao_id) porNeg.set(c.negociacao_id, c.nao_lidas);
+      convById.set(c.id, { negociacao_id: c.negociacao_id, telefone: c.telefone });
     });
     const ch: Record<string, number> = {};
     ((neg.data as Negociacao[]) || []).forEach((n) => {
@@ -104,6 +106,23 @@ export default function Negociacoes() {
       if (v !== undefined) ch[n.id] = v;
     });
     setChats(ch);
+
+    // Agendamentos pendentes por negociação (via conversa vinculada ou telefone)
+    const agendamentosPorNeg: Record<string, number> = {};
+    const agCount = (negId: string | null, telefone: string | null | undefined) => {
+      if (negId) agendamentosPorNeg[negId] = (agendamentosPorNeg[negId] || 0) + 1;
+      else if (telefone) {
+        const alvo = norm(telefone);
+        ((neg.data as Negociacao[]) || []).forEach((n) => {
+          if (n.telefone && norm(n.telefone) === alvo) agendamentosPorNeg[n.id] = (agendamentosPorNeg[n.id] || 0) + 1;
+        });
+      }
+    };
+    ((agd.data || []) as { conversa_id: string }[]).forEach((a) => {
+      const conv = convById.get(a.conversa_id);
+      if (conv) agCount(conv.negociacao_id, conv.telefone);
+    });
+    setAgend(agendamentosPorNeg);
   };
 
   useEffect(() => { load(); }, []);
