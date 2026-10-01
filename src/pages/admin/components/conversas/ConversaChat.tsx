@@ -1,14 +1,17 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { whatsappTemplates } from "@/lib/whatsapp-templates.functions";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Send, Clock, LayoutTemplate, Loader2, Check, CheckCheck, AlertCircle, MoreHorizontal, Search, Bell, Tag, Smile, Paperclip, MessageSquareText } from "lucide-react";
+import { Send, Clock, LayoutTemplate, Loader2, Check, CheckCheck, AlertCircle, MoreHorizontal, Search, Bell, Tag, Smile, Paperclip, MessageSquareText, CalendarClock, X } from "lucide-react";
 import { toast } from "sonner";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import type { TagDef } from "./tags";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 export interface Conversa {
   id: string;
@@ -40,6 +43,14 @@ interface Template {
   variaveis: number;
 }
 
+interface Agendamento {
+  id: string;
+  texto: string;
+  enviar_em: string;
+  status: "pendente" | "processando" | "enviado" | "cancelado" | "falhou";
+  erro: string | null;
+}
+
 function fmtHora(iso: string) {
   return new Date(iso).toLocaleString("pt-BR", {
     timeZone: "America/Sao_Paulo",
@@ -50,6 +61,20 @@ function fmtHora(iso: string) {
 export function janelaAberta(conversa: Conversa | null): boolean {
   if (!conversa?.ultima_entrada_cliente_em) return false;
   return Date.now() - new Date(conversa.ultima_entrada_cliente_em).getTime() < 24 * 60 * 60 * 1000;
+}
+
+function janelaLimite(conversa: Conversa): number {
+  return conversa.ultima_entrada_cliente_em
+    ? new Date(conversa.ultima_entrada_cliente_em).getTime() + 24 * 60 * 60 * 1000
+    : 0;
+}
+
+function formatRemaining(ms: number) {
+  const total = Math.max(0, Math.floor(ms / 1000));
+  const hours = Math.floor(total / 3600);
+  const minutes = Math.floor((total % 3600) / 60);
+  const seconds = total % 60;
+  return [hours, minutes, seconds].map((n) => String(n).padStart(2, "0")).join(":");
 }
 
 interface Props {
@@ -68,9 +93,29 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas = []
   const [templateSel, setTemplateSel] = useState("");
   const [params, setParams] = useState<string[]>([]);
   const [busca, setBusca] = useState("");
+  const [agendamentos, setAgendamentos] = useState<Agendamento[]>([]);
+  const [agendamentoOpen, setAgendamentoOpen] = useState(false);
+  const [dataAgendada, setDataAgendada] = useState<Date>();
+  const [horaAgendada, setHoraAgendada] = useState("");
+  const [agendando, setAgendando] = useState(false);
+  const [agora, setAgora] = useState(() => Date.now());
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  const aberta = janelaAberta(conversa);
+  const limite = janelaLimite(conversa);
+  const aberta = limite > agora;
+  const restante = Math.max(0, limite - agora);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setAgora(Date.now()), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const carregarAgendamentos = async () => {
+    const { data } = await supabase.from("whatsapp_agendamentos").select("id,texto,enviar_em,status,erro").eq("conversa_id", conversa.id).in("status", ["pendente", "processando", "falhou"]).order("enviar_em");
+    setAgendamentos((data as Agendamento[]) || []);
+  };
+
+  useEffect(() => { carregarAgendamentos(); }, [conversa.id]);
 
   // Carrega mensagens + marca como lida
   useEffect(() => {
@@ -171,9 +216,50 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas = []
     if (error) toast.error(error.message); else onTagsChange?.(proximas);
   };
 
+  const horarioAgendado = useMemo(() => {
+    if (!dataAgendada || !horaAgendada) return null;
+    const [hours, minutes] = horaAgendada.split(":").map(Number);
+    const value = new Date(dataAgendada);
+    value.setHours(hours || 0, minutes || 0, 0, 0);
+    return value;
+  }, [dataAgendada, horaAgendada]);
+
+  const agendar = async () => {
+    if (!texto.trim() || !horarioAgendado || agendando) return;
+    if (horarioAgendado.getTime() <= Date.now()) { toast.error("Escolha um horário futuro."); return; }
+    if (horarioAgendado.getTime() >= limite) { toast.error("O envio precisa acontecer antes do fim da janela de 24 horas."); return; }
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { toast.error("Sessão inválida."); return; }
+    setAgendando(true);
+    const { error } = await supabase.from("whatsapp_agendamentos").insert({
+      conversa_id: conversa.id,
+      autor_id: user.id,
+      texto: texto.trim(),
+      enviar_em: horarioAgendado.toISOString(),
+      janela_limite: new Date(limite).toISOString(),
+    });
+    setAgendando(false);
+    if (error) { toast.error(error.message); return; }
+    setTexto(""); setDataAgendada(undefined); setHoraAgendada(""); setAgendamentoOpen(false);
+    await carregarAgendamentos();
+    toast.success("Mensagem agendada");
+  };
+
+  const cancelarAgendamento = async (id: string) => {
+    const { error } = await supabase.rpc("cancel_whatsapp_agendamento", { _id: id });
+    if (error) { toast.error(error.message); return; }
+    await carregarAgendamentos();
+    toast.success("Agendamento cancelado");
+  };
+
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="flex h-11 shrink-0 items-center justify-end gap-1 border-b px-3">
+      <div className="grid min-h-11 shrink-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b px-3 py-1.5">
+        <div className="flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground">
+          <Clock className="h-3.5 w-3.5 shrink-0" />
+          <span className="truncate">{aberta ? `Janela encerra em ${formatRemaining(restante)}` : "Janela de 24h encerrada"}</span>
+        </div>
+        <div className="flex shrink-0 items-center gap-1">
         <Button variant="ghost" size="sm" className="h-8"><Check className="h-4 w-4" /> Resolver</Button>
         <Popover>
           <PopoverTrigger asChild><Button size="icon" variant="ghost" className="h-8 w-8" aria-label="Mais ações"><MoreHorizontal /></Button></PopoverTrigger>
@@ -182,6 +268,7 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas = []
             <div className="relative p-1"><Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" /><Input value={busca} onChange={(e) => setBusca(e.target.value)} className="h-9 pl-8" placeholder="Pesquisar mensagem" /></div>
           </PopoverContent>
         </Popover>
+        </div>
       </div>
       {/* Mensagens */}
       <div className="min-h-0 flex-1 space-y-2 overflow-y-auto bg-secondary/30 p-4">
@@ -241,7 +328,18 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas = []
             <Button size="icon" variant="ghost" className="h-8 w-8" disabled aria-label="Anexar arquivo"><Paperclip /></Button>
             <Button size="icon" variant="ghost" className="h-8 w-8" disabled aria-label="Emoji"><Smile /></Button>
             <Button size="icon" variant="ghost" className="h-8 w-8" disabled aria-label="Nota interna"><MessageSquareText /></Button>
-            <span className="ml-1 text-[10px] text-muted-foreground">Enter para enviar · Shift + Enter para nova linha</span>
+            <Popover open={agendamentoOpen} onOpenChange={setAgendamentoOpen}>
+              <PopoverTrigger asChild><Button size="icon" variant="ghost" className="h-8 w-8" aria-label="Agendar mensagem"><CalendarClock /></Button></PopoverTrigger>
+              <PopoverContent align="start" className="w-auto p-3">
+                <p className="mb-2 text-sm font-semibold">Agendar mensagem</p>
+                <Calendar mode="single" selected={dataAgendada} onSelect={setDataAgendada} disabled={{ before: new Date(), after: new Date(limite) }} className={cn("pointer-events-auto p-2")} />
+                <Input type="time" value={horaAgendada} onChange={(e) => setHoraAgendada(e.target.value)} className="mt-2" />
+                <Button className="mt-2 w-full" size="sm" onClick={agendar} disabled={!texto.trim() || !horarioAgendado || agendando}>
+                  {agendando ? <Loader2 className="animate-spin" /> : <CalendarClock />} Agendar
+                </Button>
+              </PopoverContent>
+            </Popover>
+            <span className="ml-1 hidden text-[10px] text-muted-foreground xl:inline">Enter envia · Shift + Enter quebra linha</span>
             <Button size="icon" onClick={enviar} disabled={!texto.trim() || enviando} className="ml-auto h-8 w-8" aria-label="Enviar mensagem">{enviando ? <Loader2 className="animate-spin" /> : <Send />}</Button>
           </div>
         </div>
@@ -303,6 +401,19 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas = []
           </PopoverContent>
         </Popover>
       </div>
+        </div>
+      )}
+      {agendamentos.length > 0 && (
+        <div className="shrink-0 border-t bg-muted/30 px-3 py-2">
+          <div className="mb-1 flex items-center gap-1 text-[10px] font-semibold uppercase text-muted-foreground"><CalendarClock className="h-3 w-3" /> Agendamentos</div>
+          <div className="space-y-1">
+            {agendamentos.map((item) => (
+              <div key={item.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 text-xs">
+                <div className="min-w-0"><span className="truncate block">{item.texto}</span><span className="text-[10px] text-muted-foreground">{fmtHora(item.enviar_em)} · {item.status}</span></div>
+                {item.status === "pendente" && <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => cancelarAgendamento(item.id)} aria-label="Cancelar agendamento"><X /></Button>}
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
