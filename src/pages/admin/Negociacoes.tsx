@@ -49,7 +49,7 @@ export default function Negociacoes() {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
   const load = async () => {
-    const [neg, wa, tar] = await Promise.all([
+    const [neg, wa, tar, agd] = await Promise.all([
       supabase.from("negociacoes").select("*").order("posicao"),
       supabase.from("whatsapp_numbers").select("user_id,nome_vendedor,numero_raw,numero_formatado"),
       supabase.from("negociacao_tarefas").select("negociacao_id,concluida,data_vencimento"),
