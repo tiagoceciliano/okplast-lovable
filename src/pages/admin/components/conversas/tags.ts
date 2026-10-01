@@ -34,7 +34,7 @@ export async function recarregarEtiquetas() {
     id: e.id,
     label: e.nome,
     cor: e.cor,
-    className: CORES[e.cor] ?? CORES.slate!,
+    className: CORES[e.cor] ?? CORES["slate"]!,
     escopo: e.escopo as TagDef["escopo"],
     owner_id: e.owner_id,
   }));
