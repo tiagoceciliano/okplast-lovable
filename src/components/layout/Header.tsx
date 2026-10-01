@@ -25,7 +25,7 @@ export function Header() {
               decoding="async"
               loading="eager"
               src={logoUrl}
-              {...({ fetchpriority: "high" } as Record<string, string>)}
+              fetchPriority="high"
             />
           </Link>
 
