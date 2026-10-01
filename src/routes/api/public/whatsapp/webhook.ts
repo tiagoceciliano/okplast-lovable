@@ -33,9 +33,11 @@ function textFromMessage(m: any): { tipo: string; conteudo: string } {
 }
 
 async function findOrCreateConversa(db: Db, from: string, nome: string | null, conteudo: string) {
-  const { data: conv, error } = await db.from("whatsapp_conversas").select("*").eq("telefone", from).maybeSingle();
+  // Um único atendimento por número: casa pelos 8 últimos dígitos (cobre variação do 9º dígito).
+  const { data: convs, error } = await db.from("whatsapp_conversas").select("*")
+    .like("telefone", `%${from.slice(-8)}`).order("created_at").limit(1);
   if (error) throw error;
-  if (conv) return conv;
+  if (convs?.[0]) return convs[0];
 
   const tail = from.replace(/^55/, "");
   const { data: negs } = await db.from("negociacoes")
@@ -109,6 +111,8 @@ async function processEvent(db: Db, event: string, payload: any): Promise<boolea
         ultima_mensagem_em: when,
         ultima_entrada_cliente_em: when,
         nao_lidas: (conv.nao_lidas ?? 0) + 1,
+        resolvida_em: null, // cliente escreveu: reabre o atendimento antigo
+
       }).eq("id", conv.id);
       if (upErr) throw upErr;
     }

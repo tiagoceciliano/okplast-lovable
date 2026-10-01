@@ -654,6 +654,7 @@ export type Database = {
           nao_lidas: number
           negociacao_id: string | null
           nome_contato: string | null
+          resolvida_em: string | null
           responsavel_id: string | null
           telefone: string
           ultima_entrada_cliente_em: string | null
@@ -667,6 +668,7 @@ export type Database = {
           nao_lidas?: number
           negociacao_id?: string | null
           nome_contato?: string | null
+          resolvida_em?: string | null
           responsavel_id?: string | null
           telefone: string
           ultima_entrada_cliente_em?: string | null
@@ -680,6 +682,7 @@ export type Database = {
           nao_lidas?: number
           negociacao_id?: string | null
           nome_contato?: string | null
+          resolvida_em?: string | null
           responsavel_id?: string | null
           telefone?: string
           ultima_entrada_cliente_em?: string | null

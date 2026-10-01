@@ -114,9 +114,11 @@ export default function Conversas() {
   const filtradas = useMemo(() => {
     const q = busca.trim().toLowerCase();
     return conversas.filter((c) => {
+      const resolvida = !!c.resolvida_em;
+      if (filtro === "arquivados") { if (!resolvida) return false; }
+      else if (resolvida) return false;
       if (filtro === "meus" && c.responsavel_id !== user?.id) return false;
-       if (filtro === "nao_atribuidos" && c.responsavel_id) return false;
-       if (filtro === "arquivados") return false;
+      if (filtro === "nao_atribuidos" && c.responsavel_id) return false;
       if (!q) return true;
       return (
         (c.nome_contato || "").toLowerCase().includes(q) ||
