@@ -109,18 +109,15 @@ export default function Negociacoes() {
 
     // Agendamentos pendentes por negociação (via conversa vinculada ou telefone)
     const agendamentosPorNeg: Record<string, number> = {};
-    const agCount = (negId: string | null, telefone: string | null | undefined) => {
-      if (negId) agendamentosPorNeg[negId] = (agendamentosPorNeg[negId] || 0) + 1;
-      else if (telefone) {
-        const alvo = norm(telefone);
-        ((neg.data as Negociacao[]) || []).forEach((n) => {
-          if (n.telefone && norm(n.telefone) === alvo) agendamentosPorNeg[n.id] = (agendamentosPorNeg[n.id] || 0) + 1;
-        });
-      }
-    };
+    const negPorTel = new Map<string, string>();
+    ((neg.data as Negociacao[]) || []).forEach((n) => {
+      if (n.telefone) negPorTel.set(norm(n.telefone), n.id);
+    });
     ((agd.data || []) as { conversa_id: string }[]).forEach((a) => {
       const conv = convById.get(a.conversa_id);
-      if (conv) agCount(conv.negociacao_id, conv.telefone);
+      if (!conv) return;
+      const negId = conv.negociacao_id ?? (conv.telefone ? negPorTel.get(norm(conv.telefone)) : undefined);
+      if (negId) agendamentosPorNeg[negId] = (agendamentosPorNeg[negId] || 0) + 1;
     });
     setAgend(agendamentosPorNeg);
   };
