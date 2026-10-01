@@ -9,12 +9,14 @@ import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { ArrowDownAZ, CalendarDays, Filter, Plus, Search, SlidersHorizontal, X } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { KanbanColumn } from "./components/kanban/KanbanColumn";
 import { KanbanCard } from "./components/kanban/KanbanCard";
 import { NegociacaoModal } from "./components/kanban/NegociacaoModal";
 import { NovaNegociacaoDialog } from "./components/kanban/NovaNegociacaoDialog";
 import { GanhoDialog } from "./components/kanban/GanhoDialog";
+import { NegociacaoChatSheet } from "./components/kanban/NegociacaoChatSheet";
 import { ETAPAS, type EtapaId, type Negociacao, type VendedorLite } from "./components/kanban/types";
 import { usePermissions } from "@/hooks/usePermissions";
 
@@ -30,9 +32,17 @@ export default function Negociacoes() {
   const [countsT, setCountsT] = useState<Record<string, number>>({});
   const [countsC, setCountsC] = useState<Record<string, number>>({});
   const [chats, setChats] = useState<Record<string, number>>({});
+  const [chatAtivo, setChatAtivo] = useState<Negociacao | null>(null);
   const [venc, setVenc] = useState<Record<string, boolean>>({});
   const [novaOpen, setNovaOpen] = useState(false);
   const [ganhoPending, setGanhoPending] = useState<Negociacao | null>(null);
+  const [filtroProduto, setFiltroProduto] = useState("all");
+  const [filtroTag, setFiltroTag] = useState("all");
+  const [filtroStatus, setFiltroStatus] = useState("all");
+  const [filtroEtapa, setFiltroEtapa] = useState("all");
+  const [filtroInicio, setFiltroInicio] = useState("");
+  const [filtroFim, setFiltroFim] = useState("");
+  const [ordenacao, setOrdenacao] = useState("recentes");
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
@@ -97,11 +107,17 @@ export default function Negociacoes() {
 
   const byEtapa = useMemo(() => {
     const map: Record<EtapaId, Negociacao[]> = {
-      entrada: [], em_contato: [], negociacao: [], venda_realizada: [], perdido: [],
+      entrada: [], em_contato: [], orcamento: [], negociacao: [], venda_realizada: [], perdido: [],
     };
     filtered.forEach((n) => { if (map[n.etapa]) map[n.etapa].push(n); });
+    Object.values(map).forEach((lista) => lista.sort((a, b) => {
+      if (ordenacao === "antigos") return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      if (ordenacao === "maior_valor") return (b.valor ?? 0) - (a.valor ?? 0);
+      if (ordenacao === "menor_valor") return (a.valor ?? 0) - (b.valor ?? 0);
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    }));
     return map;
-  }, [filtered]);
+  }, [filtered, ordenacao]);
 
   const onDragStart = (e: DragStartEvent) => {
     const item = items.find((i) => i.id === e.active.id);
