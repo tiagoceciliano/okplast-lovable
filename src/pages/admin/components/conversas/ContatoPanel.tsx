@@ -213,6 +213,7 @@ export function ContatoPanel({ conversa, onNomeAtualizado }: Props) {
                   <span className="truncate text-right">{neg.utm_campaign}</span>
                 </div>
               )}
+              </div>
              </div>
            </Section>
 
@@ -234,14 +235,14 @@ export function ContatoPanel({ conversa, onNomeAtualizado }: Props) {
             </Button>
             <div className="mt-3 space-y-2">
               {notas.map((n) => (
-                <div key={n.id} className="rounded-md bg-muted/50 px-2.5 py-2 text-xs">
+                <div key={n.id} className="rounded-md bg-gold/20 px-2.5 py-2 text-xs">
                   <p className="whitespace-pre-wrap break-words">{n.texto}</p>
                   <span className="mt-1 block text-[10px] text-muted-foreground">{fmt(n.created_at)}</span>
-           </Section>
+                </div>
               ))}
               {notas.length === 0 && <p className="text-xs text-muted-foreground">Nenhuma nota ainda.</p>}
             </div>
-          </div>
+           </Section>
         </>
       )}
     </div>
