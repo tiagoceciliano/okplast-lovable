@@ -184,7 +184,6 @@ export default function Negociacoes() {
             </Button>
           )}
         </div>
-        </div>
 
         <div className="flex shrink-0 items-center gap-2 border-b px-5 py-2">
           <div className="relative w-60"><Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" /><Input placeholder="Pesquisar" value={busca} onChange={(e) => setBusca(e.target.value)} className="h-9 pl-8" /></div>
