@@ -14,7 +14,18 @@ interface Props {
   onChanged: () => void;
 }
 
-const digits = (value: string | null) => (value || "").replace(/\D/g, "").replace(/^55/, "");
+const digits = (value: string | null) => {
+  const somenteNumeros = (value || "").replace(/\D/g, "");
+  return somenteNumeros.startsWith("55") && somenteNumeros.length > 11
+    ? somenteNumeros.slice(2)
+    : somenteNumeros;
+};
+
+const mesmoTelefone = (a: string | null, b: string | null) => {
+  const primeiro = digits(a);
+  const segundo = digits(b);
+  return primeiro.length >= 10 && primeiro === segundo;
+};
 
 export function NegociacaoChatSheet({ negociacao, onClose, onChanged }: Props) {
   const [conversa, setConversa] = useState<Conversa | null>(null);
@@ -27,26 +38,24 @@ export function NegociacaoChatSheet({ negociacao, onClose, onChanged }: Props) {
     if (!negociacao) return;
     const { data: vinculada } = await supabase.from("whatsapp_conversas").select("*").eq("negociacao_id", negociacao.id).limit(1);
     if (vinculada?.[0]) { setConversa(vinculada[0] as Conversa); return; }
-    const telefone = digits(negociacao.telefone);
-    if (telefone.length >= 10) {
-      const { data: candidatas } = await supabase.from("whatsapp_conversas").select("*").or(`telefone.eq.${telefone},telefone.eq.55${telefone}`).limit(1);
-      const candidata = candidatas?.[0] as Conversa | undefined;
-      if (candidata && !candidata.negociacao_id) {
-        const { data: vinculadaPorTelefone, error } = await supabase
-          .from("whatsapp_conversas")
-          .update({ negociacao_id: negociacao.id })
-          .eq("id", candidata.id)
-          .select("*")
-          .single();
-        if (!error && vinculadaPorTelefone) {
-          setConversa(vinculadaPorTelefone as Conversa);
-          onChanged();
-          return;
-        }
+    const { data } = await supabase.from("whatsapp_conversas").select("*").order("ultima_mensagem_em", { ascending: false, nullsFirst: false }).limit(500);
+    const todas = (data as Conversa[]) || [];
+    const correspondente = todas.find((item) => mesmoTelefone(item.telefone, negociacao.telefone));
+    if (correspondente) {
+      const { data: vinculadaPorTelefone, error } = await supabase
+        .from("whatsapp_conversas")
+        .update({ negociacao_id: negociacao.id })
+        .eq("id", correspondente.id)
+        .select("*")
+        .single();
+      if (!error && vinculadaPorTelefone) {
+        setConversa(vinculadaPorTelefone as Conversa);
+        onChanged();
+        return;
       }
+      if (error) toast.error("Encontramos a conversa deste número, mas não foi possível vinculá-la.");
     }
-    const { data } = await supabase.from("whatsapp_conversas").select("*").is("negociacao_id", null).order("ultima_mensagem_em", { ascending: false, nullsFirst: false }).limit(100);
-    setLivres((data as Conversa[]) || []);
+    setLivres(todas.filter((item) => !item.negociacao_id));
   };
 
   useEffect(() => { carregar(); }, [negociacao?.id]);
@@ -68,6 +77,12 @@ export function NegociacaoChatSheet({ negociacao, onClose, onChanged }: Props) {
 
   const criar = async () => {
     if (!negociacao) return;
+    const { data: existentes } = await supabase.from("whatsapp_conversas").select("*").limit(500);
+    const existente = ((existentes as Conversa[]) || []).find((item) => mesmoTelefone(item.telefone, negociacao.telefone));
+    if (existente) {
+      await vincular(existente);
+      return;
+    }
     let telefone = (negociacao.telefone || "").replace(/\D/g, "");
     if (telefone.length >= 10 && !telefone.startsWith("55")) telefone = `55${telefone}`;
     if (telefone.length < 12) { toast.error("Cadastre o telefone com DDD primeiro."); return; }
