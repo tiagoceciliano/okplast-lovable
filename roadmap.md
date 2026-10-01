@@ -7,7 +7,6 @@
 - [x] Página /admin/conversas (lista + chat + nova conversa + mensagens prontas)
 - [x] Chat da conversa dentro do card da negociação
 - [x] Menu lateral + matriz de permissões
-- [ ] Limitação conhecida: respostas dos clientes NÃO chegam ao sistema (stack não recebe webhooks da Meta) — chegam só no app WhatsApp do celular
+- [x] Receptor de mensagens (/api/public/whatsapp/webhook) — falta publicar e apontar o conector para este projeto
 - [ ] Teste com o usuário: enviar mensagem pronta para o próprio celular
 - [ ] Criar/aprovar templates na Meta (mensagens prontas) — aprovação pode levar até 48h
-- [ ] Pendente (legado): whatsapp-webhook direto na Meta ficou sem uso — conta de desenvolvedor suspensa
