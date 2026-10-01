@@ -5,7 +5,7 @@ import {
 } from "@dnd-kit/core";
 import { AdminLayout } from "./AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { getEquipe } from "@/lib/adminCache";
+import { getEquipe, memoGet, memoSet } from "@/lib/adminCache";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -50,12 +50,23 @@ export default function Negociacoes() {
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
-  const load = async () => {
-    const [neg, wa, tar, agd] = await Promise.all([
-      supabase.from("negociacoes").select("*").order("posicao"),
+  const [incluirAntigas, setIncluirAntigas] = useState(false);
+
+  const load = async (antigas = incluirAntigas) => {
+    let negQuery = supabase.from("negociacoes").select("*").order("posicao");
+    if (!antigas) {
+      // Abertas + ganhas/perdidas dos últimos 90 dias (as mais antigas sob demanda)
+      const corte = new Date(Date.now() - 90 * 864e5).toISOString();
+      negQuery = negQuery.or(`status.eq.aberto,updated_at.gte.${corte}`);
+    }
+    const [neg, wa, tar, agd, equipe, comsRes, convsRes] = await Promise.all([
+      negQuery,
       supabase.from("whatsapp_numbers").select("user_id,nome_vendedor,numero_raw,numero_formatado"),
       supabase.from("negociacao_tarefas").select("negociacao_id,concluida,data_vencimento"),
       supabase.from("whatsapp_agendamentos").select("conversa_id").eq("status", "pendente"),
+      getEquipe(),
+      supabase.from("negociacao_comentarios").select("negociacao_id"),
+      supabase.from("whatsapp_conversas").select("id,telefone,negociacao_id,nao_lidas"),
     ]);
     if (neg.error) { toast.error(neg.error.message); return; }
     const negociacoes = (neg.data as Negociacao[]) || [];
@@ -66,7 +77,6 @@ export default function Negociacoes() {
       if (encontrada) setAtivo(encontrada);
     }
     const waRows = (wa.data || []) as { user_id: string | null; nome_vendedor: string; numero_raw: string; numero_formatado: string }[];
-    const equipe = await getEquipe();
     const vs = (equipe ?? [])
       .filter((u) => u.roles?.includes("vendedor"))
       .map((u) => ({ user_id: u.id, nome: u.nome }));
@@ -87,12 +97,12 @@ export default function Negociacoes() {
     });
     setCountsT(cT); setVenc(vV);
 
-    const { data: coms } = await supabase.from("negociacao_comentarios").select("negociacao_id");
+    const coms = comsRes.data;
     const cC: Record<string, number> = {};
     (coms || []).forEach((c: { negociacao_id: string }) => { cC[c.negociacao_id] = (cC[c.negociacao_id] || 0) + 1; });
     setCountsC(cC);
 
-    const { data: convs } = await supabase.from("whatsapp_conversas").select("id,telefone,negociacao_id,nao_lidas");
+    const convs = convsRes.data;
     const norm = (t: string | null) => { const d = (t || "").replace(/\D/g, ""); return d.startsWith("55") ? d.slice(2) : d; };
     const porTel = new Map<string, number>();
     const porNeg = new Map<string, number>();
@@ -122,7 +132,16 @@ export default function Negociacoes() {
       if (negId) agendamentosPorNeg[negId] = (agendamentosPorNeg[negId] || 0) + 1;
     });
     setAgend(agendamentosPorNeg);
+    memoSet("funil", { items: negociacoes, vendedores: vs, numeroMap: nmap, countsT: cT, venc: vV, countsC: cC, chats: ch, agend: agendamentosPorNeg });
   };
+
+  // Mostra na hora o último funil carregado e atualiza em segundo plano
+  useEffect(() => {
+    const m = memoGet<any>("funil");
+    if (!m) return;
+    setItems(m.items); setVendedores(m.vendedores); setNumeroMap(m.numeroMap);
+    setCountsT(m.countsT); setVenc(m.venc); setCountsC(m.countsC); setChats(m.chats); setAgend(m.agend);
+  }, []);
 
   useEffect(() => { load(); }, []);
 
