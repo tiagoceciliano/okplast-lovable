@@ -13,6 +13,7 @@ import type { Conversa } from "./ConversaChat";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface Nota {
   id: string;
@@ -149,7 +150,11 @@ export function ContatoPanel({ conversa, onNomeAtualizado }: Props) {
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-xl font-bold text-primary">{(conversa.nome_contato || conversa.telefone).charAt(0).toUpperCase()}</div>
         <h2 className="mt-2 truncate text-sm font-bold">{conversa.nome_contato || conversa.telefone}</h2>
         <p className="mt-1 text-xs text-muted-foreground">{conversa.telefone}</p>
-        <div className="mt-3 flex justify-center gap-2"><Button size="icon" variant="secondary" className="h-8 w-8" aria-label="Telefone"><Phone /></Button><Button size="icon" variant="secondary" className="h-8 w-8" aria-label="WhatsApp"><MessageCircle /></Button>{neg?.email && <Button size="icon" variant="secondary" className="h-8 w-8" aria-label="E-mail"><Mail /></Button>}</div>
+        <TooltipProvider delayDuration={150}><div className="mt-3 flex justify-center gap-2">
+          <Tooltip><TooltipTrigger asChild><Button size="icon" variant="secondary" className="h-8 w-8" aria-label="Telefone"><Phone /></Button></TooltipTrigger><TooltipContent>{conversa.telefone}</TooltipContent></Tooltip>
+          <Tooltip><TooltipTrigger asChild><Button size="icon" variant="secondary" className="h-8 w-8" aria-label="WhatsApp"><MessageCircle /></Button></TooltipTrigger><TooltipContent>WhatsApp: {conversa.telefone}</TooltipContent></Tooltip>
+          <Tooltip><TooltipTrigger asChild><Button size="icon" variant="secondary" className="h-8 w-8" aria-label="E-mail" disabled={!neg?.email}><Mail /></Button></TooltipTrigger><TooltipContent>{neg?.email || "E-mail não informado"}</TooltipContent></Tooltip>
+        </div></TooltipProvider>
       </div>
       <Section title="Contato" icon={User}>
         <Input

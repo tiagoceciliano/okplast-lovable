@@ -15,6 +15,8 @@
 - [x] Reproduzir a disposição completa dos prints: navegação do chat, lista, cabeçalho, mensagens, ações e detalhes
 - [x] Ajustar etiquetas aplicadas, seletor e gerenciamento para suportar muitas etiquetas
 - [x] Manter e integrar negociação, tarefas e notas no painel lateral
+- [x] Implementar atribuição e transferência de responsável no atendimento
+- [x] Tornar anexo, emoji e nota interna funcionais
 - [x] Validar o fluxo completo em uma conta autenticada e em larguras desktop menores
 
 ## Funil e negociação no padrão Kinbox
@@ -24,4 +26,4 @@
 - [x] Recriar o detalhe da negociação com etapas, dados, comentários, tarefas e histórico
 - [x] Adicionar contador regressivo da janela de 24 horas no chat
 - [x] Agendar mensagens futuras com envio bloqueado após o fechamento da janela
-- [ ] Validar o fluxo autenticado de funil, vínculo, chat, tarefas, comentários e agendamento
+- [x] Validar o fluxo autenticado de funil, vínculo, chat, tarefas, comentários e agendamento
