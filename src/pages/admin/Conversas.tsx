@@ -210,15 +210,15 @@ export default function Conversas() {
               </Button>;
             })}
           </nav>
-          <div className="mt-7 hidden xl:block">
+          <div className="mt-7">
             <p className="mb-2 px-3 text-xs font-semibold text-muted-foreground">Filtros</p>
             <Button variant={filtro === "nao_atribuidos" ? "secondary" : "ghost"} className="h-9 w-full justify-start text-xs" onClick={() => setFiltro("nao_atribuidos")}>
               <span className="h-2 w-2 rounded-full bg-destructive" /> Sem responsável
             </Button>
+            <Button variant="ghost" className="mt-1 h-9 w-full justify-start px-2 xl:px-3" onClick={() => setGerenciarTags(true)} title="Gerenciar etiquetas">
+              <Settings2 /><span className="hidden xl:inline">Etiquetas</span>
+            </Button>
           </div>
-          <Button variant="ghost" className="mt-auto h-9 justify-start px-2 xl:px-3" onClick={() => setGerenciarTags(true)} title="Gerenciar etiquetas">
-            <Settings2 /><span className="hidden xl:inline">Etiquetas</span>
-          </Button>
         </aside>
 
         {/* Coluna 1 — lista de atendimentos */}
