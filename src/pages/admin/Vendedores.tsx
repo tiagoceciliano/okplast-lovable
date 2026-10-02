@@ -194,7 +194,7 @@ export default function Vendedores() {
 
       <AddMemberDialog open={addOpen} onOpenChange={setAddOpen} onCreated={load} />
       <EditCredentialsDialog member={editCred} onClose={() => setEditCred(null)} onSaved={load} />
-      <EditMemberDialog member={editFull} users={teamUsers} onClose={() => setEditFull(null)} onSaved={load} />
+      <EditMemberDialog member={editFull} users={teamUsers} perfis={perfis} onClose={() => setEditFull(null)} onSaved={load} />
     </ConfiguracoesLayout>
   );
 }
