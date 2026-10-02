@@ -31,8 +31,11 @@ interface Member {
   peso: number;
   ativo: boolean;
   recebe_lead: boolean;
+  perfil_id?: string | null;
   _dirty?: boolean;
 }
+
+interface PerfilOpt { id: string; nome: string; base_role: Role }
 
 interface TeamUser {
   id: string;
@@ -64,6 +67,7 @@ export default function Vendedores() {
   const [editFull, setEditFull] = useState<Member | null>(null);
   const [teamUsers, setTeamUsers] = useState<TeamUser[]>([]);
   const [busca, setBusca] = useState("");
+  const [perfis, setPerfis] = useState<PerfilOpt[]>([]);
 
   const load = async () => {
     setLoading(true);
@@ -86,6 +90,14 @@ export default function Vendedores() {
       });
     }
 
+    const perfisMap: Record<string, string> = {};
+    if (userIds.length > 0) {
+      const { data: ups } = await supabase.from("user_perfis").select("user_id,perfil_id").in("user_id", userIds);
+      (ups || []).forEach((u) => { perfisMap[u.user_id] = u.perfil_id; });
+    }
+    const { data: pf } = await supabase.from("perfis").select("id,nome,base_role").order("nome");
+    setPerfis((pf || []) as PerfilOpt[]);
+
     // busca emails via edge function (admin API)
     let emailsMap: Record<string, string> = {};
     let usersList: TeamUser[] = [];
@@ -107,6 +119,7 @@ export default function Vendedores() {
       peso: w.peso,
       ativo: w.ativo,
       recebe_lead: (w as any).recebe_lead ?? true,
+      perfil_id: w.user_id ? perfisMap[w.user_id] ?? null : null,
     }));
     setRows(members);
     setLoading(false);
@@ -145,7 +158,7 @@ export default function Vendedores() {
                  filteredRows.map((row, index) => (
                    <div key={row.id} className="grid min-h-12 grid-cols-[minmax(0,1.2fr)_minmax(120px,.8fr)_90px_auto] items-center gap-3 border-b px-3 last:border-b-0 hover:bg-muted/35">
                      <div className="flex min-w-0 items-center gap-3"><Avatar className="h-7 w-7"><AvatarFallback className={index % 2 ? "bg-amber-100 text-amber-700 text-[10px]" : "bg-violet-100 text-violet-700 text-[10px]"}>{row.nome_vendedor.charAt(0).toUpperCase()}</AvatarFallback></Avatar><div className="min-w-0"><p className="truncate text-sm font-medium">{row.nome_vendedor}</p><p className="truncate text-[10px] text-muted-foreground">{row.email || "Sem e-mail de login"}</p></div></div>
-                     <span className="w-fit rounded bg-muted px-2 py-0.5 text-[10px] font-medium">{roleLabel(row.role)}</span>
+                     <span className="w-fit rounded bg-muted px-2 py-0.5 text-[10px] font-medium">{(perfis.find((p) => p.id === row.perfil_id)?.nome ?? roleLabel(row.role)).toUpperCase()}</span>
                      <span className={row.ativo ? "text-xs font-semibold text-emerald-600" : "text-xs text-muted-foreground"}>{row.ativo ? "Online" : "Inativo"}</span>
                      <div className="flex"><Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditCred(row)} disabled={!row.user_id} title="Editar e-mail e senha"><KeyRound className="h-3.5 w-3.5"/></Button><Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditFull(row)} title="Editar membro"><Pencil className="h-3.5 w-3.5"/></Button><Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => removeRow(row)} title="Remover"><Trash2 className="h-3.5 w-3.5"/></Button></div>
                    </div>
@@ -186,7 +199,8 @@ export default function Vendedores() {
   );
 }
 
-function EditMemberDialog({ member, users, onClose, onSaved }: { member: Member | null; users: TeamUser[]; onClose: () => void; onSaved: () => void }) {
+function EditMemberDialog({ member, users, perfis, onClose, onSaved }: { member: Member | null; users: TeamUser[]; perfis: PerfilOpt[]; onClose: () => void; onSaved: () => void }) {
+  const [perfilId, setPerfilId] = useState<string>("none");
   const [nome, setNome] = useState("");
   const [userId, setUserId] = useState<string>("none");
   const [numero, setNumero] = useState("");
@@ -204,6 +218,7 @@ function EditMemberDialog({ member, users, onClose, onSaved }: { member: Member 
     setUserId(member.user_id ?? "new");
     setNumero(member.numero_formatado);
     setRole(member.role);
+    setPerfilId(member.perfil_id ?? "none");
     setPeso(member.peso);
     setAtivo(member.ativo);
     setRecebe(member.recebe_lead);
@@ -260,6 +275,8 @@ function EditMemberDialog({ member, users, onClose, onSaved }: { member: Member 
       if (nextUserId) {
         await supabase.from("user_roles").delete().eq("user_id", nextUserId);
         await supabase.from("user_roles").insert({ user_id: nextUserId, role });
+        if (perfilId === "none") await supabase.from("user_perfis").delete().eq("user_id", nextUserId);
+        else await supabase.from("user_perfis").upsert({ user_id: nextUserId, perfil_id: perfilId });
         const credChanges: { user_id: string; email?: string; password?: string } = { user_id: nextUserId };
         if (email && email !== (selectedUser?.email ?? member.email)) credChanges.email = email;
         if (senha) credChanges.password = senha;
@@ -312,6 +329,16 @@ function EditMemberDialog({ member, users, onClose, onSaved }: { member: Member 
                 <SelectItem value="admin">Admin</SelectItem>
                 <SelectItem value="gestor">Gestor</SelectItem>
                 <SelectItem value="vendedor">Vendedor</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>Perfil de permissões</Label>
+            <Select value={perfilId} onValueChange={(v) => { setPerfilId(v); const p = perfis.find((x) => x.id === v); if (p) setRole(p.base_role); }} disabled={userId === "none" || userId === "new"}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Padrão do papel</SelectItem>
+                {perfis.map((p) => <SelectItem key={p.id} value={p.id}>{p.nome}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
