@@ -5,11 +5,10 @@ import { AdminLayout } from "./AdminLayout";
 import { ConversaChat, janelaAberta, type Conversa } from "./components/conversas/ConversaChat";
 import { ContatoPanel } from "./components/conversas/ContatoPanel";
 import { tagDef, useEtiquetas } from "./components/conversas/tags";
-import { EtiquetasManager } from "./components/conversas/EtiquetasManager";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Plus, Tag, Search, Loader2, Inbox, UserRound, Bookmark, Archive, SlidersHorizontal, ArrowDownAZ, EyeOff, MoreHorizontal, Menu, Settings2, Clock } from "lucide-react";
+import { MessageCircle, Plus, Search, Loader2, Inbox, UserRound, Bookmark, Archive, SlidersHorizontal, ArrowDownAZ, EyeOff, MoreHorizontal, Menu, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
@@ -56,7 +55,6 @@ export default function Conversas() {
   const [novoNome, setNovoNome] = useState("");
   const [criando, setCriando] = useState(false);
   const etiquetas = useEtiquetas();
-  const [gerenciarTags, setGerenciarTags] = useState(false);
   const [atendentes, setAtendentes] = useState<Atendente[]>([]);
   const [templates, setTemplates] = useState<WhatsAppTemplate[]>([]);
   const [templateNovo, setTemplateNovo] = useState("");
@@ -215,9 +213,6 @@ export default function Conversas() {
             <Button variant={filtro === "nao_atribuidos" ? "secondary" : "ghost"} className="h-9 w-full justify-start text-xs" onClick={() => setFiltro("nao_atribuidos")}>
               <span className="h-2 w-2 rounded-full bg-destructive" /> Sem responsável
             </Button>
-            <Button variant="ghost" className="mt-1 h-9 w-full justify-start px-2 xl:px-3" onClick={() => setGerenciarTags(true)} title="Gerenciar etiquetas">
-              <Settings2 /><span className="hidden xl:inline">Etiquetas</span>
-            </Button>
           </div>
         </aside>
 
@@ -232,7 +227,7 @@ export default function Conversas() {
                 <Button variant="ghost" className="w-full justify-start"><SlidersHorizontal /> Filtrar por</Button>
                 <Button variant="ghost" className="w-full justify-start"><ArrowDownAZ /> Ordenar por</Button>
                 <Button variant="ghost" className="w-full justify-start"><EyeOff /> Esconder etiquetas</Button>
-                <Button variant="ghost" className="w-full justify-start" onClick={() => setGerenciarTags(true)}><Tag /> Gerenciar etiquetas</Button>
+
               </PopoverContent>
             </Popover>
             <Button size="icon" variant="ghost" className="h-8 w-8" onClick={abrirNova} aria-label="Nova conversa"><Plus /></Button>
@@ -361,7 +356,6 @@ export default function Conversas() {
        </div>
       </div>
 
-      <EtiquetasManager open={gerenciarTags} onOpenChange={setGerenciarTags} />
       {/* Nova conversa */}
       <Dialog open={novaAberta} onOpenChange={setNovaAberta}>
          <DialogContent className="max-w-lg">
