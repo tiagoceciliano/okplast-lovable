@@ -9,8 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Loader2, Lock, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
-type AppRole = "admin" | "gestor" | "vendedor";
-const ROLE_LABEL: Record<AppRole, string> = { admin: "Admin", gestor: "Gestor", vendedor: "Vendedor" };
+type AppRole = "admin" | "gestor" | "vendedor" | "user";
+const ROLE_LABEL: Record<AppRole, string> = { admin: "Admin", gestor: "Gestor", vendedor: "Vendedor", user: "Usuário" };
 const RESOURCES: { id: string; label: string; scopable: boolean }[] = [
   { id: "dashboard", label: "Dashboard", scopable: false },
   { id: "radar", label: "Radar", scopable: false },

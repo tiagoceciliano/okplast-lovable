@@ -6,7 +6,8 @@ export interface CreateTeamMemberPayload {
   email: string;
   password: string;
   nome: string;
-  role: "admin" | "gestor" | "vendedor";
+  role: "admin" | "gestor" | "vendedor" | "user";
+  perfil_id?: string | null;
   numero_raw?: string | null;
   numero_formatado?: string | null;
   peso?: number;
@@ -45,6 +46,10 @@ export const createTeamMember = createServerFn({ method: "POST" })
       throw new Error("Usuário criado mas erro no papel: " + roleErr.message);
     }
 
+    if (payload.perfil_id) {
+      await admin.from("user_perfis").upsert({ user_id: newUserId, perfil_id: payload.perfil_id });
+    }
+
     // Se veio link_whatsapp_id, apenas vincula o novo user ao registro existente
     if (payload.link_whatsapp_id) {
       const { error: linkErr } = await admin
@@ -63,7 +68,7 @@ export const createTeamMember = createServerFn({ method: "POST" })
         numero_formatado: payload.numero_formatado,
         peso: payload.peso ?? 0,
         ativo: payload.ativo ?? true,
-        recebe_lead: payload.recebe_lead ?? payload.role !== "gestor",
+        recebe_lead: payload.recebe_lead ?? payload.role === "vendedor",
       });
     }
 

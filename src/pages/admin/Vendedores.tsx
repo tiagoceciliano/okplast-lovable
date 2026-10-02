@@ -19,7 +19,7 @@ import { listTeamMembers } from "@/lib/list-team-members.functions";
 import { createTeamMember } from "@/lib/create-team-member.functions";
 import { updateTeamMember } from "@/lib/update-team-member.functions";
 
-type Role = "admin" | "gestor" | "vendedor";
+type Role = "admin" | "gestor" | "vendedor" | "user";
 
 interface Member {
   id?: string; // whatsapp_numbers.id
@@ -142,7 +142,7 @@ export default function Vendedores() {
   const totalPeso = activeReceivers.reduce((s, r) => s + (r.peso || 0), 0);
 
   const filteredRows = rows.filter((row) => `${row.nome_vendedor} ${row.email ?? ""}`.toLowerCase().includes(busca.trim().toLowerCase()));
-  const roleLabel = (role: Role) => role === "admin" ? "PROPRIETÁRIO" : role === "gestor" ? "GERENTE" : "VENDEDOR";
+  const roleLabel = (role: Role) => role === "admin" ? "PROPRIETÁRIO" : role === "gestor" ? "GERENTE" : role === "user" ? "USUÁRIO" : "VENDEDOR";
 
   return (
     <ConfiguracoesLayout active={tab === "permissoes" ? "permissoes" : "membros"}>
@@ -197,7 +197,7 @@ export default function Vendedores() {
         </Tabs>
       </div>
 
-      <AddMemberDialog open={addOpen} onOpenChange={setAddOpen} onCreated={load} />
+      <AddMemberDialog perfis={perfis} open={addOpen} onOpenChange={setAddOpen} onCreated={load} />
       <EditCredentialsDialog member={editCred} onClose={() => setEditCred(null)} onSaved={load} />
       <EditMemberDialog member={editFull} users={teamUsers} perfis={perfis} onClose={() => setEditFull(null)} onSaved={load} />
     </ConfiguracoesLayout>
@@ -248,9 +248,9 @@ function EditMemberDialog({ member, users, perfis, onClose, onSaved }: { member:
           nome_vendedor: nome,
           numero_raw: raw,
           numero_formatado: formatDisplay(raw),
-          peso: role === "gestor" ? 0 : peso,
+          peso: role === "vendedor" ? peso : 0,
           ativo,
-          recebe_lead: role === "gestor" ? false : recebe,
+          recebe_lead: role === "vendedor" ? recebe : false,
         }).eq("id", member.id);
         if (upErr) throw upErr;
         await createTeamMember({
@@ -271,9 +271,9 @@ function EditMemberDialog({ member, users, perfis, onClose, onSaved }: { member:
         nome_vendedor: nome,
         numero_raw: raw,
         numero_formatado: formatDisplay(raw),
-        peso: role === "gestor" ? 0 : peso,
+        peso: role === "vendedor" ? peso : 0,
         ativo,
-        recebe_lead: role === "gestor" ? false : recebe,
+        recebe_lead: role === "vendedor" ? recebe : false,
       }).eq("id", member.id);
       if (error) throw error;
 
@@ -338,12 +338,12 @@ function EditMemberDialog({ member, users, perfis, onClose, onSaved }: { member:
               </SelectContent>
             </Select>
           </div>
-          {role !== "gestor" && (
+          {role === "vendedor" && (
             <div><Label>Peso do rateio (%)</Label><Input type="number" min={0} max={100} value={peso} onChange={(e) => setPeso(Math.max(0, Math.min(100, Number(e.target.value) || 0)))} /></div>
           )}
           <div className="flex gap-6">
             <label className="flex items-center gap-2 text-sm"><Switch checked={ativo} onCheckedChange={setAtivo}/> Ativo</label>
-            {role !== "gestor" && (
+            {role === "vendedor" && (
               <label className="flex items-center gap-2 text-sm"><Switch checked={recebe} onCheckedChange={setRecebe}/> Recebe lead</label>
             )}
           </div>
@@ -419,11 +419,12 @@ function EditCredentialsDialog({ member, onClose, onSaved }: { member: Member | 
   );
 }
 
-function AddMemberDialog({ open, onOpenChange, onCreated }: { open: boolean; onOpenChange: (o: boolean) => void; onCreated: () => void }) {
+function AddMemberDialog({ perfis, open, onOpenChange, onCreated }: { perfis: PerfilOpt[]; open: boolean; onOpenChange: (o: boolean) => void; onCreated: () => void }) {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [role, setRole] = useState<Role>("vendedor");
+  const [perfilId, setPerfilId] = useState<string | null>(null);
   const [numero, setNumero] = useState("");
   const [peso, setPeso] = useState(0);
   const [saving, setSaving] = useState(false);
@@ -435,17 +436,17 @@ function AddMemberDialog({ open, onOpenChange, onCreated }: { open: boolean; onO
       const raw = numero ? toRaw(numero) : null;
       await createTeamMember({
         data: {
-          nome, email, password: senha, role,
+          nome, email, password: senha, role, perfil_id: perfilId,
           numero_raw: raw,
           numero_formatado: raw ? formatDisplay(raw) : null,
-          peso: role === "gestor" ? 0 : peso,
-          recebe_lead: role !== "gestor",
+          peso: role === "vendedor" ? peso : 0,
+          recebe_lead: role === "vendedor",
           ativo: true,
         },
       });
       toast.success("Membro criado");
       onOpenChange(false);
-      setNome(""); setEmail(""); setSenha(""); setNumero(""); setPeso(0); setRole("vendedor");
+      setNome(""); setEmail(""); setSenha(""); setNumero(""); setPeso(0); setRole("vendedor"); setPerfilId(null);
       onCreated();
     } catch (e) { toast.error((e as Error).message); }
     finally { setSaving(false); }
@@ -461,17 +462,18 @@ function AddMemberDialog({ open, onOpenChange, onCreated }: { open: boolean; onO
           <div><Label>Senha inicial</Label><Input type="text" value={senha} onChange={(e) => setSenha(e.target.value)} placeholder="Mínimo 6 caracteres" /></div>
           <div>
             <Label>Papel</Label>
-            <Select value={role} onValueChange={(v) => setRole(v as Role)}>
+            <Select value={perfilId ?? role} onValueChange={(v) => { const p = perfis.find((x) => x.id === v); if (p) { setPerfilId(p.id); setRole(p.base_role); } else { setPerfilId(null); setRole(v as Role); } }}>
               <SelectTrigger><SelectValue/></SelectTrigger>
               <SelectContent>
                 <SelectItem value="admin">Admin</SelectItem>
                 <SelectItem value="gestor">Gestor</SelectItem>
                 <SelectItem value="vendedor">Vendedor</SelectItem>
+                {perfis.map((p) => <SelectItem key={p.id} value={p.id}>{p.nome}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
           <div><Label>WhatsApp (opcional)</Label><Input value={numero} onChange={(e) => setNumero(formatDisplay(e.target.value))} placeholder="(21) 99999-9999" maxLength={15} /></div>
-          {role !== "gestor" && (
+          {role === "vendedor" && (
             <div><Label>Peso do rateio (%)</Label><Input type="number" min={0} max={100} value={peso} onChange={(e) => setPeso(Number(e.target.value) || 0)} /></div>
           )}
         </div>
