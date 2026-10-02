@@ -37,7 +37,7 @@ export function usePermissions() {
 
   useEffect(() => {
     if (!user) return;
-    if (cache[user.id]) { setPerms(cache[user.id]); setLoading(false); return; }
+    if (cache[user.id]) { setPerms(cache[user.id] ?? null); setLoading(false); return; }
     loadFor(user.id, user.roles).then((rows) => { cache[user.id] = rows; setPerms(rows); setLoading(false); });
   }, [user?.id]);
 

@@ -35,7 +35,7 @@ export function PermissionsMatrix() {
   const [sel, setSel] = useState<Sel>("role:admin");
   const [rows, setRows] = useState<Perm[]>([]);
   const [loading, setLoading] = useState(true);
-  const [dialog, setDialog] = useState<{ open: boolean; editing?: Perfil }>({ open: false });
+  const [dialog, setDialog] = useState<{ open: boolean; editing?: Perfil | undefined }>({ open: false });
 
   const isRole = sel.startsWith("role:");
   const loadPerfis = async () => {
@@ -68,7 +68,7 @@ export function PermissionsMatrix() {
   const removePerfil = async (p: Perfil) => {
     if (!confirm(`Excluir o perfil "${p.nome}"? Quem usa ele volta para o padrão ${ROLE_LABEL[p.base_role]}.`)) return;
     const { error } = await supabase.from("perfis").delete().eq("id", p.id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Perfil excluído");
     setSel("role:admin"); loadPerfis();
   };
@@ -145,7 +145,7 @@ export function PermissionsMatrix() {
   );
 }
 
-function PerfilDialog({ open, editing, onClose, onSaved }: { open: boolean; editing?: Perfil; onClose: () => void; onSaved: (id: string) => void }) {
+function PerfilDialog({ open, editing, onClose, onSaved }: { open: boolean; editing?: Perfil | undefined; onClose: () => void; onSaved: (id: string) => void }) {
   const [nome, setNome] = useState("");
   const [base, setBase] = useState<AppRole>("vendedor");
   const [saving, setSaving] = useState(false);
