@@ -453,6 +453,62 @@ export type Database = {
         }
         Relationships: []
       }
+      perfil_permissoes: {
+        Row: {
+          can_delete: boolean
+          can_edit: boolean
+          can_view: boolean
+          perfil_id: string
+          resource: string
+          scope: string
+        }
+        Insert: {
+          can_delete?: boolean
+          can_edit?: boolean
+          can_view?: boolean
+          perfil_id: string
+          resource: string
+          scope?: string
+        }
+        Update: {
+          can_delete?: boolean
+          can_edit?: boolean
+          can_view?: boolean
+          perfil_id?: string
+          resource?: string
+          scope?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "perfil_permissoes_perfil_id_fkey"
+            columns: ["perfil_id"]
+            isOneToOne: false
+            referencedRelation: "perfis"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      perfis: {
+        Row: {
+          base_role: Database["public"]["Enums"]["app_role"]
+          created_at: string
+          id: string
+          nome: string
+        }
+        Insert: {
+          base_role?: Database["public"]["Enums"]["app_role"]
+          created_at?: string
+          id?: string
+          nome: string
+        }
+        Update: {
+          base_role?: Database["public"]["Enums"]["app_role"]
+          created_at?: string
+          id?: string
+          nome?: string
+        }
+        Relationships: []
+      }
       produtos: {
         Row: {
           ativo: boolean
@@ -565,6 +621,29 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      user_perfis: {
+        Row: {
+          perfil_id: string
+          user_id: string
+        }
+        Insert: {
+          perfil_id: string
+          user_id: string
+        }
+        Update: {
+          perfil_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_perfis_perfil_id_fkey"
+            columns: ["perfil_id"]
+            isOneToOne: false
+            referencedRelation: "perfis"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
