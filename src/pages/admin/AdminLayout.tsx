@@ -1,6 +1,7 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AdminSidebar } from "./components/AdminSidebar";
 import { BackendHealthBanner } from "@/components/admin/BackendHealthBanner";
+import { usePresence } from "@/hooks/usePresence";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -8,6 +9,7 @@ interface AdminLayoutProps {
 }
 
 export function AdminLayout({ children, fullBleed = false }: AdminLayoutProps) {
+  usePresence();
   return (
     <SidebarProvider defaultOpen={false}>
       <div className="min-h-screen flex w-full bg-background">
