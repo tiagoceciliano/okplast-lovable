@@ -55,8 +55,6 @@ export const getGoogleAdsStats = createServerFn({ method: "POST" })
     const { admin } = await requireCaller(getRequestHeader("Authorization"), [
       "admin",
       "gestor",
-      "vendedor",
-      "user",
     ]);
 
     const { startDate, endDate } = data;
