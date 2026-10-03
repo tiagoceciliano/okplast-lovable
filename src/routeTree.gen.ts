@@ -19,6 +19,7 @@ import { Route as PublicTermoUsoRouteImport } from './routes/_public/termo-uso'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminConversasRouteImport } from './routes/admin/conversas'
 import { Route as AdminGruposRouteImport } from './routes/admin/grupos'
+import { Route as AdminInvestimentoRouteImport } from './routes/admin/investimento'
 import { Route as AdminLeadsRouteImport } from './routes/admin/leads'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AdminMetaRouteImport } from './routes/admin/meta'
@@ -92,6 +93,11 @@ const AdminConversasRoute = AdminConversasRouteImport.update({
 const AdminGruposRoute = AdminGruposRouteImport.update({
   id: '/admin/grupos',
   path: '/admin/grupos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminInvestimentoRoute = AdminInvestimentoRouteImport.update({
+  id: '/admin/investimento',
+  path: '/admin/investimento',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminLeadsRoute = AdminLeadsRouteImport.update({
@@ -233,6 +239,7 @@ export interface FileRoutesByFullPath {
   '/termo-uso': typeof PublicTermoUsoRoute
   '/admin/conversas': typeof AdminConversasRoute
   '/admin/grupos': typeof AdminGruposRoute
+  '/admin/investimento': typeof AdminInvestimentoRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/meta': typeof AdminMetaRoute
@@ -267,6 +274,7 @@ export interface FileRoutesByTo {
   '/termo-uso': typeof PublicTermoUsoRoute
   '/admin/conversas': typeof AdminConversasRoute
   '/admin/grupos': typeof AdminGruposRoute
+  '/admin/investimento': typeof AdminInvestimentoRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/meta': typeof AdminMetaRoute
@@ -304,6 +312,7 @@ export interface FileRoutesById {
   '/_public/termo-uso': typeof PublicTermoUsoRoute
   '/admin/conversas': typeof AdminConversasRoute
   '/admin/grupos': typeof AdminGruposRoute
+  '/admin/investimento': typeof AdminInvestimentoRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/meta': typeof AdminMetaRoute
@@ -342,6 +351,7 @@ export interface FileRouteTypes {
     | '/termo-uso'
     | '/admin/conversas'
     | '/admin/grupos'
+    | '/admin/investimento'
     | '/admin/leads'
     | '/admin/login'
     | '/admin/meta'
@@ -376,6 +386,7 @@ export interface FileRouteTypes {
     | '/termo-uso'
     | '/admin/conversas'
     | '/admin/grupos'
+    | '/admin/investimento'
     | '/admin/leads'
     | '/admin/login'
     | '/admin/meta'
@@ -412,6 +423,7 @@ export interface FileRouteTypes {
     | '/_public/termo-uso'
     | '/admin/conversas'
     | '/admin/grupos'
+    | '/admin/investimento'
     | '/admin/leads'
     | '/admin/login'
     | '/admin/meta'
@@ -444,6 +456,7 @@ export interface RootRouteChildren {
   PublicRoute: typeof PublicRouteWithChildren
   AdminConversasRoute: typeof AdminConversasRoute
   AdminGruposRoute: typeof AdminGruposRoute
+  AdminInvestimentoRoute: typeof AdminInvestimentoRoute
   AdminLeadsRoute: typeof AdminLeadsRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AdminMetaRoute: typeof AdminMetaRoute
@@ -528,6 +541,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/grupos'
       fullPath: '/admin/grupos'
       preLoaderRoute: typeof AdminGruposRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/investimento': {
+      id: '/admin/investimento'
+      path: '/admin/investimento'
+      fullPath: '/admin/investimento'
+      preLoaderRoute: typeof AdminInvestimentoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/leads': {
@@ -754,6 +774,7 @@ const rootRouteChildren: RootRouteChildren = {
   PublicRoute: PublicRouteWithChildren,
   AdminConversasRoute: AdminConversasRoute,
   AdminGruposRoute: AdminGruposRoute,
+  AdminInvestimentoRoute: AdminInvestimentoRoute,
   AdminLeadsRoute: AdminLeadsRoute,
   AdminLoginRoute: AdminLoginRoute,
   AdminMetaRoute: AdminMetaRoute,
