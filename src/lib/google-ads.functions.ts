@@ -109,16 +109,24 @@ export const getGoogleAdsStats = createServerFn({ method: "POST" })
       .gte("created_at", `${startDate}T00:00:00-03:00`)
       .lte("created_at", `${endDate}T23:59:59-03:00`);
 
+    // Normaliza para casar "chapas-policarbonato-rj" com "3. Chapas - Policarbonato - RJ"
+    const norm = (s: string) =>
+      s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
+
     const leadsByCampaign: Record<string, number> = {};
     let totalLeads = 0;
     for (const l of leads ?? []) {
       totalLeads++;
-      const key = String(l.utm_campaign ?? "").trim().toLowerCase();
+      const key = norm(String(l.utm_campaign ?? ""));
       if (key) leadsByCampaign[key] = (leadsByCampaign[key] ?? 0) + 1;
     }
 
     for (const c of campaigns) {
-      c.leads = leadsByCampaign[c.name.trim().toLowerCase()] ?? 0;
+      const cName = norm(c.name);
+      c.leads = Object.entries(leadsByCampaign).reduce(
+        (s, [utm, n]) => (cName.includes(utm) || utm.includes(cName) ? s + n : s),
+        0
+      );
     }
 
     const totalCost = campaigns.reduce((s, c) => s + c.cost, 0);
