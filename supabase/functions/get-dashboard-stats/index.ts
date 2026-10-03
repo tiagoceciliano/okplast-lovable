@@ -175,6 +175,9 @@ Deno.serve(async (req) => {
         .filter(c => c.leads > 0)
         .sort((a, b) => b.leads - a.leads)
       const poliLeadsTotal = leadsByCat['Policarbonato'] || 0
+      // Leads que não informaram se é alveolar ou compacto — mostra para a soma bater
+      const semTipo = poliLeadsTotal - poliChildren.reduce((s, c) => s + c.leads, 0)
+      if (semTipo > 0) poliChildren.push({ category: 'Tipo não informado', leads: semTipo })
       const calculateConversionRate = (leads: number, visits: number) => {
         if (visits <= 0) return 0
         return Number(Math.min((leads / visits) * 100, 100).toFixed(2))
