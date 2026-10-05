@@ -92,6 +92,13 @@
       "when": 1790973030988,
       "tag": "0012_custom_profiles",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1791206616723,
+      "tag": "0013_whatsapp_templates",
+      "breakpoints": true
     }
   ]
 }
