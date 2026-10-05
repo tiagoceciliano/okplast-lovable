@@ -19,7 +19,8 @@ import {
   DollarSign,
   ShieldCheck,
   Folder,
-  Tag
+  Tag,
+  MessageSquareText
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
@@ -318,6 +319,7 @@ export function AdminSidebar() {
                   { to: "/admin/vendedores?tab=permissoes", label: "Permissões", icon: ShieldCheck },
                   { to: "/admin/grupos", label: "Grupos", icon: Folder },
                   { to: "/admin/tags", label: "Tags", icon: Tag },
+                  { to: "/admin/modelos", label: "Modelos", icon: MessageSquareText },
                   { to: "/admin/produtos", label: "Produtos", icon: Boxes },
                   { to: "/admin/meta", label: "Meta", icon: Target },
                 ].map((it) => (
@@ -370,6 +372,12 @@ export function AdminSidebar() {
                       isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
                     )}>
                       <ShieldCheck className="h-3.5 w-3.5" /> Permissões
+                    </NavLink>
+                    <NavLink to="/admin/modelos" className={({ isActive }) => cn(
+                      "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm hover:bg-muted",
+                      isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
+                    )}>
+                      <MessageSquareText className="h-3.5 w-3.5" /> Modelos
                     </NavLink>
                     <NavLink to="/admin/produtos" className={({ isActive }) => cn(
                       "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm hover:bg-muted",
