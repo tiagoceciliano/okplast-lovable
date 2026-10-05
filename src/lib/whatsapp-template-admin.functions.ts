@@ -59,6 +59,7 @@ const createSchema = z.object({
   categoria: z.enum(["MARKETING", "UTILITY", "AUTHENTICATION"]),
   componentes: z.array(z.any()).max(10),
   validade: z.number().int().min(30).max(86400).optional(),
+  formato: z.enum(["POSITIONAL", "NAMED"]).optional(),
 });
 
 export const createWhatsappTemplate = createServerFn({ method: "POST" })
@@ -67,6 +68,7 @@ export const createWhatsappTemplate = createServerFn({ method: "POST" })
     const { admin } = await requireCaller(getRequestHeader("Authorization"), ["admin", "gestor"]);
     const body: any = { name: data.nome, language: data.idioma, category: data.categoria, components: data.componentes };
     if (data.validade) body.message_send_ttl_seconds = data.validade;
+    if (data.formato === "NAMED") body.parameter_format = "NAMED";
     const resp = await fetch(`${GATEWAY_URL}/message_templates`, { method: "POST", headers: headers(), body: JSON.stringify(body) });
     const text = await resp.text();
     if (!resp.ok) { console.error("create template", resp.status, text); return { ok: false as const, erro: metaError(text) }; }

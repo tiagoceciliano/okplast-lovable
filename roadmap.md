@@ -9,7 +9,9 @@
 - [x] Menu lateral + matriz de permissões
 - [x] Receptor de mensagens (/api/public/whatsapp/webhook) — falta publicar e apontar o conector para este projeto
 - [ ] Teste com o usuário: enviar mensagem pronta para o próprio celular
-- [ ] Criar/aprovar templates na Meta (mensagens prontas) — aprovação pode levar até 48h
+- [x] Tela de criação de modelos (Configurações > Modelos de mensagem) com prévia e atualização de aprovação
+- [ ] Cabeçalho com mídia nos modelos — depende de upload de amostra pela conexão
+- [ ] Assinar avisos de modelos (status/categoria/qualidade) na conexão WhatsApp — usuário
 
 ## Atendimento no padrão Kinbox
 - [x] Reproduzir a disposição completa dos prints: navegação do chat, lista, cabeçalho, mensagens, ações e detalhes
