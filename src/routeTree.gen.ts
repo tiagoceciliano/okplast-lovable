@@ -23,6 +23,7 @@ import { Route as AdminInvestimentoRouteImport } from './routes/admin/investimen
 import { Route as AdminLeadsRouteImport } from './routes/admin/leads'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AdminMetaRouteImport } from './routes/admin/meta'
+import { Route as AdminModelosRouteImport } from './routes/admin/modelos'
 import { Route as AdminNegociacoesRouteImport } from './routes/admin/negociacoes'
 import { Route as AdminProdutosRouteImport } from './routes/admin/produtos'
 import { Route as AdminRadarRouteImport } from './routes/admin/radar'
@@ -113,6 +114,11 @@ const AdminLoginRoute = AdminLoginRouteImport.update({
 const AdminMetaRoute = AdminMetaRouteImport.update({
   id: '/admin/meta',
   path: '/admin/meta',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminModelosRoute = AdminModelosRouteImport.update({
+  id: '/admin/modelos',
+  path: '/admin/modelos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminNegociacoesRoute = AdminNegociacoesRouteImport.update({
@@ -243,6 +249,7 @@ export interface FileRoutesByFullPath {
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/meta': typeof AdminMetaRoute
+  '/admin/modelos': typeof AdminModelosRoute
   '/admin/negociacoes': typeof AdminNegociacoesRoute
   '/admin/produtos': typeof AdminProdutosRoute
   '/admin/radar': typeof AdminRadarRoute
@@ -278,6 +285,7 @@ export interface FileRoutesByTo {
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/meta': typeof AdminMetaRoute
+  '/admin/modelos': typeof AdminModelosRoute
   '/admin/negociacoes': typeof AdminNegociacoesRoute
   '/admin/produtos': typeof AdminProdutosRoute
   '/admin/radar': typeof AdminRadarRoute
@@ -316,6 +324,7 @@ export interface FileRoutesById {
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/meta': typeof AdminMetaRoute
+  '/admin/modelos': typeof AdminModelosRoute
   '/admin/negociacoes': typeof AdminNegociacoesRoute
   '/admin/produtos': typeof AdminProdutosRoute
   '/admin/radar': typeof AdminRadarRoute
@@ -355,6 +364,7 @@ export interface FileRouteTypes {
     | '/admin/leads'
     | '/admin/login'
     | '/admin/meta'
+    | '/admin/modelos'
     | '/admin/negociacoes'
     | '/admin/produtos'
     | '/admin/radar'
@@ -390,6 +400,7 @@ export interface FileRouteTypes {
     | '/admin/leads'
     | '/admin/login'
     | '/admin/meta'
+    | '/admin/modelos'
     | '/admin/negociacoes'
     | '/admin/produtos'
     | '/admin/radar'
@@ -427,6 +438,7 @@ export interface FileRouteTypes {
     | '/admin/leads'
     | '/admin/login'
     | '/admin/meta'
+    | '/admin/modelos'
     | '/admin/negociacoes'
     | '/admin/produtos'
     | '/admin/radar'
@@ -460,6 +472,7 @@ export interface RootRouteChildren {
   AdminLeadsRoute: typeof AdminLeadsRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AdminMetaRoute: typeof AdminMetaRoute
+  AdminModelosRoute: typeof AdminModelosRoute
   AdminNegociacoesRoute: typeof AdminNegociacoesRoute
   AdminProdutosRoute: typeof AdminProdutosRoute
   AdminRadarRoute: typeof AdminRadarRoute
@@ -569,6 +582,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/meta'
       fullPath: '/admin/meta'
       preLoaderRoute: typeof AdminMetaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/modelos': {
+      id: '/admin/modelos'
+      path: '/admin/modelos'
+      fullPath: '/admin/modelos'
+      preLoaderRoute: typeof AdminModelosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/negociacoes': {
@@ -778,6 +798,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminLeadsRoute: AdminLeadsRoute,
   AdminLoginRoute: AdminLoginRoute,
   AdminMetaRoute: AdminMetaRoute,
+  AdminModelosRoute: AdminModelosRoute,
   AdminNegociacoesRoute: AdminNegociacoesRoute,
   AdminProdutosRoute: AdminProdutosRoute,
   AdminRadarRoute: AdminRadarRoute,
