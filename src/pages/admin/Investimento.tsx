@@ -189,6 +189,7 @@ export default function Investimento() {
                     <TableHead className="text-right">Conversões</TableHead>
                     <TableHead className="text-right">Custo/conv.</TableHead>
                     <TableHead className="text-right">Leads (sistema)</TableHead>
+                    <TableHead className="text-right">Custo/Lead</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -211,6 +212,7 @@ export default function Investimento() {
                       <TableCell className="text-right">{fmtConv(c.conversions)}</TableCell>
                       <TableCell className="text-right">{c.conversions > 0 ? brl(c.cost / c.conversions) : "—"}</TableCell>
                       <TableCell className="text-right text-muted-foreground">{c.leads}</TableCell>
+                      <TableCell className="text-right text-muted-foreground">{c.leads > 0 ? brl(c.cost / c.leads) : "—"}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -223,6 +225,7 @@ export default function Investimento() {
                     <TableCell className="text-right font-bold">{fmtConv(filteredTotals.conversions)}</TableCell>
                     <TableCell className="text-right font-bold">{filteredTotals.costPerConv != null ? brl(filteredTotals.costPerConv) : "—"}</TableCell>
                     <TableCell className="text-right font-bold text-muted-foreground">{filteredTotals.leads}</TableCell>
+                    <TableCell className="text-right font-bold text-muted-foreground">{filteredTotals.costPerLead != null ? brl(filteredTotals.costPerLead) : "—"}</TableCell>
                   </TableRow>
                 </TableFooter>
               </Table>
