@@ -139,7 +139,7 @@ export const getGoogleAdsStats = createServerFn({ method: "POST" })
         usadas.add(k);
       }
     }
-    const leadsSemCampanha = totalLeads - [...usadas].reduce((s, k) => s + leadsByKey[k], 0);
+    const leadsSemCampanha = totalLeads - [...usadas].reduce((s, k) => s + (leadsByKey[k] ?? 0), 0);
 
     const totalCost = campaigns.reduce((s, c) => s + c.cost, 0);
 
