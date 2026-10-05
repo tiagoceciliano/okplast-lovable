@@ -5,6 +5,13 @@ Objetivo: criar, enviar para análise, acompanhar a aprovação e gerenciar os m
 ## Onde fica
 Nova tela em **Configurações > Modelos de mensagem** (ao lado de Membros, Tags e Grupos). Acesso: admin e gestor.
 
+## Layout (igual ao da Meta)
+- Topo com as etapas: Configurar modelo > Editar modelo > Enviar para análise, marcando a etapa atual e as concluídas.
+- Formulário no centro, em blocos brancos, como nos prints.
+- **À direita, fixa, a "Prévia do modelo"**: a mensagem montada no visual do WhatsApp (fundo bege, balão branco, imagem/vídeo/documento no topo, cabeçalho em negrito, corpo com negrito/itálico aplicados, rodapé cinza, horário e botões embaixo do balão). Atualiza a cada letra digitada.
+- Abaixo da prévia: "Este modelo é ideal para" e "Áreas que você pode personalizar".
+- Barra inferior fixa com Descartar/Voltar à esquerda e Avançar/Enviar para análise à direita.
+
 ## 1. Lista de modelos
 - Tabela com nome, categoria (Marketing, Utilidade, Autenticação), idioma, situação (Aprovado, Em análise, Rejeitado, Pausado, Desativado) e data da última mudança.
 - Filtros por situação e categoria, busca por nome.
