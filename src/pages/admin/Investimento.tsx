@@ -36,7 +36,15 @@ export default function Investimento() {
   const [data, setData] = useState<StatsResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [labelFilter, setLabelFilter] = useState<string>("all");
+  const [labelFilter, setLabelFilterState] = useState<string>("all");
+  useEffect(() => {
+    const saved = localStorage.getItem("investimento_label_filter");
+    if (saved) setLabelFilterState(saved);
+  }, []);
+  const setLabelFilter = useCallback((v: string) => {
+    setLabelFilterState(v);
+    localStorage.setItem("investimento_label_filter", v);
+  }, []);
 
   const fetchStats = useCallback(async () => {
     setIsLoading(true);
@@ -71,8 +79,9 @@ export default function Investimento() {
     const cost = filteredCampaigns.reduce((s, c) => s + c.cost, 0);
     const leads = filteredCampaigns.reduce((s, c) => s + c.leads, 0);
     const clicks = filteredCampaigns.reduce((s, c) => s + c.clicks, 0);
+    const conversions = filteredCampaigns.reduce((s, c) => s + c.conversions, 0);
     const impressions = filteredCampaigns.reduce((s, c) => s + c.impressions, 0);
-    return { cost, leads, clicks, impressions, costPerLead: leads > 0 ? cost / leads : null };
+    return { cost, leads, clicks, impressions, conversions, costPerConv: conversions > 0 ? cost / conversions : null, costPerLead: leads > 0 ? cost / leads : null };
   }, [filteredCampaigns]);
 
   const chartData = useMemo(() => (data?.daily ?? []).map(d => ({
@@ -86,9 +95,24 @@ export default function Investimento() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Investimento Google Ads</h1>
-            <p className="text-muted-foreground">Conta OKPLAST + LAB — gasto, campanhas e custo por lead</p>
+            <p className="text-muted-foreground">Conta OKPLAST + LAB — custo, conversões e custo/conv.</p>
           </div>
-          <DashboardPeriodFilter value={filter} onChange={setFilter} />
+          <div className="flex flex-wrap items-center gap-2">
+            <Select value={labelFilter} onValueChange={setLabelFilter}>
+              <SelectTrigger className="w-[220px]">
+                <SelectValue placeholder="Filtrar por rótulo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos os rótulos</SelectItem>
+                <SelectItem value="none">Sem rótulo</SelectItem>
+                {allLabels.map(l => <SelectItem key={l} value={l}>{l}</SelectItem>)}
+                {labelFilter !== "all" && labelFilter !== "none" && !allLabels.includes(labelFilter) && (
+                  <SelectItem value={labelFilter}>{labelFilter}</SelectItem>
+                )}
+              </SelectContent>
+            </Select>
+            <DashboardPeriodFilter value={filter} onChange={setFilter} />
+          </div>
         </div>
 
         {error && (
@@ -100,9 +124,9 @@ export default function Investimento() {
         {/* KPIs */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            { title: "Investimento", value: brl(filteredTotals.cost), icon: DollarSign },
-            { title: "Leads", value: String(filteredTotals.leads), icon: Users },
-            { title: "Custo por lead", value: filteredTotals.costPerLead != null ? brl(filteredTotals.costPerLead) : "—", icon: MousePointerClick },
+            { title: "Custo", value: brl(filteredTotals.cost), icon: DollarSign },
+            { title: "Conversões", value: fmtConv(filteredTotals.conversions), icon: Users },
+            { title: "Custo/conv.", value: filteredTotals.costPerConv != null ? brl(filteredTotals.costPerConv) : "—", icon: MousePointerClick },
             { title: "Cliques", value: filteredTotals.clicks.toLocaleString("pt-BR"), icon: Eye },
           ].map(k => (
             <Card key={k.title}>
@@ -148,18 +172,8 @@ export default function Investimento() {
           <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <CardTitle>Investimento por campanha</CardTitle>
-              <CardDescription>Gasto, leads do sistema e custo por lead por campanha</CardDescription>
+              <CardDescription>Métricas do Google Ads (Custo, Conversões, Custo/conv.) e leads que entraram no sistema</CardDescription>
             </div>
-            <Select value={labelFilter} onValueChange={setLabelFilter}>
-              <SelectTrigger className="w-[220px]">
-                <SelectValue placeholder="Filtrar por rótulo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos os rótulos</SelectItem>
-                <SelectItem value="none">Sem rótulo</SelectItem>
-                {allLabels.map(l => <SelectItem key={l} value={l}>{l}</SelectItem>)}
-              </SelectContent>
-            </Select>
           </CardHeader>
           <CardContent>
             {isLoading ? <Skeleton className="h-40 w-full" /> : filteredCampaigns.length === 0 ? (
@@ -170,10 +184,11 @@ export default function Investimento() {
                   <TableRow>
                     <TableHead>Campanha</TableHead>
                     <TableHead>Rótulos</TableHead>
-                    <TableHead className="text-right">Investimento</TableHead>
+                    <TableHead className="text-right">Custo</TableHead>
                     <TableHead className="text-right">Cliques</TableHead>
-                    <TableHead className="text-right">Leads</TableHead>
-                    <TableHead className="text-right">Custo/lead</TableHead>
+                    <TableHead className="text-right">Conversões</TableHead>
+                    <TableHead className="text-right">Custo/conv.</TableHead>
+                    <TableHead className="text-right">Leads (sistema)</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -193,8 +208,9 @@ export default function Investimento() {
                       </TableCell>
                       <TableCell className="text-right">{brl(c.cost)}</TableCell>
                       <TableCell className="text-right">{c.clicks.toLocaleString("pt-BR")}</TableCell>
-                      <TableCell className="text-right">{c.leads}</TableCell>
-                      <TableCell className="text-right">{c.leads > 0 ? brl(c.cost / c.leads) : "—"}</TableCell>
+                      <TableCell className="text-right">{fmtConv(c.conversions)}</TableCell>
+                      <TableCell className="text-right">{c.conversions > 0 ? brl(c.cost / c.conversions) : "—"}</TableCell>
+                      <TableCell className="text-right text-muted-foreground">{c.leads}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -204,8 +220,9 @@ export default function Investimento() {
                     <TableCell />
                     <TableCell className="text-right font-bold">{brl(filteredTotals.cost)}</TableCell>
                     <TableCell className="text-right font-bold">{filteredTotals.clicks.toLocaleString("pt-BR")}</TableCell>
-                    <TableCell className="text-right font-bold">{filteredTotals.leads}</TableCell>
-                    <TableCell className="text-right font-bold">{filteredTotals.costPerLead != null ? brl(filteredTotals.costPerLead) : "—"}</TableCell>
+                    <TableCell className="text-right font-bold">{fmtConv(filteredTotals.conversions)}</TableCell>
+                    <TableCell className="text-right font-bold">{filteredTotals.costPerConv != null ? brl(filteredTotals.costPerConv) : "—"}</TableCell>
+                    <TableCell className="text-right font-bold text-muted-foreground">{filteredTotals.leads}</TableCell>
                   </TableRow>
                 </TableFooter>
               </Table>
@@ -216,3 +233,5 @@ export default function Investimento() {
     </AdminLayout>
   );
 }
+
+function fmtConv(n: number) { return n.toLocaleString("pt-BR", { maximumFractionDigits: 2 }); }
