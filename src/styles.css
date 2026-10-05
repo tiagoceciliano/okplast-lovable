@@ -79,6 +79,12 @@
   --color-cta-email: hsl(var(--cta-email));
   --color-cta-email-foreground: hsl(var(--cta-email-foreground));
   --color-gold: hsl(var(--gold));
+  --color-success: hsl(var(--success));
+  --color-success-foreground: hsl(var(--success-foreground));
+  --color-warning: hsl(var(--warning));
+  --color-warning-foreground: hsl(var(--warning-foreground));
+  --color-info: hsl(var(--info));
+  --color-info-foreground: hsl(var(--info-foreground));
   --color-chat-bg: hsl(var(--chat-bg));
   --color-chat-in: hsl(var(--chat-in));
   --color-chat-out: hsl(var(--chat-out));
@@ -198,6 +204,12 @@
   /* Gold/Yellow for accent buttons */
   --gold: 45 90% 50%;
   --chat-bg: 36 22% 92%;
+  --success: 152 55% 38%;
+  --success-foreground: 0 0% 100%;
+  --warning: 40 95% 55%;
+  --warning-foreground: 30 80% 25%;
+  --info: 207 85% 40%;
+  --info-foreground: 0 0% 100%;
   --chat-in: 0 0% 100%;
   --chat-out: 190 70% 89%;
   --chat-avatar: 290 60% 90%;

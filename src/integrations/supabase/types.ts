@@ -871,6 +871,86 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_template_eventos: {
+        Row: {
+          created_at: string
+          descricao: string | null
+          id: string
+          template_id: string | null
+          tipo: string
+        }
+        Insert: {
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          template_id?: string | null
+          tipo: string
+        }
+        Update: {
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          template_id?: string | null
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_template_eventos_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "whatsapp_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      whatsapp_templates: {
+        Row: {
+          categoria: string
+          categoria_anterior: string | null
+          componentes: Json
+          created_at: string
+          id: string
+          idioma: string
+          meta_id: string | null
+          motivo: string | null
+          nome: string
+          qualidade: string | null
+          status: string
+          sub_tipo: string
+          updated_at: string
+        }
+        Insert: {
+          categoria: string
+          categoria_anterior?: string | null
+          componentes?: Json
+          created_at?: string
+          id?: string
+          idioma?: string
+          meta_id?: string | null
+          motivo?: string | null
+          nome: string
+          qualidade?: string | null
+          status?: string
+          sub_tipo?: string
+          updated_at?: string
+        }
+        Update: {
+          categoria?: string
+          categoria_anterior?: string | null
+          componentes?: Json
+          created_at?: string
+          id?: string
+          idioma?: string
+          meta_id?: string | null
+          motivo?: string | null
+          nome?: string
+          qualidade?: string | null
+          status?: string
+          sub_tipo?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       whatsapp_webhook_events: {
         Row: {
           attempts: number

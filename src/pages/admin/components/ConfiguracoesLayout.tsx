@@ -2,18 +2,19 @@ import type { ReactNode } from "react";
 import { Link } from "@/lib/router-compat";
 import { AdminLayout } from "../AdminLayout";
 import { cn } from "@/lib/utils";
-import { Folder, ShieldCheck, Tag, Users } from "lucide-react";
+import { Folder, MessageSquareText, ShieldCheck, Tag, Users } from "lucide-react";
 
-type Section = "membros" | "permissoes" | "tags" | "grupos";
+type Section = "membros" | "permissoes" | "tags" | "grupos" | "modelos";
 
 const links = [
   { id: "membros", label: "Membros", to: "/admin/vendedores", icon: Users },
   { id: "permissoes", label: "Permissões", to: "/admin/vendedores?tab=permissoes", icon: ShieldCheck },
   { id: "grupos", label: "Grupos", to: "/admin/grupos", icon: Folder },
   { id: "tags", label: "Tags", to: "/admin/tags", icon: Tag },
+  { id: "modelos", label: "Modelos de mensagem", to: "/admin/modelos", icon: MessageSquareText },
 ] as const;
 
-export function ConfiguracoesLayout({ active, children }: { active: Section; children: ReactNode }) {
+export function ConfiguracoesLayout({ active, children, wide = false }: { active: Section; children: ReactNode; wide?: boolean }) {
   return (
     <AdminLayout fullBleed>
       <div className="grid h-screen min-h-[560px] overflow-hidden bg-muted/30 lg:grid-cols-[220px_minmax(0,1fr)]">
@@ -28,8 +29,8 @@ export function ConfiguracoesLayout({ active, children }: { active: Section; chi
             ))}
           </nav>
         </aside>
-        <section className="min-w-0 overflow-y-auto bg-background">
-          <div className="mx-auto w-full max-w-5xl px-4 py-5 sm:px-7 lg:px-9">{children}</div>
+        <section className={cn("min-w-0 overflow-y-auto", wide ? "bg-muted/30" : "bg-background")}>
+          <div className={cn("mx-auto w-full px-4 py-5 sm:px-7 lg:px-9", wide ? "max-w-[1400px]" : "max-w-5xl")}>{children}</div>
         </section>
       </div>
     </AdminLayout>

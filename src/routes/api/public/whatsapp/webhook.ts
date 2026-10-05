@@ -85,6 +85,27 @@ async function findOrCreateConversa(db: Db, from: string, nome: string | null, c
 /** Retorna true quando concluído; false quando precisa aguardar (ex.: status antes da mensagem enviada). */
 async function processEvent(db: Db, event: string, payload: any): Promise<boolean> {
   const value = payload?.entry?.[0]?.changes?.[0]?.value ?? {};
+  const field = payload?.entry?.[0]?.changes?.[0]?.field ?? "";
+
+  // Atualizações de modelos (aprovação, categoria, qualidade) enviadas pela Meta.
+  if (String(field).startsWith("message_template") || field === "template_category_update" || value.message_template_id) {
+    const metaId = String(value.message_template_id ?? "");
+    if (!metaId) return true;
+    const { data: t } = await db.from("whatsapp_templates").select("id,status,categoria").eq("meta_id", metaId).maybeSingle();
+    if (!t) return true;
+    const upd: any = {};
+    let desc = "";
+    let tipo = "status";
+    if (value.event) { upd.status = value.event; upd.motivo = value.reason && value.reason !== "NONE" ? value.reason : null; desc = `${t.status} → ${value.event}`; }
+    if (value.new_category) { tipo = "categoria"; upd.categoria = value.new_category; upd.categoria_anterior = value.previous_category ?? t.categoria; desc = `${value.previous_category ?? t.categoria} → ${value.new_category}`; }
+    if (value.new_quality_score) { tipo = "qualidade"; upd.qualidade = value.new_quality_score; desc = `Qualidade: ${value.new_quality_score}`; }
+    if (Object.keys(upd).length) {
+      await db.from("whatsapp_templates").update(upd).eq("id", t.id);
+      await db.from("whatsapp_template_eventos").insert({ template_id: t.id, tipo, descricao: desc });
+    }
+    return true;
+  }
+
 
   if (event === "whatsapp.message") {
     const contacts = value.contacts ?? [];
