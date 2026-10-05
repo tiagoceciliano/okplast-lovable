@@ -102,38 +102,51 @@ export const getGoogleAdsStats = createServerFn({ method: "POST" })
       leads: 0,
     }));
 
-    // 4) Leads do sistema por utm_campaign (para custo por lead)
+    // 4) Leads do sistema vindos do Google Ads, por utm_campaign
     const { data: leads } = await admin
       .from("leads")
-      .select("utm_campaign")
+      .select("utm_campaign, utm_source")
+      .eq("utm_source", "googleads")
       .gte("created_at", `${startDate}T00:00:00-03:00`)
-      .lte("created_at", `${endDate}T23:59:59-03:00`);
+      .lte("created_at", `${endDate}T23:59:59-03:00`)
+      .limit(50000);
 
-    // Normaliza para casar "chapas-policarbonato-rj" com "3. Chapas - Policarbonato - RJ"
-    const norm = (s: string) =>
-      s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
+    // Chave canônica: "8. Chapas - ACM" e "chapas-acm-rj" => "chapas|acm"
+    const IGNORAR = new Set(["rj", "riodejaneiro", "sm"]);
+    const chave = (s: string) =>
+      s
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .split(/[^a-z0-9]+/)
+        .filter((t) => t && !/^\d+$/.test(t) && !IGNORAR.has(t))
+        .join("|");
 
-    const leadsByCampaign: Record<string, number> = {};
+    const leadsByKey: Record<string, number> = {};
     let totalLeads = 0;
     for (const l of leads ?? []) {
       totalLeads++;
-      const key = norm(String(l.utm_campaign ?? ""));
-      if (key) leadsByCampaign[key] = (leadsByCampaign[key] ?? 0) + 1;
+      const k = chave(String(l.utm_campaign ?? ""));
+      if (k) leadsByKey[k] = (leadsByKey[k] ?? 0) + 1;
     }
 
+    // Igualdade exata: cada lead conta em no máximo uma campanha
+    const usadas = new Set<string>();
     for (const c of campaigns) {
-      const cName = norm(c.name);
-      c.leads = Object.entries(leadsByCampaign).reduce(
-        (s, [utm, n]) => (cName.includes(utm) || utm.includes(cName) ? s + n : s),
-        0
-      );
+      const k = chave(c.name);
+      if (k && leadsByKey[k] && !usadas.has(k)) {
+        c.leads = leadsByKey[k];
+        usadas.add(k);
+      }
     }
+    const leadsSemCampanha = totalLeads - [...usadas].reduce((s, k) => s + leadsByKey[k], 0);
 
     const totalCost = campaigns.reduce((s, c) => s + c.cost, 0);
 
     return {
       daily,
       campaigns,
+      leadsSemCampanha,
       totals: {
         cost: totalCost,
         clicks: campaigns.reduce((s, c) => s + c.clicks, 0),
