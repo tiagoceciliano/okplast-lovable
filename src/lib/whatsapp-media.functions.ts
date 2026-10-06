@@ -39,18 +39,17 @@ export const sendWhatsAppMedia = createServerFn({ method: "POST" })
     if (!lovableKey || !whatsappKey) throw new Error("Conexão WhatsApp não configurada");
 
     const bytes = Uint8Array.from(atob(data.base64), (char) => char.charCodeAt(0));
-    const form = new FormData();
-    form.append("messaging_product", "whatsapp");
-    form.append("file", new Blob([bytes], { type: data.mime }), data.nome);
     const headers = { Authorization: `Bearer ${lovableKey}`, "X-Connection-Api-Key": whatsappKey };
-    const upload = await fetch(`${GATEWAY_URL}/media`, { method: "POST", headers, body: form });
-    const uploadText = await upload.text();
-    if (!upload.ok) throw new Error("Não foi possível enviar o arquivo");
-    const mediaId = (JSON.parse(uploadText) as { id?: string }).id;
-    if (!mediaId) throw new Error("O WhatsApp não retornou o arquivo enviado");
+    // O gateway não aceita upload direto: guardamos o arquivo e enviamos um link temporário.
+    const safeName = data.nome.replace(/[^\w.\-]+/g, "_");
+    const path = `${conversa.id}/${Date.now()}-${safeName}`;
+    const { error: upErr } = await admin.storage.from("whatsapp-anexos").upload(path, bytes, { contentType: data.mime, upsert: false });
+    if (upErr) throw new Error("Não foi possível guardar o arquivo: " + upErr.message);
+    const { data: signed, error: signErr } = await admin.storage.from("whatsapp-anexos").createSignedUrl(path, 60 * 60 * 24);
+    if (signErr || !signed?.signedUrl) throw new Error("Não foi possível gerar o link do arquivo");
 
     const tipo = data.mime.startsWith("image/") ? "image" : data.mime.startsWith("video/") ? "video" : data.mime.startsWith("audio/") ? "audio" : "document";
-    const media: Record<string, string> = { id: mediaId };
+    const media: Record<string, string> = { link: signed.signedUrl };
     if (tipo === "document") media['filename'] = data.nome;
     if (data.legenda?.trim() && (tipo === "image" || tipo === "video" || tipo === "document")) media['caption'] = data.legenda.trim();
     const sent = await fetch(`${GATEWAY_URL}/messages`, {
@@ -59,7 +58,12 @@ export const sendWhatsAppMedia = createServerFn({ method: "POST" })
       body: JSON.stringify({ messaging_product: "whatsapp", to: conversa.telefone, type: tipo, [tipo]: media }),
     });
     const sentText = await sent.text();
-    if (!sent.ok) throw new Error("O arquivo foi carregado, mas o WhatsApp recusou o envio");
+    if (!sent.ok) {
+      console.error(`WhatsApp media send failed [${sent.status}]: ${sentText}`);
+      let motivo = "";
+      try { motivo = (JSON.parse(sentText) as any)?.error?.message ?? ""; } catch { /* ignora */ }
+      throw new Error(`O WhatsApp recusou o arquivo${motivo ? ": " + motivo : ""}`);
+    }
     const waId = (JSON.parse(sentText) as { messages?: Array<{ id?: string }> }).messages?.[0]?.id ?? null;
     const conteudo = data.legenda?.trim() || `[${tipo === "image" ? "Imagem" : tipo === "video" ? "Vídeo" : tipo === "audio" ? "Áudio" : "Documento"}] ${data.nome}`;
     const { data: mensagem, error: mensagemError } = await admin.from("whatsapp_mensagens").insert({
