@@ -58,7 +58,12 @@ export const sendWhatsAppMedia = createServerFn({ method: "POST" })
       body: JSON.stringify({ messaging_product: "whatsapp", to: conversa.telefone, type: tipo, [tipo]: media }),
     });
     const sentText = await sent.text();
-    if (!sent.ok) throw new Error("O arquivo foi carregado, mas o WhatsApp recusou o envio");
+    if (!sent.ok) {
+      console.error(`WhatsApp media send failed [${sent.status}]: ${sentText}`);
+      let motivo = "";
+      try { motivo = (JSON.parse(sentText) as any)?.error?.message ?? ""; } catch { /* ignora */ }
+      throw new Error(`O WhatsApp recusou o arquivo${motivo ? ": " + motivo : ""}`);
+    }
     const waId = (JSON.parse(sentText) as { messages?: Array<{ id?: string }> }).messages?.[0]?.id ?? null;
     const conteudo = data.legenda?.trim() || `[${tipo === "image" ? "Imagem" : tipo === "video" ? "Vídeo" : tipo === "audio" ? "Áudio" : "Documento"}] ${data.nome}`;
     const { data: mensagem, error: mensagemError } = await admin.from("whatsapp_mensagens").insert({
