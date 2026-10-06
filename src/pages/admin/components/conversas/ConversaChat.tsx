@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import type { TagDef } from "./tags";
 import { Calendar } from "@/components/ui/calendar";
+import { ptBR } from "date-fns/locale";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -129,6 +130,14 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
   };
 
   useEffect(() => { carregarAgendamentos(); }, [conversa.id]);
+
+  const [notas, setNotas] = useState<Array<{ id: string; texto: string; created_at: string }>>([]);
+  const carregarNotas = async () => {
+    if (!conversa.negociacao_id) { setNotas([]); return; }
+    const { data } = await supabase.from("negociacao_comentarios").select("id,texto,created_at").eq("negociacao_id", conversa.negociacao_id).order("created_at", { ascending: false }).limit(20);
+    setNotas((data as any) || []);
+  };
+  useEffect(() => { carregarNotas(); }, [conversa.negociacao_id]);
 
   // Carrega mensagens + marca como lida
   useEffect(() => {
@@ -333,6 +342,7 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
     setSalvandoNota(false);
     if (error) { toast.error(error.message); return; }
     setNota(""); setNotaOpen(false); toast.success("Nota interna salva");
+    carregarNotas();
   };
 
 
@@ -433,7 +443,8 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
               <PopoverTrigger asChild><Button size="icon" variant="ghost" className="h-8 w-8" aria-label="Agendar mensagem"><CalendarClock /></Button></PopoverTrigger>
               <PopoverContent align="start" className="w-auto p-3">
                 <p className="mb-2 text-sm font-semibold">Agendar mensagem</p>
-                <Calendar mode="single" selected={dataAgendada} onSelect={setDataAgendada} disabled={{ before: new Date(), after: new Date(limite) }} className={cn("pointer-events-auto p-2")} />
+                <Calendar mode="single" locale={ptBR} selected={dataAgendada} onSelect={setDataAgendada} disabled={{ before: new Date(), after: new Date(limite) }} className={cn("pointer-events-auto p-2")} />
+                <p className="mt-2 text-xs text-muted-foreground">Horário</p>
                 <Input type="time" value={horaAgendada} onChange={(e) => setHoraAgendada(e.target.value)} className="mt-2" />
                 <Button className="mt-2 w-full" size="sm" onClick={agendar} disabled={!texto.trim() || !horarioAgendado || agendando}>
                   {agendando ? <Loader2 className="animate-spin" /> : <CalendarClock />} Agendar
@@ -505,6 +516,19 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
         </Popover>
       </div>
 
+      {notas.length > 0 && (
+        <div className="max-h-32 shrink-0 overflow-y-auto border-t bg-accent/40 px-3 py-2">
+          <div className="mb-1 flex items-center gap-1 text-[10px] font-semibold uppercase text-muted-foreground"><MessageSquareText className="h-3 w-3" /> Notas internas (só a equipe vê)</div>
+          <div className="space-y-1">
+            {notas.map((n) => (
+              <div key={n.id} className="rounded-md border bg-background px-2 py-1 text-xs">
+                <span className="whitespace-pre-wrap">{n.texto}</span>
+                <span className="block text-[10px] text-muted-foreground">{fmtHora(n.created_at)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       {agendamentos.length > 0 && (
         <div className="shrink-0 border-t bg-muted/30 px-3 py-2">
           <div className="mb-1 flex items-center gap-1 text-[10px] font-semibold uppercase text-muted-foreground"><CalendarClock className="h-3 w-3" /> Agendamentos</div>
