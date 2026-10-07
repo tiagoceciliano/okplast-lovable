@@ -7,16 +7,18 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import type { Negociacao } from "./types";
+import { usePermissions } from "@/hooks/usePermissions";
 
 interface Props {
   negociacao: Negociacao | null;
   onClose: () => void;
-  onDone: () => void;
+  onDone: (negociacao: Negociacao) => void;
 }
 
 interface Produto { id: string; nome: string; preco: number; material: string | null; }
 
 export function GanhoDialog({ negociacao, onClose, onDone }: Props) {
+  const { can } = usePermissions();
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [nomeProduto, setNomeProduto] = useState("");
   const [valor, setValor] = useState<string>("");
@@ -35,6 +37,7 @@ export function GanhoDialog({ negociacao, onClose, onDone }: Props) {
   if (!negociacao) return null;
 
   const submit = async () => {
+    if (saving || !can("negociacoes", "edit", negociacao.responsavel_id)) return;
     if (!nomeProduto.trim()) { toast.error("Selecione o produto vendido"); return; }
     const v = Number(valor);
     if (!v || v <= 0) { toast.error("Informe o valor do produto"); return; }
@@ -44,17 +47,18 @@ export function GanhoDialog({ negociacao, onClose, onDone }: Props) {
     } catch { { toast.error("Link do PV do Bling inválido"); return; } }
 
     setSaving(true);
-    const { error } = await supabase.from("negociacoes").update({
+    const { data, error } = await supabase.from("negociacoes").update({
       etapa: "venda_realizada",
+      status: "ganho",
       nome_produto: nomeProduto.trim(),
       produto: nomeProduto.trim(),
       valor: v,
       link_pv_bling: linkBling.trim(),
-    }).eq("id", negociacao.id);
+    }).eq("id", negociacao.id).select("*").single();
     setSaving(false);
     if (error) { toast.error(error.message); return; }
-    toast.success("Venda registrada");
-    onDone();
+    toast.success("Negociação marcada como ganha — venda registrada");
+    onDone(data as Negociacao);
   };
 
   return (

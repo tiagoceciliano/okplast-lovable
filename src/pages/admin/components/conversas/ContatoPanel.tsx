@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Phone, Mail, User, Tag, StickyNote, Workflow, Settings2, ChevronDown, Plus, MessageCircle, CheckSquare, CalendarClock, Lock } from "lucide-react";
+import { Loader2, Phone, Mail, User, Tag, StickyNote, Workflow, Settings2, ChevronDown, Plus, MessageCircle, CheckSquare, CalendarClock, Lock, Check, X, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { ETAPAS, brl, type Negociacao } from "../kanban/types";
 import { useEtiquetas, tagsDe } from "./tags";
@@ -17,6 +17,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { useNavigate } from "@/lib/router-compat";
+import { usePermissions } from "@/hooks/usePermissions";
+import { GanhoDialog } from "../kanban/GanhoDialog";
+import { confirmacaoEtapa, statusDaEtapa } from "../kanban/negociacaoStatus";
 
 interface Nota {
   id: string;
@@ -41,12 +44,14 @@ const fmt = (iso: string) =>
 
 export function ContatoPanel({ conversa, onNomeAtualizado, onNegociacaoVinculada }: Props) {
   const navigate = useNavigate();
+  const { can } = usePermissions();
+  const [ganhoPending, setGanhoPending] = useState<Negociacao | null>(null);
+  const [salvandoStatus, setSalvandoStatus] = useState<string | null>(null);
   const [negs, setNegs] = useState<Negociacao[]>([]);
   const [selId, setSelId] = useState<string | null>(null);
   const neg = negs.find((n) => n.id === selId) ?? null;
   const setNeg = (n: Negociacao) => setNegs((prev) => prev.map((item) => (item.id === n.id ? n : item)));
   const [equipe, setEquipe] = useState<Record<string, string>>({});
-  const [me, setMe] = useState<{ id: string; gestor: boolean } | null>(null);
   const [notas, setNotas] = useState<Nota[]>([]);
   const [novaNota, setNovaNota] = useState("");
   const [nome, setNome] = useState(conversa.nome_contato ?? "");
@@ -56,17 +61,12 @@ export function ContatoPanel({ conversa, onNomeAtualizado, onNegociacaoVinculada
   const [gerenciar, setGerenciar] = useState(false);
   const [tarefas, setTarefas] = useState<Tarefa[]>([]);
   const [novaTarefa, setNovaTarefa] = useState("");
-  const podeEditar = !!neg && !!me && (me.gestor || neg.responsavel_id === me.id);
+  const podeEditar = !!neg && can("negociacoes", "edit", neg.responsavel_id);
 
   useEffect(() => {
     (async () => {
-      const [lista, { data: { session } }] = await Promise.all([
-        getEquipe(),
-        supabase.auth.getSession(),
-      ]);
+      const lista = await getEquipe();
       setEquipe(Object.fromEntries((lista ?? []).map((u) => [u.id, u.nome])));
-      const eu = (lista ?? []).find((u) => u.id === session?.user.id);
-      if (session) setMe({ id: session.user.id, gestor: !!eu?.roles?.some((r) => r === "admin" || r === "gestor") });
     })();
   }, []);
 
@@ -117,16 +117,18 @@ export function ContatoPanel({ conversa, onNomeAtualizado, onNegociacaoVinculada
     toast.success("Nome atualizado");
   };
 
-  const mudarEtapa = async (etapa: string) => {
-    if (!podeEditar) { toast.error("Somente o responsável pode editar esta negociação"); return; }
-    if (!neg) return;
-    const { error } = await supabase
-      .from("negociacoes")
-      .update({ etapa: etapa as Negociacao["etapa"] })
-      .eq("id", neg.id);
-    if (error) { toast.error(error.message); return; }
-    setNeg({ ...neg, etapa: etapa as Negociacao["etapa"] });
-    toast.success("Etapa atualizada");
+  const mudarEtapa = async (alvo: Negociacao, etapa: Negociacao["etapa"]) => {
+    if (!can("negociacoes", "edit", alvo.responsavel_id) || salvandoStatus) return;
+    if (etapa === "venda_realizada") { setGanhoPending(alvo); return; }
+    setSalvandoStatus(alvo.id);
+    try {
+      const { data, error } = await supabase.from("negociacoes").update({ etapa, status: statusDaEtapa(etapa) }).eq("id", alvo.id).select("*").single();
+      if (error) throw error;
+      setNeg(data as Negociacao);
+      toast.success(confirmacaoEtapa(etapa, alvo.status));
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Não foi possível salvar a negociação");
+    } finally { setSalvandoStatus(null); }
   };
 
   const alternarTag = async (tagId: string) => {
@@ -184,6 +186,7 @@ export function ContatoPanel({ conversa, onNomeAtualizado, onNegociacaoVinculada
   return (
     <div className="flex h-full min-h-0 flex-col overflow-y-auto">
       <EtiquetasManager open={gerenciar} onOpenChange={setGerenciar} />
+      <GanhoDialog negociacao={ganhoPending} onClose={() => setGanhoPending(null)} onDone={(atualizada) => { setNeg(atualizada); setGanhoPending(null); }} />
       <div className="border-b p-4 text-center">
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-xl font-bold text-primary">{(conversa.nome_contato || conversa.telefone).charAt(0).toUpperCase()}</div>
         <h2 className="mt-2 truncate text-sm font-bold">{conversa.nome_contato || conversa.telefone}</h2>
@@ -233,7 +236,7 @@ export function ContatoPanel({ conversa, onNomeAtualizado, onNegociacaoVinculada
              {negs.map((n) => {
                const etapa = ETAPAS.find((e) => e.id === n.etapa)?.label;
                const ativoCard = n.id === selId;
-               const editavel = !!me && (me.gestor || n.responsavel_id === me.id);
+               const editavel = can("negociacoes", "edit", n.responsavel_id);
                const statusCls = n.status === "ganho" ? "text-muted-foreground" : n.status === "perdido" ? "text-destructive" : "text-primary";
                return (
                  <div key={n.id} className={`rounded-md border transition ${ativoCard ? "border-primary/50 bg-muted/30" : "hover:border-primary/30"}`}>
@@ -264,10 +267,15 @@ export function ContatoPanel({ conversa, onNomeAtualizado, onNegociacaoVinculada
                        </div>
                      </HoverCardContent>
                    </HoverCard>
+                   {editavel && <div className="flex flex-wrap gap-1 border-t px-2.5 py-2">
+                     {n.status !== "ganho" && <Button size="sm" variant="outline" className="h-7 flex-1 px-2 text-[11px] text-accent" disabled={salvandoStatus !== null} onClick={() => setGanhoPending(n)}><Check className="h-3 w-3" /> Ganho</Button>}
+                     {n.status !== "perdido" && <Button size="sm" variant="outline" className="h-7 flex-1 px-2 text-[11px] text-destructive" disabled={salvandoStatus !== null} onClick={() => mudarEtapa(n, "perdido")}><X className="h-3 w-3" /> Perdido</Button>}
+                     {n.status !== "aberto" && <Button size="sm" variant="outline" className="h-7 flex-1 px-2 text-[11px]" disabled={salvandoStatus !== null} onClick={() => mudarEtapa(n, "entrada")}><RotateCcw className="h-3 w-3" /> Reabrir</Button>}
+                   </div>}
                    {ativoCard && (
                      <div className="space-y-2 border-t px-2.5 pb-2.5 pt-2">
                        {editavel ? (
-                         <Select value={n.etapa} onValueChange={mudarEtapa}>
+                         <Select value={n.etapa} disabled={salvandoStatus !== null} onValueChange={(etapa) => mudarEtapa(n, etapa as Negociacao["etapa"])}>
                            <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                            <SelectContent>{ETAPAS.map((e) => <SelectItem key={e.id} value={e.id}>{e.label}</SelectItem>)}</SelectContent>
                          </Select>

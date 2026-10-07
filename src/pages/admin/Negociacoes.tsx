@@ -21,6 +21,7 @@ import { NegociacaoChatSheet } from "./components/kanban/NegociacaoChatSheet";
 import { ETAPAS, type EtapaId, type Negociacao, type VendedorLite } from "./components/kanban/types";
 import { usePermissions } from "@/hooks/usePermissions";
 import { useSearchParams } from "@/lib/router-compat";
+import { confirmacaoEtapa, statusDaEtapa } from "./components/kanban/negociacaoStatus";
 
 export default function Negociacoes() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -193,6 +194,7 @@ export default function Negociacoes() {
     if (!over) return;
     const activeItem = items.find((i) => i.id === active.id);
     if (!activeItem) return;
+    if (!can("negociacoes", "edit", activeItem.responsavel_id)) return;
 
     const overData = over.data.current as { type?: string; etapa?: EtapaId } | undefined;
     const overItem = items.find((i) => i.id === over.id);
@@ -207,11 +209,14 @@ export default function Negociacoes() {
     }
 
     // otimista
-    setItems((prev) => prev.map((i) => (i.id === activeItem.id ? { ...i, etapa: newEtapa } : i)));
-    const { error } = await supabase.from("negociacoes").update({ etapa: newEtapa }).eq("id", activeItem.id);
+    setItems((prev) => prev.map((i) => (i.id === activeItem.id ? { ...i, etapa: newEtapa, status: statusDaEtapa(newEtapa) } : i)));
+    const { data, error } = await supabase.from("negociacoes").update({ etapa: newEtapa, status: statusDaEtapa(newEtapa) }).eq("id", activeItem.id).select("*").single();
     if (error) {
       toast.error(error.message);
       load();
+    } else {
+      setItems((prev) => prev.map((i) => i.id === activeItem.id ? data as Negociacao : i));
+      toast.success(confirmacaoEtapa(newEtapa, activeItem.status));
     }
   };
 
@@ -310,7 +315,7 @@ export default function Negociacoes() {
       <GanhoDialog
         negociacao={ganhoPending}
         onClose={() => setGanhoPending(null)}
-        onDone={() => { setGanhoPending(null); load(); }}
+        onDone={(atualizada) => { setGanhoPending(null); setAtivo((anterior) => anterior?.id === atualizada.id ? atualizada : anterior); load(); }}
       />
       <NegociacaoChatSheet negociacao={chatAtivo} onClose={() => setChatAtivo(null)} onChanged={load} />
     </AdminLayout>

@@ -1,5 +1,7 @@
 # Project architecture decisions
 
+- Negotiation stage actions derive status consistently and read back the saved row before confirming success; conversation wins reuse the sales dialog to preserve required sale data.
+
 - The shared Calendar uses React DayPicker v9 class names and fixed seven-column sizing to keep all date pickers aligned with the installed library.
 
 - `AdminLayout` accepts `fullBleed` for workspace-style screens so dense tools can use the full viewport without changing ordinary admin pages.
