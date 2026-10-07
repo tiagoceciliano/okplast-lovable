@@ -18,6 +18,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { listTeamMembers } from "@/lib/list-team-members.functions";
 import { whatsappTemplates, type WhatsAppTemplate } from "@/lib/whatsapp-templates.functions";
+import { whatsappSend } from "@/lib/whatsapp-send.functions";
 
 interface Atendente { id: string; nome: string; email: string | null }
 
@@ -138,7 +139,7 @@ export default function Conversas() {
     const tel = novoTelefone.replace(/\D/g, "");
     if (tel.length < 12) { toast.error("Informe o número com DDI e DDD, ex: 5521999998888"); return; }
     setCriando(true);
-    const { data, error } = await supabase.functions.invoke("whatsapp-send", {
+    const { data, error } = await whatsappSend({
       body: { telefone: tel, tipo: "text", criar_apenas: true, nome_contato: novoNome.trim() || undefined },
     });
     setCriando(false);
@@ -151,7 +152,7 @@ export default function Conversas() {
     if (conv && templateNovo) {
       const template = templates.find((item) => item.nome === templateNovo);
       if (template) {
-        const { error: sendError } = await supabase.functions.invoke("whatsapp-send", { body: { conversa_id: conv.id, tipo: "template", template: { name: template.nome, language: template.idioma, parametros: [] } } });
+        const { error: sendError } = await whatsappSend({ body: { conversa_id: conv.id, tipo: "template", template: { name: template.nome, language: template.idioma, parametros: [] } } });
         if (sendError) toast.error("Atendimento criado, mas a mensagem pronta não foi enviada.");
       }
     }

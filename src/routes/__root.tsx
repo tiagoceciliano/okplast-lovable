@@ -98,7 +98,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Distribuidora de chapas plásticas no RJ: acrílico, policarbonato, PETG, PS, PVC e ACM. Corte sob medida.",
       },
       { property: "og:url", content: "https://okplast.com.br/" },
-      { property: "og:image", content: "https://okplast.com.br/og-image.jpg" },
       { property: "og:locale", content: "pt_BR" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "OK Plast | Distribuidora de Chapas Plásticas no RJ" },
@@ -107,7 +106,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "Distribuidora de chapas plásticas no RJ: acrílico, policarbonato, PETG, PS, PVC e ACM. Corte sob medida.",
       },
-      { name: "twitter:image", content: "https://okplast.com.br/og-image.jpg" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

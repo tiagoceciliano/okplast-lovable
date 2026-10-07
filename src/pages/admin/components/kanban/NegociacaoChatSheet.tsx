@@ -5,6 +5,7 @@ import { useEtiquetas } from "../conversas/tags";
 import { useNavigate } from "@/lib/router-compat";
 import { supabase } from "@/integrations/supabase/client";
 import { getEquipe } from "@/lib/adminCache";
+import { whatsappSend } from "@/lib/whatsapp-send.functions";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -110,7 +111,7 @@ export function NegociacaoChatSheet({ negociacao, onClose, onChanged }: Props) {
     if (telefone.length >= 10 && !telefone.startsWith("55")) telefone = `55${telefone}`;
     if (telefone.length < 12) { toast.error("Cadastre o telefone com DDD primeiro."); return; }
     setLoading(true);
-    const { data, error } = await supabase.functions.invoke("whatsapp-send", { body: { telefone, tipo: "text", criar_apenas: true, nome_contato: negociacao.nome_cliente } });
+    const { data, error } = await whatsappSend({ body: { telefone, tipo: "text", criar_apenas: true, nome_contato: negociacao.nome_cliente } });
     const criada = (data as { conversa?: Conversa } | null)?.conversa;
     if (!error && criada) {
       const { data: linked, error: linkError } = await supabase.from("whatsapp_conversas").update({ negociacao_id: negociacao.id }).eq("id", criada.id).select("*").single();
