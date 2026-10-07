@@ -23,7 +23,9 @@
 - [x] Manter e integrar negociação, tarefas e notas no painel lateral
 - [x] Implementar atribuição e transferência de responsável no atendimento
 - [x] Tornar anexo, emoji e nota interna funcionais
+- [x] Exibir notas internas no topo do atendimento, com autor e exclusão só pelo criador
 - [x] Validar o fluxo completo em uma conta autenticada e em larguras desktop menores
+
 
 ## Funil e negociação no padrão Kinbox
 - [x] Reproduzir o quadro compacto com busca, filtros, ordenação e totais por etapa
