@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { assinarMensagem } from "@/lib/whatsapp-signature";
+import { nomeResponsavel } from "@/lib/whatsapp-signature.server";
 
 type Schedule = {
   id: string;
@@ -32,7 +34,7 @@ export const Route = createFileRoute("/api/public/whatsapp/process-schedules")({
 
         let processed = 0;
         for (const row of (data || []) as Schedule[]) {
-          const { data: conversa } = await supabaseAdmin.from("whatsapp_conversas").select("telefone,ultima_entrada_cliente_em").eq("id", row.conversa_id).maybeSingle();
+          const { data: conversa } = await supabaseAdmin.from("whatsapp_conversas").select("telefone,responsavel_id,ultima_entrada_cliente_em").eq("id", row.conversa_id).maybeSingle();
           const limite = conversa?.ultima_entrada_cliente_em
             ? new Date(conversa.ultima_entrada_cliente_em).getTime() + 24 * 60 * 60 * 1000
             : 0;
@@ -43,23 +45,25 @@ export const Route = createFileRoute("/api/public/whatsapp/process-schedules")({
           }
 
           try {
+            const template = row.template;
+            const conteudo = ehTemplate ? row.texto : assinarMensagem(await nomeResponsavel(supabaseAdmin, conversa.responsavel_id, row.autor_id), row.texto);
             const response = await fetch(`${GATEWAY_URL}/messages`, {
               method: "POST",
               headers: { Authorization: `Bearer ${lovableKey}`, "X-Connection-Api-Key": whatsappKey, "Content-Type": "application/json" },
               body: JSON.stringify(ehTemplate
-                ? { messaging_product: "whatsapp", to: conversa.telefone, type: "template", template: { name: row.template!.name, language: { code: row.template!.language || "pt_BR" }, ...((row.template!.parametros ?? []).length ? { components: [{ type: "body", parameters: row.template!.parametros!.map((t) => ({ type: "text", text: t })) }] } : {}) } }
-                : { messaging_product: "whatsapp", to: conversa.telefone, type: "text", text: { body: row.texto } }),
+                ? { messaging_product: "whatsapp", to: conversa.telefone, type: "template", template: { name: template?.name, language: { code: template?.language || "pt_BR" }, ...((template?.parametros ?? []).length ? { components: [{ type: "body", parameters: (template?.parametros ?? []).map((t) => ({ type: "text", text: t })) }] } : {}) } }
+                : { messaging_product: "whatsapp", to: conversa.telefone, type: "text", text: { body: conteudo } }),
             });
             const responseText = await response.text();
             if (!response.ok) throw new Error(`WhatsApp [${response.status}]: ${responseText}`);
             let waMessageId: string | null = null;
             try { waMessageId = JSON.parse(responseText)?.messages?.[0]?.id ?? null; } catch { waMessageId = null; }
             const { data: message, error: messageError } = await supabaseAdmin.from("whatsapp_mensagens").insert({
-              conversa_id: row.conversa_id, wa_message_id: waMessageId, direcao: "saida", tipo: ehTemplate ? "template" : "text", conteudo: row.texto, status: "enviado", autor_id: row.autor_id,
+              conversa_id: row.conversa_id, wa_message_id: waMessageId, direcao: "saida", tipo: ehTemplate ? "template" : "text", conteudo, status: "enviado", autor_id: row.autor_id,
             }).select("id").single();
             if (messageError) throw messageError;
             const now = new Date().toISOString();
-            await supabaseAdmin.from("whatsapp_conversas").update({ ultima_mensagem: row.texto, ultima_mensagem_em: now }).eq("id", row.conversa_id);
+            await supabaseAdmin.from("whatsapp_conversas").update({ ultima_mensagem: conteudo, ultima_mensagem_em: now }).eq("id", row.conversa_id);
             await supabaseAdmin.from("whatsapp_agendamentos").update({ status: "enviado", enviado_em: now, mensagem_id: message.id, erro: null }).eq("id", row.id);
             processed += 1;
           } catch (cause) {

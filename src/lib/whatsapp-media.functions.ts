@@ -3,6 +3,8 @@ import { getRequestHeader } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireCaller } from "@/lib/supabase-server";
 import { whatsappMediaPayload } from "@/lib/whatsapp-media-payload";
+import { assinarMensagem } from "@/lib/whatsapp-signature";
+import { nomeResponsavel } from "@/lib/whatsapp-signature.server";
 
 const inputSchema = z.object({
   conversaId: z.string().uuid(),
@@ -50,7 +52,9 @@ export const sendWhatsAppMedia = createServerFn({ method: "POST" })
     const { data: signed, error: signErr } = await admin.storage.from("whatsapp-anexos").createSignedUrl(path, 60 * 60 * 24);
     if (signErr || !signed?.signedUrl) throw new Error("Não foi possível gerar o link do arquivo");
 
-    const { tipo, payload } = whatsappMediaPayload(data, signed.signedUrl, conversa.telefone);
+    const permiteLegenda = !data.mime.startsWith("audio/");
+    const legenda = permiteLegenda ? assinarMensagem(await nomeResponsavel(admin, conversa.responsavel_id, userId), data.legenda || "", 1024) : data.legenda;
+    const { tipo, payload } = whatsappMediaPayload({ ...data, legenda }, signed.signedUrl, conversa.telefone);
     const sent = await fetch(`${GATEWAY_URL}/messages`, {
       method: "POST",
       headers: { ...headers, "Content-Type": "application/json" },
@@ -64,7 +68,7 @@ export const sendWhatsAppMedia = createServerFn({ method: "POST" })
       throw new Error(`O WhatsApp recusou o arquivo${motivo ? ": " + motivo : ""}`);
     }
     const waId = (JSON.parse(sentText) as { messages?: Array<{ id?: string }> }).messages?.[0]?.id ?? null;
-    const conteudo = data.legenda?.trim() || `[${tipo === "image" ? "Imagem" : tipo === "video" ? "Vídeo" : tipo === "audio" ? (data.voz ? "Mensagem de voz" : "Áudio") : "Documento"}] ${data.nome}`;
+    const conteudo = legenda?.trim() || `[${tipo === "image" ? "Imagem" : tipo === "video" ? "Vídeo" : tipo === "audio" ? (data.voz ? "Mensagem de voz" : "Áudio") : "Documento"}] ${data.nome}`;
     const { data: mensagem, error: mensagemError } = await admin.from("whatsapp_mensagens").insert({
       conversa_id: conversa.id,
       wa_message_id: waId,
