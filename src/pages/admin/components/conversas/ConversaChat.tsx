@@ -15,7 +15,6 @@ import type { TagDef } from "./tags";
 import { Calendar } from "@/components/ui/calendar";
 import { ptBR } from "date-fns/locale";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
 
 export interface Conversa {
   id: string;
