@@ -345,8 +345,31 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
         </Popover>
         </div>
       </div>
+      {notas.length > 0 && (
+        <div className="max-h-40 shrink-0 overflow-y-auto border-b border-gold/30 bg-gold/15 px-3 py-2">
+          <div className="mb-1 flex items-center gap-1 text-[10px] font-semibold uppercase text-muted-foreground"><MessageSquareText className="h-3 w-3" /> Notas internas (só a equipe vê)</div>
+          <div className="space-y-1">
+            {notas.map((n) => (
+              <div key={n.id} className="flex items-start gap-2 rounded-md border border-gold/40 bg-gold/10 px-2 py-1 text-xs">
+                <div className="min-w-0 flex-1">
+                  <span className="whitespace-pre-wrap">{n.texto}</span>
+                  <span className="block text-[10px] text-muted-foreground">
+                    {(n.autor_id && nomesEquipe[n.autor_id]) || "Equipe"} · {fmtHora(n.created_at)}
+                  </span>
+                </div>
+                {n.autor_id === userId && (
+                  <button type="button" title="Excluir nota" onClick={() => excluirNota(n.id)} className="shrink-0 rounded p-0.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive">
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       {/* Mensagens */}
       <div className="chat-wallpaper min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-4 sm:px-8">
+
         {mensagens.length === 0 && (
           <p className="mx-auto w-fit rounded-lg bg-chat-in px-3 py-1.5 text-center text-xs text-muted-foreground shadow-sm">
             Nenhuma mensagem ainda. Inicie o atendimento com uma mensagem pronta.
@@ -476,28 +499,6 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
         </Popover>
       </div>
 
-      {notas.length > 0 && (
-        <div className="max-h-32 shrink-0 overflow-y-auto border-t border-gold/30 bg-gold/15 px-3 py-2">
-          <div className="mb-1 flex items-center gap-1 text-[10px] font-semibold uppercase text-muted-foreground"><MessageSquareText className="h-3 w-3" /> Notas internas (só a equipe vê)</div>
-          <div className="space-y-1">
-            {notas.map((n) => (
-              <div key={n.id} className="flex items-start gap-2 rounded-md border border-gold/40 bg-gold/10 px-2 py-1 text-xs">
-                <div className="min-w-0 flex-1">
-                  <span className="whitespace-pre-wrap">{n.texto}</span>
-                  <span className="block text-[10px] text-muted-foreground">
-                    {(n.autor_id && nomesEquipe[n.autor_id]) || "Equipe"} · {fmtHora(n.created_at)}
-                  </span>
-                </div>
-                {n.autor_id === userId && (
-                  <button type="button" title="Excluir nota" onClick={() => excluirNota(n.id)} className="shrink-0 rounded p-0.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive">
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
       <div className="flex shrink-0 items-center gap-2 border-t bg-background px-3 py-1.5">
         {agendamentos.length > 0 && (
           <Popover open={listaAgOpen} onOpenChange={setListaAgOpen}>
