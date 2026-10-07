@@ -464,7 +464,7 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
                   </div>
                 ) : (
                 <div className={`flex items-end gap-2 rounded-2xl px-3.5 py-2 text-sm shadow-sm ${saida ? "bg-chat-out" : "bg-chat-in"}`}>
-                  <span className="whitespace-pre-wrap break-words">{m.conteudo}</span>
+                  <span className="whitespace-pre-wrap break-words">{m.direcao === "saida" && /^\*[^*\n]+\*\n\n/.test(m.conteudo) ? <><strong>{m.conteudo.slice(1, m.conteudo.indexOf("*", 1))}</strong>{m.conteudo.slice(m.conteudo.indexOf("*", 1) + 1)}</> : m.conteudo}</span>
                   <span className="shrink-0 translate-y-0.5 text-[10px] text-muted-foreground">{fmtHora(m.created_at)}</span>
                 </div>
                 )}
