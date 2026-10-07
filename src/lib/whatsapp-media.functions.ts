@@ -9,6 +9,7 @@ const inputSchema = z.object({
   mime: z.string().min(1).max(120),
   base64: z.string().min(1),
   legenda: z.string().max(1024).optional(),
+  voz: z.boolean().optional(),
 });
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/whatsapp";
@@ -65,7 +66,7 @@ export const sendWhatsAppMedia = createServerFn({ method: "POST" })
       throw new Error(`O WhatsApp recusou o arquivo${motivo ? ": " + motivo : ""}`);
     }
     const waId = (JSON.parse(sentText) as { messages?: Array<{ id?: string }> }).messages?.[0]?.id ?? null;
-    const conteudo = data.legenda?.trim() || `[${tipo === "image" ? "Imagem" : tipo === "video" ? "Vídeo" : tipo === "audio" ? "Áudio" : "Documento"}] ${data.nome}`;
+    const conteudo = data.legenda?.trim() || `[${tipo === "image" ? "Imagem" : tipo === "video" ? "Vídeo" : tipo === "audio" ? (data.voz ? "Mensagem de voz" : "Áudio") : "Documento"}] ${data.nome}`;
     const { data: mensagem, error: mensagemError } = await admin.from("whatsapp_mensagens").insert({
       conversa_id: conversa.id,
       wa_message_id: waId,
@@ -74,8 +75,19 @@ export const sendWhatsAppMedia = createServerFn({ method: "POST" })
       conteudo,
       status: "enviado",
       autor_id: userId,
-    }).select("id,direcao,tipo,conteudo,status,created_at").single();
+      midia_path: tipo === "audio" ? path : null,
+    }).select("id,direcao,tipo,conteudo,status,created_at,autor_id,midia_path").single();
     if (mensagemError) throw mensagemError;
     await admin.from("whatsapp_conversas").update({ ultima_mensagem: conteudo, ultima_mensagem_em: new Date().toISOString() }).eq("id", conversa.id);
     return { mensagem };
+  });
+export const getWhatsAppMediaUrl = createServerFn({ method: "POST" })
+  .inputValidator((input) => z.object({ mensagemId: z.string().uuid() }).parse(input))
+  .handler(async ({ data }) => {
+    const { admin } = await requireCaller(getRequestHeader("Authorization"), ["admin", "gestor", "vendedor"]);
+    const { data: msg } = await admin.from("whatsapp_mensagens").select("midia_path").eq("id", data.mensagemId).maybeSingle();
+    if (!msg?.midia_path) throw new Error("Mídia não encontrada");
+    const { data: signed, error } = await admin.storage.from("whatsapp-anexos").createSignedUrl(msg.midia_path, 60 * 60);
+    if (error || !signed?.signedUrl) throw new Error("Não foi possível abrir o áudio");
+    return { url: signed.signedUrl };
   });
