@@ -305,9 +305,23 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
     if (error) toast.error(error.message); else onTagsChange?.(proximas);
   };
 
-  const anexar = async (file: File | undefined) => {
-    if (!file || anexando) return;
+  const limparArquivo = () => {
+    if (arquivoUrl) URL.revokeObjectURL(arquivoUrl);
+    setArquivo(null);
+    setArquivoUrl(null);
+    if (fileRef.current) fileRef.current.value = "";
+  };
+
+  const anexar = (file: File | undefined) => {
+    if (!file) return;
     if (file.size > 16 * 1024 * 1024) { toast.error("O arquivo deve ter no máximo 16 MB."); return; }
+    limparArquivo();
+    setArquivo(file);
+    setArquivoUrl(file.type.startsWith("image/") ? URL.createObjectURL(file) : null);
+    if (fileRef.current) fileRef.current.value = "";
+  };
+
+  const enviarArquivo = async (file: File, legenda: string) => {
     const base64 = await new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve(String(reader.result).split(",")[1] ?? "");
@@ -316,14 +330,13 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
     });
     setAnexando(true);
     try {
-      await sendWhatsAppMedia({ data: { conversaId: conversa.id, nome: file.name, mime: file.type || "application/octet-stream", base64, legenda: texto.trim() || undefined } });
-      setTexto("");
+      await sendWhatsAppMedia({ data: { conversaId: conversa.id, nome: file.name, mime: file.type || "application/octet-stream", base64, legenda: legenda || undefined } });
       toast.success("Arquivo enviado");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Falha ao enviar arquivo");
+      throw error;
     } finally {
       setAnexando(false);
-      if (fileRef.current) fileRef.current.value = "";
     }
   };
 
