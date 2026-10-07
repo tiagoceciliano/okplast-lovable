@@ -676,8 +676,10 @@ export type Database = {
           mensagem_id: string | null
           proxima_tentativa_em: string | null
           status: string
+          template: Json | null
           tentativas: number
           texto: string
+          tipo: string
           updated_at: string
         }
         Insert: {
@@ -692,8 +694,10 @@ export type Database = {
           mensagem_id?: string | null
           proxima_tentativa_em?: string | null
           status?: string
+          template?: Json | null
           tentativas?: number
           texto: string
+          tipo?: string
           updated_at?: string
         }
         Update: {
@@ -708,8 +712,10 @@ export type Database = {
           mensagem_id?: string | null
           proxima_tentativa_em?: string | null
           status?: string
+          template?: Json | null
           tentativas?: number
           texto?: string
+          tipo?: string
           updated_at?: string
         }
         Relationships: [
@@ -1008,8 +1014,10 @@ export type Database = {
           mensagem_id: string | null
           proxima_tentativa_em: string | null
           status: string
+          template: Json | null
           tentativas: number
           texto: string
+          tipo: string
           updated_at: string
         }[]
         SetofOptions: {
@@ -1158,6 +1166,15 @@ export type Database = {
           isOneToOne: false
           isSetofReturn: true
         }
+      }
+      update_whatsapp_agendamento: {
+        Args: {
+          _enviar_em: string
+          _id: string
+          _template: Json
+          _texto: string
+        }
+        Returns: boolean
       }
     }
     Enums: {

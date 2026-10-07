@@ -99,6 +99,13 @@
       "when": 1791206616723,
       "tag": "0013_whatsapp_templates",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1791398679044,
+      "tag": "0014_agendamento_template_editar",
+      "breakpoints": true
     }
   ]
 }
