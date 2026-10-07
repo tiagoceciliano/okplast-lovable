@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Check, X, Trash2, Plus, UserCheck, MessageCirclePlus, Link2, MessageCircle, History, RotateCcw } from "lucide-react";
+import { Check, X, Trash2, Plus, UserCheck, MessageCirclePlus, Link2, MessageCircle, History, RotateCcw, ListTodo, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 import { ETAPAS, brl, type EtapaId, type Negociacao, type VendedorLite } from "./types";
 import { usePermissions } from "@/hooks/usePermissions";
@@ -28,14 +28,16 @@ interface Props {
   onRequestGanho?: (n: Negociacao) => void;
 }
 
-interface Tarefa { id: string; titulo: string; data_vencimento: string | null; concluida: boolean; }
+interface Tarefa { id: string; titulo: string; data_vencimento: string | null; concluida: boolean; created_by: string | null; }
 interface Comentario { id: string; texto: string; autor_id: string | null; created_at: string; }
 interface Hist { id: string; autor_id: string | null; tipo: string; descricao: string | null; created_at: string; }
 
 interface ProdutoLite { id: string; nome: string; material: string | null; }
 
 export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClose, onChanged, onRequestGanho }: Props) {
-  const { can } = usePermissions();
+  const { can, user } = usePermissions();
+  const userId = user?.id ?? null;
+  const [formAberto, setFormAberto] = useState<"tarefa" | "comentario" | null>(null);
   const [n, setN] = useState<Negociacao | null>(negociacao);
   const [tarefas, setTarefas] = useState<Tarefa[]>([]);
   const [coments, setComents] = useState<Comentario[]>([]);
@@ -126,6 +128,11 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
   };
 
   if (!n) return null;
+  const tarefasOrdenadas = [...tarefas].sort((a, b) => {
+    const da = a.data_vencimento ? new Date(a.data_vencimento).getTime() : Infinity;
+    const db = b.data_vencimento ? new Date(b.data_vencimento).getTime() : Infinity;
+    return da - db;
+  });
   const canEdit = can("negociacoes", "edit", n.responsavel_id);
   const canDelete = can("negociacoes", "delete", n.responsavel_id);
 
@@ -156,10 +163,12 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
     const { data, error } = await supabase.from("negociacao_tarefas").insert({
       negociacao_id: n.id, titulo: novaTarefa.trim(),
       data_vencimento: novaData ? new Date(novaData).toISOString() : null,
+      created_by: userId,
     }).select().single();
     if (error) { toast.error(error.message); return; }
     setTarefas((p) => [...p, data as Tarefa]);
-    setNovaTarefa(""); setNovaData("");
+    setNovaTarefa(""); setNovaData(""); setFormAberto(null);
+    toast.success("Tarefa criada");
   };
 
   const toggleTarefa = async (t: Tarefa) => {
@@ -216,14 +225,46 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
         <DialogHeader>
           <div className="flex items-center gap-2">
             <DialogTitle className="text-xl flex-1">{n.nome_cliente}</DialogTitle>
-            {conversa && (
-              <Button size="sm" variant="ghost" className="text-primary" onClick={() => navigate(`/admin/conversas?conversa=${conversa.id}`)}>
-                <MessageCircle className="h-4 w-4 mr-1" /> Conversa{conversa.nao_lidas > 0 ? ` (${conversa.nao_lidas})` : ""}
+            <Button size="sm" variant="outline" className="border-primary/30 bg-primary/10 text-primary hover:bg-primary/15" onClick={() => setFormAberto((f) => f === "tarefa" ? null : "tarefa")}>
+              <ListTodo className="h-4 w-4 mr-1" /> Nova tarefa
+            </Button>
+            <Button size="sm" variant="outline" className="border-gold/40 bg-gold/15 text-foreground hover:bg-gold/25" onClick={() => setFormAberto((f) => f === "comentario" ? null : "comentario")}>
+              <MessageSquare className="h-4 w-4 mr-1" /> Novo comentário
+            </Button>
+            {conversa ? (
+              <Button size="icon" variant="ghost" className="relative text-whatsapp" title="Ir para conversa" aria-label="Ir para conversa" onClick={() => navigate(`/admin/conversas?conversa=${conversa.id}`)}>
+                <MessageCircle className="h-5 w-5" />
+                {conversa.nao_lidas > 0 && <span className="absolute -right-0.5 -top-0.5 min-w-[14px] rounded-full bg-accent px-1 text-[9px] font-bold leading-[14px] text-accent-foreground">{conversa.nao_lidas}</span>}
               </Button>
+            ) : (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button size="icon" variant="ghost" className="text-muted-foreground" title="Abrir ou vincular conversa" aria-label="Abrir ou vincular conversa"><MessageCirclePlus className="h-5 w-5" /></Button>
+                </PopoverTrigger>
+                <PopoverContent align="end" className="w-80 space-y-2 p-3">
+                  <p className="text-xs text-muted-foreground">Esta negociação ainda não tem chat vinculado.</p>
+                  <Button size="sm" className="w-full" onClick={abrirNovoChat} disabled={vinculando}>
+                    <MessageCirclePlus className="h-4 w-4 mr-1" /> Abrir chat com {n.telefone || "o cliente"}
+                  </Button>
+                  {semVinculo.length > 0 && (
+                    <div className="flex gap-2">
+                      <Select value={vincSel} onValueChange={setVincSel}>
+                        <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Ou vincular conversa existente…" /></SelectTrigger>
+                        <SelectContent>
+                          {semVinculo.map((c) => (
+                            <SelectItem key={c.id} value={c.id}>{c.nome_contato ? `${c.nome_contato} · ${c.telefone}` : c.telefone}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Button size="sm" variant="outline" onClick={vincularExistente} disabled={!vincSel || vinculando}><Link2 className="h-4 w-4" /></Button>
+                    </div>
+                  )}
+                </PopoverContent>
+              </Popover>
             )}
             {canEdit && (
               <>
-                {n.status !== "aberto" && <Button size="sm" variant="outline" disabled={salvandoEtapa} onClick={() => patchN({ etapa: "entrada" })}><RotateCcw className="h-4 w-4 mr-1" /> Reabrir</Button>}
+                {n.status !== "aberto" && <Button size="sm" variant="outline" disabled={salvandoEtapa} onClick={() => patchN({ etapa: "negociacao" })}><RotateCcw className="h-4 w-4 mr-1" /> Reabrir</Button>}
                 <Button size="sm" variant="outline" className="text-accent" disabled={salvandoEtapa || n.status === "ganho"} onClick={irParaVenda}>
                   <Check className="h-4 w-4 mr-1" /> Ganho
                 </Button>
@@ -276,8 +317,70 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
         </div>
 
         <div className="grid min-h-0 lg:grid-cols-[minmax(0,1fr)_300px]">
-          {/* Coluna esquerda: comentarios + tarefas + historico */}
+          {/* Coluna esquerda: tarefas + comentarios + historico */}
           <div className="space-y-5 p-5">
+            {formAberto === "tarefa" && (
+              <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
+                <Label className="text-xs">Nova tarefa</Label>
+                <div className="flex gap-2">
+                  <Input autoFocus value={novaTarefa} onChange={(e) => setNovaTarefa(e.target.value)} placeholder="Ligar para…" onKeyDown={(e) => { if (e.key === "Enter") addTarefa(); }} />
+                  <Input type="datetime-local" value={novaData} onChange={(e) => setNovaData(e.target.value)} className="w-48" />
+                  <Button size="sm" onClick={addTarefa} disabled={!novaTarefa.trim()}>Salvar</Button>
+                </div>
+              </div>
+            )}
+            {formAberto === "comentario" && (
+              <div className="rounded-md border border-gold/40 bg-gold/10 p-3">
+                <Label className="text-xs">Novo comentário</Label>
+                <Textarea autoFocus value={novoComent} onChange={(e) => setNovoComent(e.target.value)} rows={2} placeholder="Escreva uma nota interna…" />
+                <div className="flex justify-end mt-1">
+                  <Button size="sm" onClick={addComent} disabled={!novoComent.trim()}>Adicionar</Button>
+                </div>
+              </div>
+            )}
+
+            <div>
+              <div className="mb-2 flex items-center gap-2 text-sm font-semibold"><ListTodo className="h-4 w-4 text-primary" /> Tarefas ({tarefas.length})</div>
+              <ul className="space-y-1">
+                {tarefasOrdenadas.map((t) => {
+                  const venc = !!t.data_vencimento && !t.concluida && new Date(t.data_vencimento) < new Date();
+                  return (
+                    <li key={t.id} className={`flex items-center gap-2 text-sm p-2 rounded border ${venc ? "border-destructive/30 bg-destructive/10 text-destructive" : "border-transparent bg-muted/40"}`}>
+                      <Checkbox checked={t.concluida} onCheckedChange={() => toggleTarefa(t)} />
+                      <span className={`flex-1 ${t.concluida ? "line-through" : ""}`}>{t.titulo}</span>
+                      <span className={`text-xs ${venc ? "font-semibold" : "text-muted-foreground"}`}>
+                        {venc && "Atrasada · "}
+                        {t.data_vencimento ? new Date(t.data_vencimento).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo", day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "Sem prazo"}
+                      </span>
+                      {t.created_by && t.created_by === userId && (
+                        <Button size="icon" variant="ghost" className="h-7 w-7" title="Excluir tarefa" onClick={() => removeTarefa(t.id)}>
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      )}
+                    </li>
+                  );
+                })}
+                {tarefas.length === 0 && <li className="text-xs text-muted-foreground">Nenhuma tarefa.</li>}
+              </ul>
+            </div>
+
+            <div>
+              <div className="mb-2 flex items-center gap-2 text-sm font-semibold"><MessageSquare className="h-4 w-4 text-gold" /> Comentários ({coments.length})</div>
+              <ul className="space-y-1 max-h-60 overflow-y-auto">
+                {coments.map((c) => (
+                  <li key={c.id} className="text-sm bg-muted/40 rounded p-2">
+                    <div className="text-[11px] text-muted-foreground mb-0.5">
+                      <span className="font-semibold text-foreground/80">{c.autor_id ? nomesEquipe[c.autor_id] || "Usuário" : "Sistema"}</span>
+                      {" · "}
+                      {new Date(c.created_at).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo", day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                    </div>
+                    <div className="whitespace-pre-wrap">{c.texto}</div>
+                  </li>
+                ))}
+                {coments.length === 0 && <li className="text-xs text-muted-foreground">Nenhum comentário.</li>}
+              </ul>
+            </div>
+
             <div className="rounded-md border bg-muted/30 p-3">
               <div className="mb-2 flex items-center gap-2 text-sm font-semibold"><History className="h-4 w-4 text-primary" /> Histórico</div>
               <ol className="relative max-h-56 space-y-2.5 overflow-y-auto border-l-2 border-primary/30 pl-4">
@@ -297,83 +400,6 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
                 {hist.length === 0 && <li className="text-xs text-muted-foreground">Sem histórico.</li>}
               </ol>
             </div>
-
-            <div>
-              <Label className="text-xs">Novo comentário</Label>
-              <Textarea value={novoComent} onChange={(e) => setNovoComent(e.target.value)} rows={2} placeholder="Escreva uma nota interna…" />
-              <div className="flex justify-end mt-1">
-                <Button size="sm" onClick={addComent} disabled={!novoComent.trim()}>Adicionar</Button>
-              </div>
-            </div>
-
-            <div>
-              <Label className="text-xs">Nova tarefa</Label>
-              <div className="flex gap-2">
-                <Input value={novaTarefa} onChange={(e) => setNovaTarefa(e.target.value)} placeholder="Ligar para…" />
-                <Input type="datetime-local" value={novaData} onChange={(e) => setNovaData(e.target.value)} className="w-48" />
-                <Button size="sm" onClick={addTarefa}><Plus className="h-4 w-4"/></Button>
-              </div>
-              <ul className="mt-2 space-y-1">
-                {tarefas.map((t) => {
-                  const venc = t.data_vencimento && !t.concluida && new Date(t.data_vencimento) < new Date();
-                  return (
-                    <li key={t.id} className={`flex items-center gap-2 text-sm p-2 rounded ${venc ? "bg-destructive/10" : "bg-muted/40"}`}>
-                      <Checkbox checked={t.concluida} onCheckedChange={() => toggleTarefa(t)} />
-                      <span className={`flex-1 ${t.concluida ? "line-through text-muted-foreground" : ""}`}>{t.titulo}</span>
-                      {t.data_vencimento && (
-                        <span className="text-xs text-muted-foreground">
-                          {new Date(t.data_vencimento).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })}
-                        </span>
-                      )}
-                      <Button size="icon" variant="ghost" onClick={() => removeTarefa(t.id)}>
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-
-            <div>
-              <Label className="text-xs">Comentários</Label>
-              <ul className="space-y-1 max-h-40 overflow-y-auto">
-                {coments.map((c) => (
-                  <li key={c.id} className="text-sm bg-muted/40 rounded p-2">
-                    <div>{c.texto}</div>
-                    <div className="text-[10px] text-muted-foreground mt-1">
-                      {new Date(c.created_at).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })}
-                    </div>
-                  </li>
-                ))}
-                {coments.length === 0 && <li className="text-xs text-muted-foreground">Nenhum comentário.</li>}
-              </ul>
-            </div>
-
-            {!conversa && (
-              <div className="rounded-md border border-dashed p-3 space-y-2">
-                <Label className="text-xs">Conversa WhatsApp</Label>
-                <p className="text-xs text-muted-foreground">Esta negociação ainda não tem chat vinculado.</p>
-                <Button size="sm" className="w-full" onClick={abrirNovoChat} disabled={vinculando}>
-                  <MessageCirclePlus className="h-4 w-4 mr-1" /> Abrir chat com {n.telefone || "o cliente"}
-                </Button>
-                {semVinculo.length > 0 && (
-                  <div className="flex gap-2">
-                    <Select value={vincSel} onValueChange={setVincSel}>
-                      <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Ou vincular conversa existente…" /></SelectTrigger>
-                      <SelectContent>
-                        {semVinculo.map((c) => (
-                          <SelectItem key={c.id} value={c.id}>{c.nome_contato ? `${c.nome_contato} · ${c.telefone}` : c.telefone}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Button size="sm" variant="outline" onClick={vincularExistente} disabled={!vincSel || vinculando}>
-                      <Link2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                )}
-              </div>
-            )}
-
           </div>
 
           {/* Coluna direita: dados */}
