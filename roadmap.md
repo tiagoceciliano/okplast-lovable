@@ -5,7 +5,8 @@
 - [x] Verificar perda e reabertura autenticadas no atendimento e no funil; ganho abre o registro de venda obrigatório
 
 ## WhatsApp oficial (via conector Lovable — número de teste 21 92368-6452)
-- [ ] Corrigir gravações para voz nativa e confirmar o formato recebido no celular
+- [x] Corrigir gravações para voz nativa com `audio.voice: true` e testar o conteúdo enviado
+- [ ] Confirmar voz nativa recebida no celular — depende de novo envio pelo usuário
 - [x] Tabelas whatsapp_conversas / whatsapp_mensagens
 - [x] Permissões "conversas" (admin/gestor/vendedor)
 - [x] Edge functions whatsapp-send e whatsapp-templates (deployadas)
