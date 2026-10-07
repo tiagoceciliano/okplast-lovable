@@ -21,6 +21,7 @@
 - [ ] Assinar avisos de modelos (status/categoria/qualidade) na conexão WhatsApp — usuário
 
 ## Atendimento no padrão Kinbox
+- [x] Diferenciar anexos de texto com ícone azul, nome e indicação recebido/enviado; verificado na conversa Tiago
 - [x] Reproduzir a disposição completa dos prints: navegação do chat, lista, cabeçalho, mensagens, ações e detalhes
 - [x] Ajustar etiquetas aplicadas, seletor e gerenciamento para suportar muitas etiquetas
 - [x] Manter e integrar negociação, tarefas e notas no painel lateral
