@@ -17,6 +17,7 @@ import type { TagDef } from "./tags";
 import { Calendar } from "@/components/ui/calendar";
 import { ptBR } from "date-fns/locale";
 import { format } from "date-fns";
+import { GravadorVoz, AudioBolha } from "./VozMensagem";
 import { AgendamentoDialog, type AgendamentoItem } from "./AgendamentoDialog";
 
 export interface Conversa {
@@ -41,6 +42,7 @@ interface Mensagem {
   status: string | null;
   created_at: string;
   autor_id?: string | null;
+  midia_path?: string | null;
 }
 
 interface Template {
@@ -178,7 +180,7 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
     (async () => {
       const { data } = await supabase
         .from("whatsapp_mensagens")
-        .select("id,direcao,tipo,conteudo,status,created_at,autor_id")
+        .select("id,direcao,tipo,conteudo,status,created_at,autor_id,midia_path")
         .eq("conversa_id", conversa.id)
         .order("created_at", { ascending: true })
         .limit(5000);
@@ -347,6 +349,25 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
     }
   };
 
+  const enviarVoz = async (blob: Blob) => {
+    const base64 = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result).split(",")[1] ?? "");
+      reader.onerror = () => reject(new Error("Falha ao ler o áudio"));
+      reader.readAsDataURL(blob);
+    });
+    setAnexando(true);
+    try {
+      const r = await sendWhatsAppMedia({ data: { conversaId: conversa.id, nome: `voz-${Date.now()}.ogg`, mime: "audio/ogg", base64, voz: true } });
+      const nova = r.mensagem as unknown as Mensagem;
+      setMensagens((prev) => prev.some((x) => x.id === nova.id) ? prev : [...prev, nova]);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Falha ao enviar áudio");
+    } finally {
+      setAnexando(false);
+    }
+  };
+
   const salvarNota = async () => {
     if (!conversa.negociacao_id) { toast.error("Vincule uma negociação antes de criar uma nota."); return; }
     if (!nota.trim()) return;
@@ -434,10 +455,16 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
                     {m.status === "enviando" ? <Clock className="h-3 w-3 text-muted-foreground" /> : m.status === "failed" ? <AlertCircle className="h-3 w-3 text-destructive" /> : m.status === "read" ? <CheckCheck className="h-3.5 w-3.5 text-chat-tick" /> : m.status === "delivered" ? <CheckCheck className="h-3.5 w-3.5 text-muted-foreground" /> : <Check className="h-3.5 w-3.5 text-muted-foreground" />}
                   </span>
                 )}
+                {m.tipo === "audio" && m.midia_path ? (
+                  <div className={`rounded-2xl px-3 py-1.5 shadow-sm ${saida ? "bg-chat-out" : "bg-chat-in"}`}>
+                    <AudioBolha mensagemId={m.id} iniciais={iniciais(autor)} hora={fmtHora(m.created_at)} />
+                  </div>
+                ) : (
                 <div className={`flex items-end gap-2 rounded-2xl px-3.5 py-2 text-sm shadow-sm ${saida ? "bg-chat-out" : "bg-chat-in"}`}>
                   <span className="whitespace-pre-wrap break-words">{m.conteudo}</span>
                   <span className="shrink-0 translate-y-0.5 text-[10px] text-muted-foreground">{fmtHora(m.created_at)}</span>
                 </div>
+                )}
               </div>
               {saida && <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-chat-avatar text-xs font-semibold text-chat-avatar-foreground">{iniciais(autor)}</div>}
             </div>
@@ -491,6 +518,7 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
               <PopoverContent align="start" className="w-80 p-3"><p className="mb-2 text-sm font-semibold">Nota interna</p><Textarea value={nota} onChange={(event) => setNota(event.target.value)} rows={3} placeholder="Visível somente para sua equipe" /><Button className="mt-2 w-full" size="sm" onClick={salvarNota} disabled={!nota.trim() || salvandoNota}>{salvandoNota ? <Loader2 className="animate-spin" /> : <MessageSquareText />} Salvar nota</Button></PopoverContent>
             </Popover>
             <Button size="icon" variant="ghost" className="h-8 w-8" aria-label="Agendar mensagem" onClick={() => { setAgItem(null); setAgendamentoOpen(true); }}><CalendarClock /></Button>
+            <GravadorVoz disabled={anexando || enviando} onEnviar={enviarVoz} />
             <Button size="icon" onClick={enviar} disabled={(!texto.trim() && !arquivo) || enviando || anexando} className="ml-1 h-9 w-9 rounded-xl" aria-label="Enviar mensagem">{enviando || anexando ? <Loader2 className="animate-spin" /> : <Send />}</Button>
           </div>
         </div></div>
