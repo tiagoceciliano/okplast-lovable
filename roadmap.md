@@ -1,8 +1,8 @@
 # Roadmap
 
 ## Status das negociações
-- [ ] Confirmar ganho/perdido, permitir reabrir e oferecer ações no painel da conversa
-- [ ] Verificar alteração e leitura do status no atendimento e no funil
+- [x] Confirmar ganho/perdido, permitir reabrir e oferecer ações no painel da conversa
+- [x] Verificar perda e reabertura autenticadas no atendimento e no funil; ganho abre o registro de venda obrigatório
 
 ## WhatsApp oficial (via conector Lovable — número de teste 21 92368-6452)
 - [x] Tabelas whatsapp_conversas / whatsapp_mensagens
