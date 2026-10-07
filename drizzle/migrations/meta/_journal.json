@@ -113,6 +113,13 @@
       "when": 1791400725836,
       "tag": "0015_restringir_delete_notas_autor",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1791401844930,
+      "tag": "0016_migration",
+      "breakpoints": true
     }
   ]
 }
