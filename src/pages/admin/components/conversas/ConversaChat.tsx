@@ -518,11 +518,12 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
       </div>
 
       {notas.length > 0 && (
-        <div className="max-h-32 shrink-0 overflow-y-auto border-t bg-accent/40 px-3 py-2">
+        <div className="max-h-32 shrink-0 overflow-y-auto border-t border-gold/30 bg-gold/15 px-3 py-2">
           <div className="mb-1 flex items-center gap-1 text-[10px] font-semibold uppercase text-muted-foreground"><MessageSquareText className="h-3 w-3" /> Notas internas (só a equipe vê)</div>
           <div className="space-y-1">
             {notas.map((n) => (
-              <div key={n.id} className="rounded-md border bg-background px-2 py-1 text-xs">
+              <div key={n.id} className="rounded-md border border-gold/40 bg-gold/10 px-2 py-1 text-xs">
+
                 <span className="whitespace-pre-wrap">{n.texto}</span>
                 <span className="block text-[10px] text-muted-foreground">{fmtHora(n.created_at)}</span>
               </div>
