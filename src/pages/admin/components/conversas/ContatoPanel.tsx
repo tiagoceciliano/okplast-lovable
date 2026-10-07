@@ -233,11 +233,11 @@ export function ContatoPanel({ conversa, onNomeAtualizado, onNegociacaoVinculada
           {/* Negociações */}
            <Section title={negs.length > 1 ? `Negociações (${negs.length})` : "Negociação"} icon={Workflow}>
              <div className="space-y-2">
-             {negs.map((n) => {
+             {(() => {
+               const renderCard = (n: Negociacao) => {
                const etapa = ETAPAS.find((e) => e.id === n.etapa)?.label;
                const ativoCard = n.id === selId;
                const editavel = can("negociacoes", "edit", n.responsavel_id);
-               const statusCls = n.status === "ganho" ? "text-muted-foreground" : n.status === "perdido" ? "text-destructive" : "text-primary";
                return (
                  <div key={n.id} className={`rounded-md border transition ${ativoCard ? "border-primary/50 bg-muted/30" : "hover:border-primary/30"}`}>
                    <HoverCard openDelay={300} closeDelay={100}>
@@ -246,7 +246,7 @@ export function ContatoPanel({ conversa, onNomeAtualizado, onNegociacaoVinculada
                          <div className="flex items-start justify-between gap-2">
                            <div className="min-w-0">
                              <p className="truncate text-xs font-semibold">{n.nome_produto || n.produto || n.nome_cliente}</p>
-                             <p className={`text-[10px] font-semibold uppercase ${statusCls}`}>● {n.status === "aberto" ? etapa : n.status}</p>
+                             <p className={`text-[10px] font-semibold uppercase ${n.status === "aberto" ? "text-primary" : "text-muted-foreground"}`}>● {etapa}</p>
                            </div>
                            <span className="shrink-0 text-xs font-bold">{brl(n.valor)}</span>
                          </div>
@@ -257,7 +257,7 @@ export function ContatoPanel({ conversa, onNomeAtualizado, onNegociacaoVinculada
                        </button>
                      </HoverCardTrigger>
                      <HoverCardContent side="left" align="start" className="w-72 space-y-3 p-3">
-                       <div><p className="text-sm font-semibold">{n.nome_cliente}</p><p className="text-xs text-muted-foreground">{etapa} · {n.status}</p></div>
+                       <div><p className="text-sm font-semibold">{n.nome_cliente}</p><p className="text-xs text-muted-foreground">{etapa}</p></div>
                        <div className="grid grid-cols-[84px_1fr] gap-x-2 gap-y-1.5 text-xs">
                          <span className="text-muted-foreground">Valor</span><span className="font-semibold">{brl(n.valor)}</span>
                          <span className="text-muted-foreground">Produto</span><span className="truncate">{n.nome_produto || n.produto || n.material || "Não informado"}</span>
@@ -289,7 +289,43 @@ export function ContatoPanel({ conversa, onNomeAtualizado, onNegociacaoVinculada
                    )}
                  </div>
                );
-             })}
+               };
+               const abertas = negs.filter((n) => n.status === "aberto");
+               const ganhas = negs.filter((n) => n.status === "ganho");
+               const perdidas = negs.filter((n) => n.status === "perdido");
+               const grupoFechado = (titulo: string, lista: Negociacao[], cor: string) => {
+                 if (lista.length === 0) return null;
+                 if (lista.length <= 3) {
+                   return (
+                     <div key={titulo} className="space-y-2">
+                       <p className={`text-[10px] font-semibold uppercase ${cor}`}>{titulo} ({lista.length})</p>
+                       {lista.map(renderCard)}
+                     </div>
+                   );
+                 }
+                 return (
+                   <Collapsible key={titulo} className="space-y-2">
+                     <p className={`text-[10px] font-semibold uppercase ${cor}`}>{titulo} ({lista.length})</p>
+                     {lista.slice(0, 3).map(renderCard)}
+                     <CollapsibleContent className="space-y-2">
+                       {lista.slice(3).map(renderCard)}
+                     </CollapsibleContent>
+                     <CollapsibleTrigger asChild>
+                       <Button variant="ghost" size="sm" className="h-7 w-full text-[11px] text-muted-foreground">
+                         <ChevronDown className="mr-1 h-3 w-3" /> Ver todas as {lista.length}
+                       </Button>
+                     </CollapsibleTrigger>
+                   </Collapsible>
+                 );
+               };
+               return (
+                 <>
+                   {abertas.map(renderCard)}
+                   {grupoFechado("Ganhas", ganhas, "text-accent")}
+                   {grupoFechado("Perdidas", perdidas, "text-destructive")}
+                 </>
+               );
+             })()}
              </div>
            </Section>
 
