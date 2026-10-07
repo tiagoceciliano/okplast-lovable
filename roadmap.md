@@ -24,6 +24,8 @@
 - [x] Implementar atribuição e transferência de responsável no atendimento
 - [x] Tornar anexo, emoji e nota interna funcionais
 - [x] Exibir notas internas no topo do atendimento, com autor e exclusão só pelo criador
+- [x] Mostrar só as 3 notas mais recentes, com "Ver todas" para abrir as demais
+
 - [x] Agrupar ganhas e perdidas do painel lateral em seções recolhíveis com contador e cor; abertas sempre todas
 - [x] Validar o fluxo completo em uma conta autenticada e em larguras desktop menores
 
