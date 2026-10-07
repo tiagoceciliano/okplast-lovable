@@ -15,7 +15,6 @@ import type { TagDef } from "./tags";
 import { Calendar } from "@/components/ui/calendar";
 import { ptBR } from "date-fns/locale";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
 
 export interface Conversa {
   id: string;
@@ -441,12 +440,14 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
             </Popover>
             <Popover open={agendamentoOpen} onOpenChange={setAgendamentoOpen}>
               <PopoverTrigger asChild><Button size="icon" variant="ghost" className="h-8 w-8" aria-label="Agendar mensagem"><CalendarClock /></Button></PopoverTrigger>
-              <PopoverContent align="start" className="w-auto p-3">
-                <p className="mb-2 text-sm font-semibold">Agendar mensagem</p>
-                <Calendar mode="single" locale={ptBR} selected={dataAgendada} onSelect={setDataAgendada} disabled={{ before: new Date(), after: new Date(limite) }} className={cn("pointer-events-auto p-2")} />
-                <p className="mt-2 text-xs text-muted-foreground">Horário</p>
-                <Input type="time" value={horaAgendada} onChange={(e) => setHoraAgendada(e.target.value)} className="mt-2" />
-                <Button className="mt-2 w-full" size="sm" onClick={agendar} disabled={!texto.trim() || !horarioAgendado || agendando}>
+              <PopoverContent align="end" side="top" sideOffset={8} className="w-[284px] max-w-[calc(100vw-24px)] max-h-[var(--radix-popover-content-available-height)] overflow-y-auto p-4">
+                <p className="mb-3 text-sm font-semibold">Agendar mensagem</p>
+                <Calendar mode="single" locale={ptBR} selected={dataAgendada} onSelect={setDataAgendada} disabled={{ before: new Date(), after: new Date(limite) }} labels={{ labelPrevious: () => "Mês anterior", labelNext: () => "Próximo mês" }} className="pointer-events-auto p-0" />
+                <div className="mt-3 border-t pt-3">
+                  <label htmlFor={`horario-${conversa.id}`} className="text-xs font-medium">Horário</label>
+                  <Input id={`horario-${conversa.id}`} type="time" aria-label="Horário do envio" value={horaAgendada} onChange={(e) => setHoraAgendada(e.target.value)} className="mt-1.5 h-9" />
+                </div>
+                <Button className="mt-3 w-full" size="sm" onClick={agendar} disabled={!texto.trim() || !horarioAgendado || agendando}>
                   {agendando ? <Loader2 className="animate-spin" /> : <CalendarClock />} Agendar
                 </Button>
               </PopoverContent>
