@@ -491,7 +491,7 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
               <PopoverContent align="start" className="w-80 p-3"><p className="mb-2 text-sm font-semibold">Nota interna</p><Textarea value={nota} onChange={(event) => setNota(event.target.value)} rows={3} placeholder="Visível somente para sua equipe" /><Button className="mt-2 w-full" size="sm" onClick={salvarNota} disabled={!nota.trim() || salvandoNota}>{salvandoNota ? <Loader2 className="animate-spin" /> : <MessageSquareText />} Salvar nota</Button></PopoverContent>
             </Popover>
             <Button size="icon" variant="ghost" className="h-8 w-8" aria-label="Agendar mensagem" onClick={() => { setAgItem(null); setAgendamentoOpen(true); }}><CalendarClock /></Button>
-            <Button size="icon" onClick={enviar} disabled={!texto.trim() || enviando} className="ml-1 h-9 w-9 rounded-xl" aria-label="Enviar mensagem">{enviando ? <Loader2 className="animate-spin" /> : <Send />}</Button>
+            <Button size="icon" onClick={enviar} disabled={(!texto.trim() && !arquivo) || enviando || anexando} className="ml-1 h-9 w-9 rounded-xl" aria-label="Enviar mensagem">{enviando || anexando ? <Loader2 className="animate-spin" /> : <Send />}</Button>
           </div>
         </div></div>
       ) : (
