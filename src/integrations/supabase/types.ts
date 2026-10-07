@@ -800,6 +800,7 @@ export type Database = {
           direcao: string
           erro: string | null
           id: string
+          midia_path: string | null
           status: string | null
           tipo: string
           wa_message_id: string | null
@@ -812,6 +813,7 @@ export type Database = {
           direcao: string
           erro?: string | null
           id?: string
+          midia_path?: string | null
           status?: string | null
           tipo?: string
           wa_message_id?: string | null
@@ -824,6 +826,7 @@ export type Database = {
           direcao?: string
           erro?: string | null
           id?: string
+          midia_path?: string | null
           status?: string | null
           tipo?: string
           wa_message_id?: string | null
