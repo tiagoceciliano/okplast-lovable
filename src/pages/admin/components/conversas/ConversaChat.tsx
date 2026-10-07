@@ -113,6 +113,8 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
   const [nota, setNota] = useState("");
   const [salvandoNota, setSalvandoNota] = useState(false);
   const [anexando, setAnexando] = useState(false);
+  const [arquivo, setArquivo] = useState<File | null>(null);
+  const [arquivoUrl, setArquivoUrl] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -228,6 +230,13 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
 
   const enviar = async () => {
     const conteudo = texto.trim();
+    if (arquivo) {
+      const file = arquivo;
+      limparArquivo();
+      setTexto("");
+      try { await enviarArquivo(file, conteudo); } catch { /* toast já exibido */ }
+      return;
+    }
     if (!conteudo) return;
     // Mostra o balão na hora; o servidor confirma em segundo plano
     const tmpId = `tmp-${Date.now()}`;
@@ -303,9 +312,23 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
     if (error) toast.error(error.message); else onTagsChange?.(proximas);
   };
 
-  const anexar = async (file: File | undefined) => {
-    if (!file || anexando) return;
+  const limparArquivo = () => {
+    if (arquivoUrl) URL.revokeObjectURL(arquivoUrl);
+    setArquivo(null);
+    setArquivoUrl(null);
+    if (fileRef.current) fileRef.current.value = "";
+  };
+
+  const anexar = (file: File | undefined) => {
+    if (!file) return;
     if (file.size > 16 * 1024 * 1024) { toast.error("O arquivo deve ter no máximo 16 MB."); return; }
+    limparArquivo();
+    setArquivo(file);
+    setArquivoUrl(file.type.startsWith("image/") ? URL.createObjectURL(file) : null);
+    if (fileRef.current) fileRef.current.value = "";
+  };
+
+  const enviarArquivo = async (file: File, legenda: string) => {
     const base64 = await new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve(String(reader.result).split(",")[1] ?? "");
@@ -314,14 +337,13 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
     });
     setAnexando(true);
     try {
-      await sendWhatsAppMedia({ data: { conversaId: conversa.id, nome: file.name, mime: file.type || "application/octet-stream", base64, legenda: texto.trim() || undefined } });
-      setTexto("");
+      await sendWhatsAppMedia({ data: { conversaId: conversa.id, nome: file.name, mime: file.type || "application/octet-stream", base64, legenda: legenda || undefined } });
       toast.success("Arquivo enviado");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Falha ao enviar arquivo");
+      throw error;
     } finally {
       setAnexando(false);
-      if (fileRef.current) fileRef.current.value = "";
     }
   };
 
@@ -439,6 +461,20 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
       {/* Composer */}
       {aberta ? (
         <div className="shrink-0 bg-chat-bg px-4 pb-2 pt-1 sm:px-8"><div className="rounded-2xl border bg-background/70 p-3 shadow-sm backdrop-blur">
+          {arquivo && (
+            <div className="mb-2 flex items-center gap-3 rounded-xl border bg-muted/40 p-2">
+              {arquivoUrl ? (
+                <img src={arquivoUrl} alt={arquivo.name} className="h-14 w-14 rounded-lg object-cover" />
+              ) : (
+                <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-muted"><FileUp className="h-6 w-6 text-muted-foreground" /></div>
+              )}
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium">{arquivo.name}</p>
+                <p className="text-xs text-muted-foreground">{(arquivo.size / 1024 / 1024).toFixed(2)} MB — escreva uma legenda se quiser e clique em enviar</p>
+              </div>
+              <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={limparArquivo} aria-label="Remover anexo"><X className="h-4 w-4" /></Button>
+            </div>
+          )}
           <Textarea value={texto} onChange={(e) => setTexto(e.target.value)} placeholder="Shift + Enter para nova linha." rows={2} className="min-h-14 resize-none border-0 bg-transparent p-1 shadow-none focus-visible:ring-0" onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); enviar(); } }} />
           <div className="flex items-center gap-1">
             <span className={`mr-auto flex items-center gap-1.5 text-xs font-semibold tabular-nums ${restante <= 2 * 60 * 60 * 1000 ? "text-destructive" : "text-muted-foreground"}`}><Clock className="h-4 w-4" /> {restanteCurto(restante)}</span>
@@ -455,7 +491,7 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
               <PopoverContent align="start" className="w-80 p-3"><p className="mb-2 text-sm font-semibold">Nota interna</p><Textarea value={nota} onChange={(event) => setNota(event.target.value)} rows={3} placeholder="Visível somente para sua equipe" /><Button className="mt-2 w-full" size="sm" onClick={salvarNota} disabled={!nota.trim() || salvandoNota}>{salvandoNota ? <Loader2 className="animate-spin" /> : <MessageSquareText />} Salvar nota</Button></PopoverContent>
             </Popover>
             <Button size="icon" variant="ghost" className="h-8 w-8" aria-label="Agendar mensagem" onClick={() => { setAgItem(null); setAgendamentoOpen(true); }}><CalendarClock /></Button>
-            <Button size="icon" onClick={enviar} disabled={!texto.trim() || enviando} className="ml-1 h-9 w-9 rounded-xl" aria-label="Enviar mensagem">{enviando ? <Loader2 className="animate-spin" /> : <Send />}</Button>
+            <Button size="icon" onClick={enviar} disabled={(!texto.trim() && !arquivo) || enviando || anexando} className="ml-1 h-9 w-9 rounded-xl" aria-label="Enviar mensagem">{enviando || anexando ? <Loader2 className="animate-spin" /> : <Send />}</Button>
           </div>
         </div></div>
       ) : (
