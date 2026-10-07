@@ -1,9 +1,9 @@
-type MediaInput = { mime: string; nome: string; legenda?: string; voz?: boolean };
+type MediaInput = { mime: string; nome: string; legenda?: string | undefined; voz?: boolean | undefined };
 
 /** Voice notes must be explicitly identified, not merely uploaded as OGG audio. */
 export function whatsappMediaPayload(data: MediaInput, link: string, to: string) {
   const tipo = data.mime.startsWith("image/") ? "image" : data.mime.startsWith("video/") ? "video" : data.mime.startsWith("audio/") ? "audio" : "document";
-  if (data.voz && (tipo !== "audio" || data.mime.split(";")[0].trim() !== "audio/ogg")) {
+  if (data.voz && (tipo !== "audio" || data.mime.split(";")[0]?.trim() !== "audio/ogg")) {
     throw new Error("Mensagens de voz precisam ser gravadas em OGG/Opus.");
   }
   const media: Record<string, string | boolean> = { link };
