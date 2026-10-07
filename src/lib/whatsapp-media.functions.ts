@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequestHeader } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireCaller } from "@/lib/supabase-server";
+import { whatsappMediaPayload } from "@/lib/whatsapp-media-payload";
 
 const inputSchema = z.object({
   conversaId: z.string().uuid(),
@@ -49,14 +50,11 @@ export const sendWhatsAppMedia = createServerFn({ method: "POST" })
     const { data: signed, error: signErr } = await admin.storage.from("whatsapp-anexos").createSignedUrl(path, 60 * 60 * 24);
     if (signErr || !signed?.signedUrl) throw new Error("Não foi possível gerar o link do arquivo");
 
-    const tipo = data.mime.startsWith("image/") ? "image" : data.mime.startsWith("video/") ? "video" : data.mime.startsWith("audio/") ? "audio" : "document";
-    const media: Record<string, string> = { link: signed.signedUrl };
-    if (tipo === "document") media['filename'] = data.nome;
-    if (data.legenda?.trim() && (tipo === "image" || tipo === "video" || tipo === "document")) media['caption'] = data.legenda.trim();
+    const { tipo, payload } = whatsappMediaPayload(data, signed.signedUrl, conversa.telefone);
     const sent = await fetch(`${GATEWAY_URL}/messages`, {
       method: "POST",
       headers: { ...headers, "Content-Type": "application/json" },
-      body: JSON.stringify({ messaging_product: "whatsapp", to: conversa.telefone, type: tipo, [tipo]: media }),
+      body: JSON.stringify(payload),
     });
     const sentText = await sent.text();
     if (!sent.ok) {
