@@ -28,7 +28,7 @@ export function GravadorVoz({ onEnviar, disabled }: { onEnviar: (blob: Blob, seg
       rec.ondataavailable = async (data: Uint8Array) => {
         const segundos = (Date.now() - inicioRef.current) / 1000;
         if (!enviarRef.current) return;
-        await onEnviar(new Blob([data], { type: "audio/ogg" }), segundos);
+        await onEnviar(new Blob([data as BlobPart], { type: "audio/ogg" }), segundos);
       };
       await rec.start();
       recRef.current = rec;
