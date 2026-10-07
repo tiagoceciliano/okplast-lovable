@@ -130,13 +130,22 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
 
   useEffect(() => { carregarAgendamentos(); }, [conversa.id]);
 
-  const [notas, setNotas] = useState<Array<{ id: string; texto: string; created_at: string }>>([]);
+  const [notas, setNotas] = useState<Array<{ id: string; texto: string; created_at: string; autor_id: string | null }>>([]);
+  const [userId, setUserId] = useState<string | null>(null);
+  useEffect(() => { supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null)); }, []);
   const carregarNotas = async () => {
     if (!conversa.negociacao_id) { setNotas([]); return; }
-    const { data } = await supabase.from("negociacao_comentarios").select("id,texto,created_at").eq("negociacao_id", conversa.negociacao_id).order("created_at", { ascending: false }).limit(20);
+    const { data } = await supabase.from("negociacao_comentarios").select("id,texto,created_at,autor_id").eq("negociacao_id", conversa.negociacao_id).order("created_at", { ascending: false }).limit(20);
     setNotas((data as any) || []);
   };
   useEffect(() => { carregarNotas(); }, [conversa.negociacao_id]);
+
+  const excluirNota = async (id: string) => {
+    const { error } = await supabase.from("negociacao_comentarios").delete().eq("id", id);
+    if (error) { toast.error("Só quem criou a nota pode apagar."); return; }
+    toast.success("Nota excluída");
+    carregarNotas();
+  };
 
   // Carrega mensagens + marca como lida
   useEffect(() => {
