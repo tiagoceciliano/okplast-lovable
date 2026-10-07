@@ -481,10 +481,18 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
           <div className="mb-1 flex items-center gap-1 text-[10px] font-semibold uppercase text-muted-foreground"><MessageSquareText className="h-3 w-3" /> Notas internas (só a equipe vê)</div>
           <div className="space-y-1">
             {notas.map((n) => (
-              <div key={n.id} className="rounded-md border border-gold/40 bg-gold/10 px-2 py-1 text-xs">
-
-                <span className="whitespace-pre-wrap">{n.texto}</span>
-                <span className="block text-[10px] text-muted-foreground">{fmtHora(n.created_at)}</span>
+              <div key={n.id} className="flex items-start gap-2 rounded-md border border-gold/40 bg-gold/10 px-2 py-1 text-xs">
+                <div className="min-w-0 flex-1">
+                  <span className="whitespace-pre-wrap">{n.texto}</span>
+                  <span className="block text-[10px] text-muted-foreground">
+                    {(n.autor_id && nomesEquipe[n.autor_id]) || "Equipe"} · {fmtHora(n.created_at)}
+                  </span>
+                </div>
+                {n.autor_id === userId && (
+                  <button type="button" title="Excluir nota" onClick={() => excluirNota(n.id)} className="shrink-0 rounded p-0.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive">
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                )}
               </div>
             ))}
           </div>
