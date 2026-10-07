@@ -230,6 +230,13 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
 
   const enviar = async () => {
     const conteudo = texto.trim();
+    if (arquivo) {
+      const file = arquivo;
+      limparArquivo();
+      setTexto("");
+      try { await enviarArquivo(file, conteudo); } catch { /* toast já exibido */ }
+      return;
+    }
     if (!conteudo) return;
     // Mostra o balão na hora; o servidor confirma em segundo plano
     const tmpId = `tmp-${Date.now()}`;
