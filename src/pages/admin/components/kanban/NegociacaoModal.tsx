@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getEquipe } from "@/lib/adminCache";
+import { whatsappSend } from "@/lib/whatsapp-send.functions";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -114,7 +115,7 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
     if (tel.length >= 10 && !tel.startsWith("55")) tel = `55${tel}`;
     if (tel.length < 12) { toast.error("Cadastre o telefone com DDD na negociação primeiro."); return; }
     setVinculando(true);
-    const { data, error } = await supabase.functions.invoke("whatsapp-send", {
+    const { data, error } = await whatsappSend({
       body: { telefone: tel, tipo: "text", criar_apenas: true, nome_contato: negociacao.nome_cliente },
     });
     const conv = (data as { conversa?: Conversa } | null)?.conversa;

@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getEquipe, memoGet, memoSet } from "@/lib/adminCache";
 import { whatsappTemplates } from "@/lib/whatsapp-templates.functions";
 import { sendWhatsAppMedia } from "@/lib/whatsapp-media.functions";
+import { whatsappSend } from "@/lib/whatsapp-send.functions";
 import EmojiPicker, { EmojiStyle } from "emoji-picker-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -244,7 +245,7 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
     const tmpId = `tmp-${Date.now()}`;
     setMensagens((prev) => [...prev, { id: tmpId, direcao: "saida", tipo: "text", conteudo, status: "enviando", created_at: new Date().toISOString(), autor_id: null } as unknown as Mensagem]);
     setTexto("");
-    const { error } = await supabase.functions.invoke("whatsapp-send", {
+    const { data: resultado, error } = await whatsappSend({
       body: { conversa_id: conversa.id, tipo: "text", texto: conteudo },
     });
     if (error) {
@@ -252,6 +253,8 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
       setTexto((t) => t || conteudo);
       const detalhe = (error as any)?.context ? await (error as any).context.text().catch(() => "") : "";
       toast.error("Falha ao enviar: " + (detalhe || error.message));
+    } else if (resultado?.mensagem) {
+      setMensagens((prev) => [...prev.filter((m) => m.id !== tmpId && m.id !== resultado.mensagem.id), resultado.mensagem as Mensagem]);
     }
   };
 
@@ -259,7 +262,7 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
     const t = templates.find((x) => x.nome === templateSel);
     if (!t || enviando) return;
     setEnviando(true);
-    const { error } = await supabase.functions.invoke("whatsapp-send", {
+    const { error } = await whatsappSend({
       body: {
         conversa_id: conversa.id,
         tipo: "template",
