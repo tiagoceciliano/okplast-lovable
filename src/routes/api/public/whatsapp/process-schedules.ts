@@ -7,6 +7,8 @@ type Schedule = {
   texto: string;
   janela_limite: string;
   tentativas: number;
+  tipo?: string;
+  template?: { name: string; language?: string; parametros?: string[] } | null;
 };
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/whatsapp";
@@ -34,7 +36,8 @@ export const Route = createFileRoute("/api/public/whatsapp/process-schedules")({
           const limite = conversa?.ultima_entrada_cliente_em
             ? new Date(conversa.ultima_entrada_cliente_em).getTime() + 24 * 60 * 60 * 1000
             : 0;
-          if (!conversa || Date.now() >= limite || Date.now() >= new Date(row.janela_limite).getTime()) {
+          const ehTemplate = row.tipo === "template" && !!row.template?.name;
+          if (!conversa || (!ehTemplate && Date.now() >= limite)) {
             await supabaseAdmin.from("whatsapp_agendamentos").update({ status: "falhou", erro: "A janela de 24 horas foi encerrada antes do envio." }).eq("id", row.id);
             continue;
           }
@@ -43,14 +46,16 @@ export const Route = createFileRoute("/api/public/whatsapp/process-schedules")({
             const response = await fetch(`${GATEWAY_URL}/messages`, {
               method: "POST",
               headers: { Authorization: `Bearer ${lovableKey}`, "X-Connection-Api-Key": whatsappKey, "Content-Type": "application/json" },
-              body: JSON.stringify({ messaging_product: "whatsapp", to: conversa.telefone, type: "text", text: { body: row.texto } }),
+              body: JSON.stringify(ehTemplate
+                ? { messaging_product: "whatsapp", to: conversa.telefone, type: "template", template: { name: row.template!.name, language: { code: row.template!.language || "pt_BR" }, ...((row.template!.parametros ?? []).length ? { components: [{ type: "body", parameters: row.template!.parametros!.map((t) => ({ type: "text", text: t })) }] } : {}) } }
+                : { messaging_product: "whatsapp", to: conversa.telefone, type: "text", text: { body: row.texto } }),
             });
             const responseText = await response.text();
             if (!response.ok) throw new Error(`WhatsApp [${response.status}]: ${responseText}`);
             let waMessageId: string | null = null;
             try { waMessageId = JSON.parse(responseText)?.messages?.[0]?.id ?? null; } catch { waMessageId = null; }
             const { data: message, error: messageError } = await supabaseAdmin.from("whatsapp_mensagens").insert({
-              conversa_id: row.conversa_id, wa_message_id: waMessageId, direcao: "saida", tipo: "text", conteudo: row.texto, status: "enviado", autor_id: row.autor_id,
+              conversa_id: row.conversa_id, wa_message_id: waMessageId, direcao: "saida", tipo: ehTemplate ? "template" : "text", conteudo: row.texto, status: "enviado", autor_id: row.autor_id,
             }).select("id").single();
             if (messageError) throw messageError;
             const now = new Date().toISOString();
