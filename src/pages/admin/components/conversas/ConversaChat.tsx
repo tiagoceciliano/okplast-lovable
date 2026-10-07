@@ -461,6 +461,20 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
       {/* Composer */}
       {aberta ? (
         <div className="shrink-0 bg-chat-bg px-4 pb-2 pt-1 sm:px-8"><div className="rounded-2xl border bg-background/70 p-3 shadow-sm backdrop-blur">
+          {arquivo && (
+            <div className="mb-2 flex items-center gap-3 rounded-xl border bg-muted/40 p-2">
+              {arquivoUrl ? (
+                <img src={arquivoUrl} alt={arquivo.name} className="h-14 w-14 rounded-lg object-cover" />
+              ) : (
+                <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-muted"><FileUp className="h-6 w-6 text-muted-foreground" /></div>
+              )}
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium">{arquivo.name}</p>
+                <p className="text-xs text-muted-foreground">{(arquivo.size / 1024 / 1024).toFixed(2)} MB — escreva uma legenda se quiser e clique em enviar</p>
+              </div>
+              <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={limparArquivo} aria-label="Remover anexo"><X className="h-4 w-4" /></Button>
+            </div>
+          )}
           <Textarea value={texto} onChange={(e) => setTexto(e.target.value)} placeholder="Shift + Enter para nova linha." rows={2} className="min-h-14 resize-none border-0 bg-transparent p-1 shadow-none focus-visible:ring-0" onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); enviar(); } }} />
           <div className="flex items-center gap-1">
             <span className={`mr-auto flex items-center gap-1.5 text-xs font-semibold tabular-nums ${restante <= 2 * 60 * 60 * 1000 ? "text-destructive" : "text-muted-foreground"}`}><Clock className="h-4 w-4" /> {restanteCurto(restante)}</span>
