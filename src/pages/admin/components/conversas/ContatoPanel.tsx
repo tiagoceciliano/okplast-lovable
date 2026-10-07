@@ -20,6 +20,7 @@ import { useNavigate } from "@/lib/router-compat";
 import { usePermissions } from "@/hooks/usePermissions";
 import { GanhoDialog } from "../kanban/GanhoDialog";
 import { confirmacaoEtapa, statusDaEtapa } from "../kanban/negociacaoStatus";
+import { NegAtividades } from "./NegAtividades";
 
 interface Nota {
   id: string;
@@ -44,7 +45,7 @@ const fmt = (iso: string) =>
 
 export function ContatoPanel({ conversa, onNomeAtualizado, onNegociacaoVinculada }: Props) {
   const navigate = useNavigate();
-  const { can } = usePermissions();
+  const { can, user } = usePermissions();
   const [ganhoPending, setGanhoPending] = useState<Negociacao | null>(null);
   const [salvandoStatus, setSalvandoStatus] = useState<string | null>(null);
   const [negs, setNegs] = useState<Negociacao[]>([]);
@@ -273,10 +274,13 @@ export function ContatoPanel({ conversa, onNomeAtualizado, onNegociacaoVinculada
                        </div>
                      </HoverCardContent>
                    </HoverCard>
+                   <div className="border-t px-2 py-1">
+                     <NegAtividades negociacaoId={n.id} podeEditar={editavel} equipe={equipe} userId={user?.id ?? null} />
+                   </div>
                    {editavel && <div className="flex flex-wrap gap-1 border-t px-2.5 py-2">
                      {n.status !== "ganho" && <Button size="sm" variant="outline" className="h-7 flex-1 px-2 text-[11px] text-accent" disabled={salvandoStatus !== null} onClick={() => setGanhoPending(n)}><Check className="h-3 w-3" /> Ganho</Button>}
                      {n.status !== "perdido" && <Button size="sm" variant="outline" className="h-7 flex-1 px-2 text-[11px] text-destructive" disabled={salvandoStatus !== null} onClick={() => mudarEtapa(n, "perdido")}><X className="h-3 w-3" /> Perdido</Button>}
-                     {n.status !== "aberto" && <Button size="sm" variant="outline" className="h-7 flex-1 px-2 text-[11px]" disabled={salvandoStatus !== null} onClick={() => mudarEtapa(n, "entrada")}><RotateCcw className="h-3 w-3" /> Reabrir</Button>}
+                     {n.status !== "aberto" && <Button size="sm" variant="outline" className="h-7 flex-1 px-2 text-[11px]" disabled={salvandoStatus !== null} onClick={() => mudarEtapa(n, "negociacao")}><RotateCcw className="h-3 w-3" /> Reabrir</Button>}
                    </div>}
                    {ativoCard && (
                      <div className="space-y-2 border-t px-2.5 pb-2.5 pt-2">

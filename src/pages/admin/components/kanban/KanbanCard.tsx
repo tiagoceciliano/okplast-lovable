@@ -34,7 +34,10 @@ export function KanbanCard({ negociacao, vendedores, tarefasCount, comentariosCo
       {...attributes}
       {...listeners}
       onClick={onClick}
-      className="cursor-pointer space-y-1.5 rounded-md border bg-card p-2.5 shadow-xs transition hover:border-primary/40 hover:shadow-sm"
+      className={`cursor-pointer space-y-1.5 rounded-md border p-2.5 shadow-xs transition hover:border-primary/40 hover:shadow-sm ${
+        negociacao.etapa === "perdido" ? "border-destructive/30 bg-destructive/10"
+        : negociacao.etapa === "venda_realizada" ? "border-accent/30 bg-accent/10"
+        : "bg-card"}`}
     >
       <div className="flex items-start justify-between gap-2">
         <h4 className="font-semibold text-sm leading-tight truncate">{negociacao.nome_cliente}</h4>
