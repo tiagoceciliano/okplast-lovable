@@ -8,9 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Send, Clock, LayoutTemplate, Loader2, Check, CheckCheck, AlertCircle, MoreHorizontal, Search, Bell, Tag, Smile, Paperclip, MessageSquareText, CalendarClock, X, FileUp, Trash2 } from "lucide-react";
+import { Send, Clock, LayoutTemplate, Loader2, Check, CheckCheck, AlertCircle, MoreHorizontal, Search, Bell, Tag, Smile, Paperclip, MessageSquareText, CalendarClock, X, FileUp, Trash2, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+
 import type { TagDef } from "./tags";
 import { Calendar } from "@/components/ui/calendar";
 import { ptBR } from "date-fns/locale";
@@ -131,7 +133,9 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
   useEffect(() => { carregarAgendamentos(); }, [conversa.id]);
 
   const [notas, setNotas] = useState<Array<{ id: string; texto: string; created_at: string; autor_id: string | null }>>([]);
+  const [notasAbertas, setNotasAbertas] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+
   useEffect(() => { supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null)); }, []);
   const carregarNotas = async () => {
     if (!conversa.negociacao_id) { setNotas([]); return; }
@@ -140,7 +144,24 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
   };
   useEffect(() => { carregarNotas(); }, [conversa.negociacao_id]);
 
+  const renderNota = (n: { id: string; texto: string; created_at: string; autor_id: string | null }) => (
+    <div key={n.id} className="flex items-start gap-2 rounded-md border border-gold/40 bg-gold/10 px-2 py-1 text-xs">
+      <div className="min-w-0 flex-1">
+        <span className="whitespace-pre-wrap">{n.texto}</span>
+        <span className="block text-[10px] text-muted-foreground">
+          {(n.autor_id && nomesEquipe[n.autor_id]) || "Equipe"} · {fmtHora(n.created_at)}
+        </span>
+      </div>
+      {n.autor_id === userId && (
+        <button type="button" title="Excluir nota" onClick={() => excluirNota(n.id)} className="shrink-0 rounded p-0.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive">
+          <Trash2 className="h-3.5 w-3.5" />
+        </button>
+      )}
+    </div>
+  );
+
   const excluirNota = async (id: string) => {
+
     const { error } = await supabase.from("negociacao_comentarios").delete().eq("id", id);
     if (error) { toast.error("Só quem criou a nota pode apagar."); return; }
     toast.success("Nota excluída");
@@ -346,27 +367,27 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
         </div>
       </div>
       {notas.length > 0 && (
-        <div className="max-h-40 shrink-0 overflow-y-auto border-b border-gold/30 bg-gold/15 px-3 py-2">
+        <div className="shrink-0 border-b border-gold/30 bg-gold/15 px-3 py-2">
           <div className="mb-1 flex items-center gap-1 text-[10px] font-semibold uppercase text-muted-foreground"><MessageSquareText className="h-3 w-3" /> Notas internas (só a equipe vê)</div>
-          <div className="space-y-1">
-            {notas.map((n) => (
-              <div key={n.id} className="flex items-start gap-2 rounded-md border border-gold/40 bg-gold/10 px-2 py-1 text-xs">
-                <div className="min-w-0 flex-1">
-                  <span className="whitespace-pre-wrap">{n.texto}</span>
-                  <span className="block text-[10px] text-muted-foreground">
-                    {(n.autor_id && nomesEquipe[n.autor_id]) || "Equipe"} · {fmtHora(n.created_at)}
-                  </span>
-                </div>
-                {n.autor_id === userId && (
-                  <button type="button" title="Excluir nota" onClick={() => excluirNota(n.id)} className="shrink-0 rounded p-0.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive">
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
+          <Collapsible open={notasAbertas} onOpenChange={setNotasAbertas} className="space-y-1">
+            <div className="space-y-1">{notas.slice(0, 3).map(renderNota)}</div>
+            {notas.length > 3 && (
+              <>
+                <CollapsibleContent className="max-h-40 space-y-1 overflow-y-auto">
+                  {notas.slice(3).map(renderNota)}
+                </CollapsibleContent>
+                <CollapsibleTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-6 w-full text-[11px] text-muted-foreground">
+                    <ChevronDown className={`mr-1 h-3 w-3 transition-transform ${notasAbertas ? "rotate-180" : ""}`} />
+                    {notasAbertas ? "Mostrar menos" : `Ver todas as ${notas.length}`}
+                  </Button>
+                </CollapsibleTrigger>
+              </>
+            )}
+          </Collapsible>
         </div>
       )}
+
       {/* Mensagens */}
       <div className="chat-wallpaper min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-4 sm:px-8">
 
