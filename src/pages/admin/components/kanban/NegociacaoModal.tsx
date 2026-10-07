@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Check, X, Trash2, Plus, UserCheck, MessageCirclePlus, Link2, MessageCircle, History } from "lucide-react";
+import { Check, X, Trash2, Plus, UserCheck, MessageCirclePlus, Link2, MessageCircle, History, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { ETAPAS, brl, type EtapaId, type Negociacao, type VendedorLite } from "./types";
 import { usePermissions } from "@/hooks/usePermissions";
@@ -16,6 +16,7 @@ import { type Conversa } from "../conversas/ConversaChat";
 import { useNavigate } from "@/lib/router-compat";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { tagDef, tagsDe, useEtiquetas } from "../conversas/tags";
+import { confirmacaoEtapa, statusDaEtapa } from "./negociacaoStatus";
 
 interface Props {
   negociacao: Negociacao | null;
@@ -46,6 +47,7 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
   const navigate = useNavigate();
   const etiquetas = useEtiquetas();
   const [nomesEquipe, setNomesEquipe] = useState<Record<string, string>>({});
+  const [salvandoEtapa, setSalvandoEtapa] = useState(false);
   useEffect(() => { getEquipe().then((data) => setNomesEquipe(Object.fromEntries((data).map((u) => [u.id, u.nome])))); }, []);
 
   useEffect(() => setN(negociacao), [negociacao]);
@@ -127,10 +129,25 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
   const canDelete = can("negociacoes", "delete", n.responsavel_id);
 
   const patchN = async (patch: Partial<Negociacao>) => {
-    setN((prev) => (prev ? { ...prev, ...patch } as Negociacao : prev));
-    const { error } = await supabase.from("negociacoes").update(patch as any).eq("id", n.id);
-    if (error) toast.error(error.message);
-    else onChanged();
+    if (!canEdit || salvandoEtapa) return;
+    const etapa = patch.etapa;
+    if (etapa) setSalvandoEtapa(true);
+    const dados = etapa ? { ...patch, status: statusDaEtapa(etapa) } : patch;
+    try {
+      const { data, error } = await supabase.from("negociacoes").update(dados).eq("id", n.id).select("*").single();
+      if (error) throw error;
+      setN(data as Negociacao);
+      if (etapa) {
+        toast.success(confirmacaoEtapa(etapa, n.status));
+        const { data: historico } = await supabase.from("negociacao_historico").select("*").eq("negociacao_id", n.id).order("created_at", { ascending: false });
+        if (historico) setHist(historico as Hist[]);
+      }
+      onChanged();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Não foi possível salvar a negociação");
+    } finally {
+      if (etapa) setSalvandoEtapa(false);
+    }
   };
 
   const addTarefa = async () => {
@@ -205,10 +222,11 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
             )}
             {canEdit && (
               <>
-                <Button size="sm" variant="outline" className="text-emerald-600" onClick={irParaVenda}>
+                {n.status !== "aberto" && <Button size="sm" variant="outline" disabled={salvandoEtapa} onClick={() => patchN({ etapa: "entrada" })}><RotateCcw className="h-4 w-4 mr-1" /> Reabrir</Button>}
+                <Button size="sm" variant="outline" className="text-accent" disabled={salvandoEtapa || n.status === "ganho"} onClick={irParaVenda}>
                   <Check className="h-4 w-4 mr-1" /> Ganho
                 </Button>
-                <Button size="sm" variant="outline" className="text-destructive" onClick={() => patchN({ etapa: "perdido" })}>
+                <Button size="sm" variant="outline" className="text-destructive" disabled={salvandoEtapa || n.status === "perdido"} onClick={() => patchN({ etapa: "perdido" })}>
                   <X className="h-4 w-4 mr-1" /> Perdido
                 </Button>
               </>
@@ -238,7 +256,7 @@ export function NegociacaoModal({ negociacao, vendedores, numeroMap = {}, onClos
           {ETAPAS.map((e) => (
             <button
               key={e.id}
-              disabled={!canEdit}
+              disabled={!canEdit || salvandoEtapa}
               onClick={() => {
                 if (e.id === "venda_realizada" && n.etapa !== "venda_realizada") {
                   irParaVenda();
