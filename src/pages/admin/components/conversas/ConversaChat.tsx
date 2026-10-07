@@ -19,6 +19,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { ptBR } from "date-fns/locale";
 import { format } from "date-fns";
 import { GravadorVoz, AudioBolha } from "./VozMensagem";
+import { AnexoMensagem } from "./AnexoMensagem";
 import { AgendamentoDialog, type AgendamentoItem } from "./AgendamentoDialog";
 
 export interface Conversa {
@@ -461,6 +462,10 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
                 {m.tipo === "audio" && m.midia_path ? (
                   <div className={`rounded-2xl px-3 py-1.5 shadow-sm ${saida ? "bg-chat-out" : "bg-chat-in"}`}>
                     <AudioBolha mensagemId={m.id} iniciais={iniciais(autor)} hora={fmtHora(m.created_at)} />
+                  </div>
+                ) : (["document", "image", "video", "sticker", "audio"].includes(m.tipo) || /^\[(Documento|Imagem|Vídeo|Áudio|Figurinha)\]/i.test(m.conteudo || "")) ? (
+                  <div className={`max-w-full rounded-2xl px-3 py-2 shadow-sm ${saida ? "bg-chat-out" : "bg-chat-in"}`}>
+                    <AnexoMensagem mensagemId={m.id} tipo={m.tipo === "text" ? "document" : m.tipo} conteudo={m.conteudo} disponivel={Boolean(m.midia_path)} recebido={!saida} hora={fmtHora(m.created_at)} />
                   </div>
                 ) : (
                 <div className={`flex items-end gap-2 rounded-2xl px-3.5 py-2 text-sm shadow-sm ${saida ? "bg-chat-out" : "bg-chat-in"}`}>
