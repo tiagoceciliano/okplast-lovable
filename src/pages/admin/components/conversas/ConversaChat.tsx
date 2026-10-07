@@ -113,6 +113,8 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
   const [nota, setNota] = useState("");
   const [salvandoNota, setSalvandoNota] = useState(false);
   const [anexando, setAnexando] = useState(false);
+  const [arquivo, setArquivo] = useState<File | null>(null);
+  const [arquivoUrl, setArquivoUrl] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
