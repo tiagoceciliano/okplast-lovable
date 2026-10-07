@@ -105,9 +105,6 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
   const [agItem, setAgItem] = useState<AgendamentoItem | null>(null);
   const [listaAgOpen, setListaAgOpen] = useState(false);
   const [agendamentoOpen, setAgendamentoOpen] = useState(false);
-  const [dataAgendada, setDataAgendada] = useState<Date>();
-  const [horaAgendada, setHoraAgendada] = useState("");
-  const [agendando, setAgendando] = useState(false);
   const [agora, setAgora] = useState(() => Date.now());
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [notaOpen, setNotaOpen] = useState(false);
@@ -274,42 +271,6 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
     const proximas = tags.includes(tagId) ? tags.filter((id) => id !== tagId) : [...tags, tagId];
     const { error } = await supabase.from("whatsapp_conversas").update({ tags: proximas }).eq("id", conversa.id);
     if (error) toast.error(error.message); else onTagsChange?.(proximas);
-  };
-
-  const horarioAgendado = useMemo(() => {
-    if (!dataAgendada || !horaAgendada) return null;
-    const [hours, minutes] = horaAgendada.split(":").map(Number);
-    const value = new Date(dataAgendada);
-    value.setHours(hours || 0, minutes || 0, 0, 0);
-    return value;
-  }, [dataAgendada, horaAgendada]);
-
-  const agendar = async () => {
-    if (!texto.trim() || !horarioAgendado || agendando) return;
-    if (horarioAgendado.getTime() <= Date.now()) { toast.error("Escolha um horário futuro."); return; }
-    if (horarioAgendado.getTime() >= limite) { toast.error("O envio precisa acontecer antes do fim da janela de 24 horas."); return; }
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { toast.error("Sessão inválida."); return; }
-    setAgendando(true);
-    const { error } = await supabase.from("whatsapp_agendamentos").insert({
-      conversa_id: conversa.id,
-      autor_id: user.id,
-      texto: texto.trim(),
-      enviar_em: horarioAgendado.toISOString(),
-      janela_limite: new Date(limite).toISOString(),
-    });
-    setAgendando(false);
-    if (error) { toast.error(error.message); return; }
-    setTexto(""); setDataAgendada(undefined); setHoraAgendada(""); setAgendamentoOpen(false);
-    await carregarAgendamentos();
-    toast.success("Mensagem agendada");
-  };
-
-  const cancelarAgendamento = async (id: string) => {
-    const { error } = await supabase.rpc("cancel_whatsapp_agendamento", { _id: id });
-    if (error) { toast.error(error.message); return; }
-    await carregarAgendamentos();
-    toast.success("Agendamento cancelado");
   };
 
   const anexar = async (file: File | undefined) => {
