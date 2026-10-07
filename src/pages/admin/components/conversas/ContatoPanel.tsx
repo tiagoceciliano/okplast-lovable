@@ -235,18 +235,24 @@ export function ContatoPanel({ conversa, onNomeAtualizado, onNegociacaoVinculada
              <div className="space-y-2">
              {(() => {
                const renderCard = (n: Negociacao) => {
-               const etapa = ETAPAS.find((e) => e.id === n.etapa)?.label;
-               const ativoCard = n.id === selId;
-               const editavel = can("negociacoes", "edit", n.responsavel_id);
-               return (
-                 <div key={n.id} className={`rounded-md border transition ${ativoCard ? "border-primary/50 bg-muted/30" : "hover:border-primary/30"}`}>
+                const etapa = ETAPAS.find((e) => e.id === n.etapa)?.label;
+                const ativoCard = n.id === selId;
+                const editavel = can("negociacoes", "edit", n.responsavel_id);
+                const cor = n.status === "perdido"
+                  ? "border-destructive/30 bg-destructive/10"
+                  : n.status === "ganho"
+                    ? "border-accent/30 bg-accent/10"
+                    : "border-muted-foreground/15 bg-muted/40";
+                return (
+                  <div key={n.id} className={`rounded-md border transition ${cor} ${ativoCard ? "ring-1 ring-primary/60" : "hover:border-primary/30"}`}>
+
                    <HoverCard openDelay={300} closeDelay={100}>
                      <HoverCardTrigger asChild>
                        <button type="button" onClick={() => setSelId(n.id)} className="w-full p-2.5 text-left">
                          <div className="flex items-start justify-between gap-2">
                            <div className="min-w-0">
                              <p className="truncate text-xs font-semibold">{n.nome_produto || n.produto || n.nome_cliente}</p>
-                             <p className={`text-[10px] font-semibold uppercase ${n.status === "aberto" ? "text-primary" : "text-muted-foreground"}`}>● {etapa}</p>
+                             <p className={`text-[10px] font-semibold uppercase ${n.status === "perdido" ? "text-destructive/80" : n.status === "ganho" ? "text-accent" : "text-primary"}`}>● {etapa}</p>
                            </div>
                            <span className="shrink-0 text-xs font-bold">{brl(n.valor)}</span>
                          </div>
@@ -293,38 +299,37 @@ export function ContatoPanel({ conversa, onNomeAtualizado, onNegociacaoVinculada
                const abertas = negs.filter((n) => n.status === "aberto");
                const ganhas = negs.filter((n) => n.status === "ganho");
                const perdidas = negs.filter((n) => n.status === "perdido");
-               const grupoFechado = (titulo: string, lista: Negociacao[], cor: string) => {
-                 if (lista.length === 0) return null;
-                 if (lista.length <= 3) {
-                   return (
-                     <div key={titulo} className="space-y-2">
-                       <p className={`text-[10px] font-semibold uppercase ${cor}`}>{titulo} ({lista.length})</p>
-                       {lista.map(renderCard)}
-                     </div>
-                   );
-                 }
-                 return (
-                   <Collapsible key={titulo} className="space-y-2">
-                     <p className={`text-[10px] font-semibold uppercase ${cor}`}>{titulo} ({lista.length})</p>
-                     {lista.slice(0, 3).map(renderCard)}
-                     <CollapsibleContent className="space-y-2">
-                       {lista.slice(3).map(renderCard)}
-                     </CollapsibleContent>
-                     <CollapsibleTrigger asChild>
-                       <Button variant="ghost" size="sm" className="h-7 w-full text-[11px] text-muted-foreground">
-                         <ChevronDown className="mr-1 h-3 w-3" /> Ver todas as {lista.length}
-                       </Button>
-                     </CollapsibleTrigger>
-                   </Collapsible>
-                 );
-               };
-               return (
-                 <>
-                   {abertas.map(renderCard)}
-                   {grupoFechado("Ganhas", ganhas, "text-accent")}
-                   {grupoFechado("Perdidas", perdidas, "text-destructive")}
-                 </>
-               );
+                const grupoRecolhivel = (titulo: string, lista: Negociacao[], cor: string) => {
+                  if (lista.length === 0) return null;
+                  return (
+                    <Collapsible key={titulo} className="space-y-2">
+                      <CollapsibleTrigger className={`group flex w-full items-center gap-1.5 rounded-md border px-2 py-1.5 text-[10px] font-semibold uppercase ${cor} hover:bg-muted/50`}>
+                        <span>{titulo}</span>
+                        <span className="rounded-full bg-background px-1.5 py-0.5 text-[10px] font-bold tabular-nums">{lista.length}</span>
+                        <ChevronDown className="ml-auto h-3.5 w-3.5 shrink-0 transition-transform group-data-[state=closed]:-rotate-90" />
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="space-y-2">
+                        {lista.map(renderCard)}
+                      </CollapsibleContent>
+                    </Collapsible>
+                  );
+                };
+                return (
+                  <>
+                    {abertas.length > 0 && (
+                      <div className="space-y-2">
+                        <p className="flex items-center gap-1.5 px-2 py-1.5 text-[10px] font-semibold uppercase text-muted-foreground">
+                          <span>Abertas</span>
+                          <span className="rounded-full bg-background px-1.5 py-0.5 text-[10px] font-bold tabular-nums">{abertas.length}</span>
+                        </p>
+                        {abertas.map(renderCard)}
+                      </div>
+                    )}
+                    {grupoRecolhivel("Ganhas", ganhas, "border-accent/30 bg-accent/10 text-accent")}
+                    {grupoRecolhivel("Perdidas", perdidas, "border-destructive/30 bg-destructive/10 text-destructive")}
+                  </>
+                );
+
              })()}
              </div>
            </Section>
