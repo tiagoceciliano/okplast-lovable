@@ -20,6 +20,7 @@ import { useNavigate } from "@/lib/router-compat";
 import { usePermissions } from "@/hooks/usePermissions";
 import { GanhoDialog } from "../kanban/GanhoDialog";
 import { confirmacaoEtapa, statusDaEtapa } from "../kanban/negociacaoStatus";
+import { NegAtividades } from "./NegAtividades";
 
 interface Nota {
   id: string;
@@ -44,7 +45,7 @@ const fmt = (iso: string) =>
 
 export function ContatoPanel({ conversa, onNomeAtualizado, onNegociacaoVinculada }: Props) {
   const navigate = useNavigate();
-  const { can } = usePermissions();
+  const { can, user } = usePermissions();
   const [ganhoPending, setGanhoPending] = useState<Negociacao | null>(null);
   const [salvandoStatus, setSalvandoStatus] = useState<string | null>(null);
   const [negs, setNegs] = useState<Negociacao[]>([]);
