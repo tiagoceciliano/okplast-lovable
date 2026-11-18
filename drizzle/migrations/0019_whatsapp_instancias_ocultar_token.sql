@@ -1,0 +1,2 @@
+REVOKE SELECT ON public.whatsapp_instancias FROM authenticated;
+GRANT SELECT (id, nome, user_id, phone_number_id, telefone, status, qr_code, qr_atualizado_em, ultimo_erro, created_at, updated_at) ON public.whatsapp_instancias TO authenticated;

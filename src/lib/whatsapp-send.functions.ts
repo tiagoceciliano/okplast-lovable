@@ -16,6 +16,17 @@ export const enviarWhatsApp = createServerFn({ method: "POST" }).inputValidator(
   const { admin, userId } = await requireCaller(header, ["admin", "gestor", "vendedor"]);
   if (!header) throw new Error("Não autenticado");
   const body = { ...data };
+  // Conversas de números conectados por QR Code (Uzapi) saem pelo próprio número, sem janela de 24h.
+  let instancia: { id: string; phone_number_id: string | null; status: string } | null = null;
+  let telefoneConversa = "";
+  if (body.conversa_id && !body.criar_apenas) {
+    const { data: c } = await admin.from("whatsapp_conversas").select("telefone,instancia_id").eq("id", body.conversa_id).maybeSingle();
+    if (c?.instancia_id) {
+      const { data: i } = await admin.from("whatsapp_instancias").select("id,phone_number_id,status").eq("id", c.instancia_id).maybeSingle();
+      instancia = i ?? null;
+      telefoneConversa = c.telefone;
+    }
+  }
   if (!body.criar_apenas && body.tipo === "text") {
     let responsavelId: string | null = null;
     if (body.conversa_id) {
@@ -28,6 +39,16 @@ export const enviarWhatsApp = createServerFn({ method: "POST" }).inputValidator(
     }
     if (!body.texto?.trim()) throw new Error("Escreva uma mensagem antes de enviar.");
     body.texto = assinarMensagem(await nomeResponsavel(admin, responsavelId, userId), body.texto);
+  }
+  if (instancia) {
+    if (instancia.status !== "conectado" || !instancia.phone_number_id) throw new Error("O número desta conversa está desconectado. Reconecte o QR Code em Configurações > Conexões WhatsApp.");
+    if (body.tipo !== "text") throw new Error("Números conectados por QR Code não usam modelos da Meta. Escreva a mensagem normalmente.");
+    const { enviarUzapi } = await import("@/lib/uzapi.server");
+    const waId = await enviarUzapi(instancia.phone_number_id, { to: telefoneConversa.replace(/\D/g, ""), type: "text", text: { preview_url: false, body: body.texto } });
+    const { data: mensagem, error: mErr } = await admin.from("whatsapp_mensagens").insert({ conversa_id: body.conversa_id, wa_message_id: waId, direcao: "saida", tipo: "text", conteudo: body.texto, status: "sent", autor_id: userId }).select("*").single();
+    if (mErr) throw new Error(mErr.message);
+    await admin.from("whatsapp_conversas").update({ ultima_mensagem: body.texto, ultima_mensagem_em: new Date().toISOString() }).eq("id", body.conversa_id!);
+    return { data: { mensagem }, error: null };
   }
   const { data: result, error } = await createCallerClient(header).functions.invoke("whatsapp-send", { body });
   if (error) {

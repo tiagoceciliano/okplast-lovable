@@ -127,6 +127,20 @@
       "when": 1794582959107,
       "tag": "0017_restrict_open_select_policies",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1795031675598,
+      "tag": "0018_whatsapp_instancias_uzapi",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1795031692573,
+      "tag": "0019_whatsapp_instancias_ocultar_token",
+      "breakpoints": true
     }
   ]
 }

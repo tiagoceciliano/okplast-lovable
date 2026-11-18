@@ -17,6 +17,7 @@ import { Route as PublicPoliticaVendaRouteImport } from './routes/_public/politi
 import { Route as PublicSobreNosRouteImport } from './routes/_public/sobre-nos'
 import { Route as PublicTermoUsoRouteImport } from './routes/_public/termo-uso'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminConexoesRouteImport } from './routes/admin/conexoes'
 import { Route as AdminConversasRouteImport } from './routes/admin/conversas'
 import { Route as AdminGruposRouteImport } from './routes/admin/grupos'
 import { Route as AdminInvestimentoRouteImport } from './routes/admin/investimento'
@@ -45,6 +46,7 @@ import { Route as PublicHomeSobreNosRouteImport } from './routes/_public/home/so
 import { Route as PublicHomeTermoDeUsoRouteImport } from './routes/_public/home/termo-de-uso'
 import { Route as ApiPublicWhatsappProcessSchedulesRouteImport } from './routes/api/public/whatsapp/process-schedules'
 import { Route as ApiPublicWhatsappWebhookRouteImport } from './routes/api/public/whatsapp/webhook'
+import { Route as ApiPublicUzapiWebhookTokenRouteImport } from './routes/api/public/uzapi/webhook/$token'
 
 const PublicRoute = PublicRouteImport.update({
   id: '/_public',
@@ -84,6 +86,11 @@ const PublicTermoUsoRoute = PublicTermoUsoRouteImport.update({
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminConexoesRoute = AdminConexoesRouteImport.update({
+  id: '/admin/conexoes',
+  path: '/admin/conexoes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminConversasRoute = AdminConversasRouteImport.update({
@@ -235,6 +242,12 @@ const ApiPublicWhatsappWebhookRoute =
     path: '/api/public/whatsapp/webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicUzapiWebhookTokenRoute =
+  ApiPublicUzapiWebhookTokenRouteImport.update({
+    id: '/api/public/uzapi/webhook/$token',
+    path: '/api/public/uzapi/webhook/$token',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
@@ -243,6 +256,7 @@ export interface FileRoutesByFullPath {
   '/politica-venda': typeof PublicPoliticaVendaRoute
   '/sobre-nos': typeof PublicSobreNosRoute
   '/termo-uso': typeof PublicTermoUsoRoute
+  '/admin/conexoes': typeof AdminConexoesRoute
   '/admin/conversas': typeof AdminConversasRoute
   '/admin/grupos': typeof AdminGruposRoute
   '/admin/investimento': typeof AdminInvestimentoRoute
@@ -272,6 +286,7 @@ export interface FileRoutesByFullPath {
   '/chapas/': typeof PublicChapasIndexRoute
   '/api/public/whatsapp/process-schedules': typeof ApiPublicWhatsappProcessSchedulesRoute
   '/api/public/whatsapp/webhook': typeof ApiPublicWhatsappWebhookRoute
+  '/api/public/uzapi/webhook/$token': typeof ApiPublicUzapiWebhookTokenRoute
 }
 export interface FileRoutesByTo {
   '/chapas-de-acrilico': typeof PublicChapasDeAcrilicoRoute
@@ -279,6 +294,7 @@ export interface FileRoutesByTo {
   '/politica-venda': typeof PublicPoliticaVendaRoute
   '/sobre-nos': typeof PublicSobreNosRoute
   '/termo-uso': typeof PublicTermoUsoRoute
+  '/admin/conexoes': typeof AdminConexoesRoute
   '/admin/conversas': typeof AdminConversasRoute
   '/admin/grupos': typeof AdminGruposRoute
   '/admin/investimento': typeof AdminInvestimentoRoute
@@ -309,6 +325,7 @@ export interface FileRoutesByTo {
   '/chapas': typeof PublicChapasIndexRoute
   '/api/public/whatsapp/process-schedules': typeof ApiPublicWhatsappProcessSchedulesRoute
   '/api/public/whatsapp/webhook': typeof ApiPublicWhatsappWebhookRoute
+  '/api/public/uzapi/webhook/$token': typeof ApiPublicUzapiWebhookTokenRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -318,6 +335,7 @@ export interface FileRoutesById {
   '/_public/politica-venda': typeof PublicPoliticaVendaRoute
   '/_public/sobre-nos': typeof PublicSobreNosRoute
   '/_public/termo-uso': typeof PublicTermoUsoRoute
+  '/admin/conexoes': typeof AdminConexoesRoute
   '/admin/conversas': typeof AdminConversasRoute
   '/admin/grupos': typeof AdminGruposRoute
   '/admin/investimento': typeof AdminInvestimentoRoute
@@ -348,6 +366,7 @@ export interface FileRoutesById {
   '/_public/chapas/': typeof PublicChapasIndexRoute
   '/api/public/whatsapp/process-schedules': typeof ApiPublicWhatsappProcessSchedulesRoute
   '/api/public/whatsapp/webhook': typeof ApiPublicWhatsappWebhookRoute
+  '/api/public/uzapi/webhook/$token': typeof ApiPublicUzapiWebhookTokenRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -358,6 +377,7 @@ export interface FileRouteTypes {
     | '/politica-venda'
     | '/sobre-nos'
     | '/termo-uso'
+    | '/admin/conexoes'
     | '/admin/conversas'
     | '/admin/grupos'
     | '/admin/investimento'
@@ -387,6 +407,7 @@ export interface FileRouteTypes {
     | '/chapas/'
     | '/api/public/whatsapp/process-schedules'
     | '/api/public/whatsapp/webhook'
+    | '/api/public/uzapi/webhook/$token'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/chapas-de-acrilico'
@@ -394,6 +415,7 @@ export interface FileRouteTypes {
     | '/politica-venda'
     | '/sobre-nos'
     | '/termo-uso'
+    | '/admin/conexoes'
     | '/admin/conversas'
     | '/admin/grupos'
     | '/admin/investimento'
@@ -424,6 +446,7 @@ export interface FileRouteTypes {
     | '/chapas'
     | '/api/public/whatsapp/process-schedules'
     | '/api/public/whatsapp/webhook'
+    | '/api/public/uzapi/webhook/$token'
   id:
     | '__root__'
     | '/_public'
@@ -432,6 +455,7 @@ export interface FileRouteTypes {
     | '/_public/politica-venda'
     | '/_public/sobre-nos'
     | '/_public/termo-uso'
+    | '/admin/conexoes'
     | '/admin/conversas'
     | '/admin/grupos'
     | '/admin/investimento'
@@ -462,10 +486,12 @@ export interface FileRouteTypes {
     | '/_public/chapas/'
     | '/api/public/whatsapp/process-schedules'
     | '/api/public/whatsapp/webhook'
+    | '/api/public/uzapi/webhook/$token'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   PublicRoute: typeof PublicRouteWithChildren
+  AdminConexoesRoute: typeof AdminConexoesRoute
   AdminConversasRoute: typeof AdminConversasRoute
   AdminGruposRoute: typeof AdminGruposRoute
   AdminInvestimentoRoute: typeof AdminInvestimentoRoute
@@ -482,6 +508,7 @@ export interface RootRouteChildren {
   AdminIndexRoute: typeof AdminIndexRoute
   ApiPublicWhatsappProcessSchedulesRoute: typeof ApiPublicWhatsappProcessSchedulesRoute
   ApiPublicWhatsappWebhookRoute: typeof ApiPublicWhatsappWebhookRoute
+  ApiPublicUzapiWebhookTokenRoute: typeof ApiPublicUzapiWebhookTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -540,6 +567,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/conexoes': {
+      id: '/admin/conexoes'
+      path: '/admin/conexoes'
+      fullPath: '/admin/conexoes'
+      preLoaderRoute: typeof AdminConexoesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/conversas': {
@@ -738,6 +772,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicWhatsappWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/uzapi/webhook/$token': {
+      id: '/api/public/uzapi/webhook/$token'
+      path: '/api/public/uzapi/webhook/$token'
+      fullPath: '/api/public/uzapi/webhook/$token'
+      preLoaderRoute: typeof ApiPublicUzapiWebhookTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -792,6 +833,7 @@ const PublicRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   PublicRoute: PublicRouteWithChildren,
+  AdminConexoesRoute: AdminConexoesRoute,
   AdminConversasRoute: AdminConversasRoute,
   AdminGruposRoute: AdminGruposRoute,
   AdminInvestimentoRoute: AdminInvestimentoRoute,
@@ -809,6 +851,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicWhatsappProcessSchedulesRoute:
     ApiPublicWhatsappProcessSchedulesRoute,
   ApiPublicWhatsappWebhookRoute: ApiPublicWhatsappWebhookRoute,
+  ApiPublicUzapiWebhookTokenRoute: ApiPublicUzapiWebhookTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

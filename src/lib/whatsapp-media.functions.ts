@@ -23,7 +23,7 @@ export const sendWhatsAppMedia = createServerFn({ method: "POST" })
     const { userId, admin } = await requireCaller(getRequestHeader("Authorization"), ["admin", "gestor", "vendedor"]);
     const { data: conversa, error: conversaError } = await admin
       .from("whatsapp_conversas")
-      .select("id,telefone,responsavel_id,ultima_entrada_cliente_em")
+      .select("id,telefone,responsavel_id,ultima_entrada_cliente_em,instancia_id")
       .eq("id", data.conversaId)
       .maybeSingle();
     if (conversaError || !conversa) throw new Error("Conversa não encontrada");
@@ -34,16 +34,19 @@ export const sendWhatsAppMedia = createServerFn({ method: "POST" })
       throw new Error("Esta conversa pertence a outro vendedor");
     }
     const lastInbound = conversa.ultima_entrada_cliente_em ? new Date(conversa.ultima_entrada_cliente_em).getTime() : 0;
-    if (!lastInbound || Date.now() - lastInbound >= 24 * 60 * 60 * 1000) {
+    const { data: instancia } = conversa.instancia_id
+      ? await admin.from("whatsapp_instancias").select("phone_number_id,status").eq("id", conversa.instancia_id).maybeSingle()
+      : { data: null };
+    if (!instancia && (!lastInbound || Date.now() - lastInbound >= 24 * 60 * 60 * 1000)) {
       throw new Error("A janela de 24 horas está fechada");
     }
 
     const lovableKey = process.env['LOVABLE_API_KEY'];
     const whatsappKey = process.env['WHATSAPP_API_KEY'];
-    if (!lovableKey || !whatsappKey) throw new Error("Conexão WhatsApp não configurada");
+    if (!instancia && (!lovableKey || !whatsappKey)) throw new Error("Conexão WhatsApp não configurada");
 
     const bytes = Uint8Array.from(atob(data.base64), (char) => char.charCodeAt(0));
-    const headers = { Authorization: `Bearer ${lovableKey}`, "X-Connection-Api-Key": whatsappKey };
+    const headers = { Authorization: `Bearer ${lovableKey ?? ""}`, "X-Connection-Api-Key": whatsappKey ?? "" };
     // O gateway não aceita upload direto: guardamos o arquivo e enviamos um link temporário.
     const safeName = data.nome.replace(/[^\w.\-]+/g, "_");
     const path = `${conversa.id}/${Date.now()}-${safeName}`;
@@ -55,6 +58,12 @@ export const sendWhatsAppMedia = createServerFn({ method: "POST" })
     const permiteLegenda = !data.mime.startsWith("audio/");
     const legenda = permiteLegenda ? assinarMensagem(await nomeResponsavel(admin, conversa.responsavel_id, userId), data.legenda || "", 1024) : data.legenda;
     const { tipo, payload } = whatsappMediaPayload({ ...data, legenda }, signed.signedUrl, conversa.telefone);
+    let waId: string | null = null;
+    if (instancia) {
+      if (instancia.status !== "conectado" || !instancia.phone_number_id) throw new Error("O número desta conversa está desconectado");
+      const { enviarUzapi } = await import("@/lib/uzapi.server");
+      waId = await enviarUzapi(instancia.phone_number_id, { ...payload, to: conversa.telefone.replace(/\D/g, "") });
+    } else {
     const sent = await fetch(`${GATEWAY_URL}/messages`, {
       method: "POST",
       headers: { ...headers, "Content-Type": "application/json" },
@@ -67,7 +76,8 @@ export const sendWhatsAppMedia = createServerFn({ method: "POST" })
       try { motivo = (JSON.parse(sentText) as any)?.error?.message ?? ""; } catch { /* ignora */ }
       throw new Error(`O WhatsApp recusou o arquivo${motivo ? ": " + motivo : ""}`);
     }
-    const waId = (JSON.parse(sentText) as { messages?: Array<{ id?: string }> }).messages?.[0]?.id ?? null;
+    waId = (JSON.parse(sentText) as { messages?: Array<{ id?: string }> }).messages?.[0]?.id ?? null;
+    }
     const conteudo = legenda?.trim() || `[${tipo === "image" ? "Imagem" : tipo === "video" ? "Vídeo" : tipo === "audio" ? (data.voz ? "Mensagem de voz" : "Áudio") : "Documento"}] ${data.nome}`;
     const { data: mensagem, error: mensagemError } = await admin.from("whatsapp_mensagens").insert({
       conversa_id: conversa.id,

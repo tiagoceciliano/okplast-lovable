@@ -34,6 +34,7 @@ export interface Conversa {
   ultima_entrada_cliente_em: string | null;
   nao_lidas: number;
   resolvida_em?: string | null;
+  instancia_id?: string | null;
 }
 
 interface Mensagem {
@@ -72,6 +73,7 @@ function fmtHora(iso: string) {
 }
 
 export function janelaAberta(conversa: Conversa | null): boolean {
+  if (conversa?.instancia_id) return true; // números via QR Code não têm janela de 24h
   if (!conversa?.ultima_entrada_cliente_em) return false;
   return Date.now() - new Date(conversa.ultima_entrada_cliente_em).getTime() < 24 * 60 * 60 * 1000;
 }
@@ -122,8 +124,9 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const limite = janelaLimite(conversa);
-  const aberta = limite > agora;
+  const viaQr = !!conversa.instancia_id;
+  const limite = viaQr ? Number.MAX_SAFE_INTEGER : janelaLimite(conversa);
+  const aberta = viaQr || limite > agora;
   const restante = Math.max(0, limite - agora);
 
   useEffect(() => {
@@ -388,6 +391,11 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div className="grid min-h-11 shrink-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b px-3 py-1.5">
+        {viaQr ? (
+          <div className="flex min-w-0 items-center gap-1.5 rounded-full bg-emerald-500/15 px-3 py-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-400">
+            <Clock className="h-4 w-4 shrink-0" /><span className="truncate">Número via QR Code · sem limite de 24h</span>
+          </div>
+        ) : (
         <div className={`flex min-w-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold tabular-nums ${
           !aberta
             ? "bg-destructive/10 text-destructive"
@@ -402,6 +410,7 @@ export function ConversaChat({ conversa, onMarcarLida, tags = [], etiquetas: tod
             {aberta ? `Janela encerra em ${formatRemaining(restante)}` : "Janela de 24h encerrada"}
           </span>
         </div>
+        )}
         <div className="flex shrink-0 items-center gap-1">
         <Button variant="ghost" size="sm" className="h-8" onClick={alternarResolvida}><Check className="h-4 w-4" /> {resolvida ? "Reabrir" : "Resolver"}</Button>
         <Popover>

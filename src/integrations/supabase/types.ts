@@ -739,6 +739,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          instancia_id: string | null
           nao_lidas: number
           negociacao_id: string | null
           nome_contato: string | null
@@ -754,6 +755,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          instancia_id?: string | null
           nao_lidas?: number
           negociacao_id?: string | null
           nome_contato?: string | null
@@ -769,6 +771,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          instancia_id?: string | null
           nao_lidas?: number
           negociacao_id?: string | null
           nome_contato?: string | null
@@ -783,6 +786,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "whatsapp_conversas_instancia_id_fkey"
+            columns: ["instancia_id"]
+            isOneToOne: false
+            referencedRelation: "whatsapp_instancias"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "whatsapp_conversas_negociacao_id_fkey"
             columns: ["negociacao_id"]
             isOneToOne: false
@@ -790,6 +800,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      whatsapp_instancias: {
+        Row: {
+          created_at: string
+          id: string
+          nome: string
+          phone_number_id: string | null
+          qr_atualizado_em: string | null
+          qr_code: string | null
+          status: string
+          telefone: string | null
+          ultimo_erro: string | null
+          updated_at: string
+          user_id: string | null
+          webhook_token: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nome: string
+          phone_number_id?: string | null
+          qr_atualizado_em?: string | null
+          qr_code?: string | null
+          status?: string
+          telefone?: string | null
+          ultimo_erro?: string | null
+          updated_at?: string
+          user_id?: string | null
+          webhook_token?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nome?: string
+          phone_number_id?: string | null
+          qr_atualizado_em?: string | null
+          qr_code?: string | null
+          status?: string
+          telefone?: string | null
+          ultimo_erro?: string | null
+          updated_at?: string
+          user_id?: string | null
+          webhook_token?: string
+        }
+        Relationships: []
       }
       whatsapp_mensagens: {
         Row: {
