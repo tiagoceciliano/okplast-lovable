@@ -84,19 +84,52 @@ export default function Conexoes() {
   useEffect(() => { carregar(); getEquipe().then(setEquipe).catch(() => {}); }, [carregar]);
 
   const qrInst = lista.find((i) => i.id === qrId) ?? null;
+  const [qrErro, setQrErro] = useState<string | null>(null);
+  const [qrTentativa, setQrTentativa] = useState(0);
+  const tentarNovamente = () => { setQrErro(null); setQrTentativa((n) => n + 1); };
   // Enquanto o QR estiver aberto, consulta a Uzapi a cada 4s até conectar.
   useEffect(() => {
     if (!qrId) return;
     let ativo = true;
-    void autenticarConexao({ data: { id: qrId } }).catch((e) => { if (ativo) toast.error(e instanceof Error ? e.message : "Falha ao autenticar"); });
-    const tick = async () => { await atualizarConexao({ data: { id: qrId } }).catch(() => {}); if (ativo) await carregar(); };
+    setQrErro(null);
+    const inicio = Date.now();
+    void autenticarConexao({ data: { id: qrId } }).catch((e) => {
+      if (ativo) setQrErro(`Não foi possível iniciar a autenticação no UnoTalk. ${e instanceof Error ? e.message : ""}`.trim());
+    });
+    const tick = async () => {
+      try { await atualizarConexao({ data: { id: qrId } }); }
+      catch (e) { if (ativo) setQrErro(`Não foi possível consultar o status da conexão. ${e instanceof Error ? e.message : ""}`.trim()); }
+      if (!ativo) return;
+      await carregar();
+      if (Date.now() - inicio > 90000) setQrErro((v) => v ?? "O QR Code demorou demais para carregar. Tente novamente.");
+    };
     tick();
     const t = window.setInterval(tick, 4000);
     return () => { ativo = false; window.clearInterval(t); };
-  }, [qrId, carregar]);
+  }, [qrId, qrTentativa, carregar]);
+  // Limpa o aviso de demora quando o QR chega.
+  useEffect(() => { if (qrInst?.qr_code) setQrErro((v) => (v?.startsWith("O QR Code demorou") ? null : v)); }, [qrInst?.qr_code]);
   useEffect(() => {
-    if (qrInst?.status === "conectado") { toast.success(`${qrInst.nome} conectado!`); setQrId(null); }
+    if (qrInst?.status === "conectado") { toast.success(`${qrInst.nome} conectado e ativo no UnoTalk!`); setQrId(null); }
   }, [qrInst?.status, qrInst?.nome]);
+  // Fora do QR, confirma periodicamente o status das conexões ainda não ativas (ex.: Amanda e Allan).
+  const pendentes = lista.filter((i) => i.status !== "conectado").map((i) => i.id).join(",");
+  useEffect(() => {
+    if (qrId || !pendentes) return;
+    let ativo = true;
+    const tick = async () => {
+      const antes = new Map(lista.map((i) => [i.id, i.status]));
+      await Promise.all(pendentes.split(",").map((id) => atualizarConexao({ data: { id } }).catch(() => {})));
+      if (!ativo) return;
+      const { data } = await supabase.from("whatsapp_instancias").select("id,nome,user_id,telefone,status,qr_code,ultimo_erro").order("created_at");
+      if (!ativo || !data) return;
+      (data as Inst[]).forEach((i) => { if (i.status === "conectado" && antes.get(i.id) !== "conectado") toast.success(`${i.nome} está ativo no UnoTalk`); });
+      setLista(data as Inst[]);
+    };
+    const t = window.setInterval(tick, 15000);
+    return () => { ativo = false; window.clearInterval(t); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendentes, qrId]);
 
   const criar = async () => {
     setSalvando(true);
@@ -224,7 +257,18 @@ export default function Conexoes() {
         <DialogContent className="max-w-sm">
           <DialogHeader><DialogTitle>Conectar {qrInst?.nome}</DialogTitle><DialogDescription>No celular: WhatsApp Business → Aparelhos conectados → Conectar aparelho, e aponte para o código.</DialogDescription></DialogHeader>
           <div className="flex min-h-64 items-center justify-center">
-            {qrInst?.qr_code ? <QrView valor={qrInst.qr_code} /> : (
+            {qrErro && !qrInst?.qr_code ? (
+              <div className="space-y-3 text-center text-sm">
+                <p className="font-medium text-destructive">Erro ao carregar o QR Code</p>
+                <p className="text-muted-foreground">{qrErro}</p>
+                <Button variant="outline" onClick={tentarNovamente}><RotateCw className="h-4 w-4" /> Tentar novamente</Button>
+              </div>
+            ) : qrInst?.qr_code ? (
+              <div className="flex flex-col items-center gap-2">
+                <QrView valor={qrInst.qr_code} />
+                {qrErro && <div className="text-center text-xs text-destructive">{qrErro} <Button variant="link" size="sm" className="h-auto p-0" onClick={tentarNovamente}>Tentar novamente</Button></div>}
+              </div>
+            ) : (
               <div className="text-center text-sm text-muted-foreground"><Loader2 className="mx-auto mb-2 h-6 w-6 animate-spin" />Gerando QR Code…{qrInst?.ultimo_erro && <p className="mt-2 text-destructive">{qrInst.ultimo_erro}</p>}</div>
             )}
           </div>
