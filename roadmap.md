@@ -50,6 +50,7 @@
 - [x] Validar CRUD e apresentação autenticada
 
 ## Canais de atendimento
+- [x] Corrigir leitura de qrcode[].code e recuperar eventos recentes por número; QR real da Amanda e do Allan renderizado e testes aprovados
 - [x] Reproduzir o menu de ações do UnoTalk; detalhes e janela de autenticação verificados na conta autenticada (QR ainda depende do retorno do provedor)
 - [x] Importar somente as conexões existentes Amanda/Allan e verificar os cartões autenticados
 - [x] Tela Canais com WhatsApp QR Code, API oficial e Modelos

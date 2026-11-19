@@ -15,3 +15,4 @@
 - QR-code WhatsApp numbers (Uzapi) live in `whatsapp_instancias`; conversations carry `instancia_id` and replies go out through that instance with no 24-hour window. Each instance's webhook URL embeds a random per-instance token (hidden from the browser) because Uzapi does not sign webhooks.
 - Existing UnoTalk connections are imported by explicit phone-number IDs with per-instance server secrets; never rely on an undocumented account-list endpoint or log credential-bearing provider responses.
 - Connection actions use the shared Radix dropdown menu and existing authenticated operations; instance details expose only safe local fields, never provider credentials.
+- Uzapi QR codes come from authentication webhook `qrcode[].code`; polling recovers recent events scoped to phone-number ID, while phone fields must never match provider IDs.

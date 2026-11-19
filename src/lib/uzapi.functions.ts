@@ -3,6 +3,7 @@ import { getRequestHeader } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireCaller, createCallerClient } from "@/lib/supabase-server";
 import { CONEXOES_UNOTALK } from "@/lib/uzapi-conexoes";
+import { telefoneInstancia } from "@/lib/uzapi-qr";
 
 const gestor = () => requireCaller(getRequestHeader("Authorization"), ["admin", "gestor"]);
 
@@ -34,16 +35,27 @@ export const atualizarConexao = createServerFn({ method: "POST" })
   .inputValidator((i) => z.object({ id: z.string().uuid() }).parse(i))
   .handler(async ({ data }) => {
     const { admin } = await requireCaller(getRequestHeader("Authorization"), ["admin", "gestor", "vendedor"]);
-    const { uzFetch, acharQr, acharStatus, acharChave } = await import("@/lib/uzapi.server");
+    const { uzFetch, acharQr, acharStatus } = await import("@/lib/uzapi.server");
     const { data: inst } = await admin.from("whatsapp_instancias").select("*").eq("id", data.id).maybeSingle();
     if (!inst?.phone_number_id) return { status: inst?.status ?? "erro" };
     try {
       const r = await uzFetch(`/${inst.phone_number_id}/instance`);
-      const status = acharStatus(r) ?? inst.status;
-      const qr = status === "conectado" ? null : acharQr(r) ?? inst.qr_code;
-      const tel = acharChave(r, (k) => /display_phone_number|phoneNumber|wid|number/i.test(k));
+      const remoteStatus = acharStatus(r) ?? inst.status;
+      // Read only the latest event for this number; never cross instance QR codes.
+      const { data: eventos, error: eventoError } = await admin.from("whatsapp_webhook_events")
+        .select("payload,received_at")
+        .eq("event", "uzapi.authentication")
+        .contains("payload", { entry: [{ changes: [{ value: { metadata: { phone_number_id: inst.phone_number_id } } }] }] })
+        .gte("received_at", new Date(Date.now() - 90000).toISOString())
+        .order("received_at", { ascending: false }).limit(1);
+      if (eventoError) throw new Error("Não foi possível consultar o QR Code recebido.");
+      const evento = eventos?.[0];
+      const qrEvento = acharQr(evento?.payload);
+      const qr = remoteStatus === "conectado" ? null : acharQr(r) ?? qrEvento ?? inst.qr_code;
+      const status = qr && remoteStatus !== "conectado" ? "aguardando_qr" : remoteStatus;
+      const tel = telefoneInstancia(r) ?? CONEXOES_UNOTALK.find((c) => c.phoneNumberId === inst.phone_number_id)?.telefone;
       const upd: any = { status, qr_code: qr, ultimo_erro: null };
-      if (qr && qr !== inst.qr_code) upd.qr_atualizado_em = new Date().toISOString();
+      if (qr && qr !== inst.qr_code) upd.qr_atualizado_em = qrEvento ? evento?.received_at : new Date().toISOString();
       if (tel && /\d{10,}/.test(tel)) upd.telefone = tel.replace(/\D/g, "");
       await admin.from("whatsapp_instancias").update(upd).eq("id", inst.id);
       return { status };
@@ -51,6 +63,25 @@ export const atualizarConexao = createServerFn({ method: "POST" })
       await admin.from("whatsapp_instancias").update({ ultimo_erro: e instanceof Error ? e.message : String(e) }).eq("id", inst.id);
       return { status: inst.status };
     }
+  });
+
+export const autenticarConexao = createServerFn({ method: "POST" })
+  .inputValidator((i) => z.object({ id: z.string().uuid() }).parse(i))
+  .handler(async ({ data }) => {
+    const { admin } = await gestor();
+    const { uzFetch, acharStatus } = await import("@/lib/uzapi.server");
+    const { data: inst } = await admin.from("whatsapp_instancias").select("phone_number_id").eq("id", data.id).maybeSingle();
+    if (!inst?.phone_number_id) throw new Error("Número da conexão não encontrado.");
+    const remote = await uzFetch(`/${inst.phone_number_id}/instance`);
+    if (acharStatus(remote) !== "pausado") return { ok: true };
+    try {
+      await uzFetch(`/${inst.phone_number_id}/instance/resume`, { method: "POST" });
+    } catch {
+      // The provider may return 500 after successfully reactivating the instance.
+      const current = await uzFetch(`/${inst.phone_number_id}/instance`);
+      if (acharStatus(current) === "pausado") throw new Error("O UnoTalk não conseguiu reativar este número. Tente novamente.");
+    }
+    return { ok: true };
   });
 
 export const acaoConexao = createServerFn({ method: "POST" })

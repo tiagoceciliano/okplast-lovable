@@ -1,5 +1,6 @@
 // Cliente da Uzapi/UnoTalk (números conectados por QR Code). Só roda no servidor.
 import { CONEXOES_UNOTALK } from "./uzapi-conexoes";
+import { extrairQr } from "./uzapi-qr";
 const BASE = "https://api.uzapi.com.br/v1";
 export const WEBHOOK_BASE = "https://okplast.com.br";
 
@@ -37,12 +38,13 @@ export function acharChave(obj: any, teste: (k: string) => boolean, depth = 0): 
   return null;
 }
 
-export const acharQr = (o: any) => acharChave(o, (k) => /qr|base64/i.test(k));
+export const acharQr = extrairQr;
 export const acharPhoneId = (o: any) => acharChave(o, (k) => k === "phone_number_id" || k === "phoneNumberId" || k === "instanceId" || k === "id");
 
 export function acharStatus(o: any): string | null {
   if (o?.deploymentStatus === "paused") return "pausado";
   if (o?.isAuthenticated === true) return "conectado";
+  if (o?.deploymentStatus === "pending_auth") return "aguardando_qr";
   if (o?.isAuthenticated === false) return "desconectado";
   const s = acharChave(o, (k) => /^(status|state|connection|connectionStatus)$/i.test(k));
   if (!s) return null;

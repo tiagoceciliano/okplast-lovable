@@ -12,7 +12,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { supabase } from "@/integrations/supabase/client";
 import { getEquipe, type MembroEquipe } from "@/lib/adminCache";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { acaoConexao, atualizarConexao, criarConexao, importarConexoesUnotalk } from "@/lib/uzapi.functions";
+import { acaoConexao, atualizarConexao, autenticarConexao, criarConexao, importarConexoesUnotalk } from "@/lib/uzapi.functions";
 import { toast } from "sonner";
 
 type Inst = { id: string; nome: string; user_id: string | null; telefone: string | null; status: string; qr_code: string | null; ultimo_erro: string | null };
@@ -66,6 +66,7 @@ export default function Conexoes() {
   useEffect(() => {
     if (!qrId) return;
     let ativo = true;
+    void autenticarConexao({ data: { id: qrId } }).catch((e) => { if (ativo) toast.error(e instanceof Error ? e.message : "Falha ao autenticar"); });
     const tick = async () => { await atualizarConexao({ data: { id: qrId } }).catch(() => {}); if (ativo) await carregar(); };
     tick();
     const t = window.setInterval(tick, 4000);
