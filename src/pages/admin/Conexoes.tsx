@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Plus, QrCode, RefreshCw, Smartphone, Trash2, Unplug } from "lucide-react";
+import { Eye, Loader2, MoreHorizontal, Plus, Power, QrCode, RefreshCw, Smartphone, Trash2 } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
 import { getEquipe, type MembroEquipe } from "@/lib/adminCache";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
@@ -49,6 +50,8 @@ export default function Conexoes() {
   const [resp, setResp] = useState<string>("nenhum");
   const [salvando, setSalvando] = useState(false);
   const [qrId, setQrId] = useState<string | null>(null);
+  const [detalheId, setDetalheId] = useState<string | null>(null);
+  const [atualizandoId, setAtualizandoId] = useState<string | null>(null);
 
   const carregar = useCallback(async () => {
     const { data, error } = await supabase.from("whatsapp_instancias").select("id,nome,user_id,telefone,status,qr_code,ultimo_erro").order("created_at");
@@ -92,6 +95,16 @@ export default function Conexoes() {
   };
 
   const nomeDe = (id: string | null) => equipe.find((m) => m.id === id)?.nome ?? "Sem responsável";
+  const detalhe = lista.find((i) => i.id === detalheId);
+  const atualizar = async (id: string) => {
+    setAtualizandoId(id);
+    try {
+      await atualizarConexao({ data: { id } });
+      await carregar();
+      setDetalheId(id);
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Falha ao atualizar instância"); }
+    finally { setAtualizandoId(null); }
+  };
 
   return (
     <ConfiguracoesLayout active="conexoes">
@@ -118,7 +131,21 @@ export default function Conexoes() {
                     <p className="truncate font-semibold">{i.nome}</p>
                     <p className="text-sm text-muted-foreground">{fmtTel(i.telefone)}</p>
                   </div>
-                  <Badge variant="outline" className={`border-0 ${st.cls}`}>{st.label}</Badge>
+                  <div className="flex shrink-0 items-center gap-1">
+                    <Badge variant="outline" className={`border-0 ${st.cls}`}>{st.label}</Badge>
+                    {gestor && <DropdownMenu>
+                      <DropdownMenuTrigger asChild><Button size="icon" variant="ghost" aria-label={`Ações de ${i.nome}`} disabled={atualizandoId === i.id}>{atualizandoId === i.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <MoreHorizontal className="h-5 w-5" />}</Button></DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-72">
+                        <DropdownMenuItem onSelect={() => setDetalheId(i.id)}><Eye />Visualizar Instância</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => setQrId(i.id)}><QrCode />Autenticar</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => { if (window.confirm(`Desconectar / resetar a sessão de ${i.nome}? Será necessário autenticar novamente.`)) void acao(i.id, "desconectar"); }}><Power /><span>Desconectar / Resetar Sessão</span></DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => acao(i.id, "reiniciar")}><RefreshCw />Reiniciar Instância</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => atualizar(i.id)}><RefreshCw />Atualizar Instância</DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="text-destructive focus:text-destructive" onSelect={() => acao(i.id, "excluir")}><Trash2 />Deletar Instância</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>}
+                  </div>
                 </div>
                 <div className="mt-3">
                   <Label className="text-xs text-muted-foreground">Responsável pelo número</Label>
@@ -133,19 +160,23 @@ export default function Conexoes() {
                   ) : <p className="text-sm">{nomeDe(i.user_id)}</p>}
                 </div>
                 {i.ultimo_erro && i.status !== "conectado" && <p className="mt-2 text-xs text-destructive">{i.ultimo_erro}</p>}
-                {gestor && (
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {i.status !== "conectado" && <Button size="sm" onClick={() => setQrId(i.id)}><QrCode className="h-4 w-4" /> Ler QR Code</Button>}
-                    {i.status === "conectado" && <Button size="sm" variant="outline" onClick={() => acao(i.id, "desconectar")}><Unplug className="h-4 w-4" /> Desconectar</Button>}
-                    <Button size="sm" variant="ghost" onClick={() => acao(i.id, "reiniciar")}><RefreshCw className="h-4 w-4" /> Reiniciar</Button>
-                    <Button size="sm" variant="ghost" className="text-destructive" onClick={() => acao(i.id, "excluir")} aria-label="Excluir conexão"><Trash2 className="h-4 w-4" /></Button>
-                  </div>
-                )}
               </div>
             );
           })}
         </div>
       )}
+
+      <Dialog open={!!detalheId} onOpenChange={(open) => !open && setDetalheId(null)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader><DialogTitle>Visualizar Instância</DialogTitle><DialogDescription>{detalhe?.nome}</DialogDescription></DialogHeader>
+          {detalhe && <dl className="space-y-3 text-sm">
+            <div><dt className="text-muted-foreground">Número</dt><dd>{fmtTel(detalhe.telefone)}</dd></div>
+            <div><dt className="text-muted-foreground">Status</dt><dd>{STATUS[detalhe.status]?.label ?? detalhe.status}</dd></div>
+            <div><dt className="text-muted-foreground">Responsável pelo número</dt><dd>{nomeDe(detalhe.user_id)}</dd></div>
+            {detalhe.ultimo_erro && <div><dt className="text-muted-foreground">Último erro</dt><dd className="break-words text-destructive">{detalhe.ultimo_erro}</dd></div>}
+          </dl>}
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={novo} onOpenChange={setNovo}>
         <DialogContent className="max-w-sm">
