@@ -48,3 +48,8 @@
 - [x] Criar área compartilhada de Configurações
 - [x] Implementar Membros, Tags e Grupos
 - [x] Validar CRUD e apresentação autenticada
+
+## Canais de atendimento
+- [x] Tela Canais com WhatsApp QR Code, API oficial e Modelos
+- [x] Cartão E-mail em Canais marcado como "Em breve"
+- [ ] Canal de E-mail — aguardando definição da caixa de entrada (endereço, provedor e senha/token)

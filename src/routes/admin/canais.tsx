@@ -5,9 +5,9 @@ import AdminCanais from "@/pages/admin/Canais";
 export const Route = createFileRoute("/admin/canais")({
   head: () => ({ meta: [
     { title: "Canais | Configurações OK Plast" },
-    { name: "description", content: "Canais de atendimento WhatsApp da OK Plast: QR Code, API oficial e modelos." },
+    { name: "description", content: "Canais de atendimento da OK Plast: WhatsApp via QR Code, API oficial, modelos e e-mail em breve." },
     { property: "og:title", content: "Canais | Configurações OK Plast" },
-    { property: "og:description", content: "Canais de atendimento WhatsApp da OK Plast: QR Code, API oficial e modelos." },
+    { property: "og:description", content: "Canais de atendimento da OK Plast: WhatsApp via QR Code, API oficial, modelos e e-mail em breve." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary" },
   ] }),
