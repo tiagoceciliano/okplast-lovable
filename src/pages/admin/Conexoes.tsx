@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import QRCode from "react-qr-code";
 import { ConfiguracoesLayout } from "./components/ConfiguracoesLayout";
 import { Button } from "@/components/ui/button";
@@ -7,8 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Eye, Loader2, MoreHorizontal, Plus, Power, QrCode, RefreshCw, Smartphone, Trash2 } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Eye, Loader2, Plus, Power, QrCode, RefreshCw, RotateCw, Smartphone, Trash2 } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { getEquipe, type MembroEquipe } from "@/lib/adminCache";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
@@ -38,6 +39,27 @@ function QrView({ valor }: { valor: string }) {
     return <img src={src} alt="QR Code para conectar o WhatsApp" className="h-64 w-64" />;
   }
   return <div className="rounded-lg bg-card p-3"><QRCode value={valor} size={232} /></div>;
+}
+
+function AcaoIcon({ titulo, onClick, disabled, danger, children }: { titulo: string; onClick: () => void; disabled?: boolean; danger?: boolean; children: ReactNode }) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          size="icon"
+          variant="ghost"
+          aria-label={titulo}
+          title={titulo}
+          disabled={disabled}
+          onClick={onClick}
+          className={cn("h-8 w-8", danger && "text-destructive hover:text-destructive")}
+        >
+          {children}
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent side="top" className="text-xs">{titulo}</TooltipContent>
+    </Tooltip>
+  );
 }
 
 export default function Conexoes() {
@@ -125,6 +147,7 @@ export default function Conexoes() {
         <div className="grid gap-3 sm:grid-cols-2">
           {lista.map((i) => {
             const st = STATUS[i.status] ?? { label: "Criando…", cls: "bg-muted text-muted-foreground" };
+            const ocupado = atualizandoId === i.id;
             return (
               <div key={i.id} className="rounded-lg border bg-card p-4">
                 <div className="flex items-start justify-between gap-2">
@@ -132,21 +155,7 @@ export default function Conexoes() {
                     <p className="truncate font-semibold">{i.nome}</p>
                     <p className="text-sm text-muted-foreground">{fmtTel(i.telefone)}</p>
                   </div>
-                  <div className="flex shrink-0 items-center gap-1">
-                    <Badge variant="outline" className={`border-0 ${st.cls}`}>{st.label}</Badge>
-                    {gestor && <DropdownMenu>
-                      <DropdownMenuTrigger asChild><Button size="icon" variant="ghost" aria-label={`Ações de ${i.nome}`} disabled={atualizandoId === i.id}>{atualizandoId === i.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <MoreHorizontal className="h-5 w-5" />}</Button></DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-72">
-                        <DropdownMenuItem onSelect={() => setDetalheId(i.id)}><Eye />Visualizar Instância</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => setQrId(i.id)}><QrCode />Autenticar</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => { if (window.confirm(`Desconectar / resetar a sessão de ${i.nome}? Será necessário autenticar novamente.`)) void acao(i.id, "desconectar"); }}><Power /><span>Desconectar / Resetar Sessão</span></DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => acao(i.id, "reiniciar")}><RefreshCw />Reiniciar Instância</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => atualizar(i.id)}><RefreshCw />Atualizar Instância</DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-destructive focus:text-destructive" onSelect={() => acao(i.id, "excluir")}><Trash2 />Deletar Instância</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>}
-                  </div>
+                  <Badge variant="outline" className={`shrink-0 border-0 ${st.cls}`}>{st.label}</Badge>
                 </div>
                 <div className="mt-3">
                   <Label className="text-xs text-muted-foreground">Responsável pelo número</Label>
@@ -161,6 +170,18 @@ export default function Conexoes() {
                   ) : <p className="text-sm">{nomeDe(i.user_id)}</p>}
                 </div>
                 {i.ultimo_erro && i.status !== "conectado" && <p className="mt-2 text-xs text-destructive">{i.ultimo_erro}</p>}
+                {gestor && (
+                  <TooltipProvider delayDuration={200}>
+                    <div className="mt-3 flex items-center justify-end gap-1 border-t pt-2">
+                      <AcaoIcon titulo="Visualizar Instância" onClick={() => setDetalheId(i.id)} disabled={ocupado}><Eye className="h-4 w-4" /></AcaoIcon>
+                      <AcaoIcon titulo="Autenticar" onClick={() => setQrId(i.id)} disabled={ocupado}><QrCode className="h-4 w-4" /></AcaoIcon>
+                      <AcaoIcon titulo="Desconectar / Resetar Sessão" disabled={ocupado} onClick={() => { if (window.confirm(`Desconectar / resetar a sessão de ${i.nome}? Será necessário autenticar novamente.`)) void acao(i.id, "desconectar"); }}><Power className="h-4 w-4" /></AcaoIcon>
+                      <AcaoIcon titulo="Reiniciar Instância" onClick={() => acao(i.id, "reiniciar")} disabled={ocupado}><RotateCw className="h-4 w-4" /></AcaoIcon>
+                      <AcaoIcon titulo="Atualizar Instância" onClick={() => atualizar(i.id)} disabled={ocupado}>{ocupado ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}</AcaoIcon>
+                      <AcaoIcon titulo="Deletar Instância" danger onClick={() => acao(i.id, "excluir")} disabled={ocupado}><Trash2 className="h-4 w-4" /></AcaoIcon>
+                    </div>
+                  </TooltipProvider>
+                )}
               </div>
             );
           })}
