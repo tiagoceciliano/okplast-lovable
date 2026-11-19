@@ -1,5 +1,6 @@
 import { Link } from "@/lib/router-compat";
 import { ConfiguracoesLayout } from "./components/ConfiguracoesLayout";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { ChevronRight, Mail, MessageSquareText, QrCode, ShieldCheck } from "lucide-react";
 
 type Canal = {
@@ -18,12 +19,16 @@ const canais: Canal[] = [
 ];
 
 export default function AdminCanais() {
+  const { user } = useCurrentUser();
+  const gestor = !!user?.roles.some((r) => r === "admin" || r === "gestor");
+  // Vendedores só veem o canal de QR Code, para conectar o próprio número.
+  const visiveis = gestor ? canais : canais.filter((c) => c.to === "/admin/conexoes");
   return (
     <ConfiguracoesLayout active="canais">
       <h2 className="text-xl font-bold">Canais</h2>
       <p className="mb-5 text-sm text-muted-foreground">Escolha um canal para abrir as configurações.</p>
       <div className="grid gap-3 sm:grid-cols-2">
-        {canais.map(({ to, icon: Icon, titulo, desc, emBreve }) =>
+        {visiveis.map(({ to, icon: Icon, titulo, desc, emBreve }) =>
           emBreve ? (
             <div
               key={to}

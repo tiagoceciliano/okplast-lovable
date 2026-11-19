@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Link } from "@/lib/router-compat";
 import { AdminLayout } from "../AdminLayout";
 import { cn } from "@/lib/utils";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { Folder, Radio, MessageSquareText, QrCode, ShieldCheck, Tag, Users } from "lucide-react";
 
 type Section = "membros" | "permissoes" | "tags" | "grupos" | "modelos" | "conexoes" | "canais";
@@ -17,6 +18,8 @@ const links = [
 ] as const;
 
 export function ConfiguracoesLayout({ active, children, wide = false }: { active: Section; children: ReactNode; wide?: boolean }) {
+  const { user } = useCurrentUser();
+  const soCanais = !user?.roles.some((r) => r === "admin" || r === "gestor");
   return (
     <AdminLayout fullBleed>
       <div className="grid h-screen min-h-[560px] overflow-hidden bg-muted/30 lg:grid-cols-[220px_minmax(0,1fr)]">
@@ -24,7 +27,7 @@ export function ConfiguracoesLayout({ active, children, wide = false }: { active
           <h1 className="mb-5 px-3 text-lg font-bold">Configurações</h1>
           <p className="mb-2 px-3 text-xs font-semibold text-muted-foreground">Ambiente</p>
           <nav className="space-y-1">
-            {links.map(({ id, label, to, icon: Icon }) => (
+            {links.filter((l) => !soCanais || l.id === "canais").map(({ id, label, to, icon: Icon }) => (
               <Link key={id} to={to} className={cn("flex h-9 items-center gap-2 rounded-md px-3 text-sm transition-colors hover:bg-muted", active === id && "bg-muted font-semibold text-foreground")}>
                 <Icon className="h-4 w-4" /> {label}
               </Link>

@@ -7,6 +7,18 @@ import { telefoneInstancia } from "@/lib/uzapi-qr";
 
 const gestor = () => requireCaller(getRequestHeader("Authorization"), ["admin", "gestor"]);
 
+/** Gestores acessam qualquer conexão; vendedores só a conexão da qual são responsáveis. */
+async function donoOuGestor(id: string) {
+  const { userId, admin } = await requireCaller(getRequestHeader("Authorization"), ["admin", "gestor", "vendedor"]);
+  const { data: roles } = await admin.from("user_roles").select("role").eq("user_id", userId);
+  const ehGestor = (roles ?? []).some((r: { role: string }) => r.role === "admin" || r.role === "gestor");
+  if (!ehGestor) {
+    const { data: inst } = await admin.from("whatsapp_instancias").select("user_id").eq("id", id).maybeSingle();
+    if (!inst || inst.user_id !== userId) throw new Error("Sem permissão para esta conexão");
+  }
+  return { userId, admin };
+}
+
 export const criarConexao = createServerFn({ method: "POST" })
   .inputValidator((i) => z.object({ nome: z.string().trim().min(2).max(60), userId: z.string().uuid().nullable() }).parse(i))
   .handler(async ({ data }) => {
@@ -34,7 +46,7 @@ export const criarConexao = createServerFn({ method: "POST" })
 export const atualizarConexao = createServerFn({ method: "POST" })
   .inputValidator((i) => z.object({ id: z.string().uuid() }).parse(i))
   .handler(async ({ data }) => {
-    const { admin } = await requireCaller(getRequestHeader("Authorization"), ["admin", "gestor", "vendedor"]);
+    const { admin } = await donoOuGestor(data.id);
     const { uzFetch, acharQr, acharStatus } = await import("@/lib/uzapi.server");
     const { data: inst } = await admin.from("whatsapp_instancias").select("*").eq("id", data.id).maybeSingle();
     if (!inst?.phone_number_id) return { status: inst?.status ?? "erro" };
@@ -68,7 +80,7 @@ export const atualizarConexao = createServerFn({ method: "POST" })
 export const autenticarConexao = createServerFn({ method: "POST" })
   .inputValidator((i) => z.object({ id: z.string().uuid() }).parse(i))
   .handler(async ({ data }) => {
-    const { admin } = await gestor();
+    const { admin } = await donoOuGestor(data.id);
     const { uzFetch, acharStatus } = await import("@/lib/uzapi.server");
     const { data: inst } = await admin.from("whatsapp_instancias").select("phone_number_id").eq("id", data.id).maybeSingle();
     if (!inst?.phone_number_id) throw new Error("Número da conexão não encontrado.");

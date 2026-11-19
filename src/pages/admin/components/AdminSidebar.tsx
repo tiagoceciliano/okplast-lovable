@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { COMPANY } from "@/lib/constants";
 import {
   Sidebar,
@@ -177,6 +178,9 @@ const SubPagesSection = ({ title, icon: Icon, hubPath, subPages, collapsed, open
 
 export function AdminSidebar() {
   const { state, setOpen } = useSidebar();
+  const { user: usuarioAtual } = useCurrentUser();
+  // Vendedores só acessam Canais dentro de Configurações.
+  const soCanais = !usuarioAtual?.roles.some((r) => r === "admin" || r === "gestor");
   const collapsed = state === "collapsed";
   const location = useLocation();
   const navigate = useNavigate();
@@ -324,15 +328,15 @@ export function AdminSidebar() {
                   { to: "/admin/modelos", label: "Modelos", icon: MessageSquareText },
                   { to: "/admin/produtos", label: "Produtos", icon: Boxes },
                   { to: "/admin/meta", label: "Meta", icon: Target },
-                ].map((it) => (
+                ].filter((it) => !soCanais || it.to === "/admin/canais").map((it) => (
                   <SidebarMenuItem key={it.to}>
                     <SidebarMenuButton asChild tooltip={it.label}>
-                      <NavLink to={it.to} className={({ isActive }) => cn(
+                      {!soCanais && (<NavLink to={it.to} className={({ isActive }) => cn(
                         "flex items-center justify-center h-8 w-8 mx-auto rounded-md hover:bg-muted",
                         isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
                       )}>
                         <it.icon className="h-4 w-4" />
-                      </NavLink>
+                      </NavLink>)}
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
@@ -351,54 +355,54 @@ export function AdminSidebar() {
                 </button>
                 {openSections["Configurações"] && (
                   <div className="pl-6 space-y-1">
-                    <NavLink to="/admin/vendedores" end className={({ isActive }) => cn(
+                    {!soCanais && (<NavLink to="/admin/vendedores" end className={({ isActive }) => cn(
                       "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm hover:bg-muted",
                       isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
                     )}>
                       <Users className="h-3.5 w-3.5" /> Membros
-                    </NavLink>
-                    <NavLink to="/admin/grupos" className={({ isActive }) => cn(
+                    </NavLink>)}
+                    {!soCanais && (<NavLink to="/admin/grupos" className={({ isActive }) => cn(
                       "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm hover:bg-muted",
                       isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
                     )}>
                       <Folder className="h-3.5 w-3.5" /> Grupos
-                    </NavLink>
-                    <NavLink to="/admin/tags" className={({ isActive }) => cn(
+                    </NavLink>)}
+                    {!soCanais && (<NavLink to="/admin/tags" className={({ isActive }) => cn(
                       "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm hover:bg-muted",
                       isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
                     )}>
                       <Tag className="h-3.5 w-3.5" /> Tags
-                    </NavLink>
-                    <NavLink to="/admin/vendedores?tab=permissoes" className={({ isActive }) => cn(
+                    </NavLink>)}
+                    {!soCanais && (<NavLink to="/admin/vendedores?tab=permissoes" className={({ isActive }) => cn(
                       "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm hover:bg-muted",
                       isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
                     )}>
                       <ShieldCheck className="h-3.5 w-3.5" /> Permissões
-                    </NavLink>
+                    </NavLink>)}
                     <NavLink to="/admin/canais" className={({ isActive }) => cn(
                       "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm hover:bg-muted",
                       isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
                     )}>
                       <Radio className="h-3.5 w-3.5" /> Canais
                     </NavLink>
-                    <NavLink to="/admin/modelos" className={({ isActive }) => cn(
+                    {!soCanais && (<NavLink to="/admin/modelos" className={({ isActive }) => cn(
                       "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm hover:bg-muted",
                       isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
                     )}>
                       <MessageSquareText className="h-3.5 w-3.5" /> Modelos
-                    </NavLink>
-                    <NavLink to="/admin/produtos" className={({ isActive }) => cn(
+                    </NavLink>)}
+                    {!soCanais && (<NavLink to="/admin/produtos" className={({ isActive }) => cn(
                       "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm hover:bg-muted",
                       isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
                     )}>
                       <Boxes className="h-3.5 w-3.5" /> Produtos
-                    </NavLink>
-                    <NavLink to="/admin/meta" className={({ isActive }) => cn(
+                    </NavLink>)}
+                    {!soCanais && (<NavLink to="/admin/meta" className={({ isActive }) => cn(
                       "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm hover:bg-muted",
                       isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
                     )}>
                       <Target className="h-3.5 w-3.5" /> Meta
-                    </NavLink>
+                    </NavLink>)}
                   </div>
                 )}
               </div>

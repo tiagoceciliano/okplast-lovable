@@ -78,8 +78,9 @@ export default function Conexoes() {
   const carregar = useCallback(async () => {
     const { data, error } = await supabase.from("whatsapp_instancias").select("id,nome,user_id,telefone,status,qr_code,ultimo_erro").order("created_at");
     if (error) toast.error(error.message);
-    setLista((data as Inst[]) ?? []);
-  }, []);
+    const todas = (data as Inst[]) ?? [];
+    setLista(gestor ? todas : todas.filter((i) => i.user_id === user?.id));
+  }, [gestor, user?.id]);
 
   useEffect(() => { carregar(); getEquipe().then(setEquipe).catch(() => {}); }, [carregar]);
 
@@ -124,7 +125,7 @@ export default function Conexoes() {
       const { data } = await supabase.from("whatsapp_instancias").select("id,nome,user_id,telefone,status,qr_code,ultimo_erro").order("created_at");
       if (!ativo || !data) return;
       (data as Inst[]).forEach((i) => { if (i.status === "conectado" && antes.get(i.id) !== "conectado") toast.success(`${i.nome} está ativo no UnoTalk`); });
-      setLista(data as Inst[]);
+      setLista(gestor ? (data as Inst[]) : (data as Inst[]).filter((i) => i.user_id === user?.id));
     };
     const t = window.setInterval(tick, 15000);
     return () => { ativo = false; window.clearInterval(t); };
@@ -203,15 +204,15 @@ export default function Conexoes() {
                   ) : <p className="text-sm">{nomeDe(i.user_id)}</p>}
                 </div>
                 {i.ultimo_erro && i.status !== "conectado" && <p className="mt-2 text-xs text-destructive">{i.ultimo_erro}</p>}
-                {gestor && (
+                {(
                   <TooltipProvider delayDuration={200}>
                     <div className="mt-3 flex items-center justify-end gap-1 border-t pt-2">
-                      <AcaoIcon titulo="Visualizar Instância" onClick={() => setDetalheId(i.id)} disabled={ocupado}><Eye className="h-4 w-4" /></AcaoIcon>
+                      {gestor && <AcaoIcon titulo="Visualizar Instância" onClick={() => setDetalheId(i.id)} disabled={ocupado}><Eye className="h-4 w-4" /></AcaoIcon>}
                       <AcaoIcon titulo="Autenticar" onClick={() => setQrId(i.id)} disabled={ocupado}><QrCode className="h-4 w-4" /></AcaoIcon>
-                      <AcaoIcon titulo="Desconectar / Resetar Sessão" disabled={ocupado} onClick={() => { if (window.confirm(`Desconectar / resetar a sessão de ${i.nome}? Será necessário autenticar novamente.`)) void acao(i.id, "desconectar"); }}><Power className="h-4 w-4" /></AcaoIcon>
-                      <AcaoIcon titulo="Reiniciar Instância" onClick={() => acao(i.id, "reiniciar")} disabled={ocupado}><RotateCw className="h-4 w-4" /></AcaoIcon>
-                      <AcaoIcon titulo="Atualizar Instância" onClick={() => atualizar(i.id)} disabled={ocupado}>{ocupado ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}</AcaoIcon>
-                      <AcaoIcon titulo="Deletar Instância" danger onClick={() => acao(i.id, "excluir")} disabled={ocupado}><Trash2 className="h-4 w-4" /></AcaoIcon>
+                      {gestor && <AcaoIcon titulo="Desconectar / Resetar Sessão" disabled={ocupado} onClick={() => { if (window.confirm(`Desconectar / resetar a sessão de ${i.nome}? Será necessário autenticar novamente.`)) void acao(i.id, "desconectar"); }}><Power className="h-4 w-4" /></AcaoIcon>}
+                      {gestor && <AcaoIcon titulo="Reiniciar Instância" onClick={() => acao(i.id, "reiniciar")} disabled={ocupado}><RotateCw className="h-4 w-4" /></AcaoIcon>}
+                      {gestor && <AcaoIcon titulo="Atualizar Instância" onClick={() => atualizar(i.id)} disabled={ocupado}>{ocupado ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}</AcaoIcon>}
+                      {gestor && <AcaoIcon titulo="Deletar Instância" danger onClick={() => acao(i.id, "excluir")} disabled={ocupado}><Trash2 className="h-4 w-4" /></AcaoIcon>}
                     </div>
                   </TooltipProvider>
                 )}

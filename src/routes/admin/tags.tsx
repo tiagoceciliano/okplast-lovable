@@ -11,5 +11,5 @@ export const Route = createFileRoute("/admin/tags")({
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary" },
   ] }),
-  component: () => <RequireAuth roles={["admin", "gestor", "vendedor"]}><AdminTags /></RequireAuth>,
+  component: () => <RequireAuth roles={["admin", "gestor"]}><AdminTags /></RequireAuth>,
 });
