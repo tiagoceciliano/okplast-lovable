@@ -17,6 +17,7 @@ import { toast } from "sonner";
 type Inst = { id: string; nome: string; user_id: string | null; telefone: string | null; status: string; qr_code: string | null; ultimo_erro: string | null };
 
 const STATUS: Record<string, { label: string; cls: string }> = {
+  pausado: { label: "Pausada no UnoTalk", cls: "bg-muted text-muted-foreground" },
   conectado: { label: "Conectado", cls: "bg-emerald-500/15 text-emerald-700" },
   aguardando_qr: { label: "Aguardando QR Code", cls: "bg-amber-500/20 text-amber-700" },
   desconectado: { label: "Desconectado", cls: "bg-destructive/10 text-destructive" },

@@ -50,6 +50,7 @@
 - [x] Validar CRUD e apresentação autenticada
 
 ## Canais de atendimento
+- [x] Importar somente as conexões existentes Amanda/Allan e verificar os cartões autenticados
 - [x] Tela Canais com WhatsApp QR Code, API oficial e Modelos
 - [x] Cartão E-mail em Canais marcado como "Em breve"
 - [ ] Canal de E-mail — aguardando definição da caixa de entrada (endereço, provedor e senha/token)

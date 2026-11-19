@@ -1,13 +1,16 @@
 // Cliente da Uzapi/UnoTalk (números conectados por QR Code). Só roda no servidor.
+import { CONEXOES_UNOTALK } from "./uzapi-conexoes";
 const BASE = "https://api.uzapi.com.br/v1";
-export const WEBHOOK_BASE = "https://project--bbec6f29-5b53-4452-83f6-3d94da979fd6.lovable.app";
+export const WEBHOOK_BASE = "https://okplast.com.br";
 
 export async function uzFetch(path: string, init: { method?: string; body?: unknown } = {}) {
-  const token = process.env["UZAPI_TOKEN"];
+  const phoneNumberId = path.split("/")[1];
+  const conexao = CONEXOES_UNOTALK.find((c) => c.phoneNumberId === phoneNumberId);
+  const token = process.env[conexao?.secretName ?? "UZAPI_TOKEN"];
   if (!token) throw new Error("Token da Uzapi não configurado");
   const res = await fetch(`${BASE}${path}`, {
     method: init.method ?? "GET",
-    headers: { Authorization: `Bearer ${token.trim()}`, "Content-Type": "application/json" },
+    headers: { Authorization: `Bearer ${token.trim().replace(/^Bearer\s+/i, "")}`, "Content-Type": "application/json" },
     body: init.body === undefined ? null : JSON.stringify(init.body),
   });
   const text = await res.text();
@@ -38,6 +41,9 @@ export const acharQr = (o: any) => acharChave(o, (k) => /qr|base64/i.test(k));
 export const acharPhoneId = (o: any) => acharChave(o, (k) => k === "phone_number_id" || k === "phoneNumberId" || k === "instanceId" || k === "id");
 
 export function acharStatus(o: any): string | null {
+  if (o?.deploymentStatus === "paused") return "pausado";
+  if (o?.isAuthenticated === true) return "conectado";
+  if (o?.isAuthenticated === false) return "desconectado";
   const s = acharChave(o, (k) => /^(status|state|connection|connectionStatus)$/i.test(k));
   if (!s) return null;
   const v = s.toLowerCase();
