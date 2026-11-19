@@ -2,15 +2,16 @@ import type { ReactNode } from "react";
 import { Link } from "@/lib/router-compat";
 import { AdminLayout } from "../AdminLayout";
 import { cn } from "@/lib/utils";
-import { Folder, MessageSquareText, QrCode, ShieldCheck, Tag, Users } from "lucide-react";
+import { Folder, Radio, MessageSquareText, QrCode, ShieldCheck, Tag, Users } from "lucide-react";
 
-type Section = "membros" | "permissoes" | "tags" | "grupos" | "modelos" | "conexoes";
+type Section = "membros" | "permissoes" | "tags" | "grupos" | "modelos" | "conexoes" | "canais";
 
 const links = [
   { id: "membros", label: "Membros", to: "/admin/vendedores", icon: Users },
   { id: "permissoes", label: "Permissões", to: "/admin/vendedores?tab=permissoes", icon: ShieldCheck },
   { id: "grupos", label: "Grupos", to: "/admin/grupos", icon: Folder },
   { id: "tags", label: "Tags", to: "/admin/tags", icon: Tag },
+  { id: "canais", label: "Canais", to: "/admin/canais", icon: Radio },
   { id: "conexoes", label: "Conexões WhatsApp", to: "/admin/conexoes", icon: QrCode },
   { id: "modelos", label: "Modelos de mensagem", to: "/admin/modelos", icon: MessageSquareText },
 ] as const;

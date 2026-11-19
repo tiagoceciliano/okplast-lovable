@@ -17,6 +17,7 @@ import { Route as PublicPoliticaVendaRouteImport } from './routes/_public/politi
 import { Route as PublicSobreNosRouteImport } from './routes/_public/sobre-nos'
 import { Route as PublicTermoUsoRouteImport } from './routes/_public/termo-uso'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminCanaisRouteImport } from './routes/admin/canais'
 import { Route as AdminConexoesRouteImport } from './routes/admin/conexoes'
 import { Route as AdminConversasRouteImport } from './routes/admin/conversas'
 import { Route as AdminGruposRouteImport } from './routes/admin/grupos'
@@ -86,6 +87,11 @@ const PublicTermoUsoRoute = PublicTermoUsoRouteImport.update({
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminCanaisRoute = AdminCanaisRouteImport.update({
+  id: '/admin/canais',
+  path: '/admin/canais',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminConexoesRoute = AdminConexoesRouteImport.update({
@@ -256,6 +262,7 @@ export interface FileRoutesByFullPath {
   '/politica-venda': typeof PublicPoliticaVendaRoute
   '/sobre-nos': typeof PublicSobreNosRoute
   '/termo-uso': typeof PublicTermoUsoRoute
+  '/admin/canais': typeof AdminCanaisRoute
   '/admin/conexoes': typeof AdminConexoesRoute
   '/admin/conversas': typeof AdminConversasRoute
   '/admin/grupos': typeof AdminGruposRoute
@@ -294,6 +301,7 @@ export interface FileRoutesByTo {
   '/politica-venda': typeof PublicPoliticaVendaRoute
   '/sobre-nos': typeof PublicSobreNosRoute
   '/termo-uso': typeof PublicTermoUsoRoute
+  '/admin/canais': typeof AdminCanaisRoute
   '/admin/conexoes': typeof AdminConexoesRoute
   '/admin/conversas': typeof AdminConversasRoute
   '/admin/grupos': typeof AdminGruposRoute
@@ -335,6 +343,7 @@ export interface FileRoutesById {
   '/_public/politica-venda': typeof PublicPoliticaVendaRoute
   '/_public/sobre-nos': typeof PublicSobreNosRoute
   '/_public/termo-uso': typeof PublicTermoUsoRoute
+  '/admin/canais': typeof AdminCanaisRoute
   '/admin/conexoes': typeof AdminConexoesRoute
   '/admin/conversas': typeof AdminConversasRoute
   '/admin/grupos': typeof AdminGruposRoute
@@ -377,6 +386,7 @@ export interface FileRouteTypes {
     | '/politica-venda'
     | '/sobre-nos'
     | '/termo-uso'
+    | '/admin/canais'
     | '/admin/conexoes'
     | '/admin/conversas'
     | '/admin/grupos'
@@ -415,6 +425,7 @@ export interface FileRouteTypes {
     | '/politica-venda'
     | '/sobre-nos'
     | '/termo-uso'
+    | '/admin/canais'
     | '/admin/conexoes'
     | '/admin/conversas'
     | '/admin/grupos'
@@ -455,6 +466,7 @@ export interface FileRouteTypes {
     | '/_public/politica-venda'
     | '/_public/sobre-nos'
     | '/_public/termo-uso'
+    | '/admin/canais'
     | '/admin/conexoes'
     | '/admin/conversas'
     | '/admin/grupos'
@@ -491,6 +503,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   PublicRoute: typeof PublicRouteWithChildren
+  AdminCanaisRoute: typeof AdminCanaisRoute
   AdminConexoesRoute: typeof AdminConexoesRoute
   AdminConversasRoute: typeof AdminConversasRoute
   AdminGruposRoute: typeof AdminGruposRoute
@@ -567,6 +580,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/canais': {
+      id: '/admin/canais'
+      path: '/admin/canais'
+      fullPath: '/admin/canais'
+      preLoaderRoute: typeof AdminCanaisRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/conexoes': {
@@ -833,6 +853,7 @@ const PublicRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   PublicRoute: PublicRouteWithChildren,
+  AdminCanaisRoute: AdminCanaisRoute,
   AdminConexoesRoute: AdminConexoesRoute,
   AdminConversasRoute: AdminConversasRoute,
   AdminGruposRoute: AdminGruposRoute,
