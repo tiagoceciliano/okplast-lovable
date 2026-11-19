@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import QRCode from "react-qr-code";
 import { ConfiguracoesLayout } from "./components/ConfiguracoesLayout";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getEquipe, type MembroEquipe } from "@/lib/adminCache";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { acaoConexao, atualizarConexao, autenticarConexao, criarConexao, importarConexoesUnotalk } from "@/lib/uzapi.functions";
+import { useSearchParams } from "@/lib/router-compat";
 import { toast } from "sonner";
 
 type Inst = { id: string; nome: string; user_id: string | null; telefone: string | null; status: string; qr_code: string | null; ultimo_erro: string | null };
@@ -74,6 +75,8 @@ export default function Conexoes() {
   const [qrId, setQrId] = useState<string | null>(null);
   const [detalheId, setDetalheId] = useState<string | null>(null);
   const [atualizandoId, setAtualizandoId] = useState<string | null>(null);
+  const [sp] = useSearchParams();
+  const abertoPorLink = useRef(false);
 
   const carregar = useCallback(async () => {
     const { data, error } = await supabase.from("whatsapp_instancias").select("id,nome,user_id,telefone,status,qr_code,ultimo_erro").order("created_at");
@@ -83,6 +86,19 @@ export default function Conexoes() {
   }, [gestor, user?.id]);
 
   useEffect(() => { carregar(); getEquipe().then(setEquipe).catch(() => {}); }, [carregar]);
+
+  // ?autenticar=1 abre o QR Code direto ao entrar; ?qr=<id> abre o de um número específico.
+  useEffect(() => {
+    if (abertoPorLink.current || lista.length === 0) return;
+    const alvo = sp.get("qr")
+      ? lista.find((i) => i.id === sp.get("qr"))
+      : sp.get("autenticar")
+        ? lista[0]
+        : null;
+    if (!alvo) return;
+    abertoPorLink.current = true;
+    setQrId(alvo.id);
+  }, [sp, lista]);
 
   const qrInst = lista.find((i) => i.id === qrId) ?? null;
   const [qrErro, setQrErro] = useState<string | null>(null);
