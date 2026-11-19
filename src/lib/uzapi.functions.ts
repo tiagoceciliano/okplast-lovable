@@ -76,3 +76,44 @@ export const acaoConexao = createServerFn({ method: "POST" })
     }
     return { ok: true };
   });
+
+/** Importa da conta Uzapi/UnoTalk apenas as conexões já criadas de Amanda e Allan. */
+export const importarConexoesUnotalk = createServerFn({ method: "POST" }).handler(async () => {
+  const { admin } = await gestor();
+  const { uzFetch, acharChave, acharStatus, WEBHOOK_BASE } = await import("@/lib/uzapi.server");
+  const r = await uzFetch("/instance");
+  console.log("Uzapi list:", JSON.stringify(r).slice(0, 2000));
+  const lista: any[] = Array.isArray(r) ? r : (r?.data ?? r?.instances ?? r?.items ?? r?.result ?? []);
+  if (!Array.isArray(lista) || !lista.length) throw new Error("A Uzapi não retornou a lista de conexões");
+  const alvos = [
+    { chave: "amanda", nome: "OKPLAST Amanda", tel: "21935058539" },
+    { chave: "allan", nome: "OKPLAST Allan", tel: "21936189018" },
+  ];
+  const { data: equipe } = await admin.rpc("list_equipe" as any);
+  const users = ((equipe as any[]) ?? []);
+  const importadas: string[] = [];
+  for (const a of alvos) {
+    const item = lista.find((i) => {
+      const s = JSON.stringify(i).toLowerCase();
+      return s.includes(a.chave) || s.replace(/\D/g, "").includes(a.tel);
+    });
+    if (!item) continue;
+    const pid = acharChave(item, (k) => k === "phone_number_id" || k === "phoneNumberId") ?? acharChave(item, (k) => k === "id" || k === "_id");
+    if (!pid) continue;
+    const user = users.find((u) => `${u.nome} ${u.email}`.toLowerCase().includes(a.chave === "allan" ? "al" + "lan" : a.chave))
+      ?? users.find((u) => `${u.nome} ${u.email}`.toLowerCase().includes(a.chave === "allan" ? "alan" : a.chave));
+    const { data: existente } = await admin.from("whatsapp_instancias").select("id,webhook_token").eq("phone_number_id", pid).maybeSingle();
+    let row = existente;
+    if (!row) {
+      const ins = await admin.from("whatsapp_instancias").insert({ nome: a.nome, user_id: user?.id ?? null, phone_number_id: pid, telefone: "55" + a.tel, status: acharStatus(item) ?? "desconectado" }).select("id,webhook_token").single();
+      if (ins.error) throw new Error(ins.error.message);
+      row = ins.data;
+    }
+    await uzFetch(`/${pid}/instance/update`, { method: "PUT", body: {
+      webhook: `${WEBHOOK_BASE}/api/public/uzapi/webhook/${row!.webhook_token}`,
+      webhookEvents: { authentication: true, connection: true, group_messages: false, message_status: true, message_echoes: true, group_events: false, history: false },
+    } }).catch((e) => admin.from("whatsapp_instancias").update({ ultimo_erro: `Webhook: ${e instanceof Error ? e.message : e}` }).eq("id", row!.id));
+    importadas.push(a.nome);
+  }
+  return { importadas };
+});

@@ -11,7 +11,7 @@ import { Loader2, Plus, QrCode, RefreshCw, Smartphone, Trash2, Unplug } from "lu
 import { supabase } from "@/integrations/supabase/client";
 import { getEquipe, type MembroEquipe } from "@/lib/adminCache";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { acaoConexao, atualizarConexao, criarConexao } from "@/lib/uzapi.functions";
+import { acaoConexao, atualizarConexao, criarConexao, importarConexoesUnotalk } from "@/lib/uzapi.functions";
 import { toast } from "sonner";
 
 type Inst = { id: string; nome: string; user_id: string | null; telefone: string | null; status: string; qr_code: string | null; ultimo_erro: string | null };
@@ -99,7 +99,7 @@ export default function Conexoes() {
           <h2 className="text-xl font-bold">Conexões WhatsApp</h2>
           <p className="text-sm text-muted-foreground">Cada vendedor conecta o próprio número pelo QR Code. Toda a equipe pode atender por qualquer número.</p>
         </div>
-        {gestor && <Button onClick={() => setNovo(true)}><Plus className="h-4 w-4" /> Nova conexão</Button>}
+        {gestor && <div className="flex gap-2"><Button variant="outline" onClick={async () => { try { const r = await importarConexoesUnotalk(); toast.success(r.importadas.length ? `Importadas: ${r.importadas.join(", ")}` : "Nenhuma conexão da Amanda ou do Allan encontrada"); await carregar(); } catch (e) { toast.error(e instanceof Error ? e.message : "Falha ao importar"); } }}>Importar do UnoTalk</Button><Button onClick={() => setNovo(true)}><Plus className="h-4 w-4" /> Nova conexão</Button></div>}
       </div>
 
       {lista.length === 0 ? (
