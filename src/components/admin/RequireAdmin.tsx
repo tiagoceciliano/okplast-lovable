@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "@/lib/router-compat";
+import { useNavigate, useLocation } from "@/lib/router-compat";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -18,14 +18,17 @@ export function RequireAuth({ children, roles }: RequireAuthProps) {
   const [loading, setLoading] = useState(true);
   const [authorized, setAuthorized] = useState(false);
   const navigate = useNavigate();
+  const loc = useLocation();
 
   useEffect(() => {
     const allowed: AppRole[] = roles ?? ["admin", "gestor", "vendedor"];
 
     const checkAuth = async () => {
+      const q = loc.search.replace(/^\?+/, "?");
+      const destino = encodeURIComponent(loc.pathname + (q === "?" ? "" : q));
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        navigate("/admin/login", { replace: true });
+        navigate(`/admin/login?next=${destino}`, { replace: true });
         return;
       }
       const { data: userRoles } = await supabase
@@ -36,7 +39,7 @@ export function RequireAuth({ children, roles }: RequireAuthProps) {
       const has = (userRoles ?? []).some((r) => allowed.includes(r.role as AppRole));
       if (!has) {
         await supabase.auth.signOut();
-        navigate("/admin/login", { replace: true });
+        navigate(`/admin/login?next=${destino}`, { replace: true });
         return;
       }
       setAuthorized(true);
@@ -44,7 +47,10 @@ export function RequireAuth({ children, roles }: RequireAuthProps) {
     };
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_OUT") navigate("/admin/login", { replace: true });
+      if (event === "SIGNED_OUT") {
+        const q = loc.search.replace(/^\?+/, "?");
+        navigate(`/admin/login?next=${encodeURIComponent(loc.pathname + (q === "?" ? "" : q))}`, { replace: true });
+      }
     });
 
     checkAuth();

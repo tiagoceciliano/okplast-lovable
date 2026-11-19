@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "@/lib/router-compat";
+import { useNavigate, useSearchParams } from "@/lib/router-compat";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,24 @@ export default function AdminLogin() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const [sp] = useSearchParams();
+
+  // Volta para a página pedida antes do login (ex.: link direto do QR Code),
+  // aceitando só caminhos internos do /admin.
+  const destino = (() => {
+    const next = sp.get("next");
+    if (!next) return null;
+    try {
+      const u = new URL(next, window.location.origin);
+      const params = new URLSearchParams(u.search.replace(/^\?+/, ""));
+      const search = params.toString() ? `?${params.toString()}` : "";
+      return u.origin === window.location.origin && u.pathname.startsWith("/admin")
+        ? u.pathname + search
+        : null;
+    } catch {
+      return null;
+    }
+  })();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,7 +70,9 @@ export default function AdminLogin() {
     }
 
     // Vendedor vai direto para o Kanban; admin/gestor para o Dashboard
-    if (rolesList.includes("vendedor") && !rolesList.includes("admin") && !rolesList.includes("gestor")) {
+    if (destino) {
+      navigate(destino);
+    } else if (rolesList.includes("vendedor") && !rolesList.includes("admin") && !rolesList.includes("gestor")) {
       navigate("/admin/negociacoes");
     } else {
       navigate("/admin");
